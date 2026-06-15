@@ -78,14 +78,31 @@ function buildSearchParams(apiKey: string): URLSearchParams {
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
-  const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) return null;
+  const maxAttempts = 3;
 
-  try {
-    return (await response.json()) as T;
-  } catch {
-    return null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(url, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(20_000),
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        console.warn(`[VWorld] HTTP ${response.status} (attempt ${attempt}/${maxAttempts})`);
+        continue;
+      }
+
+      return (await response.json()) as T;
+    } catch (error) {
+      console.warn(`[VWorld] fetch attempt ${attempt}/${maxAttempts} failed:`, error);
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 400));
+      }
+    }
   }
+
+  return null;
 }
 
 /** 좌표 → PNU (연속지적도 필지 경계) */
