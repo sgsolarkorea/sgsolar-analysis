@@ -44,7 +44,11 @@ interface LandCharacteristicsResponse {
 }
 
 function getApiDomain(): string {
-  return process.env.VWORLD_API_DOMAIN?.trim() || "localhost:3000";
+  const configured = process.env.VWORLD_API_DOMAIN?.trim();
+  if (configured) return configured;
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl) return vercelUrl;
+  return "localhost:3000";
 }
 
 function getStdrYears(): string[] {
@@ -201,14 +205,14 @@ export async function getLandInfoByVworld(
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
   if (!apiKey) {
-    console.warn("[VWorld] VWORLD_API_KEY not configured — using sampleData fallback");
+    console.warn("[VWorld] VWORLD_API_KEY not configured — land info unavailable");
     return fallback;
   }
 
   try {
     const pnu = await fetchPnuByCoordinates(lat, lng, apiKey);
     if (!pnu) {
-      console.warn("[VWorld] PNU not found for coordinates — using sampleData fallback");
+      console.warn("[VWorld] PNU not found for coordinates — land info unavailable");
       return fallback;
     }
 
@@ -223,7 +227,7 @@ export async function getLandInfoByVworld(
       landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
     };
   } catch (error) {
-    console.error("[VWorld] API error — using sampleData fallback:", error);
+    console.error("[VWorld] API error — land info unavailable:", error);
     return fallback;
   }
 }

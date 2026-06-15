@@ -1,4 +1,4 @@
-import { DEFAULT_ADDRESS, result } from "@/data/sampleData";
+import { DEFAULT_ADDRESS } from "@/data/sampleData";
 import type { AddressSuggestion } from "@/types/address";
 import {
   KakaoAddressNotFoundError,
@@ -13,7 +13,7 @@ export interface KakaoAddressResult {
   jibunAddress: string;
   lat: number;
   lng: number;
-  pnu: string;
+  pnu: string | null;
   buildingName: string;
   zoneNo: string;
 }
@@ -142,7 +142,7 @@ export async function searchAddressByKakao(address: string): Promise<KakaoAddres
     jibunAddress,
     lat,
     lng,
-    pnu: result.pnu,
+    pnu: null,
     buildingName: doc.road_address?.building_name ?? "",
     zoneNo: doc.road_address?.zone_no ?? "",
   };
