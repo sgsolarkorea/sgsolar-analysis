@@ -41,8 +41,24 @@ interface KakaoAddressResponse {
   documents: KakaoAddressDocument[];
 }
 
+interface KakaoRegionDocument {
+  region_type: "B" | "H";
+  code: string;
+  address_name: string;
+}
+
+interface KakaoRegionResponse {
+  documents: KakaoRegionDocument[];
+}
+
 const KAKAO_ADDRESS_API = "https://dapi.kakao.com/v2/local/search/address.json";
+const KAKAO_COORD2REGION_API = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json";
 const SUGGESTION_LIMIT = 8;
+
+export interface LegalDongCodes {
+  sigunguCd: string;
+  bjdongCd: string;
+}
 
 function mapDocumentToSuggestion(doc: KakaoAddressDocument, index: number): AddressSuggestion {
   const roadAddress = doc.road_address?.address_name?.trim() || null;
@@ -95,6 +111,51 @@ async function fetchKakaoAddressDocuments(query: string): Promise<KakaoAddressDo
   }
 
   return data.documents ?? [];
+}
+
+async function fetchKakaoRegionDocuments(lat: number, lng: number): Promise<KakaoRegionDocument[]> {
+  const apiKey = process.env.KAKAO_REST_API_KEY;
+  if (!apiKey) return [];
+
+  const url = `${KAKAO_COORD2REGION_API}?x=${lng}&y=${lat}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: `KakaoAK ${apiKey}` },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.warn(`[Kakao] coord2region HTTP ${response.status}`);
+      return [];
+    }
+
+    const data = (await response.json()) as KakaoRegionResponse;
+    return data.documents ?? [];
+  } catch (error) {
+    console.warn("[Kakao] coord2region failed:", error);
+    return [];
+  }
+}
+
+/** 좌표 → 법정동코드 (시군구 5 + 법정동 5) */
+export async function fetchLegalDongCodesByCoord(
+  lat: number,
+  lng: number,
+): Promise<LegalDongCodes | null> {
+  const documents = await fetchKakaoRegionDocuments(lat, lng);
+  const legal = documents.find((doc) => doc.region_type === "B" && /^\d{10}$/.test(doc.code));
+
+  if (!legal) {
+    console.warn("[Kakao] Legal dong code not found for coordinates");
+    return null;
+  }
+
+  return {
+    sigunguCd: legal.code.slice(0, 5),
+    bjdongCd: legal.code.slice(5, 10),
+  };
 }
 
 /**

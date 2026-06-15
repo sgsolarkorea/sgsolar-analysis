@@ -81,6 +81,7 @@ function buildSearchParams(apiKey: string, domain: string): URLSearchParams {
     key: apiKey,
     format: "json",
     domain,
+    version: "2.0",
   });
 }
 

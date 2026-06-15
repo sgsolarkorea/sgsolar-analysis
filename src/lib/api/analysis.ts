@@ -5,8 +5,10 @@
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
-import { searchAddressByKakao } from "@/lib/api/kakao";
+import { parseJibunLot } from "@/lib/api/jibunParser";
+import { fetchLegalDongCodesByCoord, searchAddressByKakao } from "@/lib/api/kakao";
 import { getMarketPrice } from "@/lib/api/market";
+import { buildPnu } from "@/lib/api/pnu";
 import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/recommendCases";
 import { getLandInfoByVworld } from "@/lib/api/vworld";
 import {
@@ -95,12 +97,39 @@ export async function getRecommendedCases(
   return recommendConstructionCases(input, cases);
 }
 
+async function resolvePnuForBuildingLookup(
+  geo: Awaited<ReturnType<typeof searchAddressByKakao>>,
+  vworldPnu: string | null,
+): Promise<string | null> {
+  if (vworldPnu) return vworldPnu;
+
+  const lot = parseJibunLot(geo.jibunAddress);
+  const legalDong = await fetchLegalDongCodesByCoord(geo.lat, geo.lng);
+
+  if (!lot || !legalDong) {
+    console.warn("[Analysis] PNU fallback unavailable — missing jibun lot or legal dong code");
+    return null;
+  }
+
+  const pnu = buildPnu({
+    sigunguCd: legalDong.sigunguCd,
+    bjdongCd: legalDong.bjdongCd,
+    platGbCd: lot.platGbCd,
+    bun: lot.bun,
+    ji: lot.ji,
+  });
+
+  console.info("[Analysis] PNU resolved via Kakao coord + jibun fallback");
+  return pnu;
+}
+
 export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const geo = await searchAddressByKakao(address);
   const landResult = await getLandInfoByVworld(geo.lat, geo.lng);
+  const pnu = await resolvePnuForBuildingLookup(geo, landResult.pnu);
 
   const buildingInfo = await getBuildingInfo({
-    pnu: landResult.pnu ?? geo.pnu,
+    pnu,
     buildingName: geo.buildingName,
   });
 
@@ -145,7 +174,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   return {
     address: geo.address,
     jibunAddress: geo.jibunAddress,
-    pnu: landResult.pnu ?? geo.pnu ?? "",
+    pnu: pnu ?? "",
     lat: geo.lat,
     lng: geo.lng,
     buildingName: geo.buildingName,
