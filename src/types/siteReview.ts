@@ -36,6 +36,7 @@ export interface OrdinanceItem {
 }
 
 export interface Profitability {
+  estimatedCapacity?: string;
   estimatedInstallCost: string;
   annualGeneration: string;
   smpRevenue: string;

@@ -2,7 +2,7 @@ import { MARKETING_NAME } from "@/data/sampleData";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 const reasons = [
-  "500건 이상 시공사례 보유",
+  "다양한 현장 조건에 맞춘 태양광 설계·시공 경험 보유",
   "현장 조건별 맞춤 설계",
   "태양광 설치·상담·시공 연계",
   "전국 시공 및 상담 가능",

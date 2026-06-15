@@ -8,6 +8,7 @@ export interface ProgressStepConfig {
   description: string;
 }
 
+/** 페이지 섹션 순서와 동일하게 유지 */
 export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   {
     id: "address-check",
@@ -15,6 +16,20 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     statusLabel: "완료",
     statusKind: "complete",
     description: "카카오 주소검색 완료",
+  },
+  {
+    id: "site-location",
+    label: "입지 위치",
+    statusLabel: "완료",
+    statusKind: "complete",
+    description: "카카오 지도 위치 확인",
+  },
+  {
+    id: "site-overview",
+    label: "입지 분석 개요",
+    statusLabel: "완료",
+    statusKind: "complete",
+    description: "추천 유형·시공비 개요",
   },
   {
     id: "land-info",
@@ -31,11 +46,18 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     description: "건축물대장 조회 완료",
   },
   {
-    id: "install-type",
-    label: "설치유형",
+    id: "capacity-analysis",
+    label: "설치용량 분석",
     statusLabel: "검토완료",
     statusKind: "reviewed",
-    description: "지붕형/토지형 가능성 분석",
+    description: "640W 모듈 기준 용량 산정",
+  },
+  {
+    id: "generation",
+    label: "예상 발전량",
+    statusLabel: "참고",
+    statusKind: "reference",
+    description: "월별·연간 발전량 참고",
   },
   {
     id: "revenue",
@@ -49,7 +71,14 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     label: "계통 연계",
     statusLabel: "확인필요",
     statusKind: "caution",
-    description: "한전 접수 전 확인 필요",
+    description: "한전 접수 전 별도 확인 필요",
+  },
+  {
+    id: "cases",
+    label: "유사 시공사례",
+    statusLabel: "완료",
+    statusKind: "complete",
+    description: "유사 현장 시공사례 추천",
   },
   {
     id: "consultation",

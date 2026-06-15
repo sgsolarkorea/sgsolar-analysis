@@ -78,7 +78,6 @@ export default function InstallTypeSelector({
           <strong className="text-navy">
             {metrics.capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW
           </strong>
-          <span className="ml-2 text-xs text-slate-500">({metrics.formula})</span>
         </p>
         <p className="mt-2 text-xs text-slate-500">API 분석 기준 참고: {apiRecommendation}</p>
       </div>

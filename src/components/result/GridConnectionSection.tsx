@@ -21,12 +21,12 @@ export default function GridConnectionSection({
   return (
     <section id="grid" className="scroll-mt-24">
       <SectionHeader
-        title="계통 연계 여유"
-        description="한국전력 계통 연계 1차 검토 결과입니다."
+        title="한전 계통 연계는 접수 전 별도 확인이 필요합니다."
+        description="위치 기반 1차 검토 결과입니다."
       />
       <div className="card-premium overflow-hidden">
-        <div className="border-b border-emerald-200 bg-emerald-50 px-5 py-3">
-          <p className="text-sm font-semibold text-emerald-900">
+        <div className="border-b border-amber-200 bg-amber-50 px-5 py-3">
+          <p className="text-sm font-semibold text-amber-900">
             상태: {gridInfo.statusMessage}
           </p>
         </div>

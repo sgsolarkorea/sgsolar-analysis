@@ -35,7 +35,7 @@ export const REVENUE_DISCLAIMER =
   "본 수익성 분석은 참고용이며 실제 발전량, REC 가격, SMP 가격, 가중치, 금융조건에 따라 달라질 수 있습니다.";
 
 export const GRID_DISCLAIMER =
-  "실제 계통연계 가능 여부는 한국전력 접수 및 기술검토 결과에 따라 달라질 수 있습니다.";
+  "본 결과는 위치 기반 1차 검토이며, 실제 계통 연계 가능 여부는 한전 접수 및 선로 용량 확인 후 확정됩니다.";
 
 export const REVENUE_WARNING =
   "예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.";
@@ -273,7 +273,7 @@ export const result: Omit<
   lat: 37.3947,
   lng: 127.1112,
   grade: "A",
-  recommendation: "옥상형 (경사 5° 고정형)",
+  recommendation: "옥상형 (경사 12° 고정형)",
   capacity: "99.4kW",
   annualGeneration: "128,400kWh/년",
   annualRevenue: "약 1,820만원",
@@ -293,7 +293,6 @@ export const result: Omit<
     { label: "건축면적", value: "820㎡", status: "상담 시 확인" },
     { label: "연면적", value: "3,280㎡", status: "상담 시 확인" },
     { label: "지상층수", value: "4층", status: "상담 시 확인" },
-    { label: "지하층수", value: "1층", status: "상담 시 확인" },
     { label: "사용승인일", value: "2014.05.30", status: "상담 시 확인" },
     { label: "지붕형태", value: "슬래브", status: "추가 확인 필요" },
   ],
@@ -301,9 +300,9 @@ export const result: Omit<
     kepcoBranch: "한국전력 성남지사",
     nearbySubstation: "판교 변전소 (154kV)",
     distributionLine: "22.9kV 배전선로 인근",
-    connectionPossibility: "1차 검토상 연계 가능성 있음",
+    connectionPossibility: "한전 접수 및 선로 용량 확인 필요",
     additionalReviewRequired: "한전 기술검토 및 잔여용량 확인 필요",
-    statusMessage: "1차 검토상 연계 가능성 있음",
+    statusMessage: "확인필요",
   },
   ordinanceInfo: [
     {

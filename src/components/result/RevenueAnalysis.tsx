@@ -14,29 +14,18 @@ export default function RevenueAnalysis({
   revenueWarning,
 }: RevenueAnalysisProps) {
   const rows = [
+    { label: "예상 설치용량", value: profitability.estimatedCapacity ?? "—" },
+    { label: "예상 발전량", value: profitability.annualGeneration },
     { label: "SMP 단가", value: profitability.smpPrice ?? "—" },
-    { label: "SMP 기준일", value: profitability.smpDate ?? "—" },
     { label: "REC 단가", value: profitability.recPrice ?? "—" },
-    { label: "REC 기준일", value: profitability.recDate ?? "—" },
-    { label: "데이터 출처", value: profitability.marketSource ?? "—" },
-    {
-      label: "Fallback 사용",
-      value: profitability.marketFallback ? "예 (설정값)" : "아니오 (실시간)",
-    },
     { label: "REC 가중치", value: profitability.recWeight ?? "—", highlight: true },
-    { label: "REC 가중치 사유", value: profitability.recWeightReason ?? "—" },
-    { label: "예상 설치비", value: profitability.estimatedInstallCost },
-    { label: "시공 단가", value: profitability.constructionCostPerKw ?? "—" },
-    { label: "예상 연간 발전량", value: profitability.annualGeneration },
-    { label: "예상 SMP 수익", value: profitability.smpRevenue },
-    { label: "예상 REC 수익", value: profitability.recRevenue },
-    { label: "예상 총수익 (연)", value: profitability.totalRevenue, highlight: true },
+    { label: "예상 연매출", value: profitability.totalRevenue, highlight: true },
+    { label: "예상 시공비", value: profitability.estimatedInstallCost },
     {
-      label: "예상 20년 누적매출",
+      label: "20년 단순 누적매출",
       value: profitability.cumulative20YearRevenue ?? "—",
       highlight: true,
     },
-    { label: "단순 회수기간", value: profitability.paybackPeriod, highlight: true },
   ];
 
   return (

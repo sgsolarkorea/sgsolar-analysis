@@ -21,38 +21,45 @@ const STATUS_STYLES: Record<ProgressStatusKind, string> = {
   error: "bg-red-50 text-red-800 border-red-200",
 };
 
+const HEADER_OFFSET = 120;
+
+function resolveActiveSection(): string {
+  const sectionIds = ANALYSIS_PROGRESS_STEPS.map((step) => step.id);
+  const scrollBottom = window.scrollY + window.innerHeight;
+  const docHeight = document.documentElement.scrollHeight;
+
+  if (docHeight - scrollBottom < 96) {
+    return sectionIds[sectionIds.length - 1] ?? "";
+  }
+
+  let activeId = sectionIds[0] ?? "";
+
+  for (const id of sectionIds) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const top = el.getBoundingClientRect().top;
+    if (top <= HEADER_OFFSET + 48) {
+      activeId = id;
+    }
+  }
+
+  return activeId;
+}
+
 export default function AnalysisProgressPanel() {
   const [activeId, setActiveId] = useState(ANALYSIS_PROGRESS_STEPS[0]?.id ?? "");
 
   useEffect(() => {
-    const sectionIds = ANALYSIS_PROGRESS_STEPS.map((step) => step.id);
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el));
+    const update = () => setActiveId(resolveActiveSection());
+    update();
 
-    if (elements.length === 0) return;
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (visible[0]?.target.id) {
-          setActiveId(visible[0].target.id);
-        }
-      },
-      {
-        rootMargin: "-20% 0px -55% 0px",
-        threshold: [0.1, 0.25, 0.5],
-      },
-    );
-
-    for (const element of elements) {
-      observer.observe(element);
-    }
-
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   return (

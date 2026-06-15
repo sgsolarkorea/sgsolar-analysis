@@ -27,7 +27,7 @@ function openLink(url: string) {
 
 export default function SimilarCases({ cases }: SimilarCasesProps) {
   return (
-    <section id="cases">
+    <section id="cases" className="scroll-mt-24">
       <SectionHeader
         title="유사 시공사례"
         description={`${MARKETING_NAME} 시공사례 중 유사한 유형의 현장을 추천합니다.`}

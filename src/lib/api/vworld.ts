@@ -146,13 +146,12 @@ function formatUseZone(field: LandCharacteristicsField): string {
 }
 
 function mapCharacteristicsToLandInfo(
-  pnu: string,
+  _pnu: string,
   field: LandCharacteristicsField,
 ): InfoField[] {
   const useZone = formatUseZone(field);
 
   return [
-    { label: "PNU(고유번호)", value: pnu, status: "상담 시 확인" },
     {
       label: "지목",
       value: field.lndcgrCodeNm?.trim() || "확인 필요",
@@ -181,11 +180,8 @@ function mapCharacteristicsToLandInfo(
   ];
 }
 
-function buildPnuOnlyLandInfo(pnu: string): InfoField[] {
-  return [
-    { label: "PNU(고유번호)", value: pnu, status: "상담 시 확인" },
-    ...result.landInfo.filter((item) => item.label !== "PNU(고유번호)"),
-  ];
+function buildPnuOnlyLandInfo(_pnu: string): InfoField[] {
+  return result.landInfo.filter((item) => item.label !== "PNU(고유번호)");
 }
 
 /**

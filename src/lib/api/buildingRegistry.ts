@@ -213,11 +213,6 @@ function mapBuildingToFields(item: BuildingTitleItem): InfoField[] {
       status: "상담 시 확인",
     },
     {
-      label: "지하층수",
-      value: formatFloorCount(pickField(item, "ugrndFlrCnt", "ugrnd_flr_cnt")),
-      status: "상담 시 확인",
-    },
-    {
       label: "사용승인일",
       value: formatUseApprovalDate(pickField(item, "useAprDay", "use_aprv_date")),
       status: "상담 시 확인",

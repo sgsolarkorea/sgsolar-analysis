@@ -1,9 +1,10 @@
 import {
-  constructionCostByType,
+  areaPerKwByType,
   disclaimer,
   modulePowerW,
   monthlyGenerationWeights,
   recWeightTable,
+  resolveConstructionCostPerKw,
   type SolarInstallCategory,
   yearlyGenerationPerKw,
 } from "@/data/solarConfig";
@@ -114,7 +115,7 @@ export interface CalculateSolarOutput {
 
 export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSolarOutput {
   const category = installTypeToCategory(input.installType);
-  const areaPerKw = constructionCostByType.areaPerKw[category];
+  const areaPerKw = areaPerKwByType[category];
   const isLand = category === "land";
 
   const buildingArea = parseAreaSqm(getFieldValue(input.buildingInfo, "건축면적"));
@@ -128,16 +129,24 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
 
   const { weight: recWeight, reason: recWeightReason } = resolveRecWeight(category, capacityKw);
 
-  const annualGenerationKwh = capacityKw * yearlyGenerationPerKw;
-  // SMP: 원/kWh × kWh
+  const annualGenerationKwh = Math.round(capacityKw * yearlyGenerationPerKw);
+
+  /**
+   * SMP 수익 = 연간 발전량(kWh) × SMP 단가(원/kWh)
+   */
   const smpRevenueWon = annualGenerationKwh * input.market.smpPrice;
-  // REC: (kWh ÷ 1000) × 원/MWh × 가중치 — REC 단위: 원/MWh (1 REC = 1,000 kWh)
+
+  /**
+   * REC 수익 = 연간 발전량(kWh) ÷ 1,000 × REC 단가(원/MWh, 1 REC = 1,000 kWh) × REC 가중치
+   */
   const recRevenueWon = (annualGenerationKwh / 1000) * input.market.recPrice * recWeight;
+
+  /** 총 연매출 = SMP 수익 + REC 수익 */
   const totalRevenueWon = smpRevenueWon + recRevenueWon;
   const revenue20YearWon = totalRevenueWon * 20;
 
-  const constructionCostPerKw = constructionCostByType.baseCostPerKw;
-  const constructionCostWon = capacityKw * constructionCostPerKw;
+  const constructionCostPerKw = resolveConstructionCostPerKw(capacityKw);
+  const constructionCostWon = Math.round(capacityKw * constructionCostPerKw);
   const paybackYears =
     totalRevenueWon > 0 ? Math.round((constructionCostWon / totalRevenueWon) * 10) / 10 : 0;
 
@@ -160,10 +169,28 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     "11월",
     "12월",
   ];
-  const monthlyGeneration: MonthlyGeneration[] = monthLabels.map((month, i) => ({
+
+  const weightSum = monthlyGenerationWeights.reduce((sum, w) => sum + w, 0);
+  const monthlyRaw = monthLabels.map((month, i) => ({
     month,
-    kwh: Math.round(annualGenerationKwh * (monthlyGenerationWeights[i] ?? 0)),
+    kwh: annualGenerationKwh * ((monthlyGenerationWeights[i] ?? 0) / weightSum),
   }));
+  const monthlyGeneration: MonthlyGeneration[] = monthlyRaw.map((item) => ({
+    month: item.month,
+    kwh: Math.round(item.kwh),
+  }));
+  const monthlySum = monthlyGeneration.reduce((sum, item) => sum + item.kwh, 0);
+  const monthlyDiff = annualGenerationKwh - monthlySum;
+  if (monthlyDiff !== 0 && monthlyGeneration.length > 0) {
+    const peakIndex = monthlyRaw.reduce(
+      (best, item, index) => (item.kwh > monthlyRaw[best].kwh ? index : best),
+      0,
+    );
+    monthlyGeneration[peakIndex] = {
+      ...monthlyGeneration[peakIndex],
+      kwh: monthlyGeneration[peakIndex].kwh + monthlyDiff,
+    };
+  }
 
   const metrics: SolarMetrics = {
     installType: input.installType,
@@ -188,13 +215,13 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     constructionCostPerKw,
     constructionCostWon,
     constructionDisclaimer: disclaimer.construction,
-    separateWorkNote:
-      "구조보강, 토목공사, 한전 인입, 감리, 안전관리, 구조검토, 기타 현장 특이사항은 별도 견적입니다.",
+    separateWorkNote: disclaimer.constructionExtra,
     paybackYears,
     recUnitNote: disclaimer.recUnit,
   };
 
   const profitability: Profitability = {
+    estimatedCapacity: formatKw(capacityKw),
     estimatedInstallCost: formatWon(constructionCostWon),
     annualGeneration: formatKwh(annualGenerationKwh),
     smpRevenue: formatWonPerYear(smpRevenueWon),
@@ -210,7 +237,6 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     marketSource: input.market.source,
     marketFallback: input.market.isFallback,
     cumulative20YearRevenue: formatWon(revenue20YearWon),
-    constructionCostPerKw: `${constructionCostPerKw.toLocaleString("ko-KR")}원/kW`,
     separateWorkNote: metrics.separateWorkNote,
   };
 
