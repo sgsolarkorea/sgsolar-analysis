@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { sendConsultationEmail } from "@/lib/consultation/email";
-import { saveConsultation } from "@/lib/consultation/storage";
+import {
+  createConsultationSubmission,
+  trySaveConsultation,
+} from "@/lib/consultation/storage";
 import { validateConsultationBody } from "@/lib/consultation/validate";
 
 export async function POST(request: Request) {
@@ -12,24 +15,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
-    const saved = await saveConsultation(validated.data);
+    const submission = createConsultationSubmission(validated.data);
 
-    try {
-      await sendConsultationEmail(saved, validated.data.resultPageUrl);
-    } catch (emailError) {
-      console.error("[Consultation] Email notification failed:", emailError);
+    const storage = await trySaveConsultation(submission);
+    if (!storage.saved) {
+      console.warn("[Consultation] JSON storage skipped or failed — continuing with email");
     }
+
+    const emailResult = await sendConsultationEmail(submission, validated.data.resultPageUrl);
 
     return NextResponse.json({
       ok: true,
-      id: saved.id,
-      submittedAt: saved.submittedAt,
+      id: submission.id,
+      submittedAt: submission.submittedAt,
+      emailSent: emailResult.sent,
+      autoReplySent: emailResult.autoReplySent,
+      jsonSaved: storage.saved,
     });
   } catch (error) {
-    console.error("[Consultation] Save failed:", error);
-    return NextResponse.json(
-      { error: "상담 신청 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." },
-      { status: 500 },
-    );
+    console.error("[Consultation] Submission failed:", error);
+    const message =
+      error instanceof Error && error.message.includes("SMTP")
+        ? error.message
+        : "상담 신청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

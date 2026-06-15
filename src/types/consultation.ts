@@ -2,6 +2,7 @@ export interface ConsultationAnalysisContext {
   jibunAddress?: string;
   landCategory?: string;
   zoning?: string;
+  landArea?: string;
   buildingArea?: string;
   installType?: string;
   capacity?: string;

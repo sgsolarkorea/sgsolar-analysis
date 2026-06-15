@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
-import type { ConsultationSubmission } from "@/types/consultation";
+import type { ConsultationAnalysisContext, ConsultationSubmission } from "@/types/consultation";
 
 interface SmtpConfig {
   host: string;
@@ -47,83 +47,74 @@ function formatInstallTypeLabel(value: string): string {
   return value.trim() || "선택";
 }
 
-function analysisContextLines(submission: ConsultationSubmission): string[] {
-  const ctx = submission.analysisContext;
-  if (!ctx) return [];
+function displayValue(value: string | undefined, fallback = "(미입력)"): string {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
+interface StaffEmailRow {
+  label: string;
+  value: string;
+}
+
+function buildStaffEmailRows(
+  submission: ConsultationSubmission,
+  resultPageUrl?: string,
+): StaffEmailRow[] {
+  const ctx: ConsultationAnalysisContext = submission.analysisContext ?? {};
+  const pageUrl = resultPageUrl?.trim() || submission.resultPageUrl?.trim() || "";
 
   return [
-    "",
-    "--- 입지검토 요약 ---",
-    ctx.jibunAddress ? `지번주소: ${ctx.jibunAddress}` : "",
-    ctx.landCategory ? `지목: ${ctx.landCategory}` : "",
-    ctx.zoning ? `용도지역: ${ctx.zoning}` : "",
-    ctx.buildingArea ? `건축면적: ${ctx.buildingArea}` : "",
-    ctx.installType ? `설치유형: ${ctx.installType}` : "",
-    ctx.capacity ? `예상 설치용량: ${ctx.capacity}` : "",
-    ctx.annualGeneration ? `예상 발전량: ${ctx.annualGeneration}` : "",
-    ctx.annualRevenue ? `예상 연매출: ${ctx.annualRevenue}` : "",
-  ].filter(Boolean);
+    { label: "신청일시", value: formatSubmittedAtKst(submission.submittedAt) },
+    { label: "이름", value: submission.name },
+    { label: "연락처", value: submission.phone },
+    { label: "이메일", value: displayValue(submission.email) },
+    { label: "주소", value: submission.address },
+    { label: "설치유형", value: formatInstallTypeLabel(submission.installType) },
+    { label: "문의내용", value: submission.message || "(없음)" },
+    { label: "지목", value: displayValue(ctx.landCategory, "확인 필요") },
+    { label: "용도지역", value: displayValue(ctx.zoning, "확인 필요") },
+    { label: "토지면적", value: displayValue(ctx.landArea, "확인 필요") },
+    { label: "건축면적", value: displayValue(ctx.buildingArea, "확인 필요") },
+    { label: "예상 설치용량", value: displayValue(ctx.capacity, "별도 확인") },
+    { label: "예상 발전량", value: displayValue(ctx.annualGeneration, "별도 확인") },
+    { label: "예상 연매출", value: displayValue(ctx.annualRevenue, "별도 확인") },
+    { label: "결과페이지 URL", value: pageUrl || "(미제공)" },
+    ...(ctx.jibunAddress ? [{ label: "지번주소", value: ctx.jibunAddress }] : []),
+    { label: "접수 ID", value: submission.id },
+  ];
 }
 
 function buildStaffEmailContent(
   submission: ConsultationSubmission,
   resultPageUrl?: string,
 ): { subject: string; text: string; html: string } {
-  const submittedAt = formatSubmittedAtKst(submission.submittedAt);
-  const resultUrl = resultPageUrl?.trim() || "(미제공)";
-  const message = submission.message || "(없음)";
-  const email = submission.email || "(미입력)";
+  const rows = buildStaffEmailRows(submission, resultPageUrl);
+  const pageUrl = resultPageUrl?.trim() || submission.resultPageUrl?.trim() || "";
 
-  const lines = [
-    `신청일시: ${submittedAt}`,
-    `이름: ${submission.name}`,
-    `연락처: ${submission.phone}`,
-    `이메일: ${email}`,
-    `주소: ${submission.address}`,
-    `설치유형: ${formatInstallTypeLabel(submission.installType)}`,
-    `문의내용: ${message}`,
-    `결과 페이지: ${resultUrl}`,
-    `접수 ID: ${submission.id}`,
-    ...analysisContextLines(submission),
-  ];
+  const text = [
+    "[SG SOLAR] 새 상담 신청",
+    "",
+    ...rows.map((row) => `${row.label}: ${row.value}`),
+  ].join("\n");
 
-  const text = [`[SG SOLAR] 새 상담 신청`, "", ...lines].join("\n");
-
-  const ctx = submission.analysisContext;
-  const ctxHtml = ctx
-    ? `
-      <h3>입지검토 요약</h3>
-      <table cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
-        ${ctx.jibunAddress ? `<tr><td><strong>지번주소</strong></td><td>${ctx.jibunAddress}</td></tr>` : ""}
-        ${ctx.landCategory ? `<tr><td><strong>지목</strong></td><td>${ctx.landCategory}</td></tr>` : ""}
-        ${ctx.zoning ? `<tr><td><strong>용도지역</strong></td><td>${ctx.zoning}</td></tr>` : ""}
-        ${ctx.buildingArea ? `<tr><td><strong>건축면적</strong></td><td>${ctx.buildingArea}</td></tr>` : ""}
-        ${ctx.installType ? `<tr><td><strong>설치유형</strong></td><td>${ctx.installType}</td></tr>` : ""}
-        ${ctx.capacity ? `<tr><td><strong>예상 설치용량</strong></td><td>${ctx.capacity}</td></tr>` : ""}
-        ${ctx.annualGeneration ? `<tr><td><strong>예상 발전량</strong></td><td>${ctx.annualGeneration}</td></tr>` : ""}
-        ${ctx.annualRevenue ? `<tr><td><strong>예상 연매출</strong></td><td>${ctx.annualRevenue}</td></tr>` : ""}
-      </table>
-    `
-    : "";
+  const htmlRows = rows
+    .map((row) => {
+      const value =
+        row.label === "결과페이지 URL" && pageUrl
+          ? `<a href="${pageUrl}">${pageUrl}</a>`
+          : row.label === "문의내용"
+            ? row.value.replace(/\n/g, "<br>")
+            : row.value;
+      return `<tr><td><strong>${row.label}</strong></td><td>${value}</td></tr>`;
+    })
+    .join("");
 
   const html = `
     <h2>SG SOLAR 새 상담 신청</h2>
     <table cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
-      <tr><td><strong>신청일시</strong></td><td>${submittedAt}</td></tr>
-      <tr><td><strong>이름</strong></td><td>${submission.name}</td></tr>
-      <tr><td><strong>연락처</strong></td><td>${submission.phone}</td></tr>
-      <tr><td><strong>이메일</strong></td><td>${email}</td></tr>
-      <tr><td><strong>주소</strong></td><td>${submission.address}</td></tr>
-      <tr><td><strong>설치유형</strong></td><td>${formatInstallTypeLabel(submission.installType)}</td></tr>
-      <tr><td><strong>문의내용</strong></td><td>${message.replace(/\n/g, "<br>")}</td></tr>
-      <tr><td><strong>결과 페이지</strong></td><td>${
-        resultPageUrl?.trim()
-          ? `<a href="${resultPageUrl}">${resultPageUrl}</a>`
-          : "(미제공)"
-      }</td></tr>
-      <tr><td><strong>접수 ID</strong></td><td>${submission.id}</td></tr>
+      ${htmlRows}
     </table>
-    ${ctxHtml}
   `.trim();
 
   return {
@@ -175,11 +166,10 @@ function buildCustomerAutoReply(submission: ConsultationSubmission): {
 export async function sendConsultationEmail(
   submission: ConsultationSubmission,
   resultPageUrl?: string,
-): Promise<{ sent: boolean; autoReplySent: boolean; reason?: string }> {
+): Promise<{ sent: boolean; autoReplySent: boolean }> {
   const config = getSmtpConfig();
   if (!config) {
-    console.warn("[Consultation] SMTP not configured — email skipped, JSON saved.");
-    return { sent: false, autoReplySent: false, reason: "smtp_not_configured" };
+    throw new Error("SMTP 설정이 되어 있지 않아 상담 이메일을 발송할 수 없습니다.");
   }
 
   const transporter = nodemailer.createTransport({
@@ -194,29 +184,37 @@ export async function sendConsultationEmail(
 
   const staff = buildStaffEmailContent(submission, resultPageUrl);
 
-  await transporter.sendMail({
-    from: `"SG SOLAR 상담신청" <${config.user}>`,
-    to: config.receiver,
-    subject: staff.subject,
-    text: staff.text,
-    html: staff.html,
-  });
-
-  console.info(`[Consultation] Notification email sent to ${config.receiver}`);
+  try {
+    await transporter.sendMail({
+      from: `"SG SOLAR 상담신청" <${config.user}>`,
+      to: config.receiver,
+      subject: staff.subject,
+      text: staff.text,
+      html: staff.html,
+    });
+    console.info(`[Consultation] Notification email sent to ${config.receiver}`);
+  } catch (error) {
+    console.error("[Consultation] Staff notification email failed:", error);
+    throw new Error("SMTP 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+  }
 
   let autoReplySent = false;
   const customerEmail = submission.email?.trim();
   if (customerEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
-    const autoReply = buildCustomerAutoReply(submission);
-    await transporter.sendMail({
-      from: `"${MARKETING_NAME}" <${config.user}>`,
-      to: customerEmail,
-      subject: autoReply.subject,
-      text: autoReply.text,
-      html: autoReply.html,
-    });
-    autoReplySent = true;
-    console.info(`[Consultation] Auto-reply sent to ${customerEmail}`);
+    try {
+      const autoReply = buildCustomerAutoReply(submission);
+      await transporter.sendMail({
+        from: `"${MARKETING_NAME}" <${config.user}>`,
+        to: customerEmail,
+        subject: autoReply.subject,
+        text: autoReply.text,
+        html: autoReply.html,
+      });
+      autoReplySent = true;
+      console.info(`[Consultation] Auto-reply sent to ${customerEmail}`);
+    } catch (error) {
+      console.warn("[Consultation] Customer auto-reply failed (staff email sent):", error);
+    }
   }
 
   return { sent: true, autoReplySent };

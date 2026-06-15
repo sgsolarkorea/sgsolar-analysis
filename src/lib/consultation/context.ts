@@ -7,6 +7,7 @@ export function buildConsultationContext(data: ResolvedSiteReview): Consultation
     jibunAddress: data.jibunAddress,
     landCategory: getFieldValue(data.landInfo, "지목"),
     zoning: getFieldValue(data.landInfo, "용도지역"),
+    landArea: getFieldValue(data.landInfo, "면적"),
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
     installType: data.solarMetrics.installType,
     capacity: data.capacity,
