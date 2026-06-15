@@ -1,4 +1,6 @@
 import type { ProgressStatusKind } from "@/components/result/AnalysisProgressPanel";
+import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
+import type { InfoField } from "@/types/siteReview";
 
 export interface ProgressStepConfig {
   id: string;
@@ -109,12 +111,65 @@ export const INSTALL_TYPE_UI_MESSAGES: Record<InstallTypeOption, string> = {
   "아직 모름": "현장 조건 확인 후 적합한 설치 유형을 안내드립니다.",
 };
 
-export function inferDefaultInstallType(recommendation: string): InstallTypeOption {
+export function hasBuildingRecord(buildingInfo: InfoField[]): boolean {
+  const buildingUse = getFieldValue(buildingInfo, "건물 용도");
+  const buildingArea = getFieldValue(buildingInfo, "건축면적");
+
+  return (
+    (buildingUse !== "" && buildingUse !== "확인 필요") ||
+    (buildingArea !== "" && buildingArea !== "확인 필요")
+  );
+}
+
+/**
+ * 기본 설치유형 산정
+ * - 건축물(건축면적/용도)이 있으면 지붕형 우선
+ * - 건축면적 없고 토지면적만 있으면 토지형
+ * - 토지형은 명시적 추천·토지만 있을 때 적용
+ */
+export function resolveDefaultInstallType(
+  recommendation: string,
+  landInfo: InfoField[],
+  buildingInfo: InfoField[],
+): InstallTypeOption {
+  const buildingArea = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
+  const landArea = parseAreaSqm(getFieldValue(landInfo, "면적"));
+  const hasBuilding = hasBuildingRecord(buildingInfo);
   const text = recommendation.toLowerCase();
+
   if (text.includes("축사")) return "축사형";
-  if (text.includes("토지")) return "토지형";
-  if (text.includes("상가") || text.includes("근린")) return "상가형";
   if (text.includes("공장")) return "공장형";
+  if (text.includes("상가") || text.includes("근린")) return "상가형";
+
+  if (buildingArea != null && buildingArea > 0) return "지붕형";
+  if (hasBuilding) return "지붕형";
+
+  if (text.includes("토지") && (landArea != null && landArea > 0)) return "토지형";
+  if (landArea != null && landArea > 0 && !hasBuilding) return "토지형";
+
   if (text.includes("옥상") || text.includes("지붕")) return "지붕형";
   return "아직 모름";
+}
+
+/** @deprecated resolveDefaultInstallType 사용 */
+export function inferDefaultInstallType(recommendation: string): InstallTypeOption {
+  return resolveDefaultInstallType(recommendation, [], []);
+}
+
+export function deriveSiteRecommendation(
+  installType: InstallTypeOption,
+  buildingInfo: InfoField[],
+): string {
+  const buildingUse = getFieldValue(buildingInfo, "건물 용도");
+
+  if (installType === "토지형") return "토지형 (경사 12° 고정형)";
+  if (installType === "축사형") return "축사형 (경사 12° 고정형)";
+  if (installType === "공장형") return "공장형 (경사 12° 고정형)";
+  if (installType === "상가형") return "상가형 (경사 12° 고정형)";
+
+  if (buildingUse.includes("단독") || buildingUse.includes("주택")) {
+    return "지붕형 (경사 12° 고정형)";
+  }
+
+  return "옥상형 (경사 12° 고정형)";
 }

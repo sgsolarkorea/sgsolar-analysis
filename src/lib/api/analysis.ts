@@ -3,7 +3,7 @@
  */
 
 import { getTodayString, result } from "@/data/sampleData";
-import { inferDefaultInstallType } from "@/data/resultUx";
+import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
 import { searchAddressByKakao } from "@/lib/api/kakao";
 import { getMarketPrice } from "@/lib/api/market";
@@ -16,6 +16,7 @@ import {
   formatGenerationDisplay,
   formatRevenueDisplay,
 } from "@/lib/solar/calculate";
+import { deriveGradeFromCapacity } from "@/lib/solar/grade";
 import type {
   Grade,
   GridInfo,
@@ -49,17 +50,18 @@ export async function getGridInfo(lat: number, lng: number): Promise<GridInfo> {
 }
 
 function deriveGrade(capacityKw: number): Grade {
-  if (capacityKw >= 50) return "A";
-  if (capacityKw >= 20) return "B";
-  if (capacityKw >= 5) return "C";
-  return "D";
+  return deriveGradeFromCapacity(capacityKw);
 }
 
 export async function calculateSolarProfitability(
   input: ProfitabilityInput,
 ): Promise<{ profitability: Profitability; solarMetrics: SolarMetrics; monthlyGeneration: ReturnType<typeof calculateSolarMetrics>["monthlyGeneration"] }> {
   const market = await getMarketPrice();
-  const installType = inferDefaultInstallType(input.recommendation);
+  const installType = resolveDefaultInstallType(
+    input.recommendation,
+    input.landInfo,
+    input.buildingInfo,
+  );
 
   const calc = calculateSolarMetrics({
     installType,
@@ -105,13 +107,18 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
 
   const { profitability, solarMetrics, monthlyGeneration } = solarResult;
 
+  const recommendation = deriveSiteRecommendation(
+    solarMetrics.installType as ReturnType<typeof resolveDefaultInstallType>,
+    buildingInfo,
+  );
+
   const recommendedCases = await getRecommendedCases({
     address: geo.address,
     jibunAddress: geo.jibunAddress,
     landInfo: landResult.landInfo,
     buildingInfo,
     capacity: formatCapacityDisplay(solarMetrics.capacityKw),
-    recommendation: result.recommendation,
+    recommendation,
   });
 
   return {
@@ -131,6 +138,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     profitability,
     solarMetrics,
     monthlyGeneration,
+    recommendation,
     capacity: formatCapacityDisplay(solarMetrics.capacityKw),
     annualGeneration: formatGenerationDisplay(solarMetrics.annualGenerationKwh),
     annualRevenue: formatRevenueDisplay(solarMetrics.totalRevenueWon),

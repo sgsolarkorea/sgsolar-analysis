@@ -32,13 +32,13 @@ function resolveActiveSection(): string {
     return sectionIds[sectionIds.length - 1] ?? "";
   }
 
+  const marker = window.scrollY + HEADER_OFFSET + 64;
   let activeId = sectionIds[0] ?? "";
 
   for (const id of sectionIds) {
     const el = document.getElementById(id);
     if (!el) continue;
-    const top = el.getBoundingClientRect().top;
-    if (top <= HEADER_OFFSET + 48) {
+    if (el.offsetTop <= marker) {
       activeId = id;
     }
   }

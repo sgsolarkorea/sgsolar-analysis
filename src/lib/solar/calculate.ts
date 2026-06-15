@@ -9,6 +9,7 @@ import {
   yearlyGenerationPerKw,
 } from "@/data/solarConfig";
 import type { InstallTypeOption } from "@/data/resultUx";
+import { resolveDefaultInstallType } from "@/data/resultUx";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
 
@@ -30,7 +31,9 @@ export function installTypeToCategory(type: InstallTypeOption): SolarInstallCate
 }
 
 export function parseAreaSqm(value: string): number | null {
-  const match = value.replace(/,/g, "").match(/([\d.]+)\s*㎡/);
+  if (!value || value === "확인 필요") return null;
+  const normalized = value.replace(/,/g, "").trim();
+  const match = normalized.match(/([\d.]+)\s*(?:㎡|m²|m2)?/i);
   if (!match) return null;
   const n = Number(match[1]);
   return Number.isFinite(n) && n > 0 ? n : null;
@@ -114,13 +117,19 @@ export interface CalculateSolarOutput {
 }
 
 export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSolarOutput {
-  const category = installTypeToCategory(input.installType);
+  const buildingArea = parseAreaSqm(getFieldValue(input.buildingInfo, "건축면적"));
+  const landArea = parseAreaSqm(getFieldValue(input.landInfo, "면적"));
+
+  let installType = input.installType;
+  if (installType === "아직 모름") {
+    installType = resolveDefaultInstallType("", input.landInfo, input.buildingInfo);
+  }
+
+  const category = installTypeToCategory(installType);
   const areaPerKw = areaPerKwByType[category];
   const isLand = category === "land";
 
-  const buildingArea = parseAreaSqm(getFieldValue(input.buildingInfo, "건축면적"));
-  const landArea = parseAreaSqm(getFieldValue(input.landInfo, "면적"));
-  const baseAreaSqm = isLand ? (landArea ?? buildingArea ?? 0) : (buildingArea ?? landArea ?? 0);
+  const baseAreaSqm = isLand ? (landArea ?? 0) : (buildingArea ?? 0);
   const baseAreaLabel = isLand ? "토지면적" : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
@@ -193,7 +202,7 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
   }
 
   const metrics: SolarMetrics = {
-    installType: input.installType,
+    installType,
     installCategory: category,
     baseAreaSqm,
     baseAreaLabel,

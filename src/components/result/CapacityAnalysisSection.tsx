@@ -3,11 +3,20 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 interface CapacityAnalysisSectionProps {
   metrics: SolarMetrics;
+  embedded?: boolean;
 }
 
-export default function CapacityAnalysisSection({ metrics }: CapacityAnalysisSectionProps) {
+export default function CapacityAnalysisSection({
+  metrics,
+  embedded = false,
+}: CapacityAnalysisSectionProps) {
+  const Wrapper = embedded ? "div" : "section";
+  const wrapperProps = embedded
+    ? {}
+    : { id: "capacity-analysis" as const, className: "scroll-mt-24" };
+
   return (
-    <section id="capacity-analysis" className="scroll-mt-24">
+    <Wrapper {...wrapperProps}>
       <SectionHeader
         title="설치용량 산정"
         description={`${metrics.modulePowerW}W 모듈 기준 1차 설치용량 검토입니다.`}
@@ -33,6 +42,6 @@ export default function CapacityAnalysisSection({ metrics }: CapacityAnalysisSec
           </p>
         </div>
       </div>
-    </section>
+    </Wrapper>
   );
 }
