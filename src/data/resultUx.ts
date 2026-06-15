@@ -1,6 +1,9 @@
 import type { ProgressStatusKind } from "@/components/result/AnalysisProgressPanel";
+import { hasBuildingRecord, hasLandRecord } from "@/lib/api/infoFallbacks";
 import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 import type { InfoField } from "@/types/siteReview";
+
+export { hasBuildingRecord } from "@/lib/api/infoFallbacks";
 
 export interface ProgressStepConfig {
   id: string;
@@ -17,14 +20,14 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     label: "주소 확인",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "카카오 주소검색 완료",
+    description: "주소 및 위치 확인 완료",
   },
   {
     id: "site-location",
     label: "입지 위치",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "카카오 지도 위치 확인",
+    description: "위치 지도 확인 완료",
   },
   {
     id: "site-overview",
@@ -38,14 +41,14 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     label: "토지 정보",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "VWorld 지목·면적·용도지역 조회 완료",
+    description: "지목·면적·용도지역 확인 완료",
   },
   {
     id: "building-info",
     label: "건축물 정보",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "건축물대장 조회 완료",
+    description: "건축물 정보 확인 완료",
   },
   {
     id: "capacity-analysis",
@@ -91,6 +94,48 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   },
 ];
 
+/** 토지·건축물 데이터 유무에 따라 원포인트 패널 상태 반영 */
+export function resolveProgressSteps(
+  landInfo: InfoField[],
+  buildingInfo: InfoField[],
+): ProgressStepConfig[] {
+  return ANALYSIS_PROGRESS_STEPS.map((step) => {
+    if (step.id === "land-info") {
+      return hasLandRecord(landInfo)
+        ? {
+            ...step,
+            statusLabel: "완료",
+            statusKind: "complete" as ProgressStatusKind,
+            description: "지목·면적·용도지역 확인 완료",
+          }
+        : {
+            ...step,
+            statusLabel: "확인필요",
+            statusKind: "caution" as ProgressStatusKind,
+            description: "토지정보 확인 필요",
+          };
+    }
+
+    if (step.id === "building-info") {
+      return hasBuildingRecord(buildingInfo)
+        ? {
+            ...step,
+            statusLabel: "완료",
+            statusKind: "complete" as ProgressStatusKind,
+            description: "건축물 정보 확인 완료",
+          }
+        : {
+            ...step,
+            statusLabel: "확인필요",
+            statusKind: "caution" as ProgressStatusKind,
+            description: "건축물 정보 확인 필요",
+          };
+    }
+
+    return step;
+  });
+}
+
 export const INSTALL_TYPE_OPTIONS = [
   "지붕형",
   "토지형",
@@ -108,16 +153,6 @@ export const INSTALL_TYPE_UI_MESSAGES: Record<InstallTypeOption, string> = {
   공장형: "공장·창고 지붕 자가소비·발전 병행 유형으로 1차 검토됩니다.",
   상가형: "상가·근린시설 지붕 소규모 설치 유형으로 1차 검토됩니다.",
 };
-
-export function hasBuildingRecord(buildingInfo: InfoField[]): boolean {
-  const buildingUse = getFieldValue(buildingInfo, "건물 용도");
-  const buildingArea = getFieldValue(buildingInfo, "건축면적");
-
-  return (
-    (buildingUse !== "" && buildingUse !== "확인 필요") ||
-    (buildingArea !== "" && buildingArea !== "확인 필요")
-  );
-}
 
 /**
  * 기본 설치유형 산정

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { analyzeSolarSite } from "@/lib/api/analysis";
 import { getKakaoErrorMessage } from "@/lib/api/kakaoErrors";
-import { resolveInfoDataSource } from "@/lib/api/infoFallbacks";
+import { hasLandRecord, resolveInfoDataSource } from "@/lib/api/infoFallbacks";
 import { extractAreasForDebug } from "@/lib/solar/debug";
+import { getFieldValue } from "@/lib/solar/calculate";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,11 @@ export async function GET(request: Request) {
         baseAreaSqm: data.solarMetrics.baseAreaSqm,
         baseAreaLabel: data.solarMetrics.baseAreaLabel,
         buildingDataSource: resolveInfoDataSource(data.buildingInfo, "건축면적"),
+        landInfo: data.landInfo,
+        landCategory: getFieldValue(data.landInfo, "지목"),
+        landZoning: getFieldValue(data.landInfo, "용도지역"),
         landDataSource: resolveInfoDataSource(data.landInfo, "면적"),
+        hasLandRecord: hasLandRecord(data.landInfo),
         contextSync: {
           overviewCapacity: data.capacity,
           revenueEstimatedCapacity: data.profitability.estimatedCapacity,

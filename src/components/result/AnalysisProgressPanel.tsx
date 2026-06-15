@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { scrollToSection } from "@/components/layout/ScrollLink";
-import { ANALYSIS_PROGRESS_STEPS } from "@/data/resultUx";
+import type { ProgressStepConfig } from "@/data/resultUx";
 
 export type ProgressStatusKind =
   | "complete"
@@ -23,19 +23,18 @@ const STATUS_STYLES: Record<ProgressStatusKind, string> = {
 
 const HEADER_OFFSET = 120;
 
-function resolveActiveSection(): string {
-  const sectionIds = ANALYSIS_PROGRESS_STEPS.map((step) => step.id);
+function resolveActiveSection(stepIds: string[]): string {
   const scrollBottom = window.scrollY + window.innerHeight;
   const docHeight = document.documentElement.scrollHeight;
 
   if (docHeight - scrollBottom < 96) {
-    return sectionIds[sectionIds.length - 1] ?? "";
+    return stepIds[stepIds.length - 1] ?? "";
   }
 
   const marker = window.scrollY + HEADER_OFFSET + 64;
-  let activeId = sectionIds[0] ?? "";
+  let activeId = stepIds[0] ?? "";
 
-  for (const id of sectionIds) {
+  for (const id of stepIds) {
     const el = document.getElementById(id);
     if (!el) continue;
     if (el.offsetTop <= marker) {
@@ -46,11 +45,16 @@ function resolveActiveSection(): string {
   return activeId;
 }
 
-export default function AnalysisProgressPanel() {
-  const [activeId, setActiveId] = useState(ANALYSIS_PROGRESS_STEPS[0]?.id ?? "");
+interface AnalysisProgressPanelProps {
+  steps: ProgressStepConfig[];
+}
+
+export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelProps) {
+  const [activeId, setActiveId] = useState(steps[0]?.id ?? "");
 
   useEffect(() => {
-    const update = () => setActiveId(resolveActiveSection());
+    const stepIds = steps.map((step) => step.id);
+    const update = () => setActiveId(resolveActiveSection(stepIds));
     update();
 
     window.addEventListener("scroll", update, { passive: true });
@@ -60,7 +64,7 @@ export default function AnalysisProgressPanel() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [steps]);
 
   return (
     <aside className="hidden lg:block lg:w-64 lg:shrink-0 lg:self-stretch">
@@ -71,7 +75,7 @@ export default function AnalysisProgressPanel() {
         </p>
 
         <ul className="mt-4 space-y-3">
-          {ANALYSIS_PROGRESS_STEPS.map((step) => {
+          {steps.map((step) => {
             const isActive = activeId === step.id;
             return (
               <li key={step.id}>

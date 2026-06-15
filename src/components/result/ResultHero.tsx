@@ -41,7 +41,7 @@ export default function ResultHero({
           {MARKETING_NAME} 태양광 입지검토 결과
         </h1>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-100">
-          {MARKETING_NAME} 시공사례와 공공데이터를 기반으로 분석한 결과입니다.
+          {MARKETING_NAME} 시공사례와 등록된 토지·건축물 정보를 바탕으로 분석한 결과입니다.
         </p>
 
         <dl className="mt-3 space-y-1.5 text-sm">

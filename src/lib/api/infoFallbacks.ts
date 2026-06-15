@@ -29,6 +29,28 @@ export type InfoDataSource = "API" | "unavailable-fallback" | "sampleData";
 const SAMPLE_BUILDING_AREA = "820㎡";
 const SAMPLE_LAND_AREA = "2,340㎡";
 
+export function hasLandRecord(landInfo: InfoField[]): boolean {
+  const landCategory = getFieldValue(landInfo, "지목");
+  const landArea = getFieldValue(landInfo, "면적");
+  const zoning = getFieldValue(landInfo, "용도지역");
+
+  return (
+    (landCategory !== "" && landCategory !== "확인 필요") ||
+    (landArea !== "" && landArea !== "확인 필요") ||
+    (zoning !== "" && zoning !== "확인 필요")
+  );
+}
+
+export function hasBuildingRecord(buildingInfo: InfoField[]): boolean {
+  const buildingUse = getFieldValue(buildingInfo, "건물 용도");
+  const buildingArea = getFieldValue(buildingInfo, "건축면적");
+
+  return (
+    (buildingUse !== "" && buildingUse !== "확인 필요") ||
+    (buildingArea !== "" && buildingArea !== "확인 필요")
+  );
+}
+
 export function resolveInfoDataSource(
   fields: InfoField[],
   areaLabel: string,

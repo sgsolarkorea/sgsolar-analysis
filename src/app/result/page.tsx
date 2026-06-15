@@ -25,7 +25,7 @@ import {
 } from "@/components/result/ResultMetricsSections";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
-import type { InstallTypeOption } from "@/data/resultUx";
+import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
 import { getFieldValue } from "@/lib/solar/calculate";
 
 interface ResultPageProps {
@@ -58,6 +58,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
   };
 
+  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
+
   return (
     <div className="pb-28 md:pb-20">
       <ResultHero
@@ -72,7 +74,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="lg:flex lg:gap-8 lg:py-6">
-          <AnalysisProgressPanel />
+          <AnalysisProgressPanel steps={progressSteps} />
 
           <ResultMetricsProvider
             landInfo={data.landInfo}
@@ -87,7 +89,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               <section id="site-location" className="scroll-mt-24">
                 <SectionHeader
                   title="입지 위치"
-                  description="카카오 API로 확인한 검토 대상 위치입니다."
+                  description="입력하신 주소의 위치를 지도에서 확인할 수 있습니다."
                 />
                 <MapArea
                   address={data.address}

@@ -5,13 +5,17 @@
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
-import { resolveInfoDataSource } from "@/lib/api/infoFallbacks";
+import {
+  hasLandRecord,
+  resolveInfoDataSource,
+  unavailableLandInfo,
+} from "@/lib/api/infoFallbacks";
 import { parseJibunLot } from "@/lib/api/jibunParser";
 import { fetchLegalDongCodesByCoord, searchAddressByKakao } from "@/lib/api/kakao";
 import { getMarketPrice } from "@/lib/api/market";
 import { buildPnu } from "@/lib/api/pnu";
 import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/recommendCases";
-import { getLandInfoByVworld } from "@/lib/api/vworld";
+import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -141,10 +145,31 @@ function hasRoadAddress(address: string): boolean {
   return /(?:\d+\s*(?:번길|길|로|대로))/.test(address);
 }
 
+async function resolveLandInfo(
+  landResult: Awaited<ReturnType<typeof getLandInfoByVworld>>,
+  pnu: string | null,
+): Promise<InfoField[]> {
+  if (hasLandRecord(landResult.landInfo)) {
+    return landResult.landInfo;
+  }
+
+  if (pnu) {
+    const retry = await getLandInfoByPnu(pnu);
+    if (hasLandRecord(retry.landInfo)) {
+      console.info("[Analysis] Land info resolved via PNU retry", { pnu });
+      return retry.landInfo;
+    }
+    console.warn("[Analysis] Land info unavailable after PNU retry", { pnu });
+  }
+
+  return unavailableLandInfo();
+}
+
 export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const geo = await searchAddressByKakao(address);
   const landResult = await getLandInfoByVworld(geo.lat, geo.lng);
   const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, landResult.pnu);
+  const landInfo = await resolveLandInfo(landResult, pnu);
 
   const buildingInfo = await getBuildingInfo({
     pnu,
@@ -153,7 +178,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
 
   const solarResult = await calculateSolarProfitability({
     address: geo.address,
-    landInfo: landResult.landInfo,
+    landInfo,
     buildingInfo,
     hasRoadAddress: hasRoadAddress(geo.address),
   });
@@ -173,12 +198,12 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
 
   logSolarCalculationDebug({
     address: geo.address,
-    ...extractAreasForDebug(landResult.landInfo, buildingInfo),
+    ...extractAreasForDebug(landInfo, buildingInfo),
     defaultInstallType: solarMetrics.installType,
     estimatedCapacity: profitability.estimatedCapacity ?? formatCapacityDisplay(solarMetrics.capacityKw),
     calculatedCapacityKw: solarMetrics.capacityKw,
     buildingDataSource: resolveInfoDataSource(buildingInfo, "건축면적"),
-    landDataSource: resolveInfoDataSource(landResult.landInfo, "면적"),
+    landDataSource: resolveInfoDataSource(landInfo, "면적"),
     pnu,
     pnuSource,
     source: "analyzeSolarSite",
@@ -187,7 +212,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   const recommendedCases = await getRecommendedCases({
     address: geo.address,
     jibunAddress: geo.jibunAddress,
-    landInfo: landResult.landInfo,
+    landInfo,
     buildingInfo,
     capacity,
     recommendation,
@@ -205,7 +230,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     zoneNo: geo.zoneNo,
     analyzedAt: getTodayString(),
     consultationDefaultAddress: geo.address,
-    landInfo: landResult.landInfo,
+    landInfo,
     buildingInfo,
     gridInfo,
     profitability,

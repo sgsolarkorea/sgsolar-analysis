@@ -97,7 +97,7 @@ export default function KakaoMapView({ address, jibunAddress, lat, lng }: KakaoM
     <div className="relative h-full w-full">
       {!mapReady && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100">
-          <p className="text-sm font-medium text-slate-600">카카오 지도를 불러오는 중...</p>
+          <p className="text-sm font-medium text-slate-600">위치 지도를 불러오는 중...</p>
         </div>
       )}
       <div ref={mapContainerRef} className="h-full w-full" />

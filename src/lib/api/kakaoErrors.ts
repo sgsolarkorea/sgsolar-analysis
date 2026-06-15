@@ -1,6 +1,6 @@
 export class KakaoApiKeyMissingError extends Error {
   constructor() {
-    super("카카오 API 키가 설정되지 않았습니다.");
+    super("주소 검색 서비스를 일시적으로 사용할 수 없습니다.");
     this.name = "KakaoApiKeyMissingError";
   }
 }

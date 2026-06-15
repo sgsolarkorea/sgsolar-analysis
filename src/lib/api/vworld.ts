@@ -1,4 +1,4 @@
-import { unavailableLandInfo } from "@/lib/api/infoFallbacks";
+import { hasLandRecord, unavailableLandInfo } from "@/lib/api/infoFallbacks";
 import type { InfoField } from "@/types/siteReview";
 
 const VWORLD_DATA_API = "https://api.vworld.kr/req/data";
@@ -7,6 +7,14 @@ const VWORLD_LAND_API = "https://api.vworld.kr/ned/data/getLandCharacteristics";
 export interface VworldLandResult {
   pnu: string | null;
   landInfo: InfoField[];
+}
+
+export interface VworldFetchDiagnostic {
+  url: string;
+  httpStatus: number | null;
+  apiStatus?: string;
+  errorText?: string;
+  bodyPreview?: string;
 }
 
 interface VworldFeatureCollection {
@@ -18,6 +26,7 @@ interface VworldFeatureCollection {
 interface VworldDataResponse {
   response?: {
     status?: string;
+    error?: { text?: string; code?: string };
     result?: {
       featureCollection?: VworldFeatureCollection;
     };
@@ -40,6 +49,10 @@ interface LandCharacteristicsResponse {
   /** VWorld API 실제 응답 키 (typo 포함) */
   landCharacteristicss?: {
     field?: LandCharacteristicsField | LandCharacteristicsField[];
+  };
+  response?: {
+    status?: string;
+    error?: { text?: string; code?: string };
   };
 }
 
@@ -85,8 +98,23 @@ function buildSearchParams(apiKey: string, domain: string): URLSearchParams {
   });
 }
 
-async function fetchJson<T>(url: string): Promise<T | null> {
+function redactApiKey(url: string): string {
+  return url.replace(/([?&](key|Key)=)[^&]+/gi, "$1***");
+}
+
+function previewBody(text: string, max = 600): string {
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+async function fetchJsonWithDiagnostic<T>(
+  url: string,
+  label: string,
+): Promise<{ data: T | null; diagnostic: VworldFetchDiagnostic }> {
   const maxAttempts = 3;
+  const diagnostic: VworldFetchDiagnostic = {
+    url: redactApiKey(url),
+    httpStatus: null,
+  };
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -96,21 +124,42 @@ async function fetchJson<T>(url: string): Promise<T | null> {
         headers: { Accept: "application/json" },
       });
 
+      diagnostic.httpStatus = response.status;
+      const text = await response.text();
+      diagnostic.bodyPreview = previewBody(text);
+
       if (!response.ok) {
-        console.warn(`[VWorld] HTTP ${response.status} (attempt ${attempt}/${maxAttempts})`);
+        console.warn(
+          `[VWorld] ${label} HTTP ${response.status} (attempt ${attempt}/${maxAttempts})`,
+          diagnostic.url,
+        );
         continue;
       }
 
-      return (await response.json()) as T;
+      try {
+        const data = JSON.parse(text) as T & {
+          response?: { status?: string; error?: { text?: string } };
+        };
+        diagnostic.apiStatus = data.response?.status;
+        if (data.response?.error?.text) {
+          diagnostic.errorText = data.response.error.text;
+        }
+        return { data, diagnostic };
+      } catch {
+        console.warn(`[VWorld] ${label} invalid JSON`, diagnostic.url);
+        return { data: null, diagnostic };
+      }
     } catch (error) {
-      console.warn(`[VWorld] fetch attempt ${attempt}/${maxAttempts} failed:`, error);
+      diagnostic.errorText = error instanceof Error ? error.message : String(error);
+      console.warn(`[VWorld] ${label} fetch attempt ${attempt}/${maxAttempts} failed:`, error);
       if (attempt < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, attempt * 400));
       }
     }
   }
 
-  return null;
+  console.warn(`[VWorld] ${label} failed`, JSON.stringify(diagnostic));
+  return { data: null, diagnostic };
 }
 
 /** 좌표 → PNU (연속지적도 필지 경계) */
@@ -131,16 +180,20 @@ export async function fetchPnuByCoordinates(
     params.set("crs", "EPSG:4326");
     params.set("geomFilter", `POINT(${lng} ${lat})`);
 
-    const data = await fetchJson<VworldDataResponse>(`${VWORLD_DATA_API}?${params.toString()}`);
+    const { data, diagnostic } = await fetchJsonWithDiagnostic<VworldDataResponse>(
+      `${VWORLD_DATA_API}?${params.toString()}`,
+      "PNU-by-coords",
+    );
+
     const features = data?.response?.result?.featureCollection?.features;
     const pnu = features?.[0]?.properties?.pnu ?? features?.[0]?.properties?.PNU;
 
     if (pnu) {
-      console.info(`[VWorld] PNU resolved with domain: ${domain}`);
+      console.info(`[VWorld] PNU resolved with domain: ${domain}`, { pnu });
       return String(pnu);
     }
 
-    console.warn(`[VWorld] PNU not found for domain: ${domain}`);
+    console.warn(`[VWorld] PNU not found for domain: ${domain}`, JSON.stringify(diagnostic));
   }
 
   return null;
@@ -157,15 +210,28 @@ export async function fetchLandCharacteristics(
       params.set("pnu", pnu);
       params.set("stdrYear", stdrYear);
 
-      const data = await fetchJson<LandCharacteristicsResponse>(
+      const { data, diagnostic } = await fetchJsonWithDiagnostic<LandCharacteristicsResponse>(
         `${VWORLD_LAND_API}?${params.toString()}`,
+        "land-characteristics",
       );
 
       const field = extractLandField(data);
       if (field?.lndcgrCodeNm || field?.lndpclAr || field?.prposArea1Nm) {
-        console.info(`[VWorld] Land characteristics resolved with domain: ${domain}`);
+        console.info(`[VWorld] Land characteristics resolved`, {
+          domain,
+          stdrYear,
+          pnu,
+          lndcgrCodeNm: field.lndcgrCodeNm,
+          lndpclAr: field.lndpclAr,
+          prposArea1Nm: field.prposArea1Nm,
+        });
         return field;
       }
+
+      console.warn(
+        `[VWorld] Land characteristics empty for domain=${domain} year=${stdrYear}`,
+        JSON.stringify(diagnostic),
+      );
     }
   }
 
@@ -221,18 +287,37 @@ function mapCharacteristicsToLandInfo(
   ];
 }
 
-function buildPnuOnlyLandInfo(_pnu: string): InfoField[] {
-  return unavailableLandInfo();
+/** PNU로 토지특성만 조회 (좌표→PNU 실패 후 재시도용) */
+export async function getLandInfoByPnu(pnu: string): Promise<VworldLandResult> {
+  const fallback: VworldLandResult = { pnu, landInfo: unavailableLandInfo() };
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+
+  if (!apiKey) {
+    console.warn("[VWorld] VWORLD_API_KEY not configured — land info by PNU unavailable");
+    return fallback;
+  }
+
+  try {
+    const characteristics = await fetchLandCharacteristics(pnu, apiKey);
+    if (!characteristics) {
+      console.warn("[VWorld] Land characteristics not found for PNU:", pnu);
+      return fallback;
+    }
+
+    return {
+      pnu,
+      landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
+    };
+  } catch (error) {
+    console.error("[VWorld] getLandInfoByPnu error:", error);
+    return fallback;
+  }
 }
 
 /**
- * VWorld API — 좌표 기반 토지정보 조회 (서버 전용)
- *
+ * VWorld — 좌표 기반 토지정보 조회 (서버 전용)
  * 1) LP_PA_CBND_BUBUN: 좌표 → PNU
  * 2) getLandCharacteristics: PNU → 지목·면적·용도지역
- *
- * 환경변수: VWORLD_API_KEY, VWORLD_API_DOMAIN (선택)
- * @see https://www.vworld.kr/dev/v4dv_2guide.do
  */
 export async function getLandInfoByVworld(
   lat: number,
@@ -240,6 +325,14 @@ export async function getLandInfoByVworld(
 ): Promise<VworldLandResult> {
   const fallback: VworldLandResult = { pnu: null, landInfo: unavailableLandInfo() };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
+
+  console.info("[VWorld] getLandInfoByVworld start", {
+    apiKeyLoaded: Boolean(apiKey),
+    apiKeyLength: apiKey?.length ?? 0,
+    domainConfigured: Boolean(process.env.VWORLD_API_DOMAIN?.trim()),
+    lat,
+    lng,
+  });
 
   if (!apiKey) {
     console.warn("[VWorld] VWORLD_API_KEY not configured — land info unavailable");
@@ -249,22 +342,59 @@ export async function getLandInfoByVworld(
   try {
     const pnu = await fetchPnuByCoordinates(lat, lng, apiKey);
     if (!pnu) {
-      console.warn("[VWorld] PNU not found for coordinates — land info unavailable");
+      console.warn("[VWorld] PNU not found for coordinates — land info unavailable", { lat, lng });
       return fallback;
     }
 
     const characteristics = await fetchLandCharacteristics(pnu, apiKey);
     if (!characteristics) {
-      console.warn("[VWorld] Land characteristics not found — partial PNU only");
-      return { pnu, landInfo: buildPnuOnlyLandInfo(pnu) };
+      console.warn("[VWorld] Land characteristics not found — partial PNU only", { pnu });
+      return { pnu, landInfo: unavailableLandInfo() };
     }
 
-    return {
+    const landInfo = mapCharacteristicsToLandInfo(pnu, characteristics);
+    console.info("[VWorld] getLandInfoByVworld success", {
       pnu,
-      landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
-    };
+      hasLandRecord: hasLandRecord(landInfo),
+    });
+
+    return { pnu, landInfo };
   } catch (error) {
     console.error("[VWorld] API error — land info unavailable:", error);
     return fallback;
   }
+}
+
+export async function diagnoseVworldForSite(
+  lat: number,
+  lng: number,
+  pnuFallback: string | null,
+): Promise<Record<string, unknown>> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  const domains = getApiDomainCandidates();
+
+  const pnuFromCoords = apiKey ? await fetchPnuByCoordinates(lat, lng, apiKey) : null;
+  const landByCoords = await getLandInfoByVworld(lat, lng);
+  const landByPnu = pnuFallback ? await getLandInfoByPnu(pnuFallback) : null;
+
+  return {
+    apiKeyLoaded: Boolean(apiKey),
+    apiKeyLength: apiKey?.length ?? 0,
+    domainCandidates: domains,
+    configuredDomain: process.env.VWORLD_API_DOMAIN?.trim() ?? null,
+    pnuFromCoordinates: pnuFromCoords,
+    pnuFallback,
+    landByCoordinates: {
+      pnu: landByCoords.pnu,
+      hasLandRecord: hasLandRecord(landByCoords.landInfo),
+      landInfo: landByCoords.landInfo,
+    },
+    landByPnu: landByPnu
+      ? {
+          pnu: landByPnu.pnu,
+          hasLandRecord: hasLandRecord(landByPnu.landInfo),
+          landInfo: landByPnu.landInfo,
+        }
+      : null,
+  };
 }

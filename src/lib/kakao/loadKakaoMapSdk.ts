@@ -106,21 +106,21 @@ export function loadKakaoMapSdk(appKey: string): Promise<void> {
 export function getKakaoMapErrorMessage(error: KakaoMapLoadError): string {
   switch (error) {
     case "missing_key":
-      return "카카오 JavaScript 키가 설정되지 않았습니다. (.env.local → NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY)";
+      return "위치 지도를 일시적으로 불러올 수 없습니다.";
     case "domain_mismatch":
-      return "카카오 지도 도메인이 등록되지 않았습니다.";
+      return "위치 지도를 표시할 수 없습니다.";
     case "script_error":
-      return "카카오 지도 SDK 스크립트를 불러오지 못했습니다.";
+      return "위치 지도를 불러오지 못했습니다.";
     case "init_error":
-      return "카카오 지도 초기화 중 오류가 발생했습니다.";
+      return "위치 지도 초기화 중 오류가 발생했습니다.";
     default:
-      return "카카오 지도를 불러오지 못했습니다.";
+      return "위치 지도를 불러오지 못했습니다.";
   }
 }
 
 export function getKakaoMapErrorDetail(error: KakaoMapLoadError): string | undefined {
   if (error === "domain_mismatch") {
-    return "카카오 Developers → 내 애플리케이션 → 플랫폼 → Web → http://localhost:3000 을 등록한 뒤 dev 서버를 재시작해주세요.";
+    return "아래 주소와 좌표로 위치를 확인하실 수 있습니다.";
   }
   return undefined;
 }

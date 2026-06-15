@@ -316,7 +316,7 @@ export const result: Omit<
       description: "지자체 조례 및 설치 위치에 따른 이격거리 확인",
     },
     {
-      label: "건축물대장 확인",
+      label: "건축물 정보 확인",
       status: "확인 필요",
       description: "옥상 설치 시 구조·용도 확인 필요",
     },
@@ -359,7 +359,7 @@ export const result: Omit<
     {
       label: "규제·인허가",
       status: "caution",
-      description: "준주거지역 내 설치 검토, 건축물대장 확인 필요",
+      description: "준주거지역 내 설치 검토, 건축물 정보 확인 필요",
     },
     {
       label: "그늘·장애물",

@@ -12,7 +12,7 @@ export default function MapPlaceholder({
   jibunAddress,
   lat,
   lng,
-  notice = "카카오 지도를 불러올 수 없습니다.",
+  notice = "위치 지도를 불러올 수 없습니다.",
   detail,
 }: MapPlaceholderProps) {
   return (
@@ -41,7 +41,7 @@ export default function MapPlaceholder({
         )}
       </div>
       <div className="absolute right-3 top-3 rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-navy-muted shadow">
-        좌표 연동 · 지도 placeholder
+        위치 확인
       </div>
       <div className="absolute bottom-0 left-0 right-0 bg-navy/90 px-4 py-4 sm:px-6 sm:py-5">
         <p className="text-xs text-slate-300">도로명주소</p>
