@@ -43,12 +43,20 @@ interface LandCharacteristicsResponse {
   };
 }
 
-function getApiDomain(): string {
+function getApiDomainCandidates(): string[] {
+  const candidates = new Set<string>();
   const configured = process.env.VWORLD_API_DOMAIN?.trim();
-  if (configured) return configured;
   const vercelUrl = process.env.VERCEL_URL?.trim();
-  if (vercelUrl) return vercelUrl;
-  return "localhost:3000";
+  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+
+  if (configured) candidates.add(configured);
+  if (vercelUrl) candidates.add(vercelUrl);
+  if (productionUrl) candidates.add(productionUrl);
+  candidates.add("sgsolar-analysis.vercel.app");
+  candidates.add("analysis.sgsolar.co.kr");
+  candidates.add("localhost:3000");
+
+  return [...candidates];
 }
 
 function getStdrYears(): string[] {
@@ -68,13 +76,12 @@ function extractLandField(
   return Array.isArray(field) ? (field[0] ?? null) : field;
 }
 
-function buildSearchParams(apiKey: string): URLSearchParams {
-  const params = new URLSearchParams({
+function buildSearchParams(apiKey: string, domain: string): URLSearchParams {
+  return new URLSearchParams({
     key: apiKey,
     format: "json",
-    domain: getApiDomain(),
+    domain,
   });
-  return params;
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {
@@ -111,22 +118,31 @@ export async function fetchPnuByCoordinates(
   lng: number,
   apiKey: string,
 ): Promise<string | null> {
-  const params = buildSearchParams(apiKey);
-  params.set("service", "data");
-  params.set("request", "GetFeature");
-  params.set("data", "LP_PA_CBND_BUBUN");
-  params.set("size", "1");
-  params.set("page", "1");
-  params.set("geometry", "false");
-  params.set("attribute", "true");
-  params.set("crs", "EPSG:4326");
-  params.set("geomFilter", `POINT(${lng} ${lat})`);
+  for (const domain of getApiDomainCandidates()) {
+    const params = buildSearchParams(apiKey, domain);
+    params.set("service", "data");
+    params.set("request", "GetFeature");
+    params.set("data", "LP_PA_CBND_BUBUN");
+    params.set("size", "1");
+    params.set("page", "1");
+    params.set("geometry", "false");
+    params.set("attribute", "true");
+    params.set("crs", "EPSG:4326");
+    params.set("geomFilter", `POINT(${lng} ${lat})`);
 
-  const data = await fetchJson<VworldDataResponse>(`${VWORLD_DATA_API}?${params.toString()}`);
-  const features = data?.response?.result?.featureCollection?.features;
-  const pnu = features?.[0]?.properties?.pnu ?? features?.[0]?.properties?.PNU;
+    const data = await fetchJson<VworldDataResponse>(`${VWORLD_DATA_API}?${params.toString()}`);
+    const features = data?.response?.result?.featureCollection?.features;
+    const pnu = features?.[0]?.properties?.pnu ?? features?.[0]?.properties?.PNU;
 
-  return pnu ? String(pnu) : null;
+    if (pnu) {
+      console.info(`[VWorld] PNU resolved with domain: ${domain}`);
+      return String(pnu);
+    }
+
+    console.warn(`[VWorld] PNU not found for domain: ${domain}`);
+  }
+
+  return null;
 }
 
 /** PNU → 토지특성 (지목·면적·용도지역) */
@@ -134,18 +150,21 @@ export async function fetchLandCharacteristics(
   pnu: string,
   apiKey: string,
 ): Promise<LandCharacteristicsField | null> {
-  for (const stdrYear of getStdrYears()) {
-    const params = buildSearchParams(apiKey);
-    params.set("pnu", pnu);
-    params.set("stdrYear", stdrYear);
+  for (const domain of getApiDomainCandidates()) {
+    for (const stdrYear of getStdrYears()) {
+      const params = buildSearchParams(apiKey, domain);
+      params.set("pnu", pnu);
+      params.set("stdrYear", stdrYear);
 
-    const data = await fetchJson<LandCharacteristicsResponse>(
-      `${VWORLD_LAND_API}?${params.toString()}`,
-    );
+      const data = await fetchJson<LandCharacteristicsResponse>(
+        `${VWORLD_LAND_API}?${params.toString()}`,
+      );
 
-    const field = extractLandField(data);
-    if (field?.lndcgrCodeNm || field?.lndpclAr || field?.prposArea1Nm) {
-      return field;
+      const field = extractLandField(data);
+      if (field?.lndcgrCodeNm || field?.lndpclAr || field?.prposArea1Nm) {
+        console.info(`[VWorld] Land characteristics resolved with domain: ${domain}`);
+        return field;
+      }
     }
   }
 
