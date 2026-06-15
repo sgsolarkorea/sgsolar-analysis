@@ -38,7 +38,7 @@ export default function Header() {
         </nav>
 
         <ScrollLink href="#consultation" className="btn-primary h-10 shrink-0 px-4 text-sm sm:px-5">
-          무료 상담 신청
+          무료 컨설팅 상담 신청하기
         </ScrollLink>
       </div>
     </header>

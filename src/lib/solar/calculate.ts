@@ -9,7 +9,7 @@ import {
   yearlyGenerationPerKw,
 } from "@/data/solarConfig";
 import type { InstallTypeOption } from "@/data/resultUx";
-import { resolveDefaultInstallType } from "@/data/resultUx";
+import { INSTALL_TYPE_OPTIONS, resolveDefaultInstallType } from "@/data/resultUx";
 import { logSolarCalculationDebug } from "@/lib/solar/debug";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
@@ -122,7 +122,7 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
   const landArea = parseAreaSqm(getFieldValue(input.landInfo, "면적"));
 
   let installType = input.installType;
-  if (installType === "아직 모름") {
+  if (!INSTALL_TYPE_OPTIONS.includes(installType as (typeof INSTALL_TYPE_OPTIONS)[number])) {
     installType = resolveDefaultInstallType("", input.landInfo, input.buildingInfo);
   }
 

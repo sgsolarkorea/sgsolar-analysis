@@ -43,6 +43,10 @@ function formatSubmittedAtKst(iso: string): string {
   }).format(new Date(iso));
 }
 
+function formatInstallTypeLabel(value: string): string {
+  return value.trim() || "선택";
+}
+
 function analysisContextLines(submission: ConsultationSubmission): string[] {
   const ctx = submission.analysisContext;
   if (!ctx) return [];
@@ -76,7 +80,7 @@ function buildStaffEmailContent(
     `연락처: ${submission.phone}`,
     `이메일: ${email}`,
     `주소: ${submission.address}`,
-    `설치유형: ${submission.installType}`,
+    `설치유형: ${formatInstallTypeLabel(submission.installType)}`,
     `문의내용: ${message}`,
     `결과 페이지: ${resultUrl}`,
     `접수 ID: ${submission.id}`,
@@ -110,7 +114,7 @@ function buildStaffEmailContent(
       <tr><td><strong>연락처</strong></td><td>${submission.phone}</td></tr>
       <tr><td><strong>이메일</strong></td><td>${email}</td></tr>
       <tr><td><strong>주소</strong></td><td>${submission.address}</td></tr>
-      <tr><td><strong>설치유형</strong></td><td>${submission.installType}</td></tr>
+      <tr><td><strong>설치유형</strong></td><td>${formatInstallTypeLabel(submission.installType)}</td></tr>
       <tr><td><strong>문의내용</strong></td><td>${message.replace(/\n/g, "<br>")}</td></tr>
       <tr><td><strong>결과 페이지</strong></td><td>${
         resultPageUrl?.trim()
@@ -144,7 +148,7 @@ function buildCustomerAutoReply(submission: ConsultationSubmission): {
     "",
     `신청자명: ${submission.name}`,
     `주소: ${submission.address}`,
-    `설치유형: ${submission.installType}`,
+    `설치유형: ${formatInstallTypeLabel(submission.installType)}`,
     "",
     "담당자가 내용을 확인한 후 순차적으로 연락드리겠습니다.",
     "추가 문의: " + company.phone + " / " + company.email,
@@ -158,7 +162,7 @@ function buildCustomerAutoReply(submission: ConsultationSubmission): {
     <ul>
       <li>신청자명: ${submission.name}</li>
       <li>주소: ${submission.address}</li>
-      <li>설치유형: ${submission.installType}</li>
+      <li>설치유형: ${formatInstallTypeLabel(submission.installType)}</li>
     </ul>
     <p>담당자가 내용을 확인한 후 순차적으로 연락드리겠습니다.</p>
     <p>추가 문의: ${company.phone} · ${company.email}</p>

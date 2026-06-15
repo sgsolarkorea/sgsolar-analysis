@@ -12,7 +12,7 @@ export default function FloatingConsultButton() {
           onClick={() => scrollToSection("consultation")}
           className="btn-primary h-12 w-full text-base"
         >
-          무료 상담 신청
+          무료 컨설팅 상담 신청하기
         </button>
       </div>
 

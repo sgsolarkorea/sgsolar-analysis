@@ -30,7 +30,7 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
     <section id="cases" className="scroll-mt-24">
       <SectionHeader
         title="유사 시공사례"
-        description={`${MARKETING_NAME} 시공사례 중 유사한 유형의 현장을 추천합니다.`}
+        description={`${MARKETING_NAME} 과거 시공사례 중 유사한 유형의 현장을 참고용으로 추천합니다. 아래 용량은 본 입지검토 예상 설치용량과 별개의 유사 사례입니다.`}
       />
       <div className="grid gap-5 lg:grid-cols-3">
         {cases.map((item) => (
@@ -49,6 +49,9 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
               <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
                 {item.type}
               </span>
+              <span className="absolute right-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white">
+                유사 사례
+              </span>
             </div>
 
             <div className="flex flex-1 flex-col p-5">
@@ -62,7 +65,7 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
                   <dd className="text-right font-medium text-slate-900">{item.region}</dd>
                 </div>
                 <div className="flex justify-between gap-2">
-                  <dt className="text-slate-500">용량</dt>
+                  <dt className="text-slate-500">유사 사례 용량</dt>
                   <dd className="font-bold text-navy">{item.capacity}</dd>
                 </div>
                 <div className="flex justify-between gap-2">

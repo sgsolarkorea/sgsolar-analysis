@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { company, MARKETING_NAME } from "@/data/sampleData";
-import { INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
+import { company } from "@/data/sampleData";
+import { CONSULTATION_INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
 import type { ConsultationAnalysisContext } from "@/types/consultation";
 
 interface ConsultationFormProps {
@@ -19,7 +19,7 @@ export default function ConsultationForm({
     phone: "",
     email: "",
     address: defaultAddress,
-    installType: "아직 모름",
+    installType: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +48,7 @@ export default function ConsultationForm({
       }
 
       alert(
-        `상담 신청이 접수되었습니다. ${MARKETING_NAME} 담당자가 확인 후 연락드리겠습니다.${
+        `상담 신청이 접수되었습니다. ${company.companyName} 담당자가 확인 후 연락드리겠습니다.${
           form.email.trim() ? " 입력하신 이메일로 접수 확인 메일이 발송됩니다." : ""
         }`,
       );
@@ -57,7 +57,7 @@ export default function ConsultationForm({
         phone: "",
         email: "",
         address: defaultAddress,
-        installType: "아직 모름",
+        installType: "",
         message: "",
       });
     } catch (err) {
@@ -69,18 +69,11 @@ export default function ConsultationForm({
 
   return (
     <section id="consultation" className="scroll-mt-24">
-      <div className="mb-4 rounded-xl border border-navy/15 bg-navy-light px-5 py-4 sm:px-6">
-        <p className="text-sm leading-relaxed text-slate-800 sm:text-base">
-          이 입지에 태양광 설치가 가능한지, 예상 수익은 어느 정도인지, 한전 계통 연계는 가능한지
-          궁금하신가요? {MARKETING_NAME} 담당자가 무료로 검토해드립니다.
-        </p>
-      </div>
-
       <div className="card-premium overflow-hidden">
         <div className="bg-navy px-5 py-5 sm:px-8 sm:py-6">
-          <h2 className="text-lg font-bold text-white sm:text-xl">전문가 무료 상담 신청</h2>
+          <h2 className="text-lg font-bold text-white sm:text-xl">전문가 무료 컨설팅 신청</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-100">
-            입지검토 결과를 바탕으로 {MARKETING_NAME} 담당자가 설치 가능성, 예상 견적, 한전
+            입지검토 결과를 바탕으로 {company.companyName} 담당자가 설치 가능성, 예상 견적, 한전
             접수, 인허가 절차를 안내드립니다.
           </p>
           <p className="mt-2 text-xs text-slate-200 sm:text-sm">
@@ -156,8 +149,8 @@ export default function ConsultationForm({
               onChange={(e) => setForm({ ...form, installType: e.target.value })}
               className="input-field"
             >
-              {INSTALL_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+              {CONSULTATION_INSTALL_TYPE_OPTIONS.map((opt) => (
+                <option key={opt.value || "placeholder"} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
@@ -187,7 +180,7 @@ export default function ConsultationForm({
               disabled={isSubmitting}
               className="btn-primary h-12 w-full text-base font-bold disabled:cursor-not-allowed disabled:opacity-60 sm:h-14"
             >
-              {isSubmitting ? "접수 중..." : "무료 입지 상담 신청하기"}
+              {isSubmitting ? "접수 중..." : "무료 컨설팅 상담 신청하기"}
             </button>
             <p className="mt-3 text-center text-xs text-slate-500">
               입력하신 정보는 상담 목적으로만 사용되며, 제3자에게 제공되지 않습니다.

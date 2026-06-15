@@ -104,7 +104,7 @@ export default function AnalysisProgressPanel() {
           onClick={() => scrollToSection("consultation")}
           className="btn-primary mt-4 h-11 w-full text-sm font-bold"
         >
-          무료 상담 신청
+          무료 컨설팅 상담 신청하기
         </button>
       </div>
     </aside>

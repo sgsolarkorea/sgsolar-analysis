@@ -15,6 +15,9 @@ export default function CapacityAnalysisSection({
     ? {}
     : { id: "capacity-analysis" as const, className: "scroll-mt-24" };
 
+  const moduleCountLabel =
+    metrics.moduleCount > 0 ? `약 ${metrics.moduleCount.toLocaleString("ko-KR")}장` : "확인 필요";
+
   return (
     <Wrapper {...wrapperProps}>
       <SectionHeader
@@ -29,6 +32,16 @@ export default function CapacityAnalysisSection({
           </span>
         </div>
         <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm text-slate-500">적용 모듈</span>
+          <span className="text-sm font-semibold text-slate-900">
+            {metrics.modulePowerW}W 기준
+          </span>
+        </div>
+        <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm text-slate-500">예상 모듈 수량</span>
+          <span className="text-sm font-semibold text-slate-900">{moduleCountLabel}</span>
+        </div>
+        <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm text-slate-500">기준면적 ({metrics.baseAreaLabel})</span>
           <span className="text-sm font-semibold text-slate-900">
             {metrics.baseAreaSqm > 0
@@ -39,6 +52,9 @@ export default function CapacityAnalysisSection({
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
           <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">
             ⚠ {metrics.capacityDisclaimer}
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-amber-900 sm:text-sm">
+            ⚠ 실제 모듈 수량은 배치도, 음영, 지붕 형상, 구조검토 결과에 따라 달라질 수 있습니다.
           </p>
         </div>
       </div>

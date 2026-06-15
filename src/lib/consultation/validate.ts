@@ -2,7 +2,7 @@ import type {
   ConsultationAnalysisContext,
   ConsultationRequestBody,
 } from "@/types/consultation";
-import { INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
+import { CONSULTATION_INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
 
 const MAX = {
   name: 50,
@@ -13,8 +13,8 @@ const MAX = {
   resultPageUrl: 500,
 } as const;
 
-const ALLOWED_INSTALL_TYPES = new Set(
-  INSTALL_TYPE_OPTIONS.map((option) => option.value),
+const ALLOWED_INSTALL_TYPES = new Set<string>(
+  CONSULTATION_INSTALL_TYPE_OPTIONS.map((option) => option.value),
 );
 
 export type ConsultationValidationResult =
@@ -31,7 +31,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   const phone = typeof raw.phone === "string" ? raw.phone.trim() : "";
   const address = typeof raw.address === "string" ? raw.address.trim() : "";
   const installType =
-    typeof raw.installType === "string" ? raw.installType.trim() : "아직 모름";
+    typeof raw.installType === "string" ? raw.installType.trim() : "";
   const message = typeof raw.message === "string" ? raw.message.trim() : "";
   const email = typeof raw.email === "string" ? raw.email.trim() : "";
   const resultPageUrl =
@@ -57,7 +57,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   ) {
     return { ok: false, error: "결과 페이지 주소 형식이 올바르지 않습니다." };
   }
-  if (!ALLOWED_INSTALL_TYPES.has(installType as (typeof INSTALL_TYPE_OPTIONS)[number]["value"])) {
+  if (!ALLOWED_INSTALL_TYPES.has(installType)) {
     return { ok: false, error: "설치 유형이 올바르지 않습니다." };
   }
 

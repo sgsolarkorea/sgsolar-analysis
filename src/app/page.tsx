@@ -4,16 +4,17 @@ import { MARKETING_NAME } from "@/data/sampleData";
 
 const features = [
   {
-    title: "3분 입지검토",
-    description: "주소만 입력하면 1차 입지 적합성을 즉시 확인합니다.",
+    title: "입지 적합성 검토",
+    description:
+      "주소 기반으로 토지·건축물 정보를 확인하고 태양광 설치 가능성을 1차 분석합니다.",
   },
   {
-    title: "수익성 분석",
-    description: "예상 발전량·시공비·회수기간을 한눈에 제공합니다.",
+    title: "발전량·수익성 분석",
+    description: "예상 설치용량, 발전량, 시공비용, 예상 수익을 종합적으로 검토합니다.",
   },
   {
-    title: "전문가 상담",
-    description: `${MARKETING_NAME} 담당자가 설치·인허가·한전 접수를 안내합니다.`,
+    title: "전문가 컨설팅",
+    description: "검토 결과를 바탕으로 설치 방식, 인허가, 한전 접수 절차를 안내합니다.",
   },
 ];
 

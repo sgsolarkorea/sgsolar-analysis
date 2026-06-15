@@ -178,10 +178,14 @@ export const GRADE_MESSAGES: Record<Grade, string> = {
   D: "현재 조건으로는 설치 검토가 어려울 수 있습니다.",
 };
 
-export const INSTALL_TYPE_OPTIONS = [
-  { value: "주택용", label: "주택용" },
-  { value: "상가/공장 자가소비", label: "상가/공장 자가소비" },
-  { value: "축사/공장 지붕형", label: "축사/공장 지붕형" },
-  { value: "토지형 발전사업", label: "토지형 발전사업" },
-  { value: "아직 모름", label: "아직 모름" },
+export const CONSULTATION_INSTALL_TYPE_OPTIONS = [
+  { value: "", label: "선택" },
+  { value: "지붕형", label: "지붕형" },
+  { value: "토지형", label: "토지형" },
+  { value: "축사형", label: "축사형" },
+  { value: "공장형", label: "공장형" },
+  { value: "상가형", label: "상가형" },
 ] as const;
+
+/** @deprecated 상담폼은 CONSULTATION_INSTALL_TYPE_OPTIONS 사용 */
+export const INSTALL_TYPE_OPTIONS = CONSULTATION_INSTALL_TYPE_OPTIONS;

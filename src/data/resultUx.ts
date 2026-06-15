@@ -87,7 +87,7 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     label: "상담 신청",
     statusLabel: "가능",
     statusKind: "available",
-    description: "전문가 무료 상담 가능",
+    description: "전문가 컨설팅 가능",
   },
 ];
 
@@ -97,7 +97,6 @@ export const INSTALL_TYPE_OPTIONS = [
   "축사형",
   "공장형",
   "상가형",
-  "아직 모름",
 ] as const;
 
 export type InstallTypeOption = (typeof INSTALL_TYPE_OPTIONS)[number];
@@ -108,7 +107,6 @@ export const INSTALL_TYPE_UI_MESSAGES: Record<InstallTypeOption, string> = {
   축사형: "축사 지붕 활용 대형 설치 유형으로 1차 검토됩니다.",
   공장형: "공장·창고 지붕 자가소비·발전 병행 유형으로 1차 검토됩니다.",
   상가형: "상가·근린시설 지붕 소규모 설치 유형으로 1차 검토됩니다.",
-  "아직 모름": "현장 조건 확인 후 적합한 설치 유형을 안내드립니다.",
 };
 
 export function hasBuildingRecord(buildingInfo: InfoField[]): boolean {
@@ -158,7 +156,7 @@ export function resolveDefaultInstallType(
 
   if (text.includes("옥상") || text.includes("지붕")) return "지붕형";
   if (options?.hasRoadAddress) return "지붕형";
-  return "아직 모름";
+  return "지붕형";
 }
 
 /** @deprecated resolveDefaultInstallType 사용 */

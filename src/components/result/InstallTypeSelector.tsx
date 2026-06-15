@@ -54,7 +54,7 @@ export default function InstallTypeSelector({ apiRecommendation }: InstallTypeSe
             {metrics.capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW
           </strong>
         </p>
-        <p className="mt-2 text-xs text-slate-500">API 분석 기준 참고: {apiRecommendation}</p>
+        <p className="mt-2 text-xs text-slate-500">1차 분석 추천: {apiRecommendation}</p>
       </div>
     </div>
   );
