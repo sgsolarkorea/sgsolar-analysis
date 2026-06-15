@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/* Tailwind v4 @theme — 반드시 hex 리터럴 사용 (var() 참조 시 유틸리티 미생성) */
+@theme inline {
+  --color-background: #f5f7fa;
+  --color-foreground: #0f172a;
+  --color-navy: #0b1d3a;
+  --color-navy-mid: #1a3270;
+  --color-navy-light: #eef2f8;
+  --color-navy-muted: #4a6085;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-card: #ffffff;
+  --color-primary: #0b1d3a;
+  --color-primary-dark: #071428;
+  --color-primary-light: #eef2f8;
+  --color-accent: #1a3270;
+  --color-accent-light: #eef2f8;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --font-sans: var(--font-noto-sans-kr);
+}
+
+:root {
+  --background: #f5f7fa;
+  --foreground: #0f172a;
+  --navy: #0b1d3a;
+  --navy-mid: #1a3270;
+  --navy-light: #eef2f8;
+  --navy-muted: #4a6085;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --card: #ffffff;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-noto-sans-kr), "Apple SD Gothic Neo", "Malgun Gothic",
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--navy);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.card-premium {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(11, 29, 58, 0.04), 0 2px 8px rgba(11, 29, 58, 0.05);
+}
+
+.card-premium:hover {
+  box-shadow: 0 4px 24px rgba(11, 29, 58, 0.08);
+}
+
+.input-field {
+  height: 3rem;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: #0b1d3a;
+  box-shadow: 0 0 0 3px rgba(11, 29, 58, 0.1);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background-color: #0b1d3a;
+  color: #ffffff;
+  font-weight: 700;
+  transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(11, 29, 58, 0.35);
+}
+
+.btn-primary:hover {
+  background-color: #071428;
+  box-shadow: 0 6px 16px rgba(11, 29, 58, 0.4);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
