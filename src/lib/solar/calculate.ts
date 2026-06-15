@@ -10,6 +10,7 @@ import {
 } from "@/data/solarConfig";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { resolveDefaultInstallType } from "@/data/resultUx";
+import { logSolarCalculationDebug } from "@/lib/solar/debug";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
 

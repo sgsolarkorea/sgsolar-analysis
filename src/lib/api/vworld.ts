@@ -1,4 +1,4 @@
-import { result } from "@/data/sampleData";
+import { unavailableLandInfo } from "@/lib/api/infoFallbacks";
 import type { InfoField } from "@/types/siteReview";
 
 const VWORLD_DATA_API = "https://api.vworld.kr/req/data";
@@ -181,7 +181,7 @@ function mapCharacteristicsToLandInfo(
 }
 
 function buildPnuOnlyLandInfo(_pnu: string): InfoField[] {
-  return result.landInfo.filter((item) => item.label !== "PNU(고유번호)");
+  return unavailableLandInfo();
 }
 
 /**
@@ -197,7 +197,7 @@ export async function getLandInfoByVworld(
   lat: number,
   lng: number,
 ): Promise<VworldLandResult> {
-  const fallback: VworldLandResult = { pnu: null, landInfo: result.landInfo };
+  const fallback: VworldLandResult = { pnu: null, landInfo: unavailableLandInfo() };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
   if (!apiKey) {

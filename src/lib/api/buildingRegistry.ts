@@ -1,4 +1,4 @@
-import { result } from "@/data/sampleData";
+import { unavailableBuildingInfo } from "@/lib/api/infoFallbacks";
 import { parsePnu } from "@/lib/api/pnu";
 import type { InfoField } from "@/types/siteReview";
 
@@ -239,7 +239,7 @@ async function fetchTitleInfo(parsed: ReturnType<typeof parsePnu>): Promise<Buil
   };
 
   if (!getServiceKey()) {
-    console.warn("[BuildingRegistry] DATA_GO_KR_SERVICE_KEY missing — using fallback");
+    console.warn("[BuildingRegistry] DATA_GO_KR_SERVICE_KEY missing — building info unavailable");
     return [];
   }
 
@@ -258,14 +258,14 @@ export async function getBuildingInfoByRegistry(
   input: BuildingInfoInput,
 ): Promise<InfoField[]> {
   if (!input.pnu) {
-    console.warn("[BuildingRegistry] PNU missing — using fallback");
-    return result.buildingInfo;
+    console.warn("[BuildingRegistry] PNU missing — building info unavailable");
+    return unavailableBuildingInfo();
   }
 
   const parsed = parsePnu(input.pnu);
   if (!parsed) {
-    console.warn("[BuildingRegistry] Invalid PNU — using fallback:", input.pnu);
-    return result.buildingInfo;
+    console.warn("[BuildingRegistry] Invalid PNU — building info unavailable:", input.pnu);
+    return unavailableBuildingInfo();
   }
 
   try {
@@ -273,13 +273,13 @@ export async function getBuildingInfoByRegistry(
     const selected = pickBestBuilding(items, input.buildingName);
 
     if (!selected) {
-      console.warn("[BuildingRegistry] No building found for PNU — using fallback");
-      return result.buildingInfo;
+      console.warn("[BuildingRegistry] No building found for PNU — building info unavailable");
+      return unavailableBuildingInfo();
     }
 
     return mapBuildingToFields(selected);
   } catch (error) {
     console.error("[BuildingRegistry] Lookup failed:", error);
-    return result.buildingInfo;
+    return unavailableBuildingInfo();
   }
 }
