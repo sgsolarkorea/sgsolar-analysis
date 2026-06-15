@@ -5,6 +5,7 @@
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
+import { resolveInfoDataSource } from "@/lib/api/infoFallbacks";
 import { parseJibunLot } from "@/lib/api/jibunParser";
 import { fetchLegalDongCodesByCoord, searchAddressByKakao } from "@/lib/api/kakao";
 import { getMarketPrice } from "@/lib/api/market";
@@ -54,7 +55,7 @@ function deriveGrade(capacityKw: number): Grade {
 }
 
 export async function calculateSolarProfitability(
-  input: ProfitabilityInput,
+  input: ProfitabilityInput & { hasRoadAddress?: boolean },
 ): Promise<{
   profitability: Profitability;
   solarMetrics: SolarMetrics;
@@ -62,7 +63,9 @@ export async function calculateSolarProfitability(
   installType: ReturnType<typeof resolveDefaultInstallType>;
 }> {
   const market = await getMarketPrice();
-  const installType = resolveDefaultInstallType("", input.landInfo, input.buildingInfo);
+  const installType = resolveDefaultInstallType("", input.landInfo, input.buildingInfo, {
+    hasRoadAddress: input.hasRoadAddress,
+  });
 
   const calc = calculateSolarMetrics({
     installType,
@@ -77,8 +80,13 @@ export async function calculateSolarProfitability(
     buildingArea: areas.buildingArea,
     landArea: areas.landArea,
     buildingUse: areas.buildingUse,
+    buildingAreaRaw: areas.buildingAreaRaw,
+    landAreaRaw: areas.landAreaRaw,
     defaultInstallType: calc.metrics.installType,
+    estimatedCapacity: calc.profitability.estimatedCapacity ?? formatCapacityDisplay(calc.capacityKw),
     calculatedCapacityKw: calc.capacityKw,
+    buildingDataSource: resolveInfoDataSource(input.buildingInfo, "건축면적"),
+    landDataSource: resolveInfoDataSource(input.landInfo, "면적"),
     source: "calculateSolarProfitability",
   });
 
@@ -100,15 +108,21 @@ export async function getRecommendedCases(
 async function resolvePnuForBuildingLookup(
   geo: Awaited<ReturnType<typeof searchAddressByKakao>>,
   vworldPnu: string | null,
-): Promise<string | null> {
-  if (vworldPnu) return vworldPnu;
+): Promise<{ pnu: string | null; pnuSource: "vworld" | "kakao-jibun-fallback" | "none" }> {
+  if (vworldPnu) {
+    return { pnu: vworldPnu, pnuSource: "vworld" };
+  }
 
   const lot = parseJibunLot(geo.jibunAddress);
   const legalDong = await fetchLegalDongCodesByCoord(geo.lat, geo.lng);
 
   if (!lot || !legalDong) {
-    console.warn("[Analysis] PNU fallback unavailable — missing jibun lot or legal dong code");
-    return null;
+    console.warn("[Analysis] PNU fallback unavailable — missing jibun lot or legal dong code", {
+      jibunAddress: geo.jibunAddress,
+      lot,
+      legalDong,
+    });
+    return { pnu: null, pnuSource: "none" };
   }
 
   const pnu = buildPnu({
@@ -119,14 +133,18 @@ async function resolvePnuForBuildingLookup(
     ji: lot.ji,
   });
 
-  console.info("[Analysis] PNU resolved via Kakao coord + jibun fallback");
-  return pnu;
+  console.info("[Analysis] PNU resolved via Kakao coord + jibun fallback", { pnu });
+  return { pnu, pnuSource: "kakao-jibun-fallback" };
+}
+
+function hasRoadAddress(address: string): boolean {
+  return /(?:\d+\s*(?:번길|길|로|대로))/.test(address);
 }
 
 export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const geo = await searchAddressByKakao(address);
   const landResult = await getLandInfoByVworld(geo.lat, geo.lng);
-  const pnu = await resolvePnuForBuildingLookup(geo, landResult.pnu);
+  const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, landResult.pnu);
 
   const buildingInfo = await getBuildingInfo({
     pnu,
@@ -137,6 +155,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     address: geo.address,
     landInfo: landResult.landInfo,
     buildingInfo,
+    hasRoadAddress: hasRoadAddress(geo.address),
   });
 
   const { profitability, solarMetrics, monthlyGeneration } = solarResult;
@@ -156,7 +175,12 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     address: geo.address,
     ...extractAreasForDebug(landResult.landInfo, buildingInfo),
     defaultInstallType: solarMetrics.installType,
+    estimatedCapacity: profitability.estimatedCapacity ?? formatCapacityDisplay(solarMetrics.capacityKw),
     calculatedCapacityKw: solarMetrics.capacityKw,
+    buildingDataSource: resolveInfoDataSource(buildingInfo, "건축면적"),
+    landDataSource: resolveInfoDataSource(landResult.landInfo, "면적"),
+    pnu,
+    pnuSource,
     source: "analyzeSolarSite",
   });
 

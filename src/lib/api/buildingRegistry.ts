@@ -55,6 +55,23 @@ function getServiceKey(): string | null {
   return process.env.DATA_GO_KR_SERVICE_KEY?.trim() || null;
 }
 
+function getServiceKeyVariants(): string[] {
+  const raw = getServiceKey();
+  if (!raw) return [];
+
+  const variants = new Set<string>([raw]);
+
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded !== raw) variants.add(decoded);
+    variants.add(encodeURIComponent(decoded));
+  } catch {
+    variants.add(encodeURIComponent(raw));
+  }
+
+  return [...variants];
+}
+
 function pickField(item: BuildingTitleItem, ...keys: (keyof BuildingTitleItem)[]): string {
   for (const key of keys) {
     const value = item[key];
@@ -106,8 +123,8 @@ const LEGACY_BASE_URL = "https://apis.data.go.kr/1613000/BldRgstService_v2";
 const LEGACY_V1_BASE_URL = "https://apis.data.go.kr/1611000/BldRgstService";
 
 function buildApiUrls(endpoint: string, params: Record<string, string>): string[] {
-  const serviceKey = getServiceKey();
-  if (!serviceKey) return [];
+  const keys = getServiceKeyVariants();
+  if (keys.length === 0) return [];
 
   const query = new URLSearchParams({
     _type: "json",
@@ -118,8 +135,10 @@ function buildApiUrls(endpoint: string, params: Record<string, string>): string[
   const urls: string[] = [];
 
   for (const base of bases) {
-    urls.push(`${base}/${endpoint}?serviceKey=${serviceKey}&${query}`);
-    urls.push(`${base}/${endpoint}?ServiceKey=${serviceKey}&${query}`);
+    for (const serviceKey of keys) {
+      urls.push(`${base}/${endpoint}?serviceKey=${serviceKey}&${query}`);
+      urls.push(`${base}/${endpoint}?ServiceKey=${serviceKey}&${query}`);
+    }
   }
 
   return urls;
@@ -273,9 +292,26 @@ export async function getBuildingInfoByRegistry(
     const selected = pickBestBuilding(items, input.buildingName);
 
     if (!selected) {
-      console.warn("[BuildingRegistry] No building found for PNU — building info unavailable");
+      console.warn("[BuildingRegistry] No building found for PNU — building info unavailable", {
+        pnu: input.pnu,
+        sigunguCd: parsed.sigunguCd,
+        bjdongCd: parsed.bjdongCd,
+        bun: parsed.bun,
+        ji: parsed.ji,
+      });
       return unavailableBuildingInfo();
     }
+
+    const archArea = pickField(selected, "archArea", "arch_area");
+    console.info(
+      "[BuildingRegistry] Success",
+      JSON.stringify({
+        pnu: input.pnu,
+        archArea,
+        buildingUse: pickField(selected, "mainPurpsCdNm", "main_purps_cd_nm"),
+        itemCount: items.length,
+      }),
+    );
 
     return mapBuildingToFields(selected);
   } catch (error) {

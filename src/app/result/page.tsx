@@ -32,6 +32,8 @@ interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ResultPage({ searchParams }: ResultPageProps) {
   const params = await searchParams;
 

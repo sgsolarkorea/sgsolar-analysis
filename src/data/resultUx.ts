@@ -131,6 +131,7 @@ export function resolveDefaultInstallType(
   recommendation: string,
   landInfo: InfoField[],
   buildingInfo: InfoField[],
+  options?: { hasRoadAddress?: boolean },
 ): InstallTypeOption {
   const buildingArea = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
   const landArea = parseAreaSqm(getFieldValue(landInfo, "면적"));
@@ -144,10 +145,19 @@ export function resolveDefaultInstallType(
   if (buildingArea != null && buildingArea > 0) return "지붕형";
   if (hasBuilding) return "지붕형";
 
-  if (text.includes("토지") && (landArea != null && landArea > 0)) return "토지형";
-  if (landArea != null && landArea > 0 && !hasBuilding) return "토지형";
+  /** 도로명주소인데 건축물대장 실패 시 토지면적만으로 토지형 용량 산정하지 않음 (94kW 오산정 방지) */
+  const blockLandOnlyFallback =
+    options?.hasRoadAddress === true && !hasBuilding && buildingArea == null;
+
+  if (text.includes("토지") && landArea != null && landArea > 0 && !blockLandOnlyFallback) {
+    return "토지형";
+  }
+  if (landArea != null && landArea > 0 && !hasBuilding && !blockLandOnlyFallback) {
+    return "토지형";
+  }
 
   if (text.includes("옥상") || text.includes("지붕")) return "지붕형";
+  if (options?.hasRoadAddress) return "지붕형";
   return "아직 모름";
 }
 

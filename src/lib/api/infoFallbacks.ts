@@ -1,4 +1,5 @@
 import type { InfoField } from "@/types/siteReview";
+import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 
 /** API 실패 시 sampleData 가짜 수치 대신 사용 — 용량 계산에 영향 없음 */
 export function unavailableLandInfo(): InfoField[] {
@@ -21,4 +22,30 @@ export function unavailableBuildingInfo(): InfoField[] {
     { label: "사용승인일", value: "확인 필요", status: "상담 시 확인" },
     { label: "지붕형태", value: "확인 필요", status: "추가 확인 필요" },
   ];
+}
+
+export type InfoDataSource = "API" | "unavailable-fallback" | "sampleData";
+
+const SAMPLE_BUILDING_AREA = "820㎡";
+const SAMPLE_LAND_AREA = "2,340㎡";
+
+export function resolveInfoDataSource(
+  fields: InfoField[],
+  areaLabel: string,
+): InfoDataSource {
+  const areaValue = getFieldValue(fields, areaLabel);
+
+  if (areaValue === SAMPLE_BUILDING_AREA || areaValue === SAMPLE_LAND_AREA) {
+    return "sampleData";
+  }
+
+  if (fields.every((field) => field.value === "확인 필요")) {
+    return "unavailable-fallback";
+  }
+
+  if (parseAreaSqm(areaValue) != null || fields.some((field) => field.value !== "확인 필요")) {
+    return "API";
+  }
+
+  return "unavailable-fallback";
 }
