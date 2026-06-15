@@ -1,10 +1,26 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import { PDFDocument, rgb } from "pdf-lib";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import { MARKETING_NAME, company } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 
+const KR_FONT_URL =
+  "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@latest/korean-400-normal.ttf";
+
+let cachedFontBytes: ArrayBuffer | null = null;
+
 function todayFileDate(): string {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());
+}
+
+async function loadKoreanFontBytes(): Promise<ArrayBuffer> {
+  if (cachedFontBytes) return cachedFontBytes;
+  const response = await fetch(KR_FONT_URL, { cache: "force-cache" });
+  if (!response.ok) {
+    throw new Error(`PDF font load failed: HTTP ${response.status}`);
+  }
+  cachedFontBytes = await response.arrayBuffer();
+  return cachedFontBytes;
 }
 
 function wrapText(text: string, maxLen: number): string[] {
@@ -22,7 +38,6 @@ function wrapText(text: string, maxLen: number): string[] {
   return lines;
 }
 
-/** Latin-safe PDF lines — Korean rendered via unicode if font supports; fallback transliteration in sections */
 function sectionLines(data: ResolvedSiteReview): string[] {
   const m = data.solarMetrics;
   const landCategory = getFieldValue(data.landInfo, "지목");
@@ -30,82 +45,87 @@ function sectionLines(data: ResolvedSiteReview): string[] {
   const buildingArea = getFieldValue(data.buildingInfo, "건축면적");
 
   return [
-    "=== Solar Site Review Report (1st) ===",
+    "태양광 입지검토 1차 제안서",
     "",
-    `Company: ${MARKETING_NAME}`,
-    `Date: ${data.analyzedAt}`,
+    `작성: ${MARKETING_NAME}`,
+    `작성일: ${data.analyzedAt}`,
     "",
-    "[ Address ]",
-    `Road: ${data.address}`,
-    `Jibun: ${data.jibunAddress}`,
-    `Lat/Lng: ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}`,
-    data.zoneNo ? `Zip: ${data.zoneNo}` : "",
+    "[ 주소 ]",
+    `도로명: ${data.address}`,
+    `지번: ${data.jibunAddress}`,
+    `좌표: ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}`,
+    data.zoneNo ? `우편번호: ${data.zoneNo}` : "",
     "",
-    "[ Land ]",
-    `Category: ${landCategory}`,
-    `Zoning: ${zoning}`,
+    "[ 토지 정보 ]",
+    `지목: ${landCategory}`,
+    `용도지역: ${zoning}`,
+    `면적: ${getFieldValue(data.landInfo, "면적")}`,
     "",
-    "[ Building ]",
-    `Area: ${buildingArea}`,
-    `Usage: ${getFieldValue(data.buildingInfo, "건물 용도")}`,
+    "[ 건축물 정보 ]",
+    `건축면적: ${buildingArea}`,
+    `건물 용도: ${getFieldValue(data.buildingInfo, "건물 용도")}`,
     "",
-    "[ Install Type & Capacity ]",
-    `Type: ${m.installType}`,
-    `Base area: ${m.baseAreaLabel} ${m.baseAreaSqm} sqm`,
-    `Formula: ${m.formula}`,
-    `Capacity: ${data.capacity}`,
-    `Module: ${m.modulePowerW}W x ${m.moduleCount}`,
+    "[ 설치유형 · 용량 ]",
+    `유형: ${m.installType}`,
+    `기준면적: ${m.baseAreaLabel} ${m.baseAreaSqm}㎡`,
+    `산식: ${m.formula}`,
+    `예상 용량: ${data.capacity}`,
+    `모듈: ${m.modulePowerW}W × ${m.moduleCount}장`,
     "",
-    "[ Generation & Revenue ]",
-    `Annual generation: ${data.annualGeneration}`,
-    `SMP price: ${m.market.smpPrice} KRW/kWh (${m.market.smpDate})`,
-    `REC price: ${m.market.recPrice} KRW/MWh (${m.market.recDate})`,
-    `REC weight: ${m.recWeight} (${m.recWeightReason})`,
-    `Annual revenue: ${data.annualRevenue}`,
-    `20-year revenue: ${data.profitability.cumulative20YearRevenue ?? "N/A"}`,
-    `Market source: ${m.market.source}${m.market.isFallback ? " (fallback)" : ""}`,
+    "[ 발전량 · 수익 ]",
+    `연간 발전량: ${data.annualGeneration}`,
+    `SMP: ${m.market.smpPrice}원/kWh (${m.market.smpDate})`,
+    `REC: ${m.market.recPrice}원/MWh (${m.market.recDate})`,
+    `REC 가중치: ${m.recWeight} (${m.recWeightReason})`,
+    `연간 예상 수익: ${data.annualRevenue}`,
+    `20년 누적 수익: ${data.profitability.cumulative20YearRevenue ?? "별도 확인"}`,
     "",
-    "[ Construction Cost ]",
-    `Estimate: ${data.constructionCost}`,
-    `Unit: ${data.profitability.constructionCostPerKw ?? "N/A"}`,
+    "[ 시공비 ]",
+    `예상 시공비: ${data.constructionCost}`,
+    `kW당 단가: ${data.profitability.constructionCostPerKw ?? "별도 확인"}`,
     "",
-    "[ Similar Cases ]",
+    "[ 유사 시공사례 ]",
     ...data.recommendedCases.slice(0, 3).map((c, i) => `${i + 1}. ${c.title} (${c.capacity})`),
     "",
-    "[ Consultation ]",
-    `Phone: ${company.phone}`,
-    `Email: ${company.email}`,
-    `Website: ${company.website}`,
+    "[ 상담 문의 ]",
+    `전화: ${company.phone}`,
+    `이메일: ${company.email}`,
+    `웹사이트: ${company.website}`,
     "",
-    "Disclaimer: Reference only. Final install/revenue subject to site survey.",
+    "※ 본 제안서는 참고용 1차 검토이며, 최종 설치·수익은 현장 실사 후 확정됩니다.",
   ].filter(Boolean);
 }
 
 export async function generateSiteReviewPdf(data: ResolvedSiteReview): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+
+  const fontBytes = await loadKoreanFontBytes();
+  const font = await pdfDoc.embedFont(fontBytes);
+  const fontBold = font;
+
   pdfDoc.setTitle("태양광 입지검토 1차 제안서");
   pdfDoc.setSubject(`${data.address} 입지검토 결과`);
   pdfDoc.setCreator(MARKETING_NAME);
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([595, 842]);
   const { height } = page.getSize();
   let y = height - 50;
   const margin = 50;
-  const lineHeight = 14;
+  const lineHeight = 16;
 
-  page.drawText("Solar Site Review Proposal (1st)", {
+  page.drawText("태양광 입지검토 1차 제안서", {
     x: margin,
     y,
-    size: 16,
+    size: 18,
     font: fontBold,
     color: rgb(0.1, 0.15, 0.3),
   });
-  y -= 28;
+  y -= 32;
 
   for (const rawLine of sectionLines(data)) {
-    const lines = wrapText(rawLine, 85);
+    const isHeading = rawLine.startsWith("[") || rawLine.startsWith("태양광");
+    const lines = wrapText(rawLine, isHeading ? 40 : 44);
     for (const line of lines) {
       if (y < 60) {
         page = pdfDoc.addPage([595, 842]);
@@ -114,8 +134,8 @@ export async function generateSiteReviewPdf(data: ResolvedSiteReview): Promise<U
       page.drawText(line, {
         x: margin,
         y,
-        size: line.startsWith("===") || line.startsWith("[") ? 10 : 9,
-        font: line.startsWith("[") ? fontBold : font,
+        size: isHeading ? 11 : 10,
+        font: isHeading ? fontBold : font,
         color: rgb(0.15, 0.15, 0.15),
         maxWidth: 495,
       });

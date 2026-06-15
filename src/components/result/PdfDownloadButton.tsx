@@ -15,7 +15,9 @@ export default function PdfDownloadButton({ address }: PdfDownloadButtonProps) {
       const params = new URLSearchParams({ address });
       const res = await fetch(`/api/report/pdf?${params.toString()}`);
       if (!res.ok) {
-        throw new Error("PDF 생성에 실패했습니다.");
+        const body = await res.json().catch(() => null);
+        const detail = body && typeof body.error === "string" ? body.error : null;
+        throw new Error(detail ?? "PDF 생성에 실패했습니다.");
       }
       const blob = await res.blob();
       const disposition = res.headers.get("Content-Disposition") ?? "";

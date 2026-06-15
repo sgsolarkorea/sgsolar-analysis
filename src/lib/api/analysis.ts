@@ -145,34 +145,29 @@ function hasRoadAddress(address: string): boolean {
   return /(?:\d+\s*(?:번길|길|로|대로))/.test(address);
 }
 
-async function resolveLandInfo(
-  landResult: Awaited<ReturnType<typeof getLandInfoByVworld>>,
-  pnu: string | null,
-): Promise<InfoField[]> {
-  if (hasLandRecord(landResult.landInfo)) {
-    return landResult.landInfo;
-  }
-
-  if (pnu) {
-    const retry = await getLandInfoByPnu(pnu);
-    if (hasLandRecord(retry.landInfo)) {
-      console.info("[Analysis] Land info resolved via PNU retry", { pnu });
-      return retry.landInfo;
-    }
-    console.warn("[Analysis] Land info unavailable after PNU retry", { pnu });
-  }
-
-  return unavailableLandInfo();
-}
-
 export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const geo = await searchAddressByKakao(address);
-  const landResult = await getLandInfoByVworld(geo.lat, geo.lng);
-  const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, landResult.pnu);
-  const landInfo = await resolveLandInfo(landResult, pnu);
+  const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, null);
+
+  const [landResult, landByPnu] = await Promise.all([
+    getLandInfoByVworld(geo.lat, geo.lng),
+    pnu ? getLandInfoByPnu(pnu) : Promise.resolve(null),
+  ]);
+
+  const effectivePnu = landResult.pnu ?? pnu;
+  let landInfo = landResult.landInfo;
+  if (!hasLandRecord(landInfo) && landByPnu && hasLandRecord(landByPnu.landInfo)) {
+    console.info("[Analysis] Land info resolved via parallel PNU lookup", { pnu: effectivePnu });
+    landInfo = landByPnu.landInfo;
+  } else if (!hasLandRecord(landInfo)) {
+    landInfo = unavailableLandInfo();
+    if (effectivePnu) {
+      console.warn("[Analysis] Land info unavailable after VWorld + PNU lookup", { pnu: effectivePnu });
+    }
+  }
 
   const buildingInfo = await getBuildingInfo({
-    pnu,
+    pnu: effectivePnu,
     buildingName: geo.buildingName,
   });
 
@@ -204,8 +199,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     calculatedCapacityKw: solarMetrics.capacityKw,
     buildingDataSource: resolveInfoDataSource(buildingInfo, "건축면적"),
     landDataSource: resolveInfoDataSource(landInfo, "면적"),
-    pnu,
-    pnuSource,
+    pnu: effectivePnu,
+    pnuSource: landResult.pnu ? "vworld" : pnuSource,
     source: "analyzeSolarSite",
   });
 
@@ -223,7 +218,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   return {
     address: geo.address,
     jibunAddress: geo.jibunAddress,
-    pnu: pnu ?? "",
+    pnu: effectivePnu ?? "",
     lat: geo.lat,
     lng: geo.lng,
     buildingName: geo.buildingName,

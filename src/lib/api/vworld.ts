@@ -9,14 +9,6 @@ export interface VworldLandResult {
   landInfo: InfoField[];
 }
 
-export interface VworldFetchDiagnostic {
-  url: string;
-  httpStatus: number | null;
-  apiStatus?: string;
-  errorText?: string;
-  bodyPreview?: string;
-}
-
 interface VworldFeatureCollection {
   features?: Array<{
     properties?: Record<string, string>;
@@ -46,7 +38,7 @@ interface LandCharacteristicsResponse {
   landCharacteristics?: {
     field?: LandCharacteristicsField | LandCharacteristicsField[];
   };
-  /** VWorld API 실제 응답 키 (typo 포함) */
+  /** VWorld API 실제 응답 키 */
   landCharacteristicss?: {
     field?: LandCharacteristicsField | LandCharacteristicsField[];
   };
@@ -56,20 +48,31 @@ interface LandCharacteristicsResponse {
   };
 }
 
+function normalizeDomain(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/+$/, "");
+}
+
+/** VWorld 키 발급 시 등록한 도메인(VWORLD_API_DOMAIN) 우선 */
 function getApiDomainCandidates(): string[] {
-  const candidates = new Set<string>();
-  const configured = process.env.VWORLD_API_DOMAIN?.trim();
-  const vercelUrl = process.env.VERCEL_URL?.trim();
-  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  const candidates: string[] = [];
+  const add = (value?: string | null) => {
+    if (!value) return;
+    const normalized = normalizeDomain(value);
+    if (normalized && !candidates.includes(normalized)) {
+      candidates.push(normalized);
+    }
+  };
 
-  if (configured) candidates.add(configured);
-  if (vercelUrl) candidates.add(vercelUrl);
-  if (productionUrl) candidates.add(productionUrl);
-  candidates.add("sgsolar-analysis.vercel.app");
-  candidates.add("analysis.sgsolar.co.kr");
-  candidates.add("localhost:3000");
+  add(process.env.VWORLD_API_DOMAIN);
+  add("sgsolar-analysis.vercel.app");
+  add(process.env.VERCEL_URL);
+  add("analysis.sgsolar.co.kr");
+  add("localhost:3000");
 
-  return [...candidates];
+  return candidates;
 }
 
 function getStdrYears(): string[] {
@@ -89,7 +92,7 @@ function extractLandField(
   return Array.isArray(field) ? (field[0] ?? null) : field;
 }
 
-function buildSearchParams(apiKey: string, domain: string): URLSearchParams {
+function buildDataApiParams(apiKey: string, domain: string): URLSearchParams {
   return new URLSearchParams({
     key: apiKey,
     format: "json",
@@ -98,78 +101,67 @@ function buildSearchParams(apiKey: string, domain: string): URLSearchParams {
   });
 }
 
-function redactApiKey(url: string): string {
-  return url.replace(/([?&](key|Key)=)[^&]+/gi, "$1***");
+function buildLandApiParams(apiKey: string, domain: string): URLSearchParams {
+  return new URLSearchParams({
+    key: apiKey,
+    format: "json",
+    domain,
+  });
 }
 
-function previewBody(text: string, max = 600): string {
-  return text.length > max ? `${text.slice(0, max)}…` : text;
+function isVworldAuthError(data: unknown): boolean {
+  if (!data || typeof data !== "object") return false;
+  const record = data as Record<string, unknown>;
+  const nested = record.landCharacteristicss as { resultCode?: string } | undefined;
+  if (nested?.resultCode === "INCORRECT_KEY") return true;
+  const response = record.response as { error?: { code?: string; text?: string } } | undefined;
+  const code = response?.error?.code ?? "";
+  const text = response?.error?.text ?? "";
+  return /INCORRECT|AUTH|KEY|인증/i.test(`${code} ${text}`);
 }
 
-async function fetchJsonWithDiagnostic<T>(
-  url: string,
-  label: string,
-): Promise<{ data: T | null; diagnostic: VworldFetchDiagnostic }> {
-  const maxAttempts = 3;
-  const diagnostic: VworldFetchDiagnostic = {
-    url: redactApiKey(url),
-    httpStatus: null,
-  };
+async function fetchVworldJson<T>(url: string, label: string): Promise<T | null> {
+  const maxAttempts = 2;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       const response = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(20_000),
-        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(12_000),
+        headers: {
+          Accept: "application/json",
+          Connection: "close",
+        },
       });
 
-      diagnostic.httpStatus = response.status;
-      const text = await response.text();
-      diagnostic.bodyPreview = previewBody(text);
-
       if (!response.ok) {
-        console.warn(
-          `[VWorld] ${label} HTTP ${response.status} (attempt ${attempt}/${maxAttempts})`,
-          diagnostic.url,
-        );
+        console.warn(`[VWorld] ${label} HTTP ${response.status} (attempt ${attempt})`);
+        if (response.status >= 400 && response.status < 500) break;
         continue;
       }
 
-      try {
-        const data = JSON.parse(text) as T & {
-          response?: { status?: string; error?: { text?: string } };
-        };
-        diagnostic.apiStatus = data.response?.status;
-        if (data.response?.error?.text) {
-          diagnostic.errorText = data.response.error.text;
-        }
-        return { data, diagnostic };
-      } catch {
-        console.warn(`[VWorld] ${label} invalid JSON`, diagnostic.url);
-        return { data: null, diagnostic };
+      const data = (await response.json()) as T;
+      if (isVworldAuthError(data)) {
+        console.warn(`[VWorld] ${label} domain/key mismatch`);
+        return null;
       }
+      return data;
     } catch (error) {
-      diagnostic.errorText = error instanceof Error ? error.message : String(error);
-      console.warn(`[VWorld] ${label} fetch attempt ${attempt}/${maxAttempts} failed:`, error);
-      if (attempt < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, attempt * 400));
-      }
+      console.warn(`[VWorld] ${label} attempt ${attempt} failed:`, error);
     }
   }
 
-  console.warn(`[VWorld] ${label} failed`, JSON.stringify(diagnostic));
-  return { data: null, diagnostic };
+  return null;
 }
 
 /** 좌표 → PNU (연속지적도 필지 경계) */
-export async function fetchPnuByCoordinates(
+async function fetchPnuByCoordinates(
   lat: number,
   lng: number,
   apiKey: string,
 ): Promise<string | null> {
   for (const domain of getApiDomainCandidates()) {
-    const params = buildSearchParams(apiKey, domain);
+    const params = buildDataApiParams(apiKey, domain);
     params.set("service", "data");
     params.set("request", "GetFeature");
     params.set("data", "LP_PA_CBND_BUBUN");
@@ -180,61 +172,43 @@ export async function fetchPnuByCoordinates(
     params.set("crs", "EPSG:4326");
     params.set("geomFilter", `POINT(${lng} ${lat})`);
 
-    const { data, diagnostic } = await fetchJsonWithDiagnostic<VworldDataResponse>(
+    const data = await fetchVworldJson<VworldDataResponse>(
       `${VWORLD_DATA_API}?${params.toString()}`,
       "PNU-by-coords",
     );
 
     const features = data?.response?.result?.featureCollection?.features;
     const pnu = features?.[0]?.properties?.pnu ?? features?.[0]?.properties?.PNU;
-
-    if (pnu) {
-      console.info(`[VWorld] PNU resolved with domain: ${domain}`, { pnu });
-      return String(pnu);
-    }
-
-    console.warn(`[VWorld] PNU not found for domain: ${domain}`, JSON.stringify(diagnostic));
+    if (pnu) return String(pnu);
   }
 
   return null;
 }
 
 /** PNU → 토지특성 (지목·면적·용도지역) */
-export async function fetchLandCharacteristics(
+async function fetchLandCharacteristics(
   pnu: string,
   apiKey: string,
 ): Promise<LandCharacteristicsField | null> {
   for (const domain of getApiDomainCandidates()) {
     for (const stdrYear of getStdrYears()) {
-      const params = buildSearchParams(apiKey, domain);
+      const params = buildLandApiParams(apiKey, domain);
       params.set("pnu", pnu);
       params.set("stdrYear", stdrYear);
 
-      const { data, diagnostic } = await fetchJsonWithDiagnostic<LandCharacteristicsResponse>(
+      const data = await fetchVworldJson<LandCharacteristicsResponse>(
         `${VWORLD_LAND_API}?${params.toString()}`,
         "land-characteristics",
       );
 
       const field = extractLandField(data);
       if (field?.lndcgrCodeNm || field?.lndpclAr || field?.prposArea1Nm) {
-        console.info(`[VWorld] Land characteristics resolved`, {
-          domain,
-          stdrYear,
-          pnu,
-          lndcgrCodeNm: field.lndcgrCodeNm,
-          lndpclAr: field.lndpclAr,
-          prposArea1Nm: field.prposArea1Nm,
-        });
         return field;
       }
-
-      console.warn(
-        `[VWorld] Land characteristics empty for domain=${domain} year=${stdrYear}`,
-        JSON.stringify(diagnostic),
-      );
     }
   }
 
+  console.warn("[VWorld] Land characteristics not found for PNU:", pnu);
   return null;
 }
 
@@ -287,22 +261,19 @@ function mapCharacteristicsToLandInfo(
   ];
 }
 
-/** PNU로 토지특성만 조회 (좌표→PNU 실패 후 재시도용) */
+/** PNU로 토지특성 조회 */
 export async function getLandInfoByPnu(pnu: string): Promise<VworldLandResult> {
   const fallback: VworldLandResult = { pnu, landInfo: unavailableLandInfo() };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
   if (!apiKey) {
-    console.warn("[VWorld] VWORLD_API_KEY not configured — land info by PNU unavailable");
+    console.warn("[VWorld] VWORLD_API_KEY not configured");
     return fallback;
   }
 
   try {
     const characteristics = await fetchLandCharacteristics(pnu, apiKey);
-    if (!characteristics) {
-      console.warn("[VWorld] Land characteristics not found for PNU:", pnu);
-      return fallback;
-    }
+    if (!characteristics) return fallback;
 
     return {
       pnu,
@@ -314,11 +285,7 @@ export async function getLandInfoByPnu(pnu: string): Promise<VworldLandResult> {
   }
 }
 
-/**
- * VWorld — 좌표 기반 토지정보 조회 (서버 전용)
- * 1) LP_PA_CBND_BUBUN: 좌표 → PNU
- * 2) getLandCharacteristics: PNU → 지목·면적·용도지역
- */
+/** 좌표 기반 토지정보 조회 (서버 전용) */
 export async function getLandInfoByVworld(
   lat: number,
   lng: number,
@@ -326,75 +293,26 @@ export async function getLandInfoByVworld(
   const fallback: VworldLandResult = { pnu: null, landInfo: unavailableLandInfo() };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
-  console.info("[VWorld] getLandInfoByVworld start", {
-    apiKeyLoaded: Boolean(apiKey),
-    apiKeyLength: apiKey?.length ?? 0,
-    domainConfigured: Boolean(process.env.VWORLD_API_DOMAIN?.trim()),
-    lat,
-    lng,
-  });
-
   if (!apiKey) {
-    console.warn("[VWorld] VWORLD_API_KEY not configured — land info unavailable");
+    console.warn("[VWorld] VWORLD_API_KEY not configured");
     return fallback;
   }
 
   try {
     const pnu = await fetchPnuByCoordinates(lat, lng, apiKey);
-    if (!pnu) {
-      console.warn("[VWorld] PNU not found for coordinates — land info unavailable", { lat, lng });
-      return fallback;
-    }
+    if (!pnu) return fallback;
 
     const characteristics = await fetchLandCharacteristics(pnu, apiKey);
     if (!characteristics) {
-      console.warn("[VWorld] Land characteristics not found — partial PNU only", { pnu });
       return { pnu, landInfo: unavailableLandInfo() };
     }
 
-    const landInfo = mapCharacteristicsToLandInfo(pnu, characteristics);
-    console.info("[VWorld] getLandInfoByVworld success", {
+    return {
       pnu,
-      hasLandRecord: hasLandRecord(landInfo),
-    });
-
-    return { pnu, landInfo };
+      landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
+    };
   } catch (error) {
-    console.error("[VWorld] API error — land info unavailable:", error);
+    console.error("[VWorld] getLandInfoByVworld error:", error);
     return fallback;
   }
-}
-
-export async function diagnoseVworldForSite(
-  lat: number,
-  lng: number,
-  pnuFallback: string | null,
-): Promise<Record<string, unknown>> {
-  const apiKey = process.env.VWORLD_API_KEY?.trim();
-  const domains = getApiDomainCandidates();
-
-  const pnuFromCoords = apiKey ? await fetchPnuByCoordinates(lat, lng, apiKey) : null;
-  const landByCoords = await getLandInfoByVworld(lat, lng);
-  const landByPnu = pnuFallback ? await getLandInfoByPnu(pnuFallback) : null;
-
-  return {
-    apiKeyLoaded: Boolean(apiKey),
-    apiKeyLength: apiKey?.length ?? 0,
-    domainCandidates: domains,
-    configuredDomain: process.env.VWORLD_API_DOMAIN?.trim() ?? null,
-    pnuFromCoordinates: pnuFromCoords,
-    pnuFallback,
-    landByCoordinates: {
-      pnu: landByCoords.pnu,
-      hasLandRecord: hasLandRecord(landByCoords.landInfo),
-      landInfo: landByCoords.landInfo,
-    },
-    landByPnu: landByPnu
-      ? {
-          pnu: landByPnu.pnu,
-          hasLandRecord: hasLandRecord(landByPnu.landInfo),
-          landInfo: landByPnu.landInfo,
-        }
-      : null,
-  };
 }

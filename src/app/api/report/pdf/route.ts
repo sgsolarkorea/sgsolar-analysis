@@ -3,6 +3,8 @@ import { analyzeSolarSite } from "@/lib/api/analysis";
 import { getKakaoErrorMessage } from "@/lib/api/kakaoErrors";
 import { generateSiteReviewPdf, siteReviewPdfFilename } from "@/lib/pdf/siteReviewPdf";
 
+export const maxDuration = 60;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const address = searchParams.get("address")?.trim() ?? "";
@@ -25,9 +27,8 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: getKakaoErrorMessage(error) },
-      { status: 500 },
-    );
+    console.error("[PDF] generation failed:", error);
+    const message = error instanceof Error ? error.message : getKakaoErrorMessage(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
