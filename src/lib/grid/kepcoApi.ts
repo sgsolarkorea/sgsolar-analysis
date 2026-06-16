@@ -1,7 +1,6 @@
 import { parseKepcoAddress } from "@/lib/grid/kepcoAddress";
 import {
   findNearbyKepcoItem,
-  isDirectKepcoMatch,
 } from "@/lib/grid/kepcoNearby";
 import {
   getKepcoDispersedGenerationUrl,
@@ -323,17 +322,16 @@ export async function fetchKepcoGridByLocation(input: {
     buildDirectParamAttempts(metroCandidates, cityCd, target),
   );
 
-  if (directItems.length && isDirectKepcoMatch(directItems, target)) {
-    const poles = mapKepcoResponseToPoles(directItems, referenceLocation, target);
-    if (poles.length) {
-      return {
-        dataAsOfDate: extractDataAsOfDate(directItems),
-        poles,
-        matchType: "direct",
-        nearbyDistanceKm: null,
-        nearbyReferenceAddress: null,
-      };
-    }
+  if (directItems.length) {
+    const best = selectBestDispersedItem(directItems, target) ?? directItems[0]!;
+    const pole = mapSingleItemToPole(best, referenceLocation);
+    return {
+      dataAsOfDate: extractDataAsOfDate(directItems),
+      poles: [pole],
+      matchType: "direct",
+      nearbyDistanceKm: null,
+      nearbyReferenceAddress: null,
+    };
   }
 
   // 2) 시군구 전체 조회 → 좌표 기반 근접 탐색 (1km → 3km → 5km)

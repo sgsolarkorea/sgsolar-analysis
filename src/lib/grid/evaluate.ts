@@ -98,6 +98,15 @@ export function formatMw(
   return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}MW`;
 }
 
+/** D/L 잔여용량 표시 — kW→MW 변환값 소수 3자리 (예: 8.001MW) */
+export function formatDlRemainingMw(
+  value: number | null | undefined,
+  fallback = GRID_UNKNOWN_VALUE,
+): string {
+  if (value == null || !Number.isFinite(value)) return fallback;
+  return `${value.toLocaleString("ko-KR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}MW`;
+}
+
 export function formatCapacityMargin(
   remainingMw: number | null,
   expectedMw: number,

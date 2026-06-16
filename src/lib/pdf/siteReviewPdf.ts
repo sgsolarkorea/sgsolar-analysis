@@ -9,7 +9,7 @@ import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { yearlyGenerationPerKw } from "@/data/solarConfig";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
-import { formatMw } from "@/lib/grid/evaluate";
+import { formatDlRemainingMw, formatMw } from "@/lib/grid/evaluate";
 import {
   COLORS,
   MARGIN,
@@ -275,7 +275,7 @@ function drawGridPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: Res
     font,
     fontBold,
     "한전 계통 연계",
-    "변전소 · MTR · D/L · 잔여용량 · 예상 접속용량",
+    "변전소 · MTR · D/L · D/L 잔여용량 · 태양광 설치용량",
   );
 
   const grid = data.gridInfo;
@@ -385,7 +385,7 @@ function drawGridPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: Res
       y,
       (tableW - 12) / 2,
       72,
-      "예상 접속용량",
+      "태양광 설치용량",
       grid.expectedCapacityDisplay,
     );
     drawMetricCard(
@@ -396,8 +396,8 @@ function drawGridPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: Res
       y,
       (tableW - 12) / 2,
       72,
-      "계통 연계 상태",
-      grid.statusLabel,
+      "D/L 잔여용량",
+      formatDlRemainingMw(grid.distributionLine.remainingMw),
     );
     y -= 96;
 

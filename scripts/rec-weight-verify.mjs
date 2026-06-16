@@ -21,7 +21,7 @@ const market = {
 };
 
 function calcByCapacity(capacityKw, category) {
-  const areaPerKw = category === "land" ? 8.94 : 8.72;
+  const areaPerKw = category === "land" ? 8.72 : 7;
   const baseAreaSqm = capacityKw * areaPerKw;
   const installType = category === "land" ? "토지형" : "지붕형";
   const landInfo = category === "land" ? [{ label: "면적", value: `${baseAreaSqm}㎡` }] : [];

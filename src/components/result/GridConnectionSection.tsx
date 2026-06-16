@@ -8,7 +8,7 @@ import {
   hasDetailedGridData,
   GRID_UNKNOWN_VALUE,
 } from "@/lib/grid/display";
-import { formatMw } from "@/lib/grid/evaluate";
+import { formatDlRemainingMw, formatMw } from "@/lib/grid/evaluate";
 import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
@@ -272,10 +272,13 @@ export default function GridConnectionSection({
                 dl={fmtRem(gridInfo.distributionLine.remainingMw)}
               />
               <SingleValueCard
-                title="예상접속용량"
+                title="태양광 설치용량"
                 value={gridInfo.expectedCapacityDisplay}
               />
-              <SingleValueCard title="용량여유" value={gridInfo.capacityMarginDisplay} />
+              <SingleValueCard
+                title="D/L 잔여용량"
+                value={formatDlRemainingMw(gridInfo.distributionLine.remainingMw)}
+              />
             </div>
 
             <p className="text-sm leading-relaxed text-slate-600">{gridInfo.reviewResult}</p>
