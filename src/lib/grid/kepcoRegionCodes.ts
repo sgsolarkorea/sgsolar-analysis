@@ -148,48 +148,31 @@ async function getCityCodesForMetro(
     (item) => normalizeMetroCode(item.uppoCd) === normalizedMetro,
   );
 
+  if (!filtered.length && sido) {
+    const normalizedSido = normalizeRegionName(sido);
+    filtered = allCityCodes.filter((item) => {
+      const uppoNm = normalizeRegionName(item.uppoCdNm ?? "");
+      return uppoNm.includes(normalizedSido);
+    });
+  }
+
   cityCodeCache.set(cacheKey, filtered);
   return filtered;
 }
 
 function matchCityCode(sigungu: string, candidates: KepcoCommonCodeItem[]): string | null {
   const normalizedSigungu = normalizeRegionName(sigungu);
-  const shortName = normalizeRegionName(sigungu.split(/\s+/).pop() ?? sigungu);
-  const tokens = sigungu.split(/\s+/).map(normalizeRegionName).filter(Boolean);
+  const shortName = normalizeRegionName((sigungu.split(/\s+/).pop() ?? sigungu).replace(/(시|군|구)$/, ""));
 
   for (const item of candidates) {
     const code = item.code?.trim();
     const name = normalizeRegionName(item.codeNm?.trim() ?? "");
     if (!code || !name) continue;
-    if (name === normalizedSigungu || name === shortName) return code;
+    const shortCodeName = name.replace(/(시|군|구)$/, "");
+    if (name === normalizedSigungu || shortCodeName === shortName) return code;
   }
 
-  let best: { code: string; score: number } | null = null;
-
-  for (const item of candidates) {
-    const code = item.code?.trim();
-    const name = item.codeNm?.trim();
-    if (!code || !name) continue;
-
-    const normalizedName = normalizeRegionName(name);
-    let score = 0;
-
-    if (normalizedSigungu.includes(normalizedName) && normalizedName.length >= 2) {
-      score = 80 + normalizedName.length;
-    } else {
-      for (const token of tokens) {
-        if (token.length < 2) continue;
-        if (normalizedName === token) score = Math.max(score, 100);
-        else if (normalizedName.includes(token)) score = Math.max(score, 60 + token.length);
-      }
-    }
-
-    if (score > 0 && (!best || score > best.score)) {
-      best = { code, score };
-    }
-  }
-
-  return best?.code ?? null;
+  return null;
 }
 
 export async function resolveKepcoRegionCodes(input: {
