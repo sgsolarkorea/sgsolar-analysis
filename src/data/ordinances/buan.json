@@ -1,0 +1,31 @@
+{
+  "slug": "buan",
+  "municipalityLabel": "부안군",
+  "ordinanceTitle": "부안군 군계획 조례",
+  "appendixTitle": "[별표] 태양광 발전시설 허가기준",
+  "relatedLaw": "재생에너지법 / 부안군 군계획 조례",
+  "promulgatedDate": "조례 확인 필요",
+  "enforcedDate": "시행일 확인 필요",
+  "distanceRules": [
+    { "label": "주거지역", "distance": "200m 이상" },
+    { "label": "하천", "distance": "200m 이상" },
+    { "label": "산림경계", "distance": "200m 이상" },
+    { "label": "농업시설", "distance": "200m 이상" },
+    { "label": "관광지", "distance": "200m 이상" },
+    { "label": "도로", "distance": "200m 이상" }
+  ],
+  "articles": [
+    {
+      "id": "buan-art23",
+      "title": "제23조(개발행위허가의 기준)",
+      "summary": "부안군 태양광 발전시설 허가기준 요약",
+      "items": [
+        { "label": "도로", "distance": "200m", "summary": "도로 이격" },
+        { "label": "주거지역", "distance": "200m", "summary": "주거지역 이격" },
+        { "label": "하천", "distance": "200m", "summary": "하천 이격" },
+        { "label": "농업진흥구역", "summary": "농지법·농업진흥구역 검토" }
+      ],
+      "originalText": "부안군 군계획 조례 별표 기준을 확인하세요."
+    }
+  ]
+}

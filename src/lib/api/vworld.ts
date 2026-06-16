@@ -1,12 +1,15 @@
-import { hasLandRecord, unavailableLandInfo } from "@/lib/api/infoFallbacks";
+import { unavailableLandInfo } from "@/lib/api/infoFallbacks";
+import type { LandInfoDetail } from "@/types/landInfo";
 import type { InfoField } from "@/types/siteReview";
 
 const VWORLD_DATA_API = "https://api.vworld.kr/req/data";
 const VWORLD_LAND_API = "https://api.vworld.kr/ned/data/getLandCharacteristics";
+const VWORLD_LAND_PRICE_API = "https://api.vworld.kr/ned/data/getIndvdLandPriceAttr";
 
 export interface VworldLandResult {
   pnu: string | null;
   landInfo: InfoField[];
+  landDetail: LandInfoDetail;
 }
 
 interface VworldFeatureCollection {
@@ -32,6 +35,21 @@ interface LandCharacteristicsField {
   prposArea1Nm?: string;
   prposArea2Nm?: string;
   ladUseSittnNm?: string;
+  pblntfPclnd?: string | number;
+  lastUpdtDt?: string;
+  stdrYear?: string | number;
+  posesnSeCodeNm?: string;
+}
+
+interface IndvdLandPriceField {
+  pblntfPclnd?: string | number;
+  stdrYear?: string | number;
+  lastUpdtDt?: string;
+}
+
+interface IndvdLandPriceResponse {
+  indvdLandPrices?: { field?: IndvdLandPriceField | IndvdLandPriceField[] };
+  indvdLandPrice?: { field?: IndvdLandPriceField | IndvdLandPriceField[] };
 }
 
 interface LandCharacteristicsResponse {
@@ -226,44 +244,126 @@ function formatUseZone(field: LandCharacteristicsField): string {
   return zones.length > 0 ? zones.join(" / ") : "확인 필요";
 }
 
-function mapCharacteristicsToLandInfo(
-  _pnu: string,
+function formatOfficialPrice(value: string | number | undefined): string | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const num = Number(String(value).replace(/,/g, ""));
+  if (!Number.isFinite(num) || num <= 0) return undefined;
+  return `${num.toLocaleString("ko-KR")}원/㎡`;
+}
+
+function extractIndvdPriceField(data: IndvdLandPriceResponse | null): IndvdLandPriceField | null {
+  if (!data) return null;
+  const field = data.indvdLandPrices?.field ?? data.indvdLandPrice?.field;
+  if (!field) return null;
+  return Array.isArray(field) ? (field[0] ?? null) : field;
+}
+
+async function fetchIndvdLandPrice(pnu: string, apiKey: string): Promise<IndvdLandPriceField | null> {
+  for (const domain of getApiDomainCandidates()) {
+    for (const stdrYear of getStdrYears()) {
+      const params = buildLandApiParams(apiKey, domain);
+      params.set("pnu", pnu);
+      params.set("stdrYear", stdrYear);
+
+      const data = await fetchVworldJson<IndvdLandPriceResponse>(
+        `${VWORLD_LAND_PRICE_API}?${params.toString()}`,
+        "indvd-land-price",
+      );
+      const field = extractIndvdPriceField(data);
+      if (field?.pblntfPclnd) return field;
+    }
+  }
+  return null;
+}
+
+function unavailableLandDetail(): LandInfoDetail {
+  return {
+    landCategory: "확인 필요",
+    area: "확인 필요",
+    zoning: "확인 필요",
+    dataSource: "unavailable",
+  };
+}
+
+function buildLandDetail(
   field: LandCharacteristicsField,
-): InfoField[] {
+  priceField?: IndvdLandPriceField | null,
+  stdrYear?: string,
+): LandInfoDetail {
+  const useZone = formatUseZone(field);
+  const priceValue = field.pblntfPclnd ?? priceField?.pblntfPclnd;
+  const year =
+    field.stdrYear?.toString() ??
+    priceField?.stdrYear?.toString() ??
+    stdrYear ??
+    undefined;
+
+  const regionParts = [field.prposArea1Nm, field.prposArea2Nm]
+    .filter(Boolean)
+    .filter((v) => v !== "지정되지않음");
+
+  return {
+    landCategory: field.lndcgrCodeNm?.trim() || "확인 필요",
+    area: formatArea(field.lndpclAr),
+    zoning: field.prposArea1Nm?.trim() || useZone,
+    zoningSecondary:
+      field.prposArea2Nm && field.prposArea2Nm !== "지정되지않음"
+        ? field.prposArea2Nm.trim()
+        : undefined,
+    landUseSituation: field.ladUseSittnNm?.trim() || undefined,
+    officialLandPrice: formatOfficialPrice(priceValue),
+    priceReferenceYear: year,
+    priceReferenceDate: field.lastUpdtDt?.trim() || priceField?.lastUpdtDt?.trim(),
+    ownershipType: field.posesnSeCodeNm?.trim() || undefined,
+    regionDistrictSummary: regionParts.length > 0 ? regionParts.join(" · ") : undefined,
+    dataSource: "api",
+  };
+}
+
+async function resolveLandPayload(
+  pnu: string,
+  field: LandCharacteristicsField,
+  apiKey: string,
+  stdrYear?: string,
+): Promise<{ landInfo: InfoField[]; landDetail: LandInfoDetail }> {
+  let priceField: IndvdLandPriceField | null = null;
+  if (!field.pblntfPclnd) {
+    priceField = await fetchIndvdLandPrice(pnu, apiKey);
+  }
+
+  const landDetail = buildLandDetail(field, priceField, stdrYear);
   const useZone = formatUseZone(field);
 
-  return [
-    {
-      label: "지목",
-      value: field.lndcgrCodeNm?.trim() || "확인 필요",
-      status: field.lndcgrCodeNm ? "상담 시 확인" : "확인 필요",
-    },
-    {
-      label: "용도지역",
-      value: useZone,
-      status: useZone !== "확인 필요" ? "추가 확인 필요" : "확인 필요",
-    },
-    {
-      label: "면적",
-      value: formatArea(field.lndpclAr),
-      status: field.lndpclAr ? "상담 시 확인" : "확인 필요",
-    },
-    {
-      label: "규제사항",
-      value: useZone !== "확인 필요" ? `${useZone} 내 설치 검토` : "용도지역 확인 필요",
-      status: "추가 확인 필요",
-    },
+  const landInfo: InfoField[] = [
+    { label: "지목", value: landDetail.landCategory },
+    { label: "용도지역", value: useZone },
+    { label: "면적", value: landDetail.area },
+    ...(landDetail.officialLandPrice
+      ? [{ label: "공시지가", value: landDetail.officialLandPrice }]
+      : []),
+    ...(landDetail.priceReferenceYear
+      ? [{ label: "공시지가 기준연도", value: `${landDetail.priceReferenceYear}년` }]
+      : []),
+    ...(landDetail.ownershipType ? [{ label: "소유구분", value: landDetail.ownershipType }] : []),
+    ...(landDetail.regionDistrictSummary
+      ? [{ label: "지역·지구", value: landDetail.regionDistrictSummary }]
+      : []),
     {
       label: "토지이용계획",
-      value: field.ladUseSittnNm?.trim() || useZone,
-      status: "확인 필요",
+      value: landDetail.landUseSituation || useZone,
     },
   ];
+
+  return { landInfo, landDetail };
 }
 
 /** PNU로 토지특성 조회 */
 export async function getLandInfoByPnu(pnu: string): Promise<VworldLandResult> {
-  const fallback: VworldLandResult = { pnu, landInfo: unavailableLandInfo() };
+  const fallback: VworldLandResult = {
+    pnu,
+    landInfo: unavailableLandInfo(),
+    landDetail: unavailableLandDetail(),
+  };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
   if (!apiKey) {
@@ -275,10 +375,8 @@ export async function getLandInfoByPnu(pnu: string): Promise<VworldLandResult> {
     const characteristics = await fetchLandCharacteristics(pnu, apiKey);
     if (!characteristics) return fallback;
 
-    return {
-      pnu,
-      landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
-    };
+    const payload = await resolveLandPayload(pnu, characteristics, apiKey);
+    return { pnu, ...payload };
   } catch (error) {
     console.error("[VWorld] getLandInfoByPnu error:", error);
     return fallback;
@@ -290,7 +388,11 @@ export async function getLandInfoByVworld(
   lat: number,
   lng: number,
 ): Promise<VworldLandResult> {
-  const fallback: VworldLandResult = { pnu: null, landInfo: unavailableLandInfo() };
+  const fallback: VworldLandResult = {
+    pnu: null,
+    landInfo: unavailableLandInfo(),
+    landDetail: unavailableLandDetail(),
+  };
   const apiKey = process.env.VWORLD_API_KEY?.trim();
 
   if (!apiKey) {
@@ -304,13 +406,11 @@ export async function getLandInfoByVworld(
 
     const characteristics = await fetchLandCharacteristics(pnu, apiKey);
     if (!characteristics) {
-      return { pnu, landInfo: unavailableLandInfo() };
+      return { pnu, landInfo: unavailableLandInfo(), landDetail: unavailableLandDetail() };
     }
 
-    return {
-      pnu,
-      landInfo: mapCharacteristicsToLandInfo(pnu, characteristics),
-    };
+    const payload = await resolveLandPayload(pnu, characteristics, apiKey);
+    return { pnu, ...payload };
   } catch (error) {
     console.error("[VWorld] getLandInfoByVworld error:", error);
     return fallback;

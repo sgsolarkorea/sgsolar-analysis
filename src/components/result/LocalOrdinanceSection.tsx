@@ -1,8 +1,71 @@
-import type { LocalOrdinanceReview } from "@/types/regulatoryReview";
+"use client";
+
+import { useState } from "react";
+import type { MunicipalityOrdinanceData, OrdinanceArticle } from "@/types/regulatoryReview";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 interface LocalOrdinanceSectionProps {
-  review: LocalOrdinanceReview;
+  review: MunicipalityOrdinanceData;
+}
+
+function OrdinanceArticleCard({ article }: { article: OrdinanceArticle }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold text-navy">조례명</p>
+          <h4 className="mt-1 text-base font-bold text-slate-900">{article.title}</h4>
+          {article.summary && (
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{article.summary}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-slate-50 text-xs text-slate-600">
+            <tr>
+              <th className="px-3 py-2.5 font-semibold">항목</th>
+              <th className="px-3 py-2.5 font-semibold">기준</th>
+              <th className="px-3 py-2.5 font-semibold">요약</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {article.items.map((item) => (
+              <tr key={item.label}>
+                <td className="whitespace-nowrap px-3 py-3 font-medium text-slate-900">
+                  {item.label}
+                </td>
+                <td className="whitespace-nowrap px-3 py-3 text-slate-700">
+                  {item.distance ?? "—"}
+                </td>
+                <td className="px-3 py-3 text-slate-700">{item.summary}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {article.originalText && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setExpanded((prev) => !prev)}
+            className="text-sm font-semibold text-navy hover:underline"
+          >
+            {expanded ? "조례 원문 접기" : "조례 원문 펼치기"}
+          </button>
+          {expanded && (
+            <pre className="mt-3 whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">
+              {article.originalText}
+            </pre>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionProps) {
@@ -10,42 +73,18 @@ export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionP
     <section id="local-ordinance" className="scroll-mt-24">
       <SectionHeader
         title="법·조례 검토"
-        description="해당 지역 조례 및 태양광 발전시설 허가기준을 참고용으로 정리했습니다."
+        description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약했습니다."
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="card-premium p-5 sm:p-6">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-navy-light text-navy">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">적용 조례</p>
-              <h3 className="mt-1 text-base font-bold text-slate-900">{review.ordinanceTitle}</h3>
-              {review.appendixTitle && (
-                <p className="mt-2 text-sm text-slate-700">{review.appendixTitle}</p>
-              )}
-              {review.ordinanceUrl ? (
-                <a
-                  href={review.ordinanceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex text-sm font-semibold text-navy hover:underline"
-                >
-                  조례 원문 확인
-                </a>
-              ) : (
-                <p className="mt-3 text-sm font-medium text-slate-600">조례 확인 필요</p>
-              )}
-            </div>
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {review.municipalityLabel}
+          </p>
+          <h3 className="mt-1 text-lg font-bold text-slate-900">{review.ordinanceTitle}</h3>
+          {review.appendixTitle && (
+            <p className="mt-2 text-sm text-slate-700">{review.appendixTitle}</p>
+          )}
 
           <ul className="mt-5 divide-y divide-slate-100 rounded-xl border border-slate-100">
             {review.distanceRules.map((rule) => (
@@ -59,7 +98,7 @@ export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionP
 
         <div className="card-premium flex flex-col p-5 sm:p-6">
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold text-slate-500">관련 조항</p>
+            <p className="text-xs font-semibold text-slate-500">관련 법령</p>
             <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-900">
               {review.relatedLaw}
             </p>
@@ -76,17 +115,25 @@ export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionP
             <p className="mt-4 text-sm leading-relaxed text-slate-600">{review.statusNote}</p>
           )}
 
-          {review.appendixUrl && (
+          {review.ordinanceUrl ? (
             <a
-              href={review.appendixUrl}
+              href={review.ordinanceUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-auto pt-4 text-sm font-semibold text-navy hover:underline"
             >
-              별표 조회 →
+              조례 원문 확인 →
             </a>
+          ) : (
+            <p className="mt-auto pt-4 text-sm font-medium text-slate-600">조례 확인 필요</p>
           )}
         </div>
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {review.articles.map((article) => (
+          <OrdinanceArticleCard key={article.id} article={article} />
+        ))}
       </div>
     </section>
   );

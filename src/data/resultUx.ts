@@ -41,7 +41,14 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     label: "토지 정보",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "지목·면적·용도지역 확인 완료",
+    description: "지목·면적·용도지역·공시지가 확인",
+  },
+  {
+    id: "region-district",
+    label: "지역/지구 분석",
+    statusLabel: "참고",
+    statusKind: "reference",
+    description: "지역·지구별 설치 검토 가능성",
   },
   {
     id: "building-info",
@@ -119,13 +126,29 @@ export function resolveProgressSteps(
             ...step,
             statusLabel: "완료",
             statusKind: "complete" as ProgressStatusKind,
-            description: "지목·면적·용도지역 확인 완료",
+            description: "지목·면적·용도지역·공시지가 확인",
           }
         : {
             ...step,
             statusLabel: "추가 확인",
             statusKind: "caution" as ProgressStatusKind,
             description: "토지정보 추가 확인 필요",
+          };
+    }
+
+    if (step.id === "region-district") {
+      return hasLandRecord(landInfo)
+        ? {
+            ...step,
+            statusLabel: "참고",
+            statusKind: "reference" as ProgressStatusKind,
+            description: "용도지역 기준 1차 매칭",
+          }
+        : {
+            ...step,
+            statusLabel: "추가 확인",
+            statusKind: "caution" as ProgressStatusKind,
+            description: "토지정보 확인 후 분석 가능",
           };
     }
 

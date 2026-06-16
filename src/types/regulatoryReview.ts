@@ -1,3 +1,37 @@
+export interface OrdinanceArticleItem {
+  label: string;
+  distance?: string;
+  summary: string;
+}
+
+export interface OrdinanceArticle {
+  id: string;
+  title: string;
+  summary?: string;
+  items: OrdinanceArticleItem[];
+  originalText?: string;
+}
+
+export interface OrdinanceDistanceRule {
+  label: string;
+  distance: string;
+}
+
+export interface MunicipalityOrdinanceData {
+  slug: string;
+  municipalityLabel: string;
+  ordinanceTitle: string;
+  appendixTitle?: string;
+  appendixUrl?: string;
+  relatedLaw: string;
+  promulgatedDate?: string;
+  enforcedDate?: string;
+  ordinanceUrl?: string;
+  statusNote?: string;
+  distanceRules: OrdinanceDistanceRule[];
+  articles: OrdinanceArticle[];
+}
+
 export type SetbackJudgment = "적합" | "검토 필요" | "추가 확인" | "미측정";
 
 export interface SetbackReviewRow {
@@ -13,20 +47,5 @@ export interface SetbackReview {
   rows: SetbackReviewRow[];
 }
 
-export interface OrdinanceDistanceRule {
-  label: string;
-  distance: string;
-}
-
-export interface LocalOrdinanceReview {
-  municipalityLabel: string;
-  ordinanceTitle: string;
-  appendixTitle?: string;
-  appendixUrl?: string;
-  distanceRules: OrdinanceDistanceRule[];
-  relatedLaw: string;
-  promulgatedDate?: string;
-  enforcedDate?: string;
-  ordinanceUrl?: string;
-  statusNote?: string;
-}
+/** @deprecated MunicipalityOrdinanceData 사용 */
+export type LocalOrdinanceReview = MunicipalityOrdinanceData;

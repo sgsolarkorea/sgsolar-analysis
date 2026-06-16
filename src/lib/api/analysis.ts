@@ -16,6 +16,8 @@ import { getMarketPrice } from "@/lib/api/market";
 import { buildPnu } from "@/lib/api/pnu";
 import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/recommendCases";
 import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
+import { resolveRegionDistrictAnalysis } from "@/lib/regulatory/resolveRegionDistrictAnalysis";
+import type { LandInfoDetail } from "@/types/landInfo";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -156,9 +158,11 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
 
   const effectivePnu = landResult.pnu ?? pnu;
   let landInfo = landResult.landInfo;
+  let landInfoDetail: LandInfoDetail = landResult.landDetail;
   if (!hasLandRecord(landInfo) && landByPnu && hasLandRecord(landByPnu.landInfo)) {
     console.info("[Analysis] Land info resolved via parallel PNU lookup", { pnu: effectivePnu });
     landInfo = landByPnu.landInfo;
+    landInfoDetail = landByPnu.landDetail;
   } else if (!hasLandRecord(landInfo)) {
     landInfo = unavailableLandInfo();
     if (effectivePnu) {
@@ -214,6 +218,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   });
 
   const gridInfo = await getGridInfo(geo.lat, geo.lng);
+  const regionDistrictAnalysis = resolveRegionDistrictAnalysis(landInfo, landInfoDetail);
 
   return {
     address: geo.address,
@@ -226,6 +231,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     analyzedAt: getTodayString(),
     consultationDefaultAddress: geo.address,
     landInfo,
+    landInfoDetail,
+    regionDistrictAnalysis,
     buildingInfo,
     gridInfo,
     profitability,

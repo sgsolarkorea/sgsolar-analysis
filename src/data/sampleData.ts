@@ -287,6 +287,23 @@ export const result: Omit<
     { label: "규제사항", value: "준주거지역 내 설치 검토", status: "추가 확인 필요" },
     { label: "토지이용계획", value: "확인 필요", status: "확인 필요" },
   ],
+  landInfoDetail: {
+    landCategory: "대",
+    area: "2,340㎡",
+    zoning: "준주거지역",
+    landUseSituation: "확인 필요",
+    dataSource: "unavailable",
+  },
+  regionDistrictAnalysis: {
+    rows: [
+      {
+        district: "농림지역",
+        feasibility: "추가 확인 필요",
+        condition: "토지이용계획 확인 필요",
+      },
+    ],
+    sourceNote: "샘플 데이터 기준 참고",
+  },
   buildingInfo: [
     { label: "건물 용도", value: "업무시설 (근린생활시설)", status: "상담 시 확인" },
     { label: "구조", value: "철근콘크리트", status: "상담 시 확인" },

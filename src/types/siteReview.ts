@@ -1,3 +1,5 @@
+import type { LandInfoDetail, RegionDistrictAnalysis } from "@/types/landInfo";
+
 export type Grade = "A" | "B" | "C" | "D";
 export type SuitabilityStatus = "pass" | "caution" | "fail";
 export type FieldStatus = "상담 시 확인" | "추가 확인 필요" | "확인 필요";
@@ -155,6 +157,8 @@ export interface SiteReviewResult {
   annualRevenue: string;
   constructionCost: string;
   landInfo: InfoField[];
+  landInfoDetail: LandInfoDetail;
+  regionDistrictAnalysis: RegionDistrictAnalysis;
   buildingInfo: InfoField[];
   gridInfo: GridInfo;
   ordinanceInfo: OrdinanceItem[];

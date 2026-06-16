@@ -18,6 +18,22 @@ declare namespace kakao {
       setPosition(position: LatLng): void;
     }
 
+    class Circle {
+      constructor(options: {
+        center: LatLng;
+        radius: number;
+        strokeWeight?: number;
+        strokeColor?: string;
+        strokeOpacity?: number;
+        strokeStyle?: string;
+        fillColor?: string;
+        fillOpacity?: number;
+        map?: Map;
+      });
+      setMap(map: Map | null): void;
+      setOptions(options: { center?: LatLng; radius?: number }): void;
+    }
+
     class ZoomControl {}
 
     enum ControlPosition {
