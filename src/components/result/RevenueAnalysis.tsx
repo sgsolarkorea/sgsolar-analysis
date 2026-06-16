@@ -19,11 +19,22 @@ export default function RevenueAnalysis({
     { label: "SMP 단가", value: profitability.smpPrice ?? "—" },
     { label: "REC 단가", value: profitability.recPrice ?? "—" },
     { label: "REC 가중치", value: profitability.recWeight ?? "—", highlight: true },
+    { label: "SMP 수익", value: profitability.smpRevenue },
+    { label: "REC 수익", value: profitability.recRevenue },
     { label: "예상 연매출", value: profitability.totalRevenue, highlight: true },
+    { label: "예상 연 순수익", value: profitability.annualNetProfit ?? profitability.totalRevenue },
     { label: "예상 시공비", value: profitability.estimatedInstallCost },
+    { label: "투자비 회수기간", value: profitability.paybackPeriod },
+    { label: "ROI (20년)", value: profitability.roi ?? "—" },
+    { label: "IRR (20년)", value: profitability.irr ?? "—" },
     {
       label: "20년 단순 누적매출",
       value: profitability.cumulative20YearRevenue ?? "—",
+      highlight: true,
+    },
+    {
+      label: "20년 누적 순수익",
+      value: profitability.cumulative20YearNetProfit ?? "—",
       highlight: true,
     },
   ];

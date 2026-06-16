@@ -3,17 +3,19 @@ import {
   disclaimer,
   modulePowerW,
   monthlyGenerationWeights,
-  recWeightTable,
   resolveConstructionCostPerKw,
   type SolarInstallCategory,
   yearlyGenerationPerKw,
 } from "@/data/solarConfig";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS, resolveDefaultInstallType } from "@/data/resultUx";
-import { logSolarCalculationDebug } from "@/lib/solar/debug";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
+import { calculateIrrPercent, calculateRoiPercent, PROJECT_YEARS } from "@/lib/solar/profitability";
+import { resolveRecWeight } from "@/lib/solar/recWeight";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
+
+export { resolveRecWeight } from "@/lib/solar/recWeight";
 
 export function installTypeToCategory(type: InstallTypeOption): SolarInstallCategory {
   switch (type) {
@@ -43,34 +45,6 @@ export function parseAreaSqm(value: string): number | null {
 
 export function getFieldValue(fields: InfoField[], label: string): string {
   return fields.find((f) => f.label === label)?.value ?? "";
-}
-
-export function resolveRecWeight(
-  category: SolarInstallCategory,
-  capacityKw: number,
-): { weight: number; reason: string } {
-  const isBuilding =
-    category === "roof" ||
-    category === "barn" ||
-    category === "factory" ||
-    category === "commercial" ||
-    category === "unknown";
-
-  if (isBuilding) {
-    return {
-      weight: recWeightTable.buildingWeight,
-      reason: recWeightTable.buildingReason,
-    };
-  }
-
-  const tier =
-    recWeightTable.landTiers.find((t) => capacityKw <= t.maxCapacityKw) ??
-    recWeightTable.landTiers[recWeightTable.landTiers.length - 1];
-
-  return {
-    weight: tier.weight,
-    reason: `토지형 ${tier.label} 기준`,
-  };
 }
 
 function formatKw(kw: number): string {
@@ -168,12 +142,18 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
 
   /** 총 연매출 = SMP 수익 + REC 수익 */
   const totalRevenueWon = smpRevenueWon + recRevenueWon;
-  const revenue20YearWon = totalRevenueWon * 20;
+  const revenue20YearWon = totalRevenueWon * PROJECT_YEARS;
 
   const constructionCostPerKw = resolveConstructionCostPerKw(capacityKw);
   const constructionCostWon = Math.round(capacityKw * constructionCostPerKw);
   const paybackYears =
     totalRevenueWon > 0 ? Math.round((constructionCostWon / totalRevenueWon) * 10) / 10 : 0;
+
+  /** 운영비·금융비 미반영 1차 추정 순수익 */
+  const annualNetProfitWon = totalRevenueWon;
+  const cumulative20YearNetWon = revenue20YearWon - constructionCostWon;
+  const roiPercent = calculateRoiPercent(constructionCostWon, totalRevenueWon);
+  const irrPercent = calculateIrrPercent(constructionCostWon, totalRevenueWon);
 
   const formula =
     baseAreaSqm > 0
@@ -243,6 +223,10 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     separateWorkNote: disclaimer.constructionExtra,
     paybackYears,
     recUnitNote: disclaimer.recUnit,
+    annualNetProfitWon,
+    cumulative20YearNetWon,
+    roiPercent,
+    irrPercent,
   };
 
   const profitability: Profitability = {
@@ -252,6 +236,7 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     smpRevenue: formatWonPerYear(smpRevenueWon),
     recRevenue: formatWonPerYear(recRevenueWon),
     totalRevenue: formatWonPerYear(totalRevenueWon),
+    annualNetProfit: formatWonPerYear(annualNetProfitWon),
     paybackPeriod: paybackYears > 0 ? `${paybackYears}년 (참고)` : "산출 불가",
     smpPrice: `${input.market.smpPrice.toLocaleString("ko-KR")}원/kWh`,
     recPrice: `${input.market.recPrice.toLocaleString("ko-KR")}원/MWh`,
@@ -262,6 +247,10 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     marketSource: input.market.source,
     marketFallback: input.market.isFallback,
     cumulative20YearRevenue: formatWon(revenue20YearWon),
+    cumulative20YearNetProfit: formatWon(cumulative20YearNetWon),
+    roi: roiPercent > 0 ? `${roiPercent.toLocaleString("ko-KR")}%` : "산출 불가",
+    irr: irrPercent > 0 ? `${irrPercent.toLocaleString("ko-KR")}%` : "산출 불가",
+    constructionCostPerKw: `${constructionCostPerKw.toLocaleString("ko-KR")}원/kW`,
     separateWorkNote: metrics.separateWorkNote,
   };
 

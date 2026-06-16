@@ -45,6 +45,7 @@ export interface Profitability {
   recRevenue: string;
   totalRevenue: string;
   paybackPeriod: string;
+  annualNetProfit?: string;
   smpPrice?: string;
   recPrice?: string;
   recWeight?: string;
@@ -54,6 +55,9 @@ export interface Profitability {
   marketSource?: string;
   marketFallback?: boolean;
   cumulative20YearRevenue?: string;
+  cumulative20YearNetProfit?: string;
+  roi?: string;
+  irr?: string;
   constructionCostPerKw?: string;
   separateWorkNote?: string;
 }
@@ -91,6 +95,10 @@ export interface SolarMetrics {
   separateWorkNote: string;
   paybackYears: number;
   recUnitNote: string;
+  annualNetProfitWon: number;
+  cumulative20YearNetWon: number;
+  roiPercent: number;
+  irrPercent: number;
 }
 
 export interface MonthlyGeneration {

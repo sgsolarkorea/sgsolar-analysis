@@ -60,18 +60,19 @@ export const constructionCostByType = {
   areaPerKw: areaPerKwByType,
 } as const;
 
-/** REC 가중치 — 용량 구간 (토지형) */
+/** @deprecated 구간 단순 조회 — 수정 전 레거시 */
 export interface RecWeightTier {
   maxCapacityKw: number;
   weight: number;
   label: string;
 }
 
+/** @deprecated resolveRecWeight (src/lib/solar/recWeight.ts) — 고시 복합가중치 공식 사용 */
 export const recWeightTable = {
-  /** 건물 활용형(지붕·축사·공장·상가) REC 가중치 */
+  /** 건물 활용형 — 3,000kW 이하 1.5, 초과 시 복합가중 */
   buildingWeight: 1.5,
-  buildingReason: "건축물 활용 설비 기준",
-  /** 토지형 용량 구간별 가중치 */
+  buildingReason: "건축물 활용 설비 기준 (별표2)",
+  /** @deprecated 구간 단순 조회 — 수정 전 레거시 */
   landTiers: [
     { maxCapacityKw: 99, weight: 1.2, label: "99kW 이하" },
     { maxCapacityKw: 199, weight: 1.1, label: "199kW 구간" },
