@@ -4,11 +4,14 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import type { InstallTypeOption } from "@/data/resultUx";
+import { buildParcelReviewSummary, parcelToSnapshot } from "@/lib/parcels/aggregate";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -17,6 +20,7 @@ import {
   formatRevenueDisplay,
 } from "@/lib/solar/calculate";
 import type { ConsultationAnalysisContext } from "@/types/consultation";
+import type { ParcelItem } from "@/types/parcelReview";
 import type {
   InfoField,
   MonthlyGeneration,
@@ -31,9 +35,12 @@ interface ResultMetricsProviderProps {
   initialMetrics: SolarMetrics;
   initialProfitability: Profitability;
   initialMonthlyGeneration: MonthlyGeneration[];
+  initialPrimaryParcel: ParcelItem;
+  multiParcelEnabled: boolean;
+  searchHistoryId?: string;
   consultationBase: Omit<
     ConsultationAnalysisContext,
-    "installType" | "capacity" | "annualGeneration" | "annualRevenue"
+    "installType" | "capacity" | "annualGeneration" | "annualRevenue" | "parcelCount" | "totalLandArea" | "parcels"
   >;
   children: ReactNode;
 }
@@ -51,9 +58,21 @@ interface ResultMetricsContextValue {
   annualRevenue: string;
   constructionCost: string;
   consultationContext: ConsultationAnalysisContext;
+  multiParcelEnabled: boolean;
+  parcels: ParcelItem[];
+  parcelSummary: ReturnType<typeof buildParcelReviewSummary>;
+  addParcel: (parcel: ParcelItem) => boolean;
+  removeParcel: (id: string) => void;
+  addParcelsFromCandidates: (candidates: ParcelItem[]) => number;
+  primaryParcel: ParcelItem;
 }
 
 const ResultMetricsContext = createContext<ResultMetricsContextValue | null>(null);
+
+function formatModuleCountDisplay(count: number): string {
+  if (count <= 0) return "확인 필요";
+  return `약 ${count.toLocaleString("ko-KR")}장`;
+}
 
 export function ResultMetricsProvider({
   landInfo,
@@ -62,13 +81,29 @@ export function ResultMetricsProvider({
   initialMetrics,
   initialProfitability,
   initialMonthlyGeneration,
+  initialPrimaryParcel,
+  multiParcelEnabled,
+  searchHistoryId,
   consultationBase,
   children,
 }: ResultMetricsProviderProps) {
   const [installType, setInstallTypeState] = useState<InstallTypeOption>(initialInstallType);
+  const [parcels, setParcels] = useState<ParcelItem[]>([initialPrimaryParcel]);
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const parcelSummary = useMemo(() => buildParcelReviewSummary(parcels), [parcels]);
+
+  const useMultiParcelMetrics =
+    multiParcelEnabled && installType === "토지형" && parcelSummary.totalAreaSqm > 0;
 
   const computed = useMemo(() => {
-    if (installType === initialInstallType) {
+    const shouldUseInitial =
+      installType === initialInstallType &&
+      parcels.length === 1 &&
+      parcels[0]?.id === initialPrimaryParcel.id &&
+      !useMultiParcelMetrics;
+
+    if (shouldUseInitial) {
       return {
         metrics: initialMetrics,
         profitability: initialProfitability,
@@ -81,6 +116,8 @@ export function ResultMetricsProvider({
       landInfo,
       buildingInfo,
       market: initialMetrics.market,
+      overrideLandAreaSqm: useMultiParcelMetrics ? parcelSummary.totalAreaSqm : undefined,
+      parcelCount: useMultiParcelMetrics ? parcelSummary.parcelCount : undefined,
     });
 
     return {
@@ -96,7 +133,57 @@ export function ResultMetricsProvider({
     initialMonthlyGeneration,
     landInfo,
     buildingInfo,
+    parcels,
+    initialPrimaryParcel.id,
+    useMultiParcelMetrics,
+    parcelSummary.totalAreaSqm,
+    parcelSummary.parcelCount,
   ]);
+
+  const addParcel = useCallback((parcel: ParcelItem): boolean => {
+    let added = false;
+    setParcels((prev) => {
+      if (prev.some((item) => item.pnu === parcel.pnu && parcel.pnu)) return prev;
+      if (prev.some((item) => item.jibunAddress === parcel.jibunAddress && parcel.jibunAddress)) {
+        return prev;
+      }
+      added = true;
+      return [...prev, { ...parcel, isPrimary: false }];
+    });
+    return added;
+  }, []);
+
+  const removeParcel = useCallback((id: string) => {
+    setParcels((prev) => {
+      const target = prev.find((item) => item.id === id);
+      if (!target || target.isPrimary) return prev;
+      return prev.filter((item) => item.id !== id);
+    });
+  }, []);
+
+  const addParcelsFromCandidates = useCallback(
+    (candidates: ParcelItem[]): number => {
+      let count = 0;
+      setParcels((prev) => {
+        const next = [...prev];
+        for (const candidate of candidates) {
+          if (next.some((item) => item.pnu === candidate.pnu && candidate.pnu)) continue;
+          if (
+            next.some(
+              (item) => item.jibunAddress === candidate.jibunAddress && candidate.jibunAddress,
+            )
+          ) {
+            continue;
+          }
+          next.push({ ...candidate, isPrimary: false });
+          count += 1;
+        }
+        return next;
+      });
+      return count;
+    },
+    [],
+  );
 
   const setInstallType = useCallback((type: InstallTypeOption) => {
     setInstallTypeState(type);
@@ -123,9 +210,72 @@ export function ResultMetricsProvider({
         capacity: formatCapacityDisplay(metrics.capacityKw),
         annualGeneration: formatGenerationDisplay(metrics.annualGenerationKwh),
         annualRevenue: formatRevenueDisplay(metrics.totalRevenueWon),
+        parcelCount: parcelSummary.parcelCount,
+        totalLandArea: parcelSummary.totalAreaLabel,
+        parcels: parcels.map((parcel) => ({
+          jibunAddress: parcel.jibunAddress,
+          areaLabel: parcel.areaLabel,
+          landCategory: parcel.landCategory,
+        })),
       },
+      multiParcelEnabled,
+      parcels,
+      parcelSummary,
+      addParcel,
+      removeParcel,
+      addParcelsFromCandidates,
+      primaryParcel: initialPrimaryParcel,
     };
-  }, [computed, consultationBase, installType, landInfo, buildingInfo, setInstallType]);
+  }, [
+    computed,
+    consultationBase,
+    installType,
+    landInfo,
+    buildingInfo,
+    setInstallType,
+    multiParcelEnabled,
+    parcels,
+    parcelSummary,
+    addParcel,
+    removeParcel,
+    addParcelsFromCandidates,
+    initialPrimaryParcel,
+  ]);
+
+  useEffect(() => {
+    if (!searchHistoryId || !multiParcelEnabled) return;
+
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      void fetch("/api/search-history/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: searchHistoryId,
+          parcels: parcels.map(parcelToSnapshot),
+          parcelCount: parcelSummary.parcelCount,
+          totalLandArea: parcelSummary.totalAreaLabel,
+          capacity: formatCapacityDisplay(value.metrics.capacityKw),
+          moduleCount: formatModuleCountDisplay(value.metrics.moduleCount),
+          annualGeneration: formatGenerationDisplay(value.metrics.annualGenerationKwh),
+          annualRevenue: formatRevenueDisplay(value.metrics.totalRevenueWon),
+        }),
+      });
+    }, 800);
+
+    return () => {
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
+  }, [
+    searchHistoryId,
+    multiParcelEnabled,
+    parcels,
+    parcelSummary,
+    value.metrics.capacityKw,
+    value.metrics.moduleCount,
+    value.metrics.annualGenerationKwh,
+    value.metrics.totalRevenueWon,
+  ]);
 
   return (
     <ResultMetricsContext.Provider value={value}>{children}</ResultMetricsContext.Provider>

@@ -8,6 +8,14 @@ export interface ConsultationAnalysisContext {
   capacity?: string;
   annualGeneration?: string;
   annualRevenue?: string;
+  /** 다중 필지 검토 */
+  parcelCount?: number;
+  totalLandArea?: string;
+  parcels?: Array<{
+    jibunAddress: string;
+    areaLabel: string;
+    landCategory: string;
+  }>;
 }
 
 export interface ConsultationSubmission {

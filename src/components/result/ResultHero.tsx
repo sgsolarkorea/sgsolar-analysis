@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { MARKETING_NAME, SITE_DISCLAIMER } from "@/data/sampleData";
-import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 
 interface ResultHeroProps {
   address: string;
@@ -28,7 +27,6 @@ export default function ResultHero({
             </svg>
             다시 검색
           </Link>
-          <PdfDownloadButton address={address} />
         </div>
 
         <h1 className="mt-3 text-xl font-bold text-white sm:text-2xl">

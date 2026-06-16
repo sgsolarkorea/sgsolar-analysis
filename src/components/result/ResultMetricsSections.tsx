@@ -7,6 +7,7 @@ import CapacityAnalysisSection from "@/components/result/CapacityAnalysisSection
 import RevenueAnalysis from "@/components/result/RevenueAnalysis";
 import MonthlyGenerationChart from "@/components/result/MonthlyGenerationChart";
 import ConsultationForm from "@/components/result/ConsultationForm";
+import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { MetricCard } from "@/components/ui/InfoCard";
@@ -16,15 +17,19 @@ import { deriveGradeFromCapacity } from "@/lib/solar/grade";
 
 interface ResultSiteOverviewProps {
   recommendation: string;
+  address: string;
 }
 
-export function ResultSiteOverview({ recommendation }: ResultSiteOverviewProps) {
+export function ResultSiteOverview({ recommendation, address }: ResultSiteOverviewProps) {
   const { capacity, annualGeneration, annualRevenue, constructionCost, metrics } =
     useResultMetrics();
   const grade = deriveGradeFromCapacity(metrics.capacityKw);
 
   return (
     <section id="site-overview" className="scroll-mt-24">
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+        <PdfDownloadButton address={address} />
+      </div>
       <SectionHeader title="입지 분석 개요" />
       <GradeSection
         grade={grade}

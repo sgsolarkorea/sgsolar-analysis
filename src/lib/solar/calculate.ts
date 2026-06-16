@@ -106,6 +106,10 @@ export interface CalculateSolarInput {
   landInfo: InfoField[];
   buildingInfo: InfoField[];
   market: MarketPriceData;
+  /** 다중 필지 합산 면적 (토지형) */
+  overrideLandAreaSqm?: number;
+  /** 다중 필지 산식 표시용 */
+  parcelCount?: number;
 }
 
 export interface CalculateSolarOutput {
@@ -120,7 +124,7 @@ export interface CalculateSolarOutput {
 
 export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSolarOutput {
   const buildingArea = parseAreaSqm(getFieldValue(input.buildingInfo, "건축면적"));
-  const landArea = parseAreaSqm(getFieldValue(input.landInfo, "면적"));
+  const parsedLandArea = parseAreaSqm(getFieldValue(input.landInfo, "면적"));
 
   let installType = input.installType;
   if (!INSTALL_TYPE_OPTIONS.includes(installType as (typeof INSTALL_TYPE_OPTIONS)[number])) {
@@ -131,8 +135,18 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
   const areaPerKw = areaPerKwByType[category];
   const isLand = category === "land";
 
+  const landArea =
+    isLand && input.overrideLandAreaSqm != null && input.overrideLandAreaSqm > 0
+      ? input.overrideLandAreaSqm
+      : parsedLandArea;
+
   const baseAreaSqm = isLand ? (landArea ?? 0) : (buildingArea ?? 0);
-  const baseAreaLabel = isLand ? "토지면적" : "건축면적";
+  const baseAreaLabel =
+    isLand && input.parcelCount && input.parcelCount > 1
+      ? `토지면적(총 ${input.parcelCount}필지)`
+      : isLand
+        ? "토지면적"
+        : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
   const capacityKw = Math.round(rawCapacityKw * 10) / 10;

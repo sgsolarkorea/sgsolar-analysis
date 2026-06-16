@@ -53,6 +53,7 @@ interface KakaoRegionResponse {
 
 const KAKAO_ADDRESS_API = "https://dapi.kakao.com/v2/local/search/address.json";
 const KAKAO_COORD2REGION_API = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json";
+const KAKAO_COORD2ADDRESS_API = "https://dapi.kakao.com/v2/local/geo/coord2address.json";
 const SUGGESTION_LIMIT = 8;
 
 export interface LegalDongCodes {
@@ -206,5 +207,50 @@ export async function searchAddressByKakao(address: string): Promise<KakaoAddres
     pnu: null,
     buildingName: doc.road_address?.building_name ?? "",
     zoneNo: doc.road_address?.zone_no ?? "",
+  };
+}
+
+interface KakaoCoord2AddressDocument {
+  address?: { address_name?: string };
+  road_address?: { address_name?: string };
+}
+
+interface KakaoCoord2AddressResponse {
+  documents: KakaoCoord2AddressDocument[];
+}
+
+/** 좌표 → 지번/도로명 주소 (연속지적 인접 필지용) */
+export async function reverseGeocodeKakao(
+  lat: number,
+  lng: number,
+): Promise<{ address: string; jibunAddress: string }> {
+  const apiKey = process.env.KAKAO_REST_API_KEY;
+  if (!apiKey) {
+    return { address: "", jibunAddress: "" };
+  }
+
+  const params = new URLSearchParams({
+    x: String(lng),
+    y: String(lat),
+    input_coord: "WGS84",
+  });
+
+  const response = await fetch(`${KAKAO_COORD2ADDRESS_API}?${params.toString()}`, {
+    headers: { Authorization: `KakaoAK ${apiKey}` },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return { address: "", jibunAddress: "" };
+  }
+
+  const data = (await response.json()) as KakaoCoord2AddressResponse;
+  const doc = data.documents?.[0];
+  const jibunAddress = doc?.address?.address_name?.trim() ?? "";
+  const roadAddress = doc?.road_address?.address_name?.trim() ?? "";
+
+  return {
+    address: roadAddress || jibunAddress,
+    jibunAddress: jibunAddress || roadAddress,
   };
 }

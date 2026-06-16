@@ -1,6 +1,7 @@
 import { mkdir, readdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import type { SearchHistoryEntry, SaveSearchHistoryResult } from "@/types/searchHistory";
+import type { ParcelSnapshot } from "@/types/parcelReview";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import { buildSearchHistoryEntry, normalizeSearchAddress } from "@/lib/searchHistory/buildEntry";
 import {
@@ -204,4 +205,46 @@ export async function listSearchHistory(limit = 500): Promise<SearchHistoryEntry
     ids.map((id) => redis.get<SearchHistoryEntry>(searchHistoryEntryKey(id))),
   );
   return entries.filter((entry): entry is SearchHistoryEntry => entry !== null);
+}
+
+export interface UpdateSearchHistoryParcelsInput {
+  id: string;
+  parcels: ParcelSnapshot[];
+  parcelCount: number;
+  totalLandArea: string;
+  capacity: string;
+  moduleCount: string;
+  annualGeneration: string;
+  annualRevenue: string;
+}
+
+export async function updateSearchHistoryParcels(
+  input: UpdateSearchHistoryParcelsInput,
+): Promise<boolean> {
+  const entry = await getSearchHistoryEntry(input.id);
+  if (!entry) return false;
+
+  const updated: SearchHistoryEntry = {
+    ...entry,
+    parcelCount: input.parcelCount,
+    totalLandArea: input.totalLandArea,
+    parcels: input.parcels,
+    capacity: input.capacity,
+    moduleCount: input.moduleCount,
+    annualGeneration: input.annualGeneration,
+    annualRevenue: input.annualRevenue,
+    landArea: input.totalLandArea,
+  };
+
+  if (shouldUseLocalStorage()) {
+    return updateLocalEntry(updated);
+  }
+
+  const redis = getRedisClient();
+  if (!redis) {
+    return updateLocalEntry(updated);
+  }
+
+  await redis.set(searchHistoryEntryKey(updated.id), updated);
+  return true;
 }

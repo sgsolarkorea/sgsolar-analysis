@@ -1,6 +1,8 @@
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, rgb } from "pdf-lib";
 import type { ResolvedSiteReview } from "@/types/siteReview";
+import type { ParcelSnapshot } from "@/types/parcelReview";
+import { formatParcelShortLabel } from "@/lib/parcels/format";
 import { MARKETING_NAME, company } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
@@ -39,11 +41,24 @@ function wrapText(text: string, maxLen: number): string[] {
   return lines;
 }
 
-function sectionLines(data: ResolvedSiteReview): string[] {
+function sectionLines(data: ResolvedSiteReview, parcels?: ParcelSnapshot[]): string[] {
   const m = data.solarMetrics;
   const landCategory = getFieldValue(data.landInfo, "지목");
   const zoning = getFieldValue(data.landInfo, "용도지역");
   const buildingArea = getFieldValue(data.buildingInfo, "건축면적");
+
+  const parcelLines =
+    parcels && parcels.length > 0
+      ? [
+          `[ 다중 필지 (${parcels.length}필지) ]`,
+          ...parcels.map(
+            (parcel, index) =>
+              `${index + 1}. ${formatParcelShortLabel(parcel.jibunAddress)} ${parcel.areaLabel}${parcel.isPrimary ? " (대표)" : ""}`,
+          ),
+          `총면적: ${parcels.reduce((sum, p) => sum + p.areaSqm, 0).toLocaleString("ko-KR")}㎡`,
+          "",
+        ]
+      : [];
 
   return [
     "태양광 입지검토 1차 제안서",
@@ -57,6 +72,7 @@ function sectionLines(data: ResolvedSiteReview): string[] {
     `좌표: ${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}`,
     data.zoneNo ? `우편번호: ${data.zoneNo}` : "",
     "",
+    ...parcelLines,
     "[ 토지 정보 ]",
     `지목: ${landCategory}`,
     `용도지역: ${zoning}`,
@@ -97,7 +113,10 @@ function sectionLines(data: ResolvedSiteReview): string[] {
   ].filter(Boolean);
 }
 
-export async function generateSiteReviewPdf(data: ResolvedSiteReview): Promise<Uint8Array> {
+export async function generateSiteReviewPdf(
+  data: ResolvedSiteReview,
+  parcels?: ParcelSnapshot[],
+): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
@@ -124,7 +143,7 @@ export async function generateSiteReviewPdf(data: ResolvedSiteReview): Promise<U
   });
   y -= 32;
 
-  for (const rawLine of sectionLines(data)) {
+  for (const rawLine of sectionLines(data, parcels)) {
     const isHeading = rawLine.startsWith("[") || rawLine.startsWith("태양광");
     const lines = wrapText(rawLine, isHeading ? 40 : 44);
     for (const line of lines) {

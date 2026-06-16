@@ -416,3 +416,104 @@ export async function getLandInfoByVworld(
     return fallback;
   }
 }
+
+interface VworldFeatureWithGeometry {
+  geometry?: {
+    type?: string;
+    coordinates?: unknown;
+  };
+  properties?: Record<string, string>;
+}
+
+function extractCentroidFromGeometry(geometry?: VworldFeatureWithGeometry["geometry"]): {
+  lat: number;
+  lng: number;
+} | null {
+  if (!geometry?.coordinates) return null;
+
+  const coords = geometry.coordinates;
+  let ring: number[][] | null = null;
+
+  if (geometry.type === "Polygon" && Array.isArray(coords) && Array.isArray(coords[0])) {
+    ring = coords[0] as number[][];
+  } else if (
+    geometry.type === "MultiPolygon" &&
+    Array.isArray(coords) &&
+    Array.isArray(coords[0]) &&
+    Array.isArray((coords[0] as number[][][])[0])
+  ) {
+    ring = (coords[0] as number[][][])[0];
+  }
+
+  if (!ring?.length) return null;
+
+  let sumLng = 0;
+  let sumLat = 0;
+  for (const point of ring) {
+    sumLng += point[0];
+    sumLat += point[1];
+  }
+
+  return { lng: sumLng / ring.length, lat: sumLat / ring.length };
+}
+
+export interface CadastralParcelFeature {
+  pnu: string;
+  lat: number;
+  lng: number;
+  jibun?: string;
+}
+
+/** 대표 필지 기준 반경(m) 내 연속지적도 필지 탐색 */
+export async function fetchAdjacentCadastralParcels(
+  lat: number,
+  lng: number,
+  radiusM = 50,
+  excludePnu?: string,
+): Promise<CadastralParcelFeature[]> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  if (!apiKey) return [];
+
+  for (const domain of getApiDomainCandidates()) {
+    const params = buildDataApiParams(apiKey, domain);
+    params.set("service", "data");
+    params.set("request", "GetFeature");
+    params.set("data", "LP_PA_CBND_BUBUN");
+    params.set("size", "20");
+    params.set("page", "1");
+    params.set("geometry", "true");
+    params.set("attribute", "true");
+    params.set("crs", "EPSG:4326");
+    params.set("geomFilter", `BUFFER(POINT(${lng} ${lat}), ${radiusM})`);
+
+    const data = await fetchVworldJson<VworldDataResponse & { response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } } }>(
+      `${VWORLD_DATA_API}?${params.toString()}`,
+      "adjacent-parcels",
+    );
+
+    const features = data?.response?.result?.featureCollection?.features ?? [];
+    const results: CadastralParcelFeature[] = [];
+    const seen = new Set<string>();
+
+    for (const feature of features) {
+      const pnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+      if (!pnu || pnu === excludePnu || seen.has(pnu)) continue;
+
+      const centroid = extractCentroidFromGeometry(feature.geometry);
+      if (!centroid) continue;
+
+      seen.add(pnu);
+      results.push({
+        pnu,
+        lat: centroid.lat,
+        lng: centroid.lng,
+        jibun: feature.properties?.jibun ?? feature.properties?.addr ?? undefined,
+      });
+    }
+
+    if (results.length > 0) return results;
+  }
+
+  return [];
+}
+

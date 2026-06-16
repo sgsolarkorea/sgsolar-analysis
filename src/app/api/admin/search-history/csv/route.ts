@@ -24,9 +24,19 @@ function escapeCsv(value: string): string {
 }
 
 function entryToCsvRow(entry: SearchHistoryEntry): string {
+  const parcelSummary =
+    entry.parcels && entry.parcels.length > 0
+      ? entry.parcels
+          .map((parcel) => `${parcel.jibunAddress}(${parcel.areaLabel})`)
+          .join(" | ")
+      : entry.jibunAddress;
+
   return [
     formatSearchedAtKst(entry.searchedAt),
     entry.address,
+    String(entry.parcelCount ?? 1),
+    entry.totalLandArea ?? entry.landArea,
+    parcelSummary,
     entry.landCategory,
     entry.zoning,
     entry.landArea,
@@ -48,7 +58,7 @@ export async function GET() {
 
   const entries = await listSearchHistory();
   const header =
-    "조회일시,주소,지목,용도지역,토지면적,건축면적,설치유형,예상 설치용량,예상 발전량,예상 연매출,상담신청 여부";
+    "조회일시,주소,필지수,총토지면적,필지목록,지목,용도지역,대표토지면적,건축면적,설치유형,예상 설치용량,예상 발전량,예상 연매출,상담신청 여부";
   const rows = entries.map(entryToCsvRow);
   const csv = `\uFEFF${header}\n${rows.join("\n")}\n`;
 

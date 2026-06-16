@@ -29,6 +29,8 @@ import { resolveRegulatoryReview } from "@/lib/regulatory/resolveRegulatoryRevie
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
+import { primaryParcelFromReview } from "@/lib/api/parcelLookup";
+import MultiParcelSection from "@/components/result/MultiParcelSection";
 
 interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
@@ -68,6 +70,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   });
   const ordinanceResult = await resolveOrdinanceForAddress(data.address);
 
+  const primaryParcel = primaryParcelFromReview(data);
+  const multiParcelEnabled = data.solarMetrics.installType === "토지형";
+
   const searchHistory = await recordSearchHistory(data, params.address ?? data.address);
 
   return (
@@ -90,6 +95,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             initialMetrics={data.solarMetrics}
             initialProfitability={data.profitability}
             initialMonthlyGeneration={data.monthlyGeneration}
+            initialPrimaryParcel={primaryParcel}
+            multiParcelEnabled={multiParcelEnabled}
+            searchHistoryId={searchHistory.id}
             consultationBase={consultationBase}
           >
             <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
@@ -106,7 +114,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                 />
               </section>
 
-              <ResultSiteOverview recommendation={data.recommendation} />
+              <ResultSiteOverview recommendation={data.recommendation} address={data.address} />
+
+              <MultiParcelSection />
 
               <LandInfoCardSection detail={data.landInfoDetail} />
               <RegionDistrictSection analysis={data.regionDistrictAnalysis} />

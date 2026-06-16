@@ -1,6 +1,7 @@
 "use client";
 
 import AdminNav from "@/components/admin/AdminNav";
+import { formatParcelShortLabel } from "@/lib/parcels/format";
 import type { SearchHistoryEntry } from "@/types/searchHistory";
 
 function formatSearchedAtKst(iso: string): string {
@@ -61,6 +62,7 @@ export default function AdminSearchHistoryTable({ entries }: AdminSearchHistoryT
               <tr>
                 <th className="px-4 py-3 font-semibold">조회일시</th>
                 <th className="px-4 py-3 font-semibold">주소</th>
+                <th className="px-4 py-3 font-semibold">필지</th>
                 <th className="px-4 py-3 font-semibold">지목</th>
                 <th className="px-4 py-3 font-semibold">용도지역</th>
                 <th className="px-4 py-3 font-semibold">설치유형</th>
@@ -72,7 +74,7 @@ export default function AdminSearchHistoryTable({ entries }: AdminSearchHistoryT
             <tbody className="divide-y divide-slate-100">
               {entries.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-slate-500">
+                  <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
                     저장된 조회 이력이 없습니다.
                   </td>
                 </tr>
@@ -83,6 +85,23 @@ export default function AdminSearchHistoryTable({ entries }: AdminSearchHistoryT
                       {formatSearchedAtKst(entry.searchedAt)}
                     </td>
                     <td className="min-w-[220px] px-4 py-3 text-slate-900">{entry.address}</td>
+                    <td className="min-w-[160px] px-4 py-3 text-slate-700">
+                      {entry.parcelCount && entry.parcelCount > 1 ? (
+                        <div>
+                          <p className="font-semibold text-navy">{entry.parcelCount}필지</p>
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            {entry.totalLandArea ?? entry.landArea}
+                          </p>
+                          {entry.parcels?.slice(0, 3).map((parcel) => (
+                            <p key={parcel.pnu} className="text-xs text-slate-600">
+                              {formatParcelShortLabel(parcel.jibunAddress)} {parcel.areaLabel}
+                            </p>
+                          ))}
+                        </div>
+                      ) : (
+                        "1필지"
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-slate-700">{entry.landCategory}</td>
                     <td className="px-4 py-3 text-slate-700">{entry.zoning}</td>
                     <td className="px-4 py-3 text-slate-700">{entry.installType}</td>

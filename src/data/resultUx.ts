@@ -37,6 +37,13 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     description: "추천 유형·시공비 개요",
   },
   {
+    id: "multi-parcel",
+    label: "다중 필지 검토",
+    statusLabel: "가능",
+    statusKind: "available",
+    description: "토지형 다중 필지 합산 검토",
+  },
+  {
     id: "land-info",
     label: "토지 정보",
     statusLabel: "완료",
