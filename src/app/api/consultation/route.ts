@@ -30,14 +30,13 @@ export async function POST(request: Request) {
       submittedAt: submission.submittedAt,
       emailSent: emailResult.sent,
       autoReplySent: emailResult.autoReplySent,
+      emailProvider: emailResult.provider,
       jsonSaved: storage.saved,
     });
   } catch (error) {
     console.error("[Consultation] Submission failed:", error);
     const message =
-      error instanceof Error && error.message.includes("SMTP")
-        ? error.message
-        : "상담 신청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+      error instanceof Error ? error.message : "상담 신청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
