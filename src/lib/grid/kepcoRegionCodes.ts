@@ -148,14 +148,6 @@ async function getCityCodesForMetro(
     (item) => normalizeMetroCode(item.uppoCd) === normalizedMetro,
   );
 
-  if (!filtered.length && sido) {
-    const sidoToken = normalizeRegionName(sido).slice(0, 2);
-    filtered = allCityCodes.filter((item) => {
-      const uppoNm = normalizeRegionName(item.uppoCdNm ?? "");
-      return uppoNm.includes(sidoToken) || uppoNm.includes(normalizeRegionName(sido));
-    });
-  }
-
   cityCodeCache.set(cacheKey, filtered);
   return filtered;
 }
@@ -231,4 +223,20 @@ export async function resolveKepcoRegionCodes(input: {
   }
 
   return { metroCd, cityCd: null, cityNm: null };
+}
+
+/** 진단용 — metroCd 하위 cityCd 목록 */
+export async function listKepcoCityCodes(
+  metroCd: string,
+  apiKey: string,
+): Promise<Array<{ code: string; name: string; uppoCd?: string; uppoCdNm?: string }>> {
+  const items = await getCityCodesForMetro(metroCd, apiKey);
+  return items
+    .map((item) => ({
+      code: item.code?.trim() ?? "",
+      name: item.codeNm?.trim() ?? "",
+      uppoCd: item.uppoCd,
+      uppoCdNm: item.uppoCdNm,
+    }))
+    .filter((item) => item.code && item.name);
 }
