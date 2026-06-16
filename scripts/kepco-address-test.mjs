@@ -27,6 +27,10 @@ assert(parsed.addrJibun === "258-7", `addrJibun expected 258-7, got ${parsed.add
 assert(parsed.sigunguCd === "44200", `sigunguCd expected 44200, got ${parsed.sigunguCd}`);
 assert(metroCdFromSigunguCd(parsed.sigunguCd) === "44", "metroCd should be 44");
 
+const abbreviated = parseKepcoAddress("충남 아산시 염치읍 방현리 258-7", TEST_PNU);
+assert(abbreviated?.sigungu === "아산시", "abbreviated jibun should resolve sigungu");
+assert(abbreviated?.addrLidong === "염치읍", "abbreviated jibun addrLidong");
+
 const mockItems = [
   {
     substNm: "아산변전소",

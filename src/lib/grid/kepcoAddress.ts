@@ -28,6 +28,34 @@ function isLidongToken(token: string): boolean {
   return /[읍면동]$/.test(token) || /[가]$/.test(token);
 }
 
+/** 카카오/VWorld 지번 약칭 → KEPCO 파싱용 정식 시도명 */
+const SIDO_ABBREV_TO_FULL: Record<string, string> = {
+  충남: "충청남도",
+  충북: "충청북도",
+  경남: "경상남도",
+  경북: "경상북도",
+  전남: "전라남도",
+  전북: "전북특별자치도",
+  강원: "강원특별자치도",
+  경기: "경기도",
+  제주: "제주특별자치도",
+  서울: "서울특별시",
+  부산: "부산광역시",
+  대구: "대구광역시",
+  인천: "인천광역시",
+  광주: "광주광역시",
+  대전: "대전광역시",
+  울산: "울산광역시",
+  세종: "세종특별자치시",
+};
+
+function expandAbbreviatedSido(parts: string[]): string[] {
+  if (!parts.length) return parts;
+  const full = SIDO_ABBREV_TO_FULL[parts[0] ?? ""];
+  if (!full) return parts;
+  return [full, ...parts.slice(1)];
+}
+
 /**
  * 지번주소 → KEPCO 분산전원 API 주소 파라미터
  * 예: "충청남도 아산시 염치읍 방현리 258-7"
@@ -41,7 +69,7 @@ export function parseKepcoAddressFromJibun(jibunAddress: string): ParsedKepcoAdd
 
   const addrJibun = formatJibun(lot);
   const withoutLot = trimmed.replace(/(?:^|\s)(산)?\s*\d+(?:-\d+)?\s*$/, "").trim();
-  const parts = withoutLot.split(/\s+/).filter(Boolean);
+  const parts = expandAbbreviatedSido(withoutLot.split(/\s+/).filter(Boolean));
   if (!parts.length) return null;
 
   let index = 0;
