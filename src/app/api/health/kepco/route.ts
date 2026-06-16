@@ -42,6 +42,7 @@ export async function GET(request: Request) {
     mappedPoles: debug.mappedPoles,
     asanCandidates,
     chungnamCityCount: chungnamCities.length,
+    chungnamCities: searchParams.get("includeCities") === "1" ? chungnamCities : undefined,
     gridInfo: {
       dataSource: gridInfo.dataSource,
       dataSourceLabel: gridInfo.dataSourceLabel,
