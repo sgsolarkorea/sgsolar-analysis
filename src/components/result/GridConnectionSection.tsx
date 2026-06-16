@@ -311,7 +311,7 @@ export default function GridConnectionSection({
             <ContactCard
               title="전력공급부"
               primary={gridInfo.contacts.supplyDepartment}
-              secondary="담당 문의"
+              secondary={gridInfo.contacts.supplyPhone}
             />
             <ContactCard
               title="계통운영기술부"

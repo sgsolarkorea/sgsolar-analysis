@@ -72,8 +72,9 @@ export default function AdminGridDashboard() {
       contacts: {
         kepcoBranch: "한국전력 ○○지사",
         branchPhone: "000-000-0000",
-        supplyDepartment: "전력공급부",
-        operationsDepartment: "계통운영기술부",
+        supplyDepartment: "태양광 계통검토 담당",
+        supplyPhone: "000-000-0000",
+        operationsDepartment: "배전계통 담당",
         operationsPhone: "000-000-0000",
       },
       poles: [

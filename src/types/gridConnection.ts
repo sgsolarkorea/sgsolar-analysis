@@ -21,7 +21,10 @@ export interface GridPoleOption {
 export interface GridContactInfo {
   kepcoBranch: string;
   branchPhone: string;
+  /** 전력공급부 담당 업무 (예: 태양광 계통검토 담당) */
   supplyDepartment: string;
+  supplyPhone: string;
+  /** 계통운영기술부 담당 업무 (예: 배전계통 담당) */
   operationsDepartment: string;
   operationsPhone: string;
 }

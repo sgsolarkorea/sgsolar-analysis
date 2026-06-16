@@ -1,5 +1,5 @@
 import { getGridDataSourceLabel } from "@/lib/grid/dataSourceLabel";
-import { resolveGridContacts } from "@/lib/grid/contacts";
+import { normalizeGridContacts, resolveGridContacts } from "@/lib/grid/contacts";
 import {
   buildReviewResult,
   evaluateGridConnectionStatus,
@@ -150,7 +150,7 @@ export async function resolveGridConnection(input: ResolveGridInput): Promise<Gr
         ...p,
         label: p.label || buildPoleLabel(p.poleId, p.referenceLocation),
       })),
-      contacts: adminMatch.contacts,
+      contacts: normalizeGridContacts(adminMatch.contacts),
     };
   }
 

@@ -330,9 +330,10 @@ export const result: Omit<
     contacts: {
       kepcoBranch: "한국전력 성남지사",
       branchPhone: "031-800-6114",
-      supplyDepartment: "전력공급부",
-      operationsDepartment: "계통운영기술부",
-      operationsPhone: "031-800-6200",
+      supplyDepartment: "태양광 계통검토 담당",
+      supplyPhone: "031-800-6234",
+      operationsDepartment: "배전계통 담당",
+      operationsPhone: "031-800-6281",
     },
     dataSource: "none",
     dataSourceLabel: "데이터 출처 : 공개 데이터 기반 1차 검토",
