@@ -65,6 +65,22 @@ function distributionLineName(item: KepcoDispersedGenerationItem): string {
   return code || "미확인";
 }
 
+async function requestDispersedGeneration(
+  apiKey: string,
+  params: Record<string, string | undefined>,
+): Promise<{ payload: KepcoDispersedGenerationResponse; httpStatus: number }> {
+  const url = new URL(getKepcoDispersedGenerationUrl());
+  url.searchParams.set("apiKey", apiKey);
+  url.searchParams.set("returnType", "json");
+  for (const [key, value] of Object.entries(params)) {
+    if (value) url.searchParams.set(key, value);
+  }
+
+  const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
+  const payload = (await response.json()) as KepcoDispersedGenerationResponse;
+  return { payload, httpStatus: response.status };
+}
+
 function mapItemToPole(
   item: KepcoDispersedGenerationItem,
   referenceLocation: string,
@@ -190,7 +206,7 @@ export async function fetchKepcoGridByLocation(input: {
     return null;
   }
 
-  const { metroCd, cityCd } = await resolveKepcoRegionCodes({
+  const { metroCd, cityCd, cityNm } = await resolveKepcoRegionCodes({
     sido: parsed.sido,
     sigungu: parsed.sigungu,
     sigunguCd: parsed.sigunguCd,
@@ -202,56 +218,60 @@ export async function fetchKepcoGridByLocation(input: {
       address: input.jibunAddress,
       metroCd,
       cityCd,
+      cityNm,
       sigungu: parsed.sigungu,
     });
     return null;
   }
 
-  const url = new URL(getKepcoDispersedGenerationUrl());
-  url.searchParams.set("apiKey", apiKey);
-  url.searchParams.set("returnType", "json");
-  url.searchParams.set("metroCd", metroCd);
-  url.searchParams.set("cityCd", cityCd);
-  if (parsed.addrLidong) url.searchParams.set("addrLidong", parsed.addrLidong);
-  if (parsed.addrLi) url.searchParams.set("addrLi", parsed.addrLi);
-  if (parsed.addrJibun) url.searchParams.set("addrJibun", parsed.addrJibun);
+  const baseParams = {
+    metroCd,
+    cityCd,
+    addrLidong: parsed.addrLidong,
+    addrLi: parsed.addrLi,
+    addrJibun: parsed.addrJibun,
+  };
 
-  let response: Response;
-  try {
-    response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
-  } catch (error) {
-    console.warn("[Grid/KepcoAPI] Network error:", error);
-    return null;
-  }
+  const paramAttempts: Record<string, string | undefined>[] = [
+    baseParams,
+    { metroCd, cityCd, addrLidong: parsed.addrLidong, addrLi: parsed.addrLi },
+    { metroCd, cityCd, addrLidong: parsed.addrLidong },
+    { metroCd, cityCd },
+  ];
 
-  if (!response.ok) {
-    let errBody: KepcoDispersedGenerationResponse | null = null;
+  let payload: KepcoDispersedGenerationResponse | null = null;
+  let httpStatus = 0;
+
+  for (const attempt of paramAttempts) {
     try {
-      errBody = (await response.json()) as KepcoDispersedGenerationResponse;
-    } catch {
-      /* ignore */
+      const result = await requestDispersedGeneration(apiKey, attempt);
+      payload = result.payload;
+      httpStatus = result.httpStatus;
+
+      if (payload.errCd === "401") {
+        console.warn("[Grid/KepcoAPI] Invalid API key", { errMsg: payload.errMsg });
+        return null;
+      }
+
+      const items = Array.isArray(payload.data) ? payload.data : [];
+      if (items.length) break;
+    } catch (error) {
+      console.warn("[Grid/KepcoAPI] Network error:", error);
+      return null;
     }
-    console.warn(`[Grid/KepcoAPI] HTTP ${response.status}`, {
-      url: url.origin + url.pathname,
-      errCd: errBody?.errCd,
-      errMsg: errBody?.errMsg,
-    });
-    return null;
   }
 
-  let payload: KepcoDispersedGenerationResponse;
-  try {
-    payload = (await response.json()) as KepcoDispersedGenerationResponse;
-  } catch (error) {
-    console.warn("[Grid/KepcoAPI] Invalid JSON:", error);
-    return null;
-  }
+  if (!payload) return null;
 
-  if (payload.errCd) {
+  if (payload.errCd && !Array.isArray(payload.data)) {
     console.warn("[Grid/KepcoAPI] API error", {
       address: input.jibunAddress,
+      httpStatus,
       errCd: payload.errCd,
       errMsg: payload.errMsg,
+      metroCd,
+      cityCd,
+      cityNm,
     });
     return null;
   }
@@ -284,7 +304,7 @@ export async function fetchKepcoGridByLocation(input: {
 export interface KepcoDispersedGenerationDebugResult {
   keyConfigured: boolean;
   parsed: ReturnType<typeof parseKepcoAddress>;
-  regionCodes: { metroCd: string | null; cityCd: string | null } | null;
+  regionCodes: { metroCd: string | null; cityCd: string | null; cityNm?: string | null } | null;
   requestParams: Record<string, string> | null;
   httpStatus: number | null;
   rawResponse: KepcoDispersedGenerationResponse | null;
@@ -342,20 +362,39 @@ export async function debugKepcoDispersedGeneration(input: {
     addrJibun: parsed.addrJibun,
   };
 
-  const url = new URL(getKepcoDispersedGenerationUrl());
-  url.searchParams.set("apiKey", apiKey);
-  for (const [key, value] of Object.entries(requestParams)) {
-    if (value) url.searchParams.set(key, value);
-  }
+  const paramAttempts: Record<string, string | undefined>[] = [
+    requestParams,
+    {
+      metroCd: regionCodes.metroCd,
+      cityCd: regionCodes.cityCd,
+      addrLidong: parsed.addrLidong,
+      addrLi: parsed.addrLi,
+    },
+    { metroCd: regionCodes.metroCd, cityCd: regionCodes.cityCd, addrLidong: parsed.addrLidong },
+    { metroCd: regionCodes.metroCd, cityCd: regionCodes.cityCd },
+  ];
 
   let rawResponse: KepcoDispersedGenerationResponse | null = null;
   let httpStatus: number | null = null;
-  try {
-    const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
-    httpStatus = response.status;
-    rawResponse = (await response.json()) as KepcoDispersedGenerationResponse;
-  } catch (error) {
-    rawResponse = { errCd: "FETCH_ERROR", errMsg: String(error) };
+  let usedParams: Record<string, string> | null = null;
+
+  for (const attempt of paramAttempts) {
+    try {
+      const result = await requestDispersedGeneration(apiKey, attempt);
+      rawResponse = result.payload;
+      httpStatus = result.httpStatus;
+      usedParams = Object.fromEntries(
+        Object.entries(attempt).filter(([, value]) => Boolean(value)),
+      ) as Record<string, string>;
+      usedParams.returnType = "json";
+
+      const items = Array.isArray(rawResponse.data) ? rawResponse.data : [];
+      if (items.length) break;
+      if (rawResponse.errCd === "401") break;
+    } catch (error) {
+      rawResponse = { errCd: "FETCH_ERROR", errMsg: String(error) };
+      break;
+    }
   }
 
   const items = Array.isArray(rawResponse?.data) ? rawResponse!.data! : [];
@@ -373,7 +412,7 @@ export async function debugKepcoDispersedGeneration(input: {
     keyConfigured: true,
     parsed,
     regionCodes,
-    requestParams,
+    requestParams: usedParams ?? requestParams,
     httpStatus,
     rawResponse,
     selectedItem,

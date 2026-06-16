@@ -134,13 +134,21 @@ async function getCityCodesForMetro(metroCd: string, apiKey: string): Promise<Ke
 
   const allCityCodes = await fetchCommonCodes("cityCd", apiKey);
   const filtered = allCityCodes.filter((item) => item.uppoCd === metroCd);
-  cityCodeCache.set(metroCd, filtered.length ? filtered : allCityCodes);
-  return cityCodeCache.get(metroCd) ?? [];
+  cityCodeCache.set(metroCd, filtered);
+  return filtered;
 }
 
 function matchCityCode(sigungu: string, candidates: KepcoCommonCodeItem[]): string | null {
   const normalizedSigungu = normalizeRegionName(sigungu);
+  const shortName = normalizeRegionName(sigungu.split(/\s+/).pop() ?? sigungu);
   const tokens = sigungu.split(/\s+/).map(normalizeRegionName).filter(Boolean);
+
+  for (const item of candidates) {
+    const code = item.code?.trim();
+    const name = normalizeRegionName(item.codeNm?.trim() ?? "");
+    if (!code || !name) continue;
+    if (name === normalizedSigungu || name === shortName) return code;
+  }
 
   let best: { code: string; score: number } | null = null;
 
@@ -152,14 +160,13 @@ function matchCityCode(sigungu: string, candidates: KepcoCommonCodeItem[]): stri
     const normalizedName = normalizeRegionName(name);
     let score = 0;
 
-    if (normalizedSigungu === normalizedName || normalizedSigungu.includes(normalizedName)) {
-      score = 100;
-    } else if (normalizedName.includes(normalizedSigungu)) {
-      score = 90;
+    if (normalizedSigungu.includes(normalizedName) && normalizedName.length >= 2) {
+      score = 80 + normalizedName.length;
     } else {
       for (const token of tokens) {
         if (token.length < 2) continue;
-        if (normalizedName.includes(token)) score = Math.max(score, 60 + token.length);
+        if (normalizedName === token) score = Math.max(score, 100);
+        else if (normalizedName.includes(token)) score = Math.max(score, 60 + token.length);
       }
     }
 
@@ -176,26 +183,30 @@ export async function resolveKepcoRegionCodes(input: {
   sigungu: string;
   sigunguCd: string | null;
   apiKey: string;
-}): Promise<{ metroCd: string | null; cityCd: string | null }> {
+}): Promise<{ metroCd: string | null; cityCd: string | null; cityNm: string | null }> {
   const metroCd =
     metroCdFromSigunguCd(input.sigunguCd) ?? metroCdFromSido(input.sido);
   if (!metroCd) {
     console.warn("[Grid/KepcoAPI] metroCd unresolved", { sido: input.sido, sigungu: input.sigungu });
-    return { metroCd: null, cityCd: null };
+    return { metroCd: null, cityCd: null, cityNm: null };
   }
 
   try {
     const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey);
     const cityCd = matchCityCode(input.sigungu, cityCodes);
-    if (cityCd) return { metroCd, cityCd };
+    if (cityCd) {
+      const cityNm =
+        cityCodes.find((item) => item.code?.trim() === cityCd)?.codeNm?.trim() ?? null;
+      return { metroCd, cityCd, cityNm };
+    }
   } catch (error) {
     console.warn("[Grid/KepcoAPI] cityCd lookup failed:", error);
   }
 
   const staticCity = staticCityLookup(metroCd, input.sigungu);
   if (staticCity) {
-    return { metroCd, cityCd: staticCity };
+    return { metroCd, cityCd: staticCity, cityNm: input.sigungu };
   }
 
-  return { metroCd, cityCd: null };
+  return { metroCd, cityCd: null, cityNm: null };
 }
