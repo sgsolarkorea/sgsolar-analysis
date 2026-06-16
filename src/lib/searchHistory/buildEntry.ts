@@ -6,6 +6,7 @@ import {
   getFieldValue,
 } from "@/lib/solar/calculate";
 import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
+import type { SearchHistoryEntry } from "@/types/searchHistory";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 
 function formatModuleCountDisplay(count: number): string {
