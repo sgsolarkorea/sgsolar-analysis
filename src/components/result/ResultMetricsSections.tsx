@@ -10,7 +10,6 @@ import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { MetricCard } from "@/components/ui/InfoCard";
-import { REVENUE_DISCLAIMER, REVENUE_WARNING } from "@/data/sampleData";
 import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
 
 interface ResultSiteOverviewProps {
@@ -77,13 +76,7 @@ export function ResultGenerationSection() {
 export function ResultRevenueSection() {
   const { profitability } = useResultMetrics();
 
-  return (
-    <RevenueAnalysis
-      profitability={profitability}
-      disclaimer={REVENUE_DISCLAIMER}
-      revenueWarning={REVENUE_WARNING}
-    />
-  );
+  return <RevenueAnalysis profitability={profitability} />;
 }
 
 export function ResultConsultationSection({

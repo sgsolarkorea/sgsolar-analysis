@@ -3,6 +3,7 @@ import { analyzeSolarSite } from "@/lib/api/analysis";
 import { getMarketPrice } from "@/lib/api/market";
 import { getKakaoErrorMessage } from "@/lib/api/kakaoErrors";
 import { generateSiteReviewPdf, siteReviewPdfFilename } from "@/lib/pdf/siteReviewPdf";
+import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -19,6 +20,38 @@ interface PdfPostBody {
   parcels?: ParcelSnapshot[];
 }
 
+async function buildPdfBytes(address: string, parcels?: ParcelSnapshot[]) {
+  const data = await analyzeSolarSite(address);
+
+  if (parcels && parcels.length > 1) {
+    const totalAreaSqm = parcels.reduce((sum, parcel) => sum + parcel.areaSqm, 0);
+    const market = data.solarMetrics.market ?? (await getMarketPrice());
+    const calc = calculateSolarMetrics({
+      installType: "토지형",
+      landInfo: data.landInfo,
+      buildingInfo: data.buildingInfo,
+      market,
+      overrideLandAreaSqm: totalAreaSqm,
+      parcelCount: parcels.length,
+    });
+
+    data.capacity = formatCapacityDisplay(calc.capacityKw);
+    data.annualGeneration = formatGenerationDisplay(calc.annualGenerationKwh);
+    data.annualRevenue = formatRevenueDisplay(calc.totalRevenueWon);
+    data.constructionCost = formatConstructionDisplay(calc.constructionCostWon);
+    data.solarMetrics = calc.metrics;
+    data.profitability = calc.profitability;
+    data.monthlyGeneration = calc.monthlyGeneration;
+  }
+
+  const ordinanceResult = await resolveOrdinanceForAddress(data.address);
+
+  return generateSiteReviewPdf(data, {
+    parcels: parcels && parcels.length > 0 ? parcels : undefined,
+    ordinance: ordinanceResult.data,
+  });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const address = searchParams.get("address")?.trim() ?? "";
@@ -28,8 +61,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await analyzeSolarSite(address);
-    const pdfBytes = await generateSiteReviewPdf(data);
+    const pdfBytes = await buildPdfBytes(address);
     return pdfResponse(pdfBytes);
   } catch (error) {
     console.error("[PDF] generation failed:", error);
@@ -47,31 +79,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const data = await analyzeSolarSite(address);
-    const parcels = body?.parcels ?? [];
-
-    if (parcels.length > 1) {
-      const totalAreaSqm = parcels.reduce((sum, parcel) => sum + parcel.areaSqm, 0);
-      const market = data.solarMetrics.market ?? (await getMarketPrice());
-      const calc = calculateSolarMetrics({
-        installType: "토지형",
-        landInfo: data.landInfo,
-        buildingInfo: data.buildingInfo,
-        market,
-        overrideLandAreaSqm: totalAreaSqm,
-        parcelCount: parcels.length,
-      });
-
-      data.capacity = formatCapacityDisplay(calc.capacityKw);
-      data.annualGeneration = formatGenerationDisplay(calc.annualGenerationKwh);
-      data.annualRevenue = formatRevenueDisplay(calc.totalRevenueWon);
-      data.constructionCost = formatConstructionDisplay(calc.constructionCostWon);
-      data.solarMetrics = calc.metrics;
-      data.profitability = calc.profitability;
-      data.monthlyGeneration = calc.monthlyGeneration;
-    }
-
-    const pdfBytes = await generateSiteReviewPdf(data, parcels.length > 0 ? parcels : undefined);
+    const pdfBytes = await buildPdfBytes(address, body?.parcels ?? []);
     return pdfResponse(pdfBytes);
   } catch (error) {
     console.error("[PDF] multi-parcel generation failed:", error);

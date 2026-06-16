@@ -309,13 +309,13 @@ export default function GridConnectionSection({
               secondary={gridInfo.contacts.branchPhone}
             />
             <ContactCard
-              title="전력공급부"
-              primary={gridInfo.contacts.supplyDepartment}
+              title="전력공급부 담당자"
+              primary="전력공급부 담당자"
               secondary={gridInfo.contacts.supplyPhone}
             />
             <ContactCard
-              title="계통운영기술부"
-              primary={gridInfo.contacts.operationsDepartment}
+              title="배전계통 담당자"
+              primary="배전계통 담당자"
               secondary={gridInfo.contacts.operationsPhone}
             />
           </div>

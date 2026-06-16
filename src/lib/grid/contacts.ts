@@ -5,6 +5,9 @@ interface BranchRule {
   contacts: GridContactInfo;
 }
 
+const SUPPLY_ROLE = "전력공급부 담당자";
+const OPERATIONS_ROLE = "배전계통 담당자";
+
 /** 시·군·구 키워드 → 관할 한전 지사 연락처 (KEPCO API 미제공, 내부 참고용) */
 const BRANCH_RULES: BranchRule[] = [
   {
@@ -12,9 +15,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 아산지사",
       branchPhone: "041-540-6114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "041-540-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "041-540-6281",
     },
   },
@@ -23,9 +26,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 남원지사",
       branchPhone: "063-630-1114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "063-630-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "063-630-6281",
     },
   },
@@ -34,9 +37,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 성남지사",
       branchPhone: "031-800-6114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "031-800-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "031-800-6281",
     },
   },
@@ -45,9 +48,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 속초지사 (고성군 관할)",
       branchPhone: "033-639-6114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "033-639-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "033-639-6281",
     },
   },
@@ -56,9 +59,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 천안지사",
       branchPhone: "041-521-6114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "041-521-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "041-521-6281",
     },
   },
@@ -67,9 +70,9 @@ const BRANCH_RULES: BranchRule[] = [
     contacts: {
       kepcoBranch: "한국전력 충주지사",
       branchPhone: "043-840-6114",
-      supplyDepartment: "태양광 계통검토 담당",
+      supplyDepartment: SUPPLY_ROLE,
       supplyPhone: "043-840-6234",
-      operationsDepartment: "배전계통 담당",
+      operationsDepartment: OPERATIONS_ROLE,
       operationsPhone: "043-840-6281",
     },
   },
@@ -80,9 +83,9 @@ const KEPCO_MAIN_PHONE = "국번없이 123";
 const DEFAULT_CONTACTS: GridContactInfo = {
   kepcoBranch: "한국전력 관할 지사",
   branchPhone: KEPCO_MAIN_PHONE,
-  supplyDepartment: "태양광 계통검토 담당",
+  supplyDepartment: SUPPLY_ROLE,
   supplyPhone: KEPCO_MAIN_PHONE,
-  operationsDepartment: "배전계통 담당",
+  operationsDepartment: OPERATIONS_ROLE,
   operationsPhone: KEPCO_MAIN_PHONE,
 };
 
@@ -97,10 +100,10 @@ export function normalizeGridContacts(contacts: Partial<GridContactInfo>): GridC
   return {
     kepcoBranch: contacts.kepcoBranch?.trim() || DEFAULT_CONTACTS.kepcoBranch,
     branchPhone,
-    supplyDepartment: contacts.supplyDepartment?.trim() || "태양광 계통검토 담당",
-    supplyPhone: contacts.supplyPhone?.trim() || branchPhone,
-    operationsDepartment: contacts.operationsDepartment?.trim() || "배전계통 담당",
-    operationsPhone: contacts.operationsPhone?.trim() || branchPhone,
+    supplyDepartment: contacts.supplyDepartment?.trim() || SUPPLY_ROLE,
+    supplyPhone: contacts.supplyPhone?.trim() || KEPCO_MAIN_PHONE,
+    operationsDepartment: contacts.operationsDepartment?.trim() || OPERATIONS_ROLE,
+    operationsPhone: contacts.operationsPhone?.trim() || KEPCO_MAIN_PHONE,
   };
 }
 
