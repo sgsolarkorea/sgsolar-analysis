@@ -79,6 +79,20 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
       ...(typeof ctx.capacity === "string" ? { capacity: ctx.capacity.slice(0, 50) } : {}),
       ...(typeof ctx.annualGeneration === "string" ? { annualGeneration: ctx.annualGeneration.slice(0, 50) } : {}),
       ...(typeof ctx.annualRevenue === "string" ? { annualRevenue: ctx.annualRevenue.slice(0, 50) } : {}),
+      ...(typeof ctx.parcelCount === "number" ? { parcelCount: ctx.parcelCount } : {}),
+      ...(typeof ctx.totalLandArea === "string" ? { totalLandArea: ctx.totalLandArea.slice(0, 50) } : {}),
+      ...(Array.isArray(ctx.parcels)
+        ? {
+            parcels: ctx.parcels
+              .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+              .slice(0, 20)
+              .map((item) => ({
+                jibunAddress: String(item.jibunAddress ?? "").slice(0, 200),
+                areaLabel: String(item.areaLabel ?? "").slice(0, 50),
+                landCategory: String(item.landCategory ?? "").slice(0, 50),
+              })),
+          }
+        : {}),
     };
   }
 

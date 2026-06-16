@@ -55,7 +55,17 @@ function buildStaffEmailRows(
     { label: "문의내용", value: submission.message || "(없음)" },
     { label: "지목", value: displayValue(ctx.landCategory, "확인 필요") },
     { label: "용도지역", value: displayValue(ctx.zoning, "확인 필요") },
-    { label: "토지면적", value: displayValue(ctx.landArea, "확인 필요") },
+    { label: "토지면적", value: displayValue(ctx.totalLandArea ?? ctx.landArea, "확인 필요") },
+    ...(ctx.parcelCount && ctx.parcelCount > 1
+      ? [
+          { label: "필지 수", value: `${ctx.parcelCount}필지` },
+          {
+            label: "필지 목록",
+            value:
+              ctx.parcels?.map((p) => `${p.jibunAddress} ${p.areaLabel}`).join(" / ") ?? "(미제공)",
+          },
+        ]
+      : []),
     { label: "건축면적", value: displayValue(ctx.buildingArea, "확인 필요") },
     { label: "예상 설치용량", value: displayValue(ctx.capacity, "별도 확인") },
     { label: "예상 발전량", value: displayValue(ctx.annualGeneration, "별도 확인") },
