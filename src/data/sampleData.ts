@@ -315,7 +315,7 @@ export const result: Omit<
   ],
   gridInfo: {
     status: "unknown",
-    statusLabel: "한전 확인 필요",
+    statusLabel: "⚫ 한전 확인 필요",
     expectedCapacityMw: 0,
     expectedCapacityDisplay: "—",
     referenceLocation: "경기 성남시 분당구 판교동",
@@ -337,7 +337,7 @@ export const result: Omit<
     },
     dataSource: "none",
     dataSourceLabel: "데이터 출처 : 공개 데이터 미확보",
-    queryBasisLabel: null,
+    queryBasisLabel: "해당 위치 기준",
     nearbyDistanceKm: null,
     nearbyNotice: null,
     substation: { name: "한전 확인 필요", cumulativeMw: null, remainingMw: null },

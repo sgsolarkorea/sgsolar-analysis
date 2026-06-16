@@ -48,18 +48,19 @@ function buildFromPole(
 ): GridConnectionInfo {
   const expectedMw = Math.round((input.capacityKw / 1000) * 1000) / 1000;
   const remainingMw = pickBottleneckRemainingMw(pole);
-  const status = evaluateGridConnectionStatus(remainingMw, expectedMw);
+  const status = evaluateGridConnectionStatus(pole, expectedMw);
   const margin = formatCapacityMargin(remainingMw, expectedMw);
   const nearbyDistanceKm = options?.nearbyDistanceKm ?? null;
+  const referenceLocation =
+    options?.referenceLocation ??
+    (pole.referenceLocation || input.jibunAddress || input.address);
 
   return {
     status,
     statusLabel: GRID_STATUS_LABELS[status],
     expectedCapacityMw: expectedMw,
     expectedCapacityDisplay: formatMw(expectedMw, "—"),
-    referenceLocation:
-      options?.referenceLocation ??
-      (pole.referenceLocation || input.jibunAddress || input.address),
+    referenceLocation,
     dataAsOfDate,
     selectedPoleId: pole.poleId,
     poles: [pole],
@@ -67,11 +68,15 @@ function buildFromPole(
     remainingCapacityDisplay: formatMw(remainingMw),
     capacityMarginMw: margin.mw,
     capacityMarginDisplay: margin.display,
-    reviewResult: buildReviewResult(status, remainingMw, expectedMw),
+    reviewResult: buildReviewResult(status, pole, expectedMw),
     contacts,
     dataSource,
     dataSourceLabel: getGridDataSourceLabel(dataSource),
-    queryBasisLabel: buildQueryBasisLabel(dataSource, nearbyDistanceKm),
+    queryBasisLabel: buildQueryBasisLabel(
+      dataSource,
+      nearbyDistanceKm,
+      input.jibunAddress || input.address,
+    ),
     nearbyDistanceKm,
     nearbyNotice: dataSource === "kepco-api-nearby" ? NEARBY_GRID_NOTICE : null,
     substation: pole.substation,
@@ -106,11 +111,22 @@ function buildUnknownState(
     remainingCapacityDisplay: GRID_UNKNOWN_VALUE,
     capacityMarginMw: null,
     capacityMarginDisplay: GRID_UNKNOWN_VALUE,
-    reviewResult: buildReviewResult("unknown", null, expectedMw),
+    reviewResult: buildReviewResult("unknown", selected ?? {
+      poleId: "",
+      label: "",
+      referenceLocation: input.jibunAddress || input.address,
+      substation,
+      transformer,
+      distributionLine,
+    }, expectedMw),
     contacts,
     dataSource: "none",
     dataSourceLabel: getGridDataSourceLabel("none"),
-    queryBasisLabel: null,
+    queryBasisLabel: buildQueryBasisLabel(
+      "none",
+      null,
+      input.jibunAddress || input.address,
+    ),
     nearbyDistanceKm: null,
     nearbyNotice: null,
     substation,

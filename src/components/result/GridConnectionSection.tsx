@@ -8,7 +8,7 @@ import {
   hasDetailedGridData,
   GRID_UNKNOWN_VALUE,
 } from "@/lib/grid/display";
-import { formatDlRemainingMw, formatMw } from "@/lib/grid/evaluate";
+import { formatDlRemainingMw, formatMw, formatRemainingWithStatus } from "@/lib/grid/evaluate";
 import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
@@ -29,9 +29,9 @@ const STATUS_STYLES: Record<
     dot: "bg-amber-500",
   },
   difficult: {
-    badge: "bg-orange-50 text-orange-900 border-orange-200",
-    border: "border-orange-200",
-    dot: "bg-orange-500",
+    badge: "bg-red-50 text-red-900 border-red-200",
+    border: "border-red-200",
+    dot: "bg-red-500",
   },
   unknown: {
     badge: "bg-slate-100 text-slate-700 border-slate-200",
@@ -63,28 +63,60 @@ function CapacityRowsCard({
   substation,
   transformer,
   dl,
+  warnRemaining = false,
+  expectedCapacityMw = 0,
+  substationMw,
+  transformerMw,
+  dlMw,
 }: {
   title: string;
   substation: string;
   transformer: string;
   dl: string;
+  warnRemaining?: boolean;
+  expectedCapacityMw?: number;
+  substationMw?: number | null;
+  transformerMw?: number | null;
+  dlMw?: number | null;
 }) {
   const rows = [
-    { label: "변전소", value: substation },
-    { label: "변압기", value: transformer },
-    { label: "D/L", value: dl },
+    {
+      label: "변전소",
+      value: warnRemaining
+        ? formatRemainingWithStatus(substationMw ?? null, expectedCapacityMw)
+        : substation,
+    },
+    {
+      label: "변압기",
+      value: warnRemaining
+        ? formatRemainingWithStatus(transformerMw ?? null, expectedCapacityMw)
+        : transformer,
+    },
+    {
+      label: "D/L",
+      value: warnRemaining
+        ? formatRemainingWithStatus(dlMw ?? null, expectedCapacityMw)
+        : dl,
+    },
   ];
 
   return (
     <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <p className="text-sm font-bold text-slate-800">{title}</p>
       <div className="mt-4 flex flex-1 flex-col justify-center space-y-3">
-        {rows.map((row) => (
-          <div key={row.label} className="flex items-center justify-between gap-3 text-sm">
-            <span className="shrink-0 text-slate-500">{row.label}</span>
-            <span className="text-right font-semibold text-slate-900">{row.value}</span>
-          </div>
-        ))}
+        {rows.map((row) => {
+          const insufficient = warnRemaining && row.value.includes("🔴 부족");
+          return (
+            <div key={row.label} className="flex items-center justify-between gap-3 text-sm">
+              <span className="shrink-0 text-slate-500">{row.label}</span>
+              <span
+                className={`text-right font-semibold ${insufficient ? "text-red-600" : "text-slate-900"}`}
+              >
+                {row.value}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -270,6 +302,11 @@ export default function GridConnectionSection({
                 substation={fmtRem(gridInfo.substation.remainingMw)}
                 transformer={fmtRem(gridInfo.transformer.remainingMw)}
                 dl={fmtRem(gridInfo.distributionLine.remainingMw)}
+                warnRemaining
+                expectedCapacityMw={gridInfo.expectedCapacityMw}
+                substationMw={gridInfo.substation.remainingMw}
+                transformerMw={gridInfo.transformer.remainingMw}
+                dlMw={gridInfo.distributionLine.remainingMw}
               />
               <SingleValueCard
                 title="태양광 설치용량"
@@ -281,7 +318,9 @@ export default function GridConnectionSection({
               />
             </div>
 
-            <p className="text-sm leading-relaxed text-slate-600">{gridInfo.reviewResult}</p>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
+              {gridInfo.reviewResult}
+            </p>
           </div>
         )}
 

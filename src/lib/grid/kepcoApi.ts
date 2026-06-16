@@ -141,7 +141,10 @@ function mapItemToPole(
   item: KepcoDispersedGenerationItem,
   referenceLocation: string,
 ): GridPoleOption {
-  const poleId = item.addrJibun?.trim() || "unknown";
+  const poleId =
+    item.addrJibun?.trim() ||
+    referenceLocation.split(/\s+/).slice(-2).join("-") ||
+    referenceLocation;
   const dlRemaining = pickDlRemainingMw(item);
 
   return {

@@ -8,7 +8,7 @@ import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
-import { formatDlRemainingMw, formatMw } from "@/lib/grid/evaluate";
+import { formatDlRemainingMw, formatRemainingWithStatus } from "@/lib/grid/evaluate";
 import {
   COLORS,
   MARGIN,
@@ -398,9 +398,9 @@ function drawGridPage(
 
     y -= 8;
     const detailRows = [
-      ["변전소 잔여", formatMw(grid.substation.remainingMw)],
-      ["MTR 잔여", formatMw(grid.transformer.remainingMw)],
-      ["D/L 잔여", formatMw(grid.distributionLine.remainingMw)],
+      ["변전소 잔여", formatRemainingWithStatus(grid.substation.remainingMw, grid.expectedCapacityMw)],
+      ["MTR 잔여", formatRemainingWithStatus(grid.transformer.remainingMw, grid.expectedCapacityMw)],
+      ["D/L 잔여", formatRemainingWithStatus(grid.distributionLine.remainingMw, grid.expectedCapacityMw)],
     ];
     const detailW = (contentW - 16) / 3;
     for (let i = 0; i < detailRows.length; i++) {

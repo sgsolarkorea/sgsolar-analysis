@@ -53,7 +53,7 @@ export interface GridConnectionInfo {
   dataAsOfDate: string | null;
   selectedPoleId: string | null;
   poles: GridPoleOption[];
-  /** 검토 기준 잔여용량 (D/L 기준, 없으면 null) */
+  /** 검토 기준 잔여용량 — min(변전소, MTR, D/L) */
   remainingCapacityMw: number | null;
   remainingCapacityDisplay: string;
   capacityMarginMw: number | null;
