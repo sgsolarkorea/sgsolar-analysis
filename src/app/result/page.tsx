@@ -26,6 +26,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
 import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
 import { resolveRegulatoryReview } from "@/lib/regulatory/resolveRegulatoryReview";
+import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
 
@@ -65,6 +66,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     address: data.address,
     installType: data.solarMetrics.installType,
   });
+  const ordinanceResult = await resolveOrdinanceForAddress(data.address);
 
   const searchHistory = await recordSearchHistory(data, params.address ?? data.address);
 
@@ -116,7 +118,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               />
 
               <SetbackReviewSection review={regulatory.setbackReview} />
-              <LocalOrdinanceSection review={regulatory.localOrdinance} />
+              <LocalOrdinanceSection review={ordinanceResult.data} meta={ordinanceResult.meta} />
 
               <ResultCapacitySection recommendation={data.recommendation} />
               <ResultGenerationSection />

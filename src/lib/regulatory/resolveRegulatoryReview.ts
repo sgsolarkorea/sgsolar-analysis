@@ -1,5 +1,4 @@
 import type { SetbackReview } from "@/types/regulatoryReview";
-import { loadMunicipalityOrdinance } from "@/lib/regulatory/loadOrdinance";
 
 export { extractMunicipalityLabel, loadMunicipalityOrdinance } from "@/lib/regulatory/loadOrdinance";
 
@@ -69,6 +68,5 @@ export function resolveRegulatoryReview(input: {
 }) {
   return {
     setbackReview: buildDefaultSetbackReview(input.installType),
-    localOrdinance: loadMunicipalityOrdinance(input.address),
   };
 }

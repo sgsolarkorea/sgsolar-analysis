@@ -39,6 +39,7 @@ yarn-error.log*
 
 # search history (local dev JSON storage)
 /data/search-history/
+/data/ordinance-learning/
 
 # vercel
 .vercel

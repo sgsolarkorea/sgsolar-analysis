@@ -1,5 +1,6 @@
 "use client";
 
+import AdminNav from "@/components/admin/AdminNav";
 import type { SearchHistoryEntry } from "@/types/searchHistory";
 
 function formatSearchedAtKst(iso: string): string {
@@ -27,6 +28,8 @@ export default function AdminSearchHistoryTable({ entries }: AdminSearchHistoryT
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+      <AdminNav active="search-history" />
+
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">입지검토 조회 이력</h1>

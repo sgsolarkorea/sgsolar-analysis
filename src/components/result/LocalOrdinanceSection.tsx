@@ -2,10 +2,45 @@
 
 import { useState } from "react";
 import type { MunicipalityOrdinanceData, OrdinanceArticle } from "@/types/regulatoryReview";
+import type { OrdinanceLoadMeta } from "@/types/ordinanceLearning";
+import { ORDINANCE_DISPLAY_LABELS } from "@/types/ordinanceLearning";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 interface LocalOrdinanceSectionProps {
-  review: MunicipalityOrdinanceData;
+  review: MunicipalityOrdinanceData | null;
+  meta: OrdinanceLoadMeta;
+}
+
+function formatReviewDate(iso?: string): string {
+  if (!iso) return "—";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(new Date(iso))
+    .replace(/\./g, "-")
+    .replace(/\s/g, "")
+    .replace(/-$/, "");
+}
+
+function DisplayStatusBadge({ meta }: { meta: OrdinanceLoadMeta }) {
+  const styles = {
+    verified: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    ai_draft: "bg-violet-50 text-violet-800 border-violet-200",
+    preparing: "bg-amber-50 text-amber-900 border-amber-200",
+    default_template: "bg-slate-100 text-slate-700 border-slate-200",
+  };
+
+  return (
+    <span
+      className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-semibold ${styles[meta.displayStatus]}`}
+    >
+      {ORDINANCE_DISPLAY_LABELS[meta.displayStatus]}
+    </span>
+  );
 }
 
 function OrdinanceArticleCard({ article }: { article: OrdinanceArticle }) {
@@ -13,14 +48,12 @@ function OrdinanceArticleCard({ article }: { article: OrdinanceArticle }) {
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold text-navy">조례명</p>
-          <h4 className="mt-1 text-base font-bold text-slate-900">{article.title}</h4>
-          {article.summary && (
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">{article.summary}</p>
-          )}
-        </div>
+      <div>
+        <p className="text-xs font-semibold text-navy">조례명</p>
+        <h4 className="mt-1 text-base font-bold text-slate-900">{article.title}</h4>
+        {article.summary && (
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">{article.summary}</p>
+        )}
       </div>
 
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
@@ -68,7 +101,38 @@ function OrdinanceArticleCard({ article }: { article: OrdinanceArticle }) {
   );
 }
 
-export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionProps) {
+function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
+  return (
+    <div className="card-premium p-6 sm:p-8">
+      <div className="flex flex-wrap items-center gap-2">
+        <DisplayStatusBadge meta={meta} />
+        <span className="text-sm font-semibold text-slate-900">{meta.municipalityLabel}</span>
+      </div>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">조례 데이터 준비 중입니다.</h3>
+      <p className="mt-3 text-sm leading-relaxed text-slate-600">
+        해당 지역({meta.municipalityLabel}) 조례를 수집·검토 중이며, 관리자 승인 후 자동으로 표시됩니다.
+        현재는 이격거리 검토와 기본 법령 정보만 참고해 주세요.
+      </p>
+      <p className="mt-4 text-xs text-slate-500">
+        상태: {meta.status === "review" ? "관리자 검토 중" : "AI 생성 대기/진행 중"}
+      </p>
+    </div>
+  );
+}
+
+export default function LocalOrdinanceSection({ review, meta }: LocalOrdinanceSectionProps) {
+  if (meta.isPreparing || !review) {
+    return (
+      <section id="local-ordinance" className="scroll-mt-24">
+        <SectionHeader
+          title="법·조례 검토"
+          description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
+        />
+        <OrdinancePreparingPanel meta={meta} />
+      </section>
+    );
+  }
+
   return (
     <section id="local-ordinance" className="scroll-mt-24">
       <SectionHeader
@@ -76,11 +140,22 @@ export default function LocalOrdinanceSection({ review }: LocalOrdinanceSectionP
         description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약했습니다."
       />
 
+      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <DisplayStatusBadge meta={meta} />
+        <div className="text-sm text-slate-700">
+          <span className="font-semibold text-slate-900">{review.municipalityLabel}</span>
+          {meta.reviewedAt && (
+            <span className="ml-2 text-slate-600">
+              최종 검토일 {formatReviewDate(meta.reviewedAt)}
+              {meta.version ? ` · v${meta.version}` : ""}
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="card-premium p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {review.municipalityLabel}
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">출처</p>
           <h3 className="mt-1 text-lg font-bold text-slate-900">{review.ordinanceTitle}</h3>
           {review.appendixTitle && (
             <p className="mt-2 text-sm text-slate-700">{review.appendixTitle}</p>

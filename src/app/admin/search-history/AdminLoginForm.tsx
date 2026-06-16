@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 
-export default function AdminLoginForm() {
+interface AdminLoginFormProps {
+  redirectPath?: string;
+}
+
+export default function AdminLoginForm(_props: AdminLoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +38,7 @@ export default function AdminLoginForm() {
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="card-premium p-6 sm:p-8">
         <h1 className="text-xl font-bold text-slate-900">관리자 로그인</h1>
-        <p className="mt-2 text-sm text-slate-600">입지검토 조회 이력을 확인하려면 비밀번호를 입력하세요.</p>
+        <p className="mt-2 text-sm text-slate-600">SG SOLAR 입지검토 관리자 메뉴에 접근하려면 비밀번호를 입력하세요.</p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label htmlFor="admin-password" className="mb-1.5 block text-sm font-semibold text-slate-900">
