@@ -225,7 +225,17 @@ export async function fetchKepcoGridByLocation(input: {
   }
 
   if (!response.ok) {
-    console.warn(`[Grid/KepcoAPI] HTTP ${response.status}`, { url: url.origin + url.pathname });
+    let errBody: KepcoDispersedGenerationResponse | null = null;
+    try {
+      errBody = (await response.json()) as KepcoDispersedGenerationResponse;
+    } catch {
+      /* ignore */
+    }
+    console.warn(`[Grid/KepcoAPI] HTTP ${response.status}`, {
+      url: url.origin + url.pathname,
+      errCd: errBody?.errCd,
+      errMsg: errBody?.errMsg,
+    });
     return null;
   }
 
