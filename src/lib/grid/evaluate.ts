@@ -1,5 +1,7 @@
 import type { GridConnectionStatus, GridPoleOption } from "@/types/gridConnection";
 
+export const GRID_UNKNOWN_VALUE = "미확인";
+
 export const GRID_STATUS_LABELS: Record<GridConnectionStatus, string> = {
   high: "연계 가능성 높음",
   review: "추가 확인 필요",
@@ -46,7 +48,7 @@ export function buildReviewResult(
   expectedMw: number,
 ): string {
   if (status === "unknown") {
-    return "공개 데이터 미확보 — 한전 선로용량 확인 필요";
+    return "계통 공개 데이터 미확보 — 선로용량 확인 권장";
   }
   const remaining = remainingMw?.toFixed(1) ?? "—";
   const expected = expectedMw.toFixed(1);
@@ -58,11 +60,14 @@ export function buildReviewResult(
     case "difficult":
       return `D/L 잔여 ${remaining}MW — 예상 ${expected}MW 대비 잔여 부족, 대안 선로·승압 검토 필요`;
     default:
-      return "한전 확인 필요";
+      return GRID_UNKNOWN_VALUE;
   }
 }
 
-export function formatMw(value: number | null | undefined, fallback = "한전 확인 필요"): string {
+export function formatMw(
+  value: number | null | undefined,
+  fallback = GRID_UNKNOWN_VALUE,
+): string {
   if (value == null || !Number.isFinite(value)) return fallback;
   return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}MW`;
 }
@@ -72,7 +77,7 @@ export function formatCapacityMargin(
   expectedMw: number,
 ): { mw: number | null; display: string } {
   if (remainingMw == null || expectedMw <= 0) {
-    return { mw: null, display: "한전 확인 필요" };
+    return { mw: null, display: GRID_UNKNOWN_VALUE };
   }
   const margin = remainingMw - expectedMw;
   const sign = margin >= 0 ? "+" : "";

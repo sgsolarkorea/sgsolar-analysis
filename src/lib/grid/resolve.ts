@@ -7,6 +7,7 @@ import {
   formatMw,
   GRID_DISCLAIMER_TEXT,
   GRID_STATUS_LABELS,
+  GRID_UNKNOWN_VALUE,
   pickBottleneckRemainingMw,
 } from "@/lib/grid/evaluate";
 import { fetchKepcoGridByLocation } from "@/lib/grid/kepcoApi";
@@ -27,7 +28,7 @@ export interface ResolveGridInput {
   poleId?: string;
 }
 
-function emptyLevel(name: string): GridLevelCapacity {
+function emptyLevel(name: string = GRID_UNKNOWN_VALUE): GridLevelCapacity {
   return { name, cumulativeMw: null, remainingMw: null };
 }
 
@@ -75,9 +76,9 @@ function buildUnknownState(
   const selected =
     poles.find((p) => p.poleId === input.poleId) ?? poles[0] ?? null;
 
-  const substation = selected?.substation ?? emptyLevel("한전 확인 필요");
-  const transformer = selected?.transformer ?? emptyLevel("한전 확인 필요");
-  const distributionLine = selected?.distributionLine ?? emptyLevel("한전 확인 필요");
+  const substation = selected?.substation ?? emptyLevel();
+  const transformer = selected?.transformer ?? emptyLevel();
+  const distributionLine = selected?.distributionLine ?? emptyLevel();
 
   return {
     status: "unknown",
@@ -89,9 +90,9 @@ function buildUnknownState(
     selectedPoleId: selected?.poleId ?? null,
     poles,
     remainingCapacityMw: null,
-    remainingCapacityDisplay: "한전 확인 필요",
+    remainingCapacityDisplay: GRID_UNKNOWN_VALUE,
     capacityMarginMw: null,
-    capacityMarginDisplay: "한전 확인 필요",
+    capacityMarginDisplay: GRID_UNKNOWN_VALUE,
     reviewResult: buildReviewResult("unknown", null, expectedMw),
     contacts,
     dataSource: "none",
@@ -157,9 +158,9 @@ export async function resolveGridConnection(input: ResolveGridInput): Promise<Gr
     poleId,
     label: buildPoleLabel(poleId, input.jibunAddress),
     referenceLocation: input.jibunAddress || input.address,
-    substation: emptyLevel("한전 확인 필요"),
-    transformer: emptyLevel("한전 확인 필요"),
-    distributionLine: emptyLevel("한전 확인 필요"),
+    substation: emptyLevel(),
+    transformer: emptyLevel(),
+    distributionLine: emptyLevel(),
   }));
 
   return buildUnknownState(input, placeholderPoles, contacts);
