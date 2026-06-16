@@ -1,3 +1,4 @@
+import { getGridDataSourceLabel } from "@/lib/grid/dataSourceLabel";
 import { resolveGridContacts } from "@/lib/grid/contacts";
 import {
   buildReviewResult,
@@ -58,6 +59,7 @@ function buildFromPole(
     reviewResult: buildReviewResult(status, remainingMw, expectedMw),
     contacts,
     dataSource,
+    dataSourceLabel: getGridDataSourceLabel(dataSource),
     substation: pole.substation,
     transformer: pole.transformer,
     distributionLine: pole.distributionLine,
@@ -93,6 +95,7 @@ function buildUnknownState(
     reviewResult: buildReviewResult("unknown", null, expectedMw),
     contacts,
     dataSource: "none",
+    dataSourceLabel: getGridDataSourceLabel("none"),
     substation,
     transformer,
     distributionLine,

@@ -92,6 +92,11 @@ export async function listGridAdminRecords(): Promise<GridAdminRecord[]> {
   const redisRecords = await listRedisRecords();
   if (redisRecords.length) return redisRecords;
 
+  // Production: seed.json 미사용 — 실데이터 오해 방지
+  if (process.env.NODE_ENV === "production") {
+    return [];
+  }
+
   return loadSeedRecords();
 }
 

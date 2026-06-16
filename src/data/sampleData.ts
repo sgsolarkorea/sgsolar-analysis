@@ -335,6 +335,7 @@ export const result: Omit<
       operationsPhone: "031-800-6200",
     },
     dataSource: "none",
+    dataSourceLabel: "데이터 출처 : 공개 데이터 기반 1차 검토",
     substation: { name: "한전 확인 필요", cumulativeMw: null, remainingMw: null },
     transformer: { name: "한전 확인 필요", cumulativeMw: null, remainingMw: null },
     distributionLine: { name: "한전 확인 필요", cumulativeMw: null, remainingMw: null },

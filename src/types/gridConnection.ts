@@ -54,6 +54,7 @@ export interface GridConnectionInfo {
   reviewResult: string;
   contacts: GridContactInfo;
   dataSource: GridDataSource;
+  dataSourceLabel: string;
   /** 3개 박스용 — 선택된 전주 기준 */
   substation: GridLevelCapacity;
   transformer: GridLevelCapacity;

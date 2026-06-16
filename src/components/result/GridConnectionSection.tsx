@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import { formatMw } from "@/lib/grid/evaluate";
+import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
 const KEPCO_LINE_CAPACITY_URL = "https://online.kepco.co.kr/EWM092D00";
@@ -187,6 +188,9 @@ export default function GridConnectionSection({
               <p className="text-xs text-slate-400">
                 데이터 기준일: {gridInfo.dataAsOfDate ?? "미확보"}
               </p>
+              <p className="mt-1 text-xs font-medium text-slate-600">
+                {gridInfo.dataSourceLabel}
+              </p>
             </div>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-slate-600">{disclaimer}</p>
@@ -305,10 +309,9 @@ export default function GridConnectionSection({
           <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">
             ⚠ {disclaimer}
           </p>
-          {gridInfo.dataSource === "none" && (
+          {getGridDataSourceNotice(gridInfo.dataSource) && (
             <p className="mt-1 text-xs leading-relaxed text-amber-900 sm:text-sm">
-              ⚠ 해당 지역 공개 계통 데이터가 없어 한전 확인이 필요합니다. 관리자 페이지에서
-              수동 데이터를 등록하면 검토 결과가 표시됩니다.
+              ⚠ {getGridDataSourceNotice(gridInfo.dataSource)}
             </p>
           )}
         </div>
