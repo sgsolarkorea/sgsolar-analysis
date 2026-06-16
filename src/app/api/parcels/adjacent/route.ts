@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { findAdjacentParcels } from "@/lib/api/adjacentParcels";
+import { ADJACENT_PARCEL_MVP_LIMIT } from "@/lib/parcels/constants";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,7 +20,12 @@ export async function GET(request: Request) {
     excludePnu,
     existingPnus,
     radiusM: 50,
+    maxCandidates: ADJACENT_PARCEL_MVP_LIMIT,
   });
 
-  return NextResponse.json({ candidates, radiusM: 50 });
+  return NextResponse.json({
+    candidates,
+    radiusM: 50,
+    maxCandidates: ADJACENT_PARCEL_MVP_LIMIT,
+  });
 }

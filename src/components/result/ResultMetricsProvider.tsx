@@ -101,7 +101,8 @@ export function ResultMetricsProvider({
       installType === initialInstallType &&
       parcels.length === 1 &&
       parcels[0]?.id === initialPrimaryParcel.id &&
-      !useMultiParcelMetrics;
+      !useMultiParcelMetrics &&
+      Math.abs(parcelSummary.totalAreaSqm - initialPrimaryParcel.areaSqm) < 0.01;
 
     if (shouldUseInitial) {
       return {
@@ -138,6 +139,7 @@ export function ResultMetricsProvider({
     useMultiParcelMetrics,
     parcelSummary.totalAreaSqm,
     parcelSummary.parcelCount,
+    initialPrimaryParcel.areaSqm,
   ]);
 
   const addParcel = useCallback((parcel: ParcelItem): boolean => {

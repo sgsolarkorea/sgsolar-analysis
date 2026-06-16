@@ -1,4 +1,5 @@
 import { unavailableLandInfo } from "@/lib/api/infoFallbacks";
+import { ADJACENT_CADASTRAL_FETCH_SIZE } from "@/lib/parcels/constants";
 import type { LandInfoDetail } from "@/types/landInfo";
 import type { InfoField } from "@/types/siteReview";
 
@@ -479,7 +480,7 @@ export async function fetchAdjacentCadastralParcels(
     params.set("service", "data");
     params.set("request", "GetFeature");
     params.set("data", "LP_PA_CBND_BUBUN");
-    params.set("size", "20");
+    params.set("size", String(ADJACENT_CADASTRAL_FETCH_SIZE));
     params.set("page", "1");
     params.set("geometry", "true");
     params.set("attribute", "true");

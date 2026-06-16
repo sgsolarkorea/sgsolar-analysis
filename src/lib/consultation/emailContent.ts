@@ -59,10 +59,14 @@ function buildStaffEmailRows(
     ...(ctx.parcelCount && ctx.parcelCount > 1
       ? [
           { label: "필지 수", value: `${ctx.parcelCount}필지` },
+          { label: "총 토지면적", value: displayValue(ctx.totalLandArea, "확인 필요") },
+          { label: "총 설치용량", value: displayValue(ctx.capacity, "별도 확인") },
           {
             label: "필지 목록",
             value:
-              ctx.parcels?.map((p) => `${p.jibunAddress} ${p.areaLabel}`).join(" / ") ?? "(미제공)",
+              ctx.parcels
+                ?.map((p) => `${p.jibunAddress} ${p.areaLabel}${p.landCategory ? ` (${p.landCategory})` : ""}`)
+                .join(" / ") ?? "(미제공)",
           },
         ]
       : []),

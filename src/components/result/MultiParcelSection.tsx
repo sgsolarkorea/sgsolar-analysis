@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { ADJACENT_PARCEL_MVP_LIMIT } from "@/lib/parcels/constants";
 import { formatParcelShortLabel } from "@/lib/parcels/format";
 import type { AdjacentParcelCandidate } from "@/types/parcelReview";
 import type { AddressSuggestion } from "@/types/address";
@@ -27,6 +28,7 @@ function candidateToParcel(candidate: AdjacentParcelCandidate): ParcelItem {
 export default function MultiParcelSection() {
   const {
     multiParcelEnabled,
+    installType,
     parcels,
     parcelSummary,
     addParcel,
@@ -34,6 +36,9 @@ export default function MultiParcelSection() {
     addParcelsFromCandidates,
     primaryParcel,
   } = useResultMetrics();
+
+  const parcelsRef = useRef(parcels);
+  parcelsRef.current = parcels;
 
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -44,9 +49,12 @@ export default function MultiParcelSection() {
   const [selectedAdjacent, setSelectedAdjacent] = useState<Set<string>>(new Set());
   const [loadingAdjacent, setLoadingAdjacent] = useState(false);
   const [showAdjacentCard, setShowAdjacentCard] = useState(false);
+  const adjacentLoadedRef = useRef(false);
+
+  const showSection = multiParcelEnabled && installType === "토지형";
 
   useEffect(() => {
-    if (!multiParcelEnabled) return;
+    if (!showSection) return;
 
     const trimmed = query.trim();
     if (trimmed.length < 2) {
@@ -68,39 +76,41 @@ export default function MultiParcelSection() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [query, multiParcelEnabled]);
+  }, [query, showSection]);
 
-  const loadAdjacent = useCallback(async () => {
+  const loadAdjacent = useCallback(async (force = false) => {
+    if (!force && adjacentLoadedRef.current) return;
     setLoadingAdjacent(true);
     try {
       const params = new URLSearchParams({
         lat: String(primaryParcel.lat),
         lng: String(primaryParcel.lng),
-        existingPnus: parcels.map((p) => p.pnu).filter(Boolean).join(","),
+        existingPnus: parcelsRef.current.map((p) => p.pnu).filter(Boolean).join(","),
       });
       if (primaryParcel.pnu) params.set("excludePnu", primaryParcel.pnu);
 
       const res = await fetch(`/api/parcels/adjacent?${params.toString()}`);
       const data = (await res.json()) as { candidates?: AdjacentParcelCandidate[] };
-      const candidates = data.candidates ?? [];
+      const candidates = (data.candidates ?? []).slice(0, ADJACENT_PARCEL_MVP_LIMIT);
       setAdjacentCandidates(candidates);
       setSelectedAdjacent(new Set(candidates.map((item) => item.pnu)));
       setShowAdjacentCard(candidates.length > 0);
+      adjacentLoadedRef.current = true;
     } catch {
       setAdjacentCandidates([]);
       setShowAdjacentCard(false);
     } finally {
       setLoadingAdjacent(false);
     }
-  }, [primaryParcel, parcels]);
+  }, [primaryParcel]);
 
   useEffect(() => {
-    if (multiParcelEnabled) {
+    if (showSection && !adjacentLoadedRef.current) {
       void loadAdjacent();
     }
-  }, [multiParcelEnabled, loadAdjacent]);
+  }, [showSection, loadAdjacent]);
 
-  if (!multiParcelEnabled) return null;
+  if (!showSection) return null;
 
   async function handleAddAddress(address: string) {
     setError(null);
@@ -113,7 +123,14 @@ export default function MultiParcelSection() {
       });
       const data = (await res.json()) as { parcel?: ParcelItem; error?: string };
       if (!res.ok || !data.parcel) {
-        throw new Error(data.error ?? "필지 조회에 실패했습니다.");
+        throw new Error(data.error ?? "필지 조회에 실패했습니다. 주소를 다시 확인해 주세요.");
+      }
+
+      if (
+        parcelsRef.current.some((item) => item.pnu && item.pnu === data.parcel!.pnu)
+      ) {
+        setError("동일한 필지(PNU)가 이미 추가되어 있습니다.");
+        return;
       }
 
       const added = addParcel(data.parcel);
@@ -138,7 +155,10 @@ export default function MultiParcelSection() {
     const count = addParcelsFromCandidates(selected);
     if (count > 0) {
       setShowAdjacentCard(false);
-      void loadAdjacent();
+      adjacentLoadedRef.current = false;
+      void loadAdjacent(true);
+    } else {
+      setError("선택한 필지가 이미 추가되어 있거나 추가할 수 없습니다.");
     }
   }
 
@@ -163,18 +183,18 @@ export default function MultiParcelSection() {
           {parcels.map((parcel) => (
             <li
               key={parcel.id}
-              className="flex items-center justify-between gap-3 px-4 py-3.5"
+              className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
             >
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="font-semibold text-slate-900">
                   {formatParcelShortLabel(parcel.jibunAddress)}
                   {parcel.isPrimary && (
                     <span className="ml-2 text-xs font-medium text-navy">대표</span>
                   )}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-slate-500">{parcel.jibunAddress}</p>
+                <p className="mt-0.5 break-words text-xs text-slate-500">{parcel.jibunAddress}</p>
               </div>
-              <div className="flex shrink-0 items-center gap-3">
+              <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
                 <span className="text-sm font-bold text-navy">{parcel.areaLabel}</span>
                 {!parcel.isPrimary && (
                   <button
@@ -236,7 +256,11 @@ export default function MultiParcelSection() {
               </ul>
             )}
           </div>
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          )}
         </div>
 
         {showAdjacentCard && adjacentCandidates.length > 0 && (
@@ -245,19 +269,19 @@ export default function MultiParcelSection() {
               인접 필지를 함께 검토하시겠습니까?
             </p>
             <p className="mt-1 text-xs text-slate-600">
-              대표 필지 기준 반경 50m 내 VWorld 연속지적도 필지입니다.
+              대표 필지 기준 반경 50m 내 필지 (최대 {ADJACENT_PARCEL_MVP_LIMIT}건)
             </p>
             <ul className="mt-3 space-y-2">
               {adjacentCandidates.map((item) => (
                 <li key={item.pnu}>
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-amber-100 bg-white px-3 py-2.5">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-amber-100 bg-white px-3 py-2.5 sm:items-center">
                     <input
                       type="checkbox"
                       checked={selectedAdjacent.has(item.pnu)}
                       onChange={() => toggleAdjacent(item.pnu)}
-                      className="h-4 w-4 rounded border-slate-300"
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 sm:mt-0"
                     />
-                    <span className="text-sm font-semibold text-slate-900">
+                    <span className="text-sm font-semibold leading-snug text-slate-900">
                       {formatParcelShortLabel(item.jibunAddress)} {item.areaLabel}
                     </span>
                   </label>

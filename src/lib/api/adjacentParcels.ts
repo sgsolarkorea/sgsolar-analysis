@@ -1,6 +1,6 @@
 import { reverseGeocodeKakao } from "@/lib/api/kakao";
-import { fetchAdjacentCadastralParcels } from "@/lib/api/vworld";
-import { getLandInfoByPnu } from "@/lib/api/vworld";
+import { fetchAdjacentCadastralParcels, getLandInfoByPnu } from "@/lib/api/vworld";
+import { ADJACENT_PARCEL_MVP_LIMIT } from "@/lib/parcels/constants";
 import { formatAreaSqmLabel } from "@/lib/parcels/format";
 import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 import type { AdjacentParcelCandidate } from "@/types/parcelReview";
@@ -11,8 +11,10 @@ export async function findAdjacentParcels(input: {
   excludePnu?: string;
   radiusM?: number;
   existingPnus?: string[];
+  maxCandidates?: number;
 }): Promise<AdjacentParcelCandidate[]> {
   const radiusM = input.radiusM ?? 50;
+  const maxCandidates = input.maxCandidates ?? ADJACENT_PARCEL_MVP_LIMIT;
   const existing = new Set(input.existingPnus ?? []);
   if (input.excludePnu) existing.add(input.excludePnu);
 
@@ -26,6 +28,7 @@ export async function findAdjacentParcels(input: {
   const candidates: AdjacentParcelCandidate[] = [];
 
   for (const feature of cadastral) {
+    if (candidates.length >= maxCandidates) break;
     if (existing.has(feature.pnu)) continue;
 
     const [landResult, geo] = await Promise.all([
