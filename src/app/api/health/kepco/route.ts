@@ -28,6 +28,7 @@ export async function GET(request: Request) {
     regionCodes: debug.regionCodes,
     requestParams: debug.requestParams,
     rawKepcoResponse: debug.rawResponse,
+    httpStatus: debug.httpStatus,
     selectedItem: debug.selectedItem,
     mappedPoles: debug.mappedPoles,
     gridInfo: {

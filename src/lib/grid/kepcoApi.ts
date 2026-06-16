@@ -276,6 +276,7 @@ export interface KepcoDispersedGenerationDebugResult {
   parsed: ReturnType<typeof parseKepcoAddress>;
   regionCodes: { metroCd: string | null; cityCd: string | null } | null;
   requestParams: Record<string, string> | null;
+  httpStatus: number | null;
   rawResponse: KepcoDispersedGenerationResponse | null;
   selectedItem: KepcoDispersedGenerationItem | null;
   mappedPoles: GridPoleOption[];
@@ -295,6 +296,7 @@ export async function debugKepcoDispersedGeneration(input: {
       parsed,
       regionCodes: null,
       requestParams: null,
+      httpStatus: null,
       rawResponse: null,
       selectedItem: null,
       mappedPoles: [],
@@ -314,6 +316,7 @@ export async function debugKepcoDispersedGeneration(input: {
       parsed,
       regionCodes,
       requestParams: null,
+      httpStatus: null,
       rawResponse: null,
       selectedItem: null,
       mappedPoles: [],
@@ -336,13 +339,13 @@ export async function debugKepcoDispersedGeneration(input: {
   }
 
   let rawResponse: KepcoDispersedGenerationResponse | null = null;
+  let httpStatus: number | null = null;
   try {
     const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
-    if (response.ok) {
-      rawResponse = (await response.json()) as KepcoDispersedGenerationResponse;
-    }
-  } catch {
-    rawResponse = null;
+    httpStatus = response.status;
+    rawResponse = (await response.json()) as KepcoDispersedGenerationResponse;
+  } catch (error) {
+    rawResponse = { errCd: "FETCH_ERROR", errMsg: String(error) };
   }
 
   const items = Array.isArray(rawResponse?.data) ? rawResponse!.data! : [];
@@ -361,6 +364,7 @@ export async function debugKepcoDispersedGeneration(input: {
     parsed,
     regionCodes,
     requestParams,
+    httpStatus,
     rawResponse,
     selectedItem,
     mappedPoles,
