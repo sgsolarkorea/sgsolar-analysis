@@ -1,4 +1,4 @@
-import { analyzeSolarSite } from "@/lib/api/analysis";
+import { getCachedAnalyzeSolarSite } from "@/lib/api/analysis";
 import {
   KakaoAddressNotFoundError,
   getKakaoErrorMessage,
@@ -43,7 +43,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
   let data;
   try {
-    data = await analyzeSolarSite(params.address ?? "");
+    data = await getCachedAnalyzeSolarSite(params.address ?? "");
   } catch (error) {
     const detail =
       error instanceof KakaoAddressNotFoundError

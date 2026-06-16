@@ -2,6 +2,7 @@
  * SG SOLAR 입지검토 API 연동 레이어
  */
 
+import { unstable_cache } from "next/cache";
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
@@ -264,4 +265,14 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     ordinanceInfo: result.ordinanceInfo,
     suitability: result.suitability,
   };
+}
+
+/** 로딩 화면 prefetch와 결과 페이지 SSR 간 중복 분석 방지 (2분 캐시) */
+export async function getCachedAnalyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
+  const normalized = address.trim();
+  return unstable_cache(
+    () => analyzeSolarSite(normalized),
+    ["analyze-solar-site", normalized],
+    { revalidate: 120 },
+  )();
 }

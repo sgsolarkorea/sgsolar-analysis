@@ -9,7 +9,7 @@ export function getGridDataSourceLabel(source: GridDataSource): string {
     case "derived":
     case "none":
     default:
-      return "데이터 출처 : 공개 데이터 기반 1차 검토";
+      return "데이터 출처 : 공개 데이터 미확보";
   }
 }
 

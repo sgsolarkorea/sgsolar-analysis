@@ -14,5 +14,5 @@ export const ANALYSIS_LOADING_STEPS: AnalysisLoadingStep[] = [
   { id: "result", label: "결과 생성" },
 ];
 
-/** 전체 로딩 UX 목표 시간 (ms) */
-export const ANALYSIS_LOADING_DURATION_MS = 4200;
+/** 로딩 화면 0~80% 구간 최대 시간 (ms) — AnalysisLoadingScreen 참고 */
+export const ANALYSIS_LOADING_SLOW_MAX_MS = 14000;

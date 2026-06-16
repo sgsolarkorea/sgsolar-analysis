@@ -1,6 +1,5 @@
 "use client";
 
-import { GRADE_MESSAGES } from "@/types/siteReview";
 import GradeSection from "@/components/result/GradeSection";
 import InstallTypeSelector from "@/components/result/InstallTypeSelector";
 import CapacityAnalysisSection from "@/components/result/CapacityAnalysisSection";
@@ -13,7 +12,6 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { MetricCard } from "@/components/ui/InfoCard";
 import { REVENUE_DISCLAIMER, REVENUE_WARNING } from "@/data/sampleData";
 import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
-import { deriveGradeFromCapacity } from "@/lib/solar/grade";
 
 interface ResultSiteOverviewProps {
   recommendation: string;
@@ -21,9 +19,7 @@ interface ResultSiteOverviewProps {
 }
 
 export function ResultSiteOverview({ recommendation, address }: ResultSiteOverviewProps) {
-  const { capacity, annualGeneration, annualRevenue, constructionCost, metrics } =
-    useResultMetrics();
-  const grade = deriveGradeFromCapacity(metrics.capacityKw);
+  const { capacity, annualGeneration, annualRevenue, constructionCost } = useResultMetrics();
 
   return (
     <section id="site-overview" className="scroll-mt-24">
@@ -32,8 +28,6 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
       </div>
       <SectionHeader title="입지 분석 개요" />
       <GradeSection
-        grade={grade}
-        gradeMessage={GRADE_MESSAGES[grade]}
         capacity={capacity}
         annualGeneration={annualGeneration}
         annualRevenue={annualRevenue}

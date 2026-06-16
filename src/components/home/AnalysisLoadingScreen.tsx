@@ -2,14 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import {
-  ANALYSIS_LOADING_DURATION_MS,
-  ANALYSIS_LOADING_STEPS,
-} from "@/data/analysisLoadingSteps";
+import { ANALYSIS_LOADING_STEPS } from "@/data/analysisLoadingSteps";
 
 interface AnalysisLoadingScreenProps {
   address: string;
 }
+
+const SLOW_PROGRESS_CAP = 80;
+const MIN_LOADING_MS = 2800;
+const MAX_SLOW_MS = 14000;
+const FINISH_ANIMATION_MS = 350;
 
 function StepIcon({ completed, active }: { completed: boolean; active: boolean }) {
   if (completed) {
@@ -45,26 +47,74 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
   }, [progress]);
 
   useEffect(() => {
-    const startedAt = Date.now();
+    let cancelled = false;
     let frame = 0;
+    let finishing = false;
+    const startedAt = Date.now();
+    let apiDone = false;
 
-    const tick = () => {
-      const elapsed = Date.now() - startedAt;
-      const ratio = Math.min(elapsed / ANALYSIS_LOADING_DURATION_MS, 1);
-      const eased = 1 - Math.pow(1 - ratio, 2.2);
-      setProgress(Math.round(eased * 100));
+    const resultHref = `/result?address=${encodeURIComponent(address)}`;
+    router.prefetch(resultHref);
 
-      if (ratio < 1) {
-        frame = window.requestAnimationFrame(tick);
-      } else {
-        window.setTimeout(() => {
-          router.replace(`/result?address=${encodeURIComponent(address)}`);
-        }, 350);
+    const navigate = () => {
+      if (cancelled || finishing) return;
+      finishing = true;
+      const finishStart = Date.now();
+
+      const animateFinish = () => {
+        if (cancelled) return;
+        const t = Date.now() - finishStart;
+        const ratio = Math.min(t / FINISH_ANIMATION_MS, 1);
+        setProgress(Math.round(SLOW_PROGRESS_CAP + ratio * (100 - SLOW_PROGRESS_CAP)));
+
+        if (ratio < 1) {
+          frame = window.requestAnimationFrame(animateFinish);
+        } else {
+          router.replace(resultHref);
+        }
+      };
+
+      frame = window.requestAnimationFrame(animateFinish);
+    };
+
+    const tryFinish = () => {
+      if (cancelled || finishing || !apiDone) return;
+      if (Date.now() - startedAt >= MIN_LOADING_MS) {
+        navigate();
       }
     };
 
+    const tick = () => {
+      if (cancelled || finishing) return;
+
+      const elapsed = Date.now() - startedAt;
+
+      if (!apiDone) {
+        const ratio = Math.min(elapsed / MAX_SLOW_MS, 1);
+        const eased = 1 - Math.pow(1 - ratio, 2.2);
+        setProgress(Math.min(SLOW_PROGRESS_CAP, Math.round(eased * SLOW_PROGRESS_CAP)));
+      }
+
+      tryFinish();
+
+      if (!finishing) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    fetch(`/api/analyze?address=${encodeURIComponent(address)}`)
+      .catch(() => undefined)
+      .finally(() => {
+        apiDone = true;
+        tryFinish();
+      });
+
     frame = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frame);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
   }, [address, router]);
 
   return (
@@ -89,7 +139,7 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-navy via-blue-600 to-amber-500 transition-[width] duration-150 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-navy via-blue-600 to-amber-500 transition-[width] duration-200 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
