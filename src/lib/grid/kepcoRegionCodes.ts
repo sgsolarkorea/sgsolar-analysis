@@ -128,13 +128,35 @@ async function fetchCommonCodes(
   return Array.isArray(payload.data) ? payload.data : [];
 }
 
-async function getCityCodesForMetro(metroCd: string, apiKey: string): Promise<KepcoCommonCodeItem[]> {
-  const cached = cityCodeCache.get(metroCd);
+function normalizeMetroCode(code: string | null | undefined): string {
+  return (code ?? "").trim().replace(/^0+/, "");
+}
+
+async function getCityCodesForMetro(
+  metroCd: string,
+  apiKey: string,
+  sido?: string,
+): Promise<KepcoCommonCodeItem[]> {
+  const cacheKey = `${metroCd}:${sido ?? ""}`;
+  const cached = cityCodeCache.get(cacheKey);
   if (cached) return cached;
 
   const allCityCodes = await fetchCommonCodes("cityCd", apiKey);
-  const filtered = allCityCodes.filter((item) => item.uppoCd === metroCd);
-  cityCodeCache.set(metroCd, filtered);
+  const normalizedMetro = normalizeMetroCode(metroCd);
+
+  let filtered = allCityCodes.filter(
+    (item) => normalizeMetroCode(item.uppoCd) === normalizedMetro,
+  );
+
+  if (!filtered.length && sido) {
+    const sidoToken = normalizeRegionName(sido).slice(0, 2);
+    filtered = allCityCodes.filter((item) => {
+      const uppoNm = normalizeRegionName(item.uppoCdNm ?? "");
+      return uppoNm.includes(sidoToken) || uppoNm.includes(normalizeRegionName(sido));
+    });
+  }
+
+  cityCodeCache.set(cacheKey, filtered);
   return filtered;
 }
 
@@ -192,7 +214,7 @@ export async function resolveKepcoRegionCodes(input: {
   }
 
   try {
-    const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey);
+    const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey, input.sido);
     const cityCd = matchCityCode(input.sigungu, cityCodes);
     if (cityCd) {
       const cityNm =
