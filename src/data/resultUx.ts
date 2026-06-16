@@ -13,7 +13,7 @@ export interface ProgressStepConfig {
   description: string;
 }
 
-/** 페이지 섹션 순서와 동일하게 유지 */
+/** 결과 페이지 섹션 순서와 동일 */
 export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   {
     id: "address-check",
@@ -49,6 +49,20 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     statusLabel: "완료",
     statusKind: "complete",
     description: "건축물 정보 확인 완료",
+  },
+  {
+    id: "setback-review",
+    label: "이격거리 검토",
+    statusLabel: "참고",
+    statusKind: "reference",
+    description: "이격거리 기준 참고 검토",
+  },
+  {
+    id: "local-ordinance",
+    label: "법·조례 검토",
+    statusLabel: "참고",
+    statusKind: "reference",
+    description: "지자체 조례·허가기준 참고",
   },
   {
     id: "capacity-analysis",
@@ -94,7 +108,6 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   },
 ];
 
-/** 토지·건축물 데이터 유무에 따라 원포인트 패널 상태 반영 */
 export function resolveProgressSteps(
   landInfo: InfoField[],
   buildingInfo: InfoField[],
@@ -110,9 +123,9 @@ export function resolveProgressSteps(
           }
         : {
             ...step,
-            statusLabel: "확인필요",
+            statusLabel: "추가 확인",
             statusKind: "caution" as ProgressStatusKind,
-            description: "토지정보 확인 필요",
+            description: "토지정보 추가 확인 필요",
           };
     }
 
@@ -126,9 +139,9 @@ export function resolveProgressSteps(
           }
         : {
             ...step,
-            statusLabel: "확인필요",
+            statusLabel: "추가 확인",
             statusKind: "caution" as ProgressStatusKind,
-            description: "건축물 정보 확인 필요",
+            description: "건축물 정보 추가 확인 필요",
           };
     }
 
@@ -154,12 +167,6 @@ export const INSTALL_TYPE_UI_MESSAGES: Record<InstallTypeOption, string> = {
   상가형: "상가·근린시설 지붕 소규모 설치 유형으로 1차 검토됩니다.",
 };
 
-/**
- * 기본 설치유형 산정
- * - 건축물(건축면적/용도)이 있으면 지붕형 우선
- * - 건축면적 없고 토지면적만 있으면 토지형
- * - 토지형은 명시적 추천·토지만 있을 때 적용
- */
 export function resolveDefaultInstallType(
   recommendation: string,
   landInfo: InfoField[],
@@ -178,7 +185,6 @@ export function resolveDefaultInstallType(
   if (buildingArea != null && buildingArea > 0) return "지붕형";
   if (hasBuilding) return "지붕형";
 
-  /** 도로명주소인데 건축물대장 실패 시 토지면적만으로 토지형 용량 산정하지 않음 (94kW 오산정 방지) */
   const blockLandOnlyFallback =
     options?.hasRoadAddress === true && !hasBuilding && buildingArea == null;
 

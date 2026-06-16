@@ -5,9 +5,10 @@ declare namespace kakao {
     }
 
     class Map {
-      constructor(container: HTMLElement, options: { center: LatLng; level: number });
+      constructor(container: HTMLElement, options: { center: LatLng; level: number; mapTypeId?: MapTypeId });
       setCenter(latlng: LatLng): void;
       setLevel(level: number): void;
+      setMapTypeId(mapTypeId: MapTypeId): void;
       addControl(control: ZoomControl, position: ControlPosition): void;
       relayout(): void;
     }
@@ -21,6 +22,12 @@ declare namespace kakao {
 
     enum ControlPosition {
       RIGHT = 1,
+    }
+
+    enum MapTypeId {
+      ROADMAP = 1,
+      SKYVIEW = 2,
+      HYBRID = 3,
     }
 
     function load(callback: () => void): void;

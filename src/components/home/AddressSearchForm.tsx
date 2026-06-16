@@ -60,7 +60,7 @@ export default function AddressSearchForm() {
   const navigateToResult = useCallback(
     (value: string) => {
       const query = encodeURIComponent(value.trim() || DEFAULT_ADDRESS);
-      router.push(`/result?address=${query}`);
+      router.push(`/analyzing?address=${query}`);
     },
     [router],
   );
