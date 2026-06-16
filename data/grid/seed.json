@@ -1,0 +1,147 @@
+[
+  {
+    "id": "namwon-demo",
+    "regionKeywords": ["남원"],
+    "dataAsOfDate": "2026-06-01",
+    "contacts": {
+      "kepcoBranch": "한국전력 남원지사",
+      "branchPhone": "063-630-1114",
+      "supplyDepartment": "전력공급부",
+      "operationsDepartment": "계통운영기술부",
+      "operationsPhone": "063-630-1234"
+    },
+    "poles": [
+      {
+        "poleId": "258-7",
+        "label": "258-7 (남원시 금동)",
+        "referenceLocation": "남원시 금동 일대",
+        "substation": {
+          "name": "남원변전소",
+          "cumulativeMw": 18.4,
+          "remainingMw": 6.2
+        },
+        "transformer": {
+          "name": "MTR-2",
+          "cumulativeMw": 7.3,
+          "remainingMw": 3.8
+        },
+        "distributionLine": {
+          "name": "남원D/L-03",
+          "cumulativeMw": 2.1,
+          "remainingMw": 1.8
+        }
+      },
+      {
+        "poleId": "258-12",
+        "label": "258-12 (남원시 금동)",
+        "referenceLocation": "남원시 금동 북측",
+        "substation": {
+          "name": "남원변전소",
+          "cumulativeMw": 18.4,
+          "remainingMw": 6.2
+        },
+        "transformer": {
+          "name": "MTR-3",
+          "cumulativeMw": 5.1,
+          "remainingMw": 2.4
+        },
+        "distributionLine": {
+          "name": "남원D/L-05",
+          "cumulativeMw": 3.2,
+          "remainingMw": 0.9
+        }
+      }
+    ],
+    "updatedAt": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "seongnam-pangyo",
+    "regionKeywords": ["성남", "판교"],
+    "dataAsOfDate": "2026-06-01",
+    "contacts": {
+      "kepcoBranch": "한국전력 성남지사",
+      "branchPhone": "031-800-6114",
+      "supplyDepartment": "전력공급부",
+      "operationsDepartment": "계통운영기술부",
+      "operationsPhone": "031-800-6200"
+    },
+    "poles": [
+      {
+        "poleId": "142-3",
+        "label": "142-3 (판교)",
+        "referenceLocation": "경기 성남시 분당구 판교동",
+        "substation": {
+          "name": "판교변전소 (154kV)",
+          "cumulativeMw": 12.5,
+          "remainingMw": 4.2
+        },
+        "transformer": {
+          "name": "MTR-1",
+          "cumulativeMw": 4.8,
+          "remainingMw": 1.6
+        },
+        "distributionLine": {
+          "name": "판교D/L-02",
+          "cumulativeMw": 1.9,
+          "remainingMw": 0.7
+        }
+      }
+    ],
+    "updatedAt": "2026-06-01T00:00:00.000Z"
+  },
+  {
+    "id": "goseong-unbong",
+    "regionKeywords": ["고성군", "토성면", "운봉리"],
+    "dataAsOfDate": "2026-06-01",
+    "contacts": {
+      "kepcoBranch": "한국전력 속초지사 (고성군 관할)",
+      "branchPhone": "033-639-6114",
+      "supplyDepartment": "전력공급부",
+      "operationsDepartment": "계통운영기술부",
+      "operationsPhone": "033-639-6200"
+    },
+    "poles": [
+      {
+        "poleId": "114-0",
+        "label": "114 (운봉리)",
+        "referenceLocation": "강원 고성군 토성면 운봉리 114",
+        "substation": {
+          "name": "속초변전소 (22.9kV)",
+          "cumulativeMw": 22.8,
+          "remainingMw": 8.5
+        },
+        "transformer": {
+          "name": "MTR-4",
+          "cumulativeMw": 9.2,
+          "remainingMw": 4.1
+        },
+        "distributionLine": {
+          "name": "운봉D/L-01",
+          "cumulativeMw": 4.6,
+          "remainingMw": 2.3
+        }
+      },
+      {
+        "poleId": "113-0",
+        "label": "113 (운봉리)",
+        "referenceLocation": "강원 고성군 토성면 운봉리 113",
+        "substation": {
+          "name": "속초변전소 (22.9kV)",
+          "cumulativeMw": 22.8,
+          "remainingMw": 8.5
+        },
+        "transformer": {
+          "name": "MTR-4",
+          "cumulativeMw": 9.2,
+          "remainingMw": 4.1
+        },
+        "distributionLine": {
+          "name": "운봉D/L-01",
+          "cumulativeMw": 4.6,
+          "remainingMw": 2.3
+        }
+      }
+    ],
+    "updatedAt": "2026-06-01T00:00:00.000Z"
+  }
+]

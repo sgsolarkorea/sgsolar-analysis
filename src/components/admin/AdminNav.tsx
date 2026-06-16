@@ -1,12 +1,13 @@
 "use client";
 
 interface AdminNavProps {
-  active: "search-history" | "ordinances";
+  active: "search-history" | "ordinances" | "grid-data";
 }
 
 const LINKS = [
   { id: "search-history" as const, href: "/admin/search-history", label: "조회 이력" },
   { id: "ordinances" as const, href: "/admin/ordinances", label: "조례 학습" },
+  { id: "grid-data" as const, href: "/admin/grid-data", label: "계통 데이터" },
 ];
 
 export default function AdminNav({ active }: AdminNavProps) {

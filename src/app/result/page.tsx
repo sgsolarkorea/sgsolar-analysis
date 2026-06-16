@@ -63,7 +63,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
   };
 
-  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
+  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo, data.gridInfo);
   const regulatory = resolveRegulatoryReview({
     address: data.address,
     installType: data.solarMetrics.installType,
@@ -134,7 +134,14 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               <ResultGenerationSection />
               <ResultRevenueSection />
 
-              <GridConnectionSection gridInfo={data.gridInfo} disclaimer={GRID_DISCLAIMER} />
+              <GridConnectionSection
+                initialGridInfo={data.gridInfo}
+                address={data.address}
+                jibunAddress={data.jibunAddress}
+                lat={data.lat}
+                lng={data.lng}
+                disclaimer={GRID_DISCLAIMER}
+              />
 
               <SimilarCases cases={data.recommendedCases} />
 

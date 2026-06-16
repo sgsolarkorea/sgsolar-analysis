@@ -1,4 +1,5 @@
 import type { LandInfoDetail, RegionDistrictAnalysis } from "@/types/landInfo";
+import type { GridConnectionInfo } from "@/types/gridConnection";
 
 export type Grade = "A" | "B" | "C" | "D";
 export type SuitabilityStatus = "pass" | "caution" | "fail";
@@ -22,14 +23,7 @@ export interface InfoField {
   status?: FieldStatus;
 }
 
-export interface GridInfo {
-  kepcoBranch: string;
-  nearbySubstation: string;
-  distributionLine: string;
-  connectionPossibility: string;
-  additionalReviewRequired: string;
-  statusMessage: string;
-}
+export interface GridInfo extends GridConnectionInfo {}
 
 export interface OrdinanceItem {
   label: string;

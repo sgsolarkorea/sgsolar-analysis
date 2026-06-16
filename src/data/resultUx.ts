@@ -1,3 +1,4 @@
+import type { GridConnectionInfo } from "@/types/gridConnection";
 import type { ProgressStatusKind } from "@/components/result/AnalysisProgressPanel";
 import { hasBuildingRecord, hasLandRecord } from "@/lib/api/infoFallbacks";
 import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
@@ -122,9 +123,41 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   },
 ];
 
+export function resolveGridProgressStep(
+  gridInfo: GridConnectionInfo,
+): Pick<ProgressStepConfig, "statusLabel" | "statusKind" | "description"> {
+  switch (gridInfo.status) {
+    case "high":
+      return {
+        statusLabel: "여유",
+        statusKind: "available",
+        description: gridInfo.reviewResult.slice(0, 48),
+      };
+    case "review":
+      return {
+        statusLabel: "추가확인",
+        statusKind: "caution",
+        description: gridInfo.reviewResult.slice(0, 48),
+      };
+    case "difficult":
+      return {
+        statusLabel: "여유부족",
+        statusKind: "caution",
+        description: gridInfo.reviewResult.slice(0, 48),
+      };
+    default:
+      return {
+        statusLabel: "확인필요",
+        statusKind: "caution",
+        description: "한전 선로용량 확인 필요",
+      };
+  }
+}
+
 export function resolveProgressSteps(
   landInfo: InfoField[],
   buildingInfo: InfoField[],
+  gridInfo?: GridConnectionInfo,
 ): ProgressStepConfig[] {
   return ANALYSIS_PROGRESS_STEPS.map((step) => {
     if (step.id === "land-info") {
@@ -173,6 +206,11 @@ export function resolveProgressSteps(
             statusKind: "caution" as ProgressStatusKind,
             description: "건축물 정보 추가 확인 필요",
           };
+    }
+
+    if (step.id === "grid" && gridInfo) {
+      const gridStep = resolveGridProgressStep(gridInfo);
+      return { ...step, ...gridStep };
     }
 
     return step;

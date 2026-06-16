@@ -50,10 +50,15 @@ export async function getBuildingInfo(input: {
   return getBuildingInfoByRegistry(input);
 }
 
-export async function getGridInfo(lat: number, lng: number): Promise<GridInfo> {
-  void lat;
-  void lng;
-  return result.gridInfo;
+export async function getGridInfo(input: {
+  lat: number;
+  lng: number;
+  address: string;
+  jibunAddress: string;
+  capacityKw: number;
+}): Promise<GridInfo> {
+  const { resolveGridConnection } = await import("@/lib/grid/resolve");
+  return resolveGridConnection(input);
 }
 
 function deriveGrade(capacityKw: number): Grade {
@@ -217,7 +222,13 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     recommendation,
   });
 
-  const gridInfo = await getGridInfo(geo.lat, geo.lng);
+  const gridInfo = await getGridInfo({
+    lat: geo.lat,
+    lng: geo.lng,
+    address: geo.address,
+    jibunAddress: geo.jibunAddress,
+    capacityKw: solarMetrics.capacityKw,
+  });
   const regionDistrictAnalysis = resolveRegionDistrictAnalysis(landInfo, landInfoDetail);
 
   return {
