@@ -48,9 +48,6 @@ export default function MapPlaceholder({
         <p className="text-sm font-semibold text-white sm:text-base">{address}</p>
         <p className="mt-2 text-xs text-slate-300">지번주소</p>
         <p className="text-sm text-slate-100">{jibunAddress}</p>
-        <p className="mt-2 text-xs text-slate-300">
-          위도 {lat.toFixed(6)}° · 경도 {lng.toFixed(6)}°
-        </p>
       </div>
     </>
   );

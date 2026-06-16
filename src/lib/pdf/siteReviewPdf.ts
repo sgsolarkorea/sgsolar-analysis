@@ -3,6 +3,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import { MARKETING_NAME, company } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
+import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 
 const KR_FONT_URL =
   "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@latest/korean-400-normal.ttf";
@@ -76,7 +77,7 @@ function sectionLines(data: ResolvedSiteReview): string[] {
     `연간 발전량: ${data.annualGeneration}`,
     `SMP: ${m.market.smpPrice}원/kWh (${m.market.smpDate})`,
     `REC: ${m.market.recPrice}원/MWh (${m.market.recDate})`,
-    `REC 가중치: ${m.recWeight} (${m.recWeightReason})`,
+    `REC 가중치: ${formatRecWeightDisplay(m.recWeight)} (${m.recWeightReason})`,
     `연간 예상 수익: ${data.annualRevenue}`,
     `20년 누적 수익: ${data.profitability.cumulative20YearRevenue ?? "별도 확인"}`,
     "",

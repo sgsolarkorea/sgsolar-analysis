@@ -11,6 +11,7 @@ import {
 import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS, resolveDefaultInstallType } from "@/data/resultUx";
 import { logSolarCalculationDebug } from "@/lib/solar/debug";
+import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
 
@@ -240,7 +241,7 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     paybackPeriod: paybackYears > 0 ? `${paybackYears}년 (참고)` : "산출 불가",
     smpPrice: `${input.market.smpPrice.toLocaleString("ko-KR")}원/kWh`,
     recPrice: `${input.market.recPrice.toLocaleString("ko-KR")}원/MWh`,
-    recWeight: recWeight.toFixed(2),
+    recWeight: formatRecWeightDisplay(recWeight),
     recWeightReason,
     smpDate: input.market.smpDate,
     recDate: input.market.recDate,

@@ -5,20 +5,14 @@ import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 interface ResultHeroProps {
   address: string;
   jibunAddress: string;
-  lat: number;
-  lng: number;
   buildingName?: string;
-  zoneNo?: string;
   analyzedAt: string;
 }
 
 export default function ResultHero({
   address,
   jibunAddress,
-  lat,
-  lng,
   buildingName,
-  zoneNo,
   analyzedAt,
 }: ResultHeroProps) {
   return (
@@ -53,22 +47,10 @@ export default function ResultHero({
             <dt className="text-slate-400">지번주소</dt>
             <dd className="font-medium text-white">{jibunAddress}</dd>
           </div>
-          <div>
-            <dt className="text-slate-400">위도 / 경도</dt>
-            <dd className="font-medium text-white">
-              {lat.toFixed(6)}°N · {lng.toFixed(6)}°E
-            </dd>
-          </div>
           {buildingName && (
             <div>
               <dt className="text-slate-400">건물명</dt>
               <dd className="font-medium text-white">{buildingName}</dd>
-            </div>
-          )}
-          {zoneNo && (
-            <div>
-              <dt className="text-slate-400">우편번호</dt>
-              <dd className="font-medium text-white">{zoneNo}</dd>
             </div>
           )}
         </dl>

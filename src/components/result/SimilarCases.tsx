@@ -59,22 +59,22 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
                 {item.recommendReason}
               </p>
               <h4 className="mt-3 text-base font-bold leading-snug text-slate-900">{item.title}</h4>
-              <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between gap-2">
-                  <dt className="text-slate-500">지역</dt>
+              <dl className="mt-3 grid flex-1 gap-2 text-sm">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
+                  <dt className="whitespace-nowrap text-slate-500">지역</dt>
                   <dd className="text-right font-medium text-slate-900">{item.region}</dd>
                 </div>
-                <div className="flex justify-between gap-2">
-                  <dt className="text-slate-500">유사 사례 용량</dt>
-                  <dd className="font-bold text-navy">{item.capacity}</dd>
+                <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
+                  <dt className="whitespace-nowrap text-slate-500">유사 사례 용량</dt>
+                  <dd className="text-right font-bold text-navy">{item.capacity}</dd>
                 </div>
-                <div className="flex justify-between gap-2">
-                  <dt className="text-slate-500">특징</dt>
-                  <dd className="text-right font-medium text-slate-900">{item.description}</dd>
+                <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
+                  <dt className="whitespace-nowrap text-slate-500">특징</dt>
+                  <dd className="text-right font-medium leading-snug text-slate-900">{item.description}</dd>
                 </div>
-                <div className="flex justify-between gap-2">
-                  <dt className="text-slate-500">준공</dt>
-                  <dd className="font-medium text-slate-900">{item.completedAt}</dd>
+                <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
+                  <dt className="whitespace-nowrap text-slate-500">준공</dt>
+                  <dd className="text-right font-medium text-slate-900">{item.completedAt}</dd>
                 </div>
               </dl>
 

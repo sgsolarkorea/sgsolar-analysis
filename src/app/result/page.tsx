@@ -69,10 +69,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
       <ResultHero
         address={data.address}
         jibunAddress={data.jibunAddress}
-        lat={data.lat}
-        lng={data.lng}
         buildingName={data.buildingName}
-        zoneNo={data.zoneNo}
         analyzedAt={data.analyzedAt}
       />
 
@@ -90,7 +87,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             consultationBase={consultationBase}
           >
             <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
-              <section id="site-location" className="scroll-mt-24">
+              <section id="site-location" className="scroll-mt-24 mt-8 sm:mt-0">
                 <SectionHeader
                   title="입지 위치"
                   description="입력하신 주소의 위치를 지도에서 확인할 수 있습니다."

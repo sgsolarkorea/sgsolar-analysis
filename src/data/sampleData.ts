@@ -45,7 +45,7 @@ export const company: CompanyInfo = {
   brandName: "SG SOLAR",
   companyName: "신재생에너지 한국태양광 에스지솔라",
   ceo: "박성수",
-  phone: "대표번호 입력 필요",
+  phone: "1844-2807",
   email: "sgsolarkorea@naver.com",
   website: "www.sgsolar.co.kr",
   address: "사업장 주소 입력 필요",
@@ -354,12 +354,12 @@ export const result: Omit<
     {
       label: "계통 연계",
       status: "caution",
-      description: "인근 변압기 잔여용량 확인 필요, 한전 기술검토 대상",
+      description: "인근 변압기 잔여용량·한전 접수 조건은 현장 확인 후 안내드립니다.",
     },
     {
       label: "규제·인허가",
       status: "caution",
-      description: "준주거지역 내 설치 검토, 건축물 정보 확인 필요",
+      description: "용도지역·건축물 조건에 따라 추가 검토가 필요할 수 있습니다.",
     },
     {
       label: "그늘·장애물",
@@ -367,9 +367,9 @@ export const result: Omit<
       description: "남향 기준 그늘 영향 5% 미만 (추정)",
     },
     {
-      label: "투자 회수",
+      label: "수익성 참고",
       status: "caution",
-      description: "단순 회수기간 6.8년 추정 (SMP·REC 기준, 변동 가능)",
+      description: "예상 수익성은 시장단가와 현장 조건에 따라 달라질 수 있습니다.",
     },
   ],
   recommendedCases: [],

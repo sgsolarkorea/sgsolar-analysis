@@ -1,9 +1,11 @@
 import type { MonthlyGeneration } from "@/types/siteReview";
+import { yearlyGenerationPerKw } from "@/data/solarConfig";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 interface MonthlyGenerationChartProps {
   data: MonthlyGeneration[];
   annualTotalKwh?: number;
+  capacityKw?: number;
 }
 
 function formatMonthKwh(kwh: number): string {
@@ -16,6 +18,7 @@ function formatMonthKwh(kwh: number): string {
 export default function MonthlyGenerationChart({
   data,
   annualTotalKwh,
+  capacityKw,
 }: MonthlyGenerationChartProps) {
   const maxKwh = Math.max(...data.map((d) => d.kwh), 1);
   const computedTotal = data.reduce((sum, item) => sum + item.kwh, 0);
@@ -66,6 +69,17 @@ export default function MonthlyGenerationChart({
         </div>
 
         <p className="mt-4 break-words text-xs leading-relaxed text-slate-500">
+          예상 발전량은 1kW당 연간 {yearlyGenerationPerKw.toLocaleString("ko-KR")}kWh 발전량을 기준으로
+          산정한 참고값입니다.
+          {capacityKw && capacityKw > 0 && (
+            <>
+              {" "}
+              (예: {capacityKw}kW × {yearlyGenerationPerKw.toLocaleString("ko-KR")}kWh/kW·년 ≈{" "}
+              {annualKwh.toLocaleString("ko-KR")}kWh/년)
+            </>
+          )}
+        </p>
+        <p className="mt-2 break-words text-xs leading-relaxed text-slate-500">
           단위: kWh · 막대 위 숫자는 월별 예상 발전량 · 월별 합계{" "}
           {computedTotal.toLocaleString("ko-KR")} kWh = 연간{" "}
           {annualKwh.toLocaleString("ko-KR")} kWh

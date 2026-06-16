@@ -18,9 +18,6 @@ export default function MapArea({ address, jibunAddress, lat, lng }: MapAreaProp
         <p className="mt-0.5 text-sm font-semibold text-slate-900 sm:text-base">{address}</p>
         <p className="mt-3 text-xs font-medium text-slate-500">지번주소</p>
         <p className="mt-0.5 text-sm text-slate-800">{jibunAddress}</p>
-        <p className="mt-3 text-xs text-slate-500">
-          위도 {lat.toFixed(6)}° · 경도 {lng.toFixed(6)}°
-        </p>
       </div>
     </div>
   );

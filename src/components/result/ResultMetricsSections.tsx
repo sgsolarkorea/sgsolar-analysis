@@ -70,6 +70,7 @@ export function ResultGenerationSection() {
     <MonthlyGenerationChart
       data={monthlyGeneration}
       annualTotalKwh={metrics.annualGenerationKwh}
+      capacityKw={metrics.capacityKw}
     />
   );
 }
