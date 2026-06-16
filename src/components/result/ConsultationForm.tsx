@@ -8,11 +8,13 @@ import type { ConsultationAnalysisContext } from "@/types/consultation";
 interface ConsultationFormProps {
   defaultAddress?: string;
   analysisContext?: ConsultationAnalysisContext;
+  searchHistoryId?: string;
 }
 
 export default function ConsultationForm({
   defaultAddress = "",
   analysisContext,
+  searchHistoryId,
 }: ConsultationFormProps) {
   const [form, setForm] = useState({
     name: "",
@@ -38,6 +40,7 @@ export default function ConsultationForm({
           ...form,
           resultPageUrl: window.location.href,
           analysisContext,
+          ...(searchHistoryId ? { searchHistoryId } : {}),
         }),
       });
 

@@ -37,6 +37,9 @@ yarn-error.log*
 # consultation submissions (PII — local/server only)
 /data/consultations/*.json
 
+# search history (local dev JSON storage)
+/data/search-history/
+
 # vercel
 .vercel
 

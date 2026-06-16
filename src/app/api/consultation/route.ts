@@ -5,6 +5,7 @@ import {
   trySaveConsultation,
 } from "@/lib/consultation/storage";
 import { validateConsultationBody } from "@/lib/consultation/validate";
+import { linkSearchHistoryToConsultation } from "@/lib/searchHistory/storage";
 
 export async function POST(request: Request) {
   try {
@@ -24,6 +25,12 @@ export async function POST(request: Request) {
 
     const emailResult = await sendConsultationEmail(submission, validated.data.resultPageUrl);
 
+    const linked = await linkSearchHistoryToConsultation({
+      searchHistoryId: validated.data.searchHistoryId,
+      consultationId: submission.id,
+      address: submission.address,
+    });
+
     return NextResponse.json({
       ok: true,
       id: submission.id,
@@ -32,6 +39,7 @@ export async function POST(request: Request) {
       autoReplySent: emailResult.autoReplySent,
       emailProvider: emailResult.provider,
       jsonSaved: storage.saved,
+      searchHistoryLinked: linked,
     });
   } catch (error) {
     console.error("[Consultation] Submission failed:", error);

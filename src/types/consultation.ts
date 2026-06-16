@@ -33,4 +33,5 @@ export interface ConsultationRequestBody {
   message?: string;
   resultPageUrl?: string;
   analysisContext?: ConsultationAnalysisContext;
+  searchHistoryId?: string;
 }

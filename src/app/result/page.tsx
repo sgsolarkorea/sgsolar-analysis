@@ -26,6 +26,7 @@ import {
 import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
 import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
+import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
 
 interface ResultPageProps {
@@ -60,6 +61,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   };
 
   const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
+
+  const searchHistory = await recordSearchHistory(data, params.address ?? data.address);
 
   return (
     <div className="pb-28 md:pb-20">
@@ -121,7 +124,10 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
               <SimilarCases cases={data.recommendedCases} />
               <TrustSection />
-              <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
+              <ResultConsultationSection
+                defaultAddress={data.consultationDefaultAddress}
+                searchHistoryId={searchHistory.id}
+              />
             </div>
           </ResultMetricsProvider>
         </div>

@@ -86,13 +86,20 @@ export function ResultRevenueSection() {
   );
 }
 
-export function ResultConsultationSection({ defaultAddress }: { defaultAddress: string }) {
+export function ResultConsultationSection({
+  defaultAddress,
+  searchHistoryId,
+}: {
+  defaultAddress: string;
+  searchHistoryId?: string;
+}) {
   const { consultationContext } = useResultMetrics();
 
   return (
     <ConsultationForm
       defaultAddress={defaultAddress}
       analysisContext={consultationContext}
+      searchHistoryId={searchHistoryId}
     />
   );
 }

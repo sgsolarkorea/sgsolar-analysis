@@ -36,6 +36,8 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   const email = typeof raw.email === "string" ? raw.email.trim() : "";
   const resultPageUrl =
     typeof raw.resultPageUrl === "string" ? raw.resultPageUrl.trim() : "";
+  const searchHistoryId =
+    typeof raw.searchHistoryId === "string" ? raw.searchHistoryId.trim() : "";
 
   if (!name) return { ok: false, error: "이름을 입력해 주세요." };
   if (!phone) return { ok: false, error: "연락처를 입력해 주세요." };
@@ -50,6 +52,9 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   }
   if (resultPageUrl.length > MAX.resultPageUrl) {
     return { ok: false, error: "결과 페이지 주소가 너무 깁니다." };
+  }
+  if (searchHistoryId && !/^[0-9a-f-]{36}$/i.test(searchHistoryId)) {
+    return { ok: false, error: "조회 이력 ID 형식이 올바르지 않습니다." };
   }
   if (
     resultPageUrl &&
@@ -88,6 +93,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
       ...(email ? { email } : {}),
       ...(resultPageUrl ? { resultPageUrl } : {}),
       ...(analysisContext ? { analysisContext } : {}),
+      ...(searchHistoryId ? { searchHistoryId } : {}),
     },
   };
 }
