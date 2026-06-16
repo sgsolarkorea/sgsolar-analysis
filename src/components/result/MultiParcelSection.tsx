@@ -230,7 +230,7 @@ export default function MultiParcelSection() {
               id="parcel-add-search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="추가할 필지 주소를 검색하세요 (예: 운봉리 113)"
+              placeholder="추가할 필지의 주소 또는 지번을 입력하세요"
               className="input-field"
             />
             {(isSearching || suggestions.length > 0) && query.trim().length >= 2 && (
@@ -256,6 +256,12 @@ export default function MultiParcelSection() {
               </ul>
             )}
           </div>
+          <p className="mt-2 text-xs leading-relaxed text-slate-500">
+            같은 리 인근 지번, 도로명주소, 지번주소 모두 검색 가능합니다.
+            <span className="mt-0.5 block text-slate-400">
+              예: 113번지, 산12-1, 인근 필지 주소
+            </span>
+          </p>
           {error && (
             <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}

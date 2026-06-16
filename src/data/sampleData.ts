@@ -273,7 +273,7 @@ export const result: Omit<
   lat: 37.3947,
   lng: 127.1112,
   grade: "A",
-  recommendation: "옥상형 (경사 12° 고정형)",
+  recommendation: "지붕형 (12° 고정형)",
   capacity: "99.4kW",
   annualGeneration: "128,400kWh/년",
   annualRevenue: "약 1,820만원",

@@ -1,7 +1,12 @@
+import { readFile } from "fs/promises";
+import { join } from "path";
 import { rgb, type PDFImage, type PDFFont, type PDFPage } from "pdf-lib";
 
 export const PAGE = { width: 595, height: 842 } as const;
 export const MARGIN = 48;
+
+/** /public/sgsolar-logo.png — 없으면 텍스트·아이콘 로고로 대체 */
+export const BRAND_LOGO_FILENAME = "sgsolar-logo.png";
 
 export const COLORS = {
   navy: { r: 0.08, g: 0.12, b: 0.28 },
@@ -18,10 +23,46 @@ export function rgbColor(c: (typeof COLORS)[keyof typeof COLORS]) {
   return rgb(c.r, c.g, c.b);
 }
 
+/** PDF 출력용 — 이모지·제로폭 문자 등 깨짐 유발 문자 정리 */
+export function sanitizePdfText(text: string): string {
+  return text
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/⚠\uFE0F?/g, "※")
+    .trim();
+}
+
+export function wrapTextByWidth(
+  text: string,
+  font: PDFFont,
+  fontSize: number,
+  maxWidth: number,
+): string[] {
+  const sanitized = sanitizePdfText(text);
+  if (!sanitized) return [""];
+
+  const lines: string[] = [];
+  let current = "";
+
+  for (const char of sanitized) {
+    const test = current + char;
+    const width = font.widthOfTextAtSize(test, fontSize);
+    if (width > maxWidth && current.length > 0) {
+      lines.push(current);
+      current = char;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+/** @deprecated wrapTextByWidth 사용 */
 export function wrapText(text: string, maxLen: number): string[] {
   const lines: string[] = [];
   let current = "";
-  for (const char of text) {
+  for (const char of sanitizePdfText(text)) {
     if (current.length >= maxLen) {
       lines.push(current);
       current = char;
@@ -33,12 +74,49 @@ export function wrapText(text: string, maxLen: number): string[] {
   return lines;
 }
 
+export async function loadBrandLogoBytes(): Promise<Uint8Array | null> {
+  try {
+    const bytes = await readFile(join(process.cwd(), "public", BRAND_LOGO_FILENAME));
+    return new Uint8Array(bytes);
+  } catch {
+    return null;
+  }
+}
+
+export function drawBrandLogo(
+  page: PDFPage,
+  fontBold: PDFFont,
+  x: number,
+  y: number,
+  logoImage: PDFImage | null,
+  height = 28,
+  onDark = true,
+): number {
+  if (logoImage) {
+    const scale = height / logoImage.height;
+    const width = logoImage.width * scale;
+    page.drawImage(logoImage, { x, y, width, height });
+    return width + 10;
+  }
+
+  drawSunLogo(page, x, y, height);
+  page.drawText("SG SOLAR", {
+    x: x + height + 8,
+    y: y + height / 2 - 5,
+    size: 14,
+    font: fontBold,
+    color: onDark ? rgbColor(COLORS.white) : rgbColor(COLORS.navy),
+  });
+  return height + 88;
+}
+
 export function drawPageHeader(
   page: PDFPage,
   font: PDFFont,
   fontBold: PDFFont,
   title: string,
   subtitle?: string,
+  logoImage: PDFImage | null = null,
 ): number {
   const { height } = page.getSize();
   let y = height - MARGIN;
@@ -51,17 +129,9 @@ export function drawPageHeader(
     color: rgbColor(COLORS.navy),
   });
 
-  drawSunLogo(page, MARGIN, height - 52, 28);
+  drawBrandLogo(page, fontBold, MARGIN, height - 52, logoImage, 28, true);
 
-  page.drawText("SG SOLAR", {
-    x: MARGIN + 36,
-    y: height - 38,
-    size: 14,
-    font: fontBold,
-    color: rgbColor(COLORS.white),
-  });
-
-  page.drawText(title, {
+  page.drawText(sanitizePdfText(title), {
     x: MARGIN,
     y: height - 92,
     size: 16,
@@ -72,7 +142,7 @@ export function drawPageHeader(
   y = height - 112;
 
   if (subtitle) {
-    for (const line of wrapText(subtitle, 52)) {
+    for (const line of wrapTextByWidth(subtitle, font, 9, PAGE.width - MARGIN * 2)) {
       page.drawText(line, {
         x: MARGIN,
         y,
@@ -95,14 +165,22 @@ export function drawPageHeader(
   return y - 8;
 }
 
-export function drawPageFooter(page: PDFPage, font: PDFFont, pageNum: number, total: number) {
-  page.drawText(`SG SOLAR 태양광 입지검토 제안서  ·  ${pageNum} / ${total}`, {
-    x: MARGIN,
-    y: 28,
-    size: 8,
-    font,
-    color: rgbColor(COLORS.slateLight),
-  });
+export function drawPageFooter(
+  page: PDFPage,
+  font: PDFFont,
+  pageNum: number,
+  total: number,
+) {
+  page.drawText(
+    sanitizePdfText(`SG SOLAR 태양광 입지검토 제안서  ·  ${pageNum} / ${total}`),
+    {
+      x: MARGIN,
+      y: 28,
+      size: 8,
+      font,
+      color: rgbColor(COLORS.slateLight),
+    },
+  );
 }
 
 export function drawSunLogo(page: PDFPage, x: number, y: number, size: number) {
@@ -156,7 +234,7 @@ export function drawMetricCard(
     color: rgbColor(COLORS.navyLight),
   });
 
-  page.drawText(label, {
+  page.drawText(sanitizePdfText(label), {
     x: x + 12,
     y: y - 22,
     size: 9,
@@ -164,17 +242,17 @@ export function drawMetricCard(
     color: rgbColor(COLORS.slate),
   });
 
-  const valueLines = wrapText(value, Math.floor(w / 11));
-  let valueY = y - 48;
+  const valueLines = wrapTextByWidth(sanitizePdfText(value), fontBold, 13, w - 24);
+  let valueY = y - 46;
   for (const line of valueLines.slice(0, 2)) {
     page.drawText(line, {
       x: x + 12,
       y: valueY,
-      size: 14,
+      size: 13,
       font: fontBold,
       color: rgbColor(COLORS.navy),
     });
-    valueY -= 18;
+    valueY -= 17;
   }
 }
 
@@ -200,12 +278,13 @@ export function drawTableRow(
   });
 
   for (const col of cols) {
-    const lines = wrapText(col.text, Math.floor(col.w / 6));
-    page.drawText(lines[0] ?? "", {
+    const f = col.bold || header ? fontBold : font;
+    const fontSize = header ? 8.5 : 8;
+    page.drawText(sanitizePdfText(col.text), {
       x: col.x + 6,
       y: y - (header ? 15 : 14),
-      size: header ? 8.5 : 8,
-      font: col.bold || header ? fontBold : font,
+      size: fontSize,
+      font: f,
       color: rgbColor(COLORS.text),
       maxWidth: col.w - 10,
     });
@@ -214,11 +293,49 @@ export function drawTableRow(
   return y - rowH;
 }
 
+export function drawInfoCard(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  title: string,
+  body: string,
+) {
+  page.drawRectangle({
+    x,
+    y: y - h,
+    width: w,
+    height: h,
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.75,
+    color: rgbColor(COLORS.white),
+  });
+  page.drawText(sanitizePdfText(title), {
+    x: x + 12,
+    y: y - 20,
+    size: 9,
+    font: fontBold,
+    color: rgbColor(COLORS.navy),
+  });
+  const paragraphs = sanitizePdfText(body).split("\n");
+  let lineY = y - 38;
+  for (const paragraph of paragraphs) {
+    const lines = wrapTextByWidth(paragraph, font, 8.5, w - 24);
+    for (const line of lines.slice(0, 4)) {
+      page.drawText(line, { x: x + 12, y: lineY, size: 8.5, font, color: rgbColor(COLORS.text) });
+      lineY -= 13;
+    }
+  }
+}
+
 export async function fetchKakaoStaticMap(lat: number, lng: number): Promise<Uint8Array | null> {
   const apiKey = process.env.KAKAO_REST_API_KEY?.trim();
   if (!apiKey) return null;
 
-  const size = "480x280";
+  const size = "480x160";
   const url =
     `https://apis.map.kakao.com/maps/v3/staticmap?center=${lng},${lat}` +
     `&level=4&size=${size}&marker=${lng},${lat}`;

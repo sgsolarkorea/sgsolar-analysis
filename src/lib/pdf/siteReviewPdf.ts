@@ -7,31 +7,33 @@ import { formatParcelShortLabel } from "@/lib/parcels/format";
 import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
-import { yearlyGenerationPerKw } from "@/data/solarConfig";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
 import { formatDlRemainingMw, formatMw } from "@/lib/grid/evaluate";
 import {
   COLORS,
   MARGIN,
   PAGE,
+  drawBrandLogo,
+  drawInfoCard,
   drawMetricCard,
   drawPageFooter,
   drawPageHeader,
-  drawSunLogo,
   drawTableRow,
   embedPngImage,
   fetchKakaoStaticMap,
   fetchQrCodePng,
+  loadBrandLogoBytes,
   rgbColor,
-  wrapText,
+  sanitizePdfText,
+  wrapTextByWidth,
 } from "@/lib/pdf/pdfHelpers";
 
-const KR_FONT_URL =
+const KR_FONT_REGULAR =
   "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@latest/korean-400-normal.ttf";
+const KR_FONT_BOLD =
+  "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@latest/korean-700-normal.ttf";
 
-const TOTAL_PAGES = 6;
-
-let cachedFontBytes: ArrayBuffer | null = null;
+const fontCache = new Map<string, ArrayBuffer>();
 
 export interface SiteReviewPdfOptions {
   parcels?: ParcelSnapshot[];
@@ -42,14 +44,25 @@ function todayFileDate(): string {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());
 }
 
-async function loadKoreanFontBytes(): Promise<ArrayBuffer> {
-  if (cachedFontBytes) return cachedFontBytes;
-  const response = await fetch(KR_FONT_URL, { cache: "force-cache" });
+async function loadFontBytes(url: string): Promise<ArrayBuffer> {
+  const cached = fontCache.get(url);
+  if (cached) return cached;
+  const response = await fetch(url, { cache: "force-cache" });
   if (!response.ok) {
     throw new Error(`PDF font load failed: HTTP ${response.status}`);
   }
-  cachedFontBytes = await response.arrayBuffer();
-  return cachedFontBytes;
+  const bytes = await response.arrayBuffer();
+  fontCache.set(url, bytes);
+  return bytes;
+}
+
+function hasOrdinanceContent(ordinance?: MunicipalityOrdinanceData | null): boolean {
+  if (!ordinance) return false;
+  return Boolean(
+    ordinance.ordinanceTitle?.trim() ||
+      ordinance.distanceRules?.length ||
+      ordinance.ordinanceUrl,
+  );
 }
 
 function drawCoverPage(
@@ -58,94 +71,129 @@ function drawCoverPage(
   fontBold: PDFFont,
   data: ResolvedSiteReview,
   mapImage: PDFImage | null,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
 ) {
   const { height } = page.getSize();
 
   page.drawRectangle({
     x: 0,
-    y: height - 160,
+    y: height - 140,
     width: PAGE.width,
-    height: 160,
+    height: 140,
     color: rgbColor(COLORS.navy),
   });
 
-  drawSunLogo(page, MARGIN, height - 88, 40);
-
-  page.drawText(company.brandName, {
-    x: MARGIN + 50,
-    y: height - 62,
-    size: 22,
-    font: fontBold,
-    color: rgbColor(COLORS.white),
-  });
-
-  page.drawText(MARKETING_NAME, {
-    x: MARGIN + 50,
-    y: height - 82,
-    size: 9,
-    font,
-    color: rgb(0.85, 0.88, 0.95),
-  });
+  drawBrandLogo(page, fontBold, MARGIN, height - 72, logoImage, 36, true);
 
   page.drawText("태양광 입지검토 제안서", {
     x: MARGIN,
-    y: height - 200,
-    size: 26,
+    y: height - 168,
+    size: 24,
     font: fontBold,
     color: rgbColor(COLORS.navy),
   });
 
   page.drawText("Site Review Proposal", {
     x: MARGIN,
-    y: height - 222,
-    size: 11,
+    y: height - 186,
+    size: 10,
     font,
     color: rgbColor(COLORS.slateLight),
   });
 
-  let y = height - 260;
-  const addressLines = wrapText(data.address, 46);
-  for (const line of addressLines) {
+  const contentW = PAGE.width - MARGIN * 2;
+  const kpiW = (contentW - 16) / 3;
+  const kpiH = 72;
+  let kpiY = height - 210;
+
+  const kpis = [
+    { label: "예상 설치용량", value: data.capacity },
+    { label: "예상 발전량", value: data.annualGeneration },
+    { label: "예상 연매출", value: data.annualRevenue },
+  ];
+
+  for (let i = 0; i < kpis.length; i++) {
+    drawMetricCard(
+      page,
+      font,
+      fontBold,
+      MARGIN + i * (kpiW + 8),
+      kpiY,
+      kpiW,
+      kpiH,
+      kpis[i].label,
+      kpis[i].value,
+    );
+  }
+
+  kpiY -= kpiH + 12;
+  drawMetricCard(
+    page,
+    font,
+    fontBold,
+    MARGIN,
+    kpiY,
+    (contentW - 8) / 2,
+    kpiH,
+    "예상 시공비",
+    data.constructionCost,
+  );
+  drawMetricCard(
+    page,
+    font,
+    fontBold,
+    MARGIN + (contentW - 8) / 2 + 8,
+    kpiY,
+    (contentW - 8) / 2,
+    kpiH,
+    "작성일",
+    data.analyzedAt,
+  );
+
+  kpiY -= kpiH + 16;
+  page.drawText("검토 주소", {
+    x: MARGIN,
+    y: kpiY,
+    size: 9,
+    font: fontBold,
+    color: rgbColor(COLORS.slate),
+  });
+  kpiY -= 14;
+
+  for (const line of wrapTextByWidth(data.address, fontBold, 11, contentW)) {
     page.drawText(line, {
       x: MARGIN,
-      y,
-      size: 12,
+      y: kpiY,
+      size: 11,
       font: fontBold,
       color: rgbColor(COLORS.text),
     });
-    y -= 18;
+    kpiY -= 15;
   }
 
   if (data.jibunAddress && data.jibunAddress !== data.address) {
-    page.drawText(`지번: ${data.jibunAddress}`, {
+    page.drawText(sanitizePdfText(`지번: ${data.jibunAddress}`), {
       x: MARGIN,
-      y: y - 4,
-      size: 10,
+      y: kpiY - 2,
+      size: 9,
       font,
       color: rgbColor(COLORS.slate),
     });
-    y -= 20;
+    kpiY -= 16;
   }
 
-  page.drawText(`작성일: ${data.analyzedAt}`, {
-    x: MARGIN,
-    y: y - 8,
-    size: 10,
-    font,
-    color: rgbColor(COLORS.slate),
-  });
-
-  const mapY = 120;
-  const mapW = PAGE.width - MARGIN * 2;
-  const mapH = 240;
+  const mapH = mapImage ? 100 : 48;
+  const mapY = 88;
 
   page.drawRectangle({
     x: MARGIN,
     y: mapY,
-    width: mapW,
+    width: contentW,
     height: mapH,
     borderColor: rgbColor(COLORS.border),
-    borderWidth: 1,
+    borderWidth: 0.75,
     color: rgbColor(COLORS.navyLight),
   });
 
@@ -153,20 +201,13 @@ function drawCoverPage(
     page.drawImage(mapImage, {
       x: MARGIN + 1,
       y: mapY + 1,
-      width: mapW - 2,
+      width: contentW - 2,
       height: mapH - 2,
     });
   } else {
-    page.drawText("입지 위치 지도", {
-      x: MARGIN + mapW / 2 - 40,
-      y: mapY + mapH / 2 + 6,
-      size: 12,
-      font: fontBold,
-      color: rgbColor(COLORS.slateLight),
-    });
-    page.drawText(`${data.lat.toFixed(5)}, ${data.lng.toFixed(5)}`, {
-      x: MARGIN + mapW / 2 - 52,
-      y: mapY + mapH / 2 - 12,
+    page.drawText("입지 위치 지도는 준비 중입니다.", {
+      x: MARGIN + 12,
+      y: mapY + mapH / 2 - 4,
       size: 9,
       font,
       color: rgbColor(COLORS.slate),
@@ -174,16 +215,20 @@ function drawCoverPage(
   }
 
   page.drawText(
-    "본 제안서는 공공데이터 기반 1차 입지검토 결과이며, 최종 설치·수익은 현장 실사 후 확정됩니다.",
+    sanitizePdfText(
+      "본 제안서는 공공데이터 기반 1차 입지검토 결과이며, 최종 설치·수익은 현장 실사 후 확정됩니다.",
+    ),
     {
       x: MARGIN,
-      y: 72,
-      size: 8,
+      y: 56,
+      size: 7.5,
       font,
       color: rgbColor(COLORS.slate),
-      maxWidth: mapW,
+      maxWidth: contentW,
     },
   );
+
+  drawPageFooter(page, font, pageNum, totalPages);
 }
 
 function drawSiteSummaryPage(
@@ -191,16 +236,19 @@ function drawSiteSummaryPage(
   font: PDFFont,
   fontBold: PDFFont,
   data: ResolvedSiteReview,
-  parcels?: ParcelSnapshot[],
+  parcels: ParcelSnapshot[] | undefined,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
 ) {
-  let y = drawPageHeader(page, font, fontBold, "입지 요약", data.address);
+  let y = drawPageHeader(page, font, fontBold, "입지 요약", data.address, logoImage);
 
   const landCategory = getFieldValue(data.landInfo, "지목");
   const zoning = getFieldValue(data.landInfo, "용도지역");
   const area = getFieldValue(data.landInfo, "면적");
 
   const cardW = (PAGE.width - MARGIN * 2 - 12) / 2;
-  const cardH = 88;
+  const cardH = 84;
   const metrics = [
     { label: "지목", value: landCategory },
     { label: "용도지역", value: zoning },
@@ -209,11 +257,22 @@ function drawSiteSummaryPage(
     { label: "예상 발전량", value: data.annualGeneration },
     { label: "예상 연매출", value: data.annualRevenue },
     { label: "예상 시공비", value: data.constructionCost },
+    { label: "설치 유형", value: data.recommendation },
   ];
 
   for (let i = 0; i < metrics.length; i += 2) {
     const rowY = y - (Math.floor(i / 2) + 1) * (cardH + 10);
-    drawMetricCard(page, font, fontBold, MARGIN, rowY, cardW, cardH, metrics[i].label, metrics[i].value);
+    drawMetricCard(
+      page,
+      font,
+      fontBold,
+      MARGIN,
+      rowY,
+      cardW,
+      cardH,
+      metrics[i].label,
+      metrics[i].value,
+    );
     if (metrics[i + 1]) {
       drawMetricCard(
         page,
@@ -229,27 +288,10 @@ function drawSiteSummaryPage(
     }
   }
 
-  y = y - Math.ceil(metrics.length / 2) * (cardH + 10) - 24;
-
-  page.drawText("설치 유형 · 추천", {
-    x: MARGIN,
-    y,
-    size: 11,
-    font: fontBold,
-    color: rgbColor(COLORS.navy),
-  });
-  y -= 18;
-  page.drawText(data.recommendation, {
-    x: MARGIN,
-    y,
-    size: 10,
-    font,
-    color: rgbColor(COLORS.text),
-  });
+  y = y - Math.ceil(metrics.length / 2) * (cardH + 10) - 20;
 
   if (parcels && parcels.length > 1) {
-    y -= 28;
-    page.drawText(`다중 필지 (${parcels.length}필지)`, {
+    page.drawText(sanitizePdfText(`다중 필지 (${parcels.length}필지)`), {
       x: MARGIN,
       y,
       size: 10,
@@ -259,251 +301,125 @@ function drawSiteSummaryPage(
     y -= 16;
     for (const parcel of parcels.slice(0, 5)) {
       page.drawText(
-        `· ${formatParcelShortLabel(parcel.jibunAddress)} ${parcel.areaLabel}${parcel.isPrimary ? " (대표)" : ""}`,
+        sanitizePdfText(
+          `· ${formatParcelShortLabel(parcel.jibunAddress)} ${parcel.areaLabel}${parcel.isPrimary ? " (대표)" : ""}`,
+        ),
         { x: MARGIN + 4, y, size: 9, font, color: rgbColor(COLORS.text) },
       );
       y -= 14;
     }
   }
 
-  drawPageFooter(page, font, 2, TOTAL_PAGES);
+  drawPageFooter(page, font, pageNum, totalPages);
 }
 
-function drawGridPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: ResolvedSiteReview) {
+function drawGridPage(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  data: ResolvedSiteReview,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
+) {
   let y = drawPageHeader(
     page,
     font,
     fontBold,
     "한전 계통 연계",
-    "변전소 · MTR · D/L · D/L 잔여용량 · 태양광 설치용량",
+    "변전소 · MTR · D/L · 태양광 설치용량",
+    logoImage,
   );
 
   const grid = data.gridInfo;
   const hasDetails = hasDetailedGridData(grid);
   const fmtName = (name: string) => formatGridLevelName(name, hasDetails);
+  const contentW = PAGE.width - MARGIN * 2;
 
   if (!hasDetails) {
-    page.drawRectangle({
-      x: MARGIN,
-      y: y - 120,
-      width: PAGE.width - MARGIN * 2,
-      height: 120,
-      color: rgbColor(COLORS.navyLight),
-      borderColor: rgbColor(COLORS.border),
-      borderWidth: 0.75,
-    });
-    page.drawText("한전 공개 데이터 미확보", {
-      x: MARGIN + 16,
-      y: y - 48,
-      size: 16,
-      font: fontBold,
-      color: rgbColor(COLORS.navy),
-    });
-    page.drawText(
+    drawInfoCard(
+      page,
+      font,
+      fontBold,
+      MARGIN,
+      y,
+      contentW,
+      72,
+      "한전 공개 데이터 미확보",
       "해당 위치의 계통 공개 데이터가 아직 확보되지 않았습니다. 한전 선로용량 공개 시스템에서 별도 확인이 필요합니다.",
-      {
-        x: MARGIN + 16,
-        y: y - 72,
-        size: 9,
-        font,
-        color: rgbColor(COLORS.slate),
-        maxWidth: PAGE.width - MARGIN * 2 - 32,
-      },
     );
-    y -= 140;
+    y -= 88;
   } else {
-    if (grid.queryBasisLabel) {
-      page.drawText(`조회 기준: ${grid.queryBasisLabel}`, {
-        x: MARGIN,
-        y,
-        size: 9,
-        font: fontBold,
-        color: rgbColor(COLORS.slate),
-      });
-      y -= 16;
-    }
-    if (grid.nearbyNotice) {
-      page.drawText(`※ ${grid.nearbyNotice}`, {
-        x: MARGIN,
-        y,
-        size: 8,
-        font,
-        color: rgbColor(COLORS.slate),
-        maxWidth: PAGE.width - MARGIN * 2,
-      });
-      y -= 28;
-    }
-
-    const cols = [
-      { label: "구분", substation: "변전소", transformer: "MTR", dl: "D/L" },
-      {
-        label: "설비명",
-        substation: fmtName(grid.substation.name),
-        transformer: fmtName(grid.transformer.name),
-        dl: fmtName(grid.distributionLine.name),
-      },
-      {
-        label: "잔여용량",
-        substation: formatMw(grid.substation.remainingMw),
-        transformer: formatMw(grid.transformer.remainingMw),
-        dl: formatMw(grid.distributionLine.remainingMw),
-      },
+    const rows: [string, string][] = [
+      ["변전소", fmtName(grid.substation.name)],
+      ["변압기 (MTR)", fmtName(grid.transformer.name)],
+      ["배전선로 (D/L)", fmtName(grid.distributionLine.name)],
+      ["태양광 설치용량", grid.expectedCapacityDisplay],
+      ["D/L 잔여용량", formatDlRemainingMw(grid.distributionLine.remainingMw)],
+      ["검토결과", grid.reviewResult],
+      ["데이터 출처", grid.dataSourceLabel],
     ];
+    if (grid.queryBasisLabel) {
+      rows.push(["조회 기준", grid.queryBasisLabel]);
+    }
 
-    const tableW = PAGE.width - MARGIN * 2;
-    const colW = tableW / 4;
-
+    const colW = contentW / 2;
     y = drawTableRow(
       page,
       font,
       fontBold,
       y,
       [
-        { x: MARGIN, w: colW, text: "구분", bold: true },
-        { x: MARGIN + colW, w: colW, text: "변전소", bold: true },
-        { x: MARGIN + colW * 2, w: colW, text: "MTR", bold: true },
-        { x: MARGIN + colW * 3, w: colW, text: "D/L", bold: true },
+        { x: MARGIN, w: colW, text: "항목", bold: true },
+        { x: MARGIN + colW, w: colW, text: "내용", bold: true },
       ],
       true,
     );
 
-    for (const row of cols.slice(1)) {
+    for (const [label, value] of rows) {
       y = drawTableRow(page, font, fontBold, y, [
-        { x: MARGIN, w: colW, text: row.label, bold: true },
-        { x: MARGIN + colW, w: colW, text: row.substation },
-        { x: MARGIN + colW * 2, w: colW, text: row.transformer },
-        { x: MARGIN + colW * 3, w: colW, text: row.dl },
+        { x: MARGIN, w: colW, text: label, bold: true },
+        { x: MARGIN + colW, w: colW, text: value },
       ]);
     }
 
-    y -= 16;
-    drawMetricCard(
-      page,
-      font,
-      fontBold,
-      MARGIN,
-      y,
-      (tableW - 12) / 2,
-      72,
-      "태양광 설치용량",
-      grid.expectedCapacityDisplay,
-    );
-    drawMetricCard(
-      page,
-      font,
-      fontBold,
-      MARGIN + (tableW - 12) / 2 + 12,
-      y,
-      (tableW - 12) / 2,
-      72,
-      "D/L 잔여용량",
-      formatDlRemainingMw(grid.distributionLine.remainingMw),
-    );
-    y -= 96;
+    if (grid.nearbyNotice) {
+      y -= 8;
+      page.drawText(sanitizePdfText(`※ ${grid.nearbyNotice}`), {
+        x: MARGIN,
+        y,
+        size: 8,
+        font,
+        color: rgbColor(COLORS.slate),
+        maxWidth: contentW,
+      });
+      y -= 20;
+    }
 
-    page.drawText(grid.reviewResult, {
-      x: MARGIN,
-      y,
-      size: 9,
-      font,
-      color: rgbColor(COLORS.text),
-      maxWidth: tableW,
-    });
-    y -= 24;
+    y -= 8;
+    const detailRows = [
+      ["변전소 잔여", formatMw(grid.substation.remainingMw)],
+      ["MTR 잔여", formatMw(grid.transformer.remainingMw)],
+      ["D/L 잔여", formatMw(grid.distributionLine.remainingMw)],
+    ];
+    const detailW = (contentW - 16) / 3;
+    for (let i = 0; i < detailRows.length; i++) {
+      drawMetricCard(
+        page,
+        font,
+        fontBold,
+        MARGIN + i * (detailW + 8),
+        y,
+        detailW,
+        64,
+        detailRows[i][0],
+        detailRows[i][1],
+      );
+    }
+    y -= 80;
   }
 
   page.drawText("한전 연락처", {
-    x: MARGIN,
-    y,
-    size: 11,
-    font: fontBold,
-    color: rgbColor(COLORS.navy),
-  });
-  y -= 18;
-
-  const contacts = [
-    { title: "관할 한전 지사", name: grid.contacts.kepcoBranch, phone: grid.contacts.branchPhone },
-    { title: "전력공급부 담당자", name: "전력공급부 담당자", phone: grid.contacts.supplyPhone },
-    { title: "배전계통 담당자", name: "배전계통 담당자", phone: grid.contacts.operationsPhone },
-  ];
-
-  const contactW = (PAGE.width - MARGIN * 2 - 16) / 3;
-  for (let i = 0; i < contacts.length; i++) {
-    const cx = MARGIN + i * (contactW + 8);
-    page.drawRectangle({
-      x: cx,
-      y: y - 72,
-      width: contactW,
-      height: 72,
-      borderColor: rgbColor(COLORS.border),
-      borderWidth: 0.75,
-      color: rgbColor(COLORS.white),
-    });
-    page.drawText(contacts[i].title, {
-      x: cx + 8,
-      y: y - 18,
-      size: 8,
-      font,
-      color: rgbColor(COLORS.slate),
-    });
-    page.drawText(contacts[i].name, {
-      x: cx + 8,
-      y: y - 36,
-      size: 9,
-      font: fontBold,
-      color: rgbColor(COLORS.text),
-      maxWidth: contactW - 16,
-    });
-    page.drawText(contacts[i].phone, {
-      x: cx + 8,
-      y: y - 54,
-      size: 9,
-      font,
-      color: rgbColor(COLORS.navy),
-    });
-  }
-
-  drawPageFooter(page, font, 3, TOTAL_PAGES);
-}
-
-function drawOrdinancePage(
-  page: PDFPage,
-  font: PDFFont,
-  fontBold: PDFFont,
-  ordinance: MunicipalityOrdinanceData | null | undefined,
-  municipalityFallback: string,
-) {
-  let y = drawPageHeader(page, font, fontBold, "법·조례 검토", "지자체 조례 및 허가기준");
-
-  if (!ordinance) {
-    page.drawRectangle({
-      x: MARGIN,
-      y: y - 80,
-      width: PAGE.width - MARGIN * 2,
-      height: 80,
-      color: rgbColor(COLORS.navyLight),
-      borderColor: rgbColor(COLORS.border),
-      borderWidth: 0.75,
-    });
-    page.drawText(`${municipalityFallback} 조례 데이터 준비 중`, {
-      x: MARGIN + 12,
-      y: y - 36,
-      size: 12,
-      font: fontBold,
-      color: rgbColor(COLORS.navy),
-    });
-    page.drawText("관련 조례 수집·검토 후 자동 반영됩니다. 상담 시 별도 안내드립니다.", {
-      x: MARGIN + 12,
-      y: y - 54,
-      size: 9,
-      font,
-      color: rgbColor(COLORS.slate),
-    });
-    drawPageFooter(page, font, 4, TOTAL_PAGES);
-    return;
-  }
-
-  page.drawText(ordinance.municipalityLabel, {
     x: MARGIN,
     y,
     size: 10,
@@ -511,7 +427,52 @@ function drawOrdinancePage(
     color: rgbColor(COLORS.navy),
   });
   y -= 16;
-  page.drawText(ordinance.ordinanceTitle, {
+
+  const contacts = [
+    { title: "관할 한전 지사", name: grid.contacts.kepcoBranch, phone: grid.contacts.branchPhone },
+    { title: "전력공급부", name: "전력공급부 담당", phone: grid.contacts.supplyPhone },
+    { title: "배전계통", name: "배전계통 담당", phone: grid.contacts.operationsPhone },
+  ];
+
+  const contactW = (contentW - 16) / 3;
+  for (let i = 0; i < contacts.length; i++) {
+    const cx = MARGIN + i * (contactW + 8);
+    drawInfoCard(
+      page,
+      font,
+      fontBold,
+      cx,
+      y,
+      contactW,
+      68,
+      contacts[i].title,
+      `${contacts[i].name}\n${contacts[i].phone}`,
+    );
+  }
+
+  drawPageFooter(page, font, pageNum, totalPages);
+}
+
+function drawOrdinancePage(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  ordinance: MunicipalityOrdinanceData,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
+) {
+  let y = drawPageHeader(page, font, fontBold, "법·조례 검토", "지자체 조례 및 허가기준", logoImage);
+
+  page.drawText(sanitizePdfText(ordinance.municipalityLabel), {
+    x: MARGIN,
+    y,
+    size: 10,
+    font: fontBold,
+    color: rgbColor(COLORS.navy),
+  });
+  y -= 16;
+  page.drawText(sanitizePdfText(ordinance.ordinanceTitle), {
     x: MARGIN,
     y,
     size: 9,
@@ -554,38 +515,40 @@ function drawOrdinancePage(
     ]);
   }
 
-  y -= 12;
-  page.drawText("이격거리 기준", {
-    x: MARGIN,
-    y,
-    size: 10,
-    font: fontBold,
-    color: rgbColor(COLORS.navy),
-  });
-  y -= 14;
+  if (ordinance.distanceRules.length > 0) {
+    y -= 12;
+    page.drawText("이격거리 기준", {
+      x: MARGIN,
+      y,
+      size: 10,
+      font: fontBold,
+      color: rgbColor(COLORS.navy),
+    });
+    y -= 14;
 
-  y = drawTableRow(
-    page,
-    font,
-    fontBold,
-    y,
-    [
-      { x: MARGIN, w: colW, text: "항목", bold: true },
-      { x: MARGIN + colW, w: colW * 2, text: "기준", bold: true },
-    ],
-    true,
-  );
+    y = drawTableRow(
+      page,
+      font,
+      fontBold,
+      y,
+      [
+        { x: MARGIN, w: colW, text: "항목", bold: true },
+        { x: MARGIN + colW, w: colW * 2, text: "기준", bold: true },
+      ],
+      true,
+    );
 
-  for (const rule of ordinance.distanceRules.slice(0, 8)) {
-    y = drawTableRow(page, font, fontBold, y, [
-      { x: MARGIN, w: colW, text: rule.label },
-      { x: MARGIN + colW, w: colW * 2, text: rule.distance },
-    ]);
-    if (y < 100) break;
+    for (const rule of ordinance.distanceRules.slice(0, 10)) {
+      y = drawTableRow(page, font, fontBold, y, [
+        { x: MARGIN, w: colW, text: rule.label },
+        { x: MARGIN + colW, w: colW * 2, text: rule.distance },
+      ]);
+      if (y < 100) break;
+    }
   }
 
   if (ordinance.ordinanceUrl) {
-    page.drawText(`조례 원문: ${ordinance.ordinanceUrl}`, {
+    page.drawText(sanitizePdfText(`조례 원문: ${ordinance.ordinanceUrl}`), {
       x: MARGIN,
       y: 56,
       size: 7.5,
@@ -595,11 +558,19 @@ function drawOrdinancePage(
     });
   }
 
-  drawPageFooter(page, font, 4, TOTAL_PAGES);
+  drawPageFooter(page, font, pageNum, totalPages);
 }
 
-function drawProfitabilityPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: ResolvedSiteReview) {
-  let y = drawPageHeader(page, font, fontBold, "수익성 분석", "SMP · REC · 가중치 · 발전량 기준");
+function drawProfitabilityPage(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  data: ResolvedSiteReview,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
+) {
+  let y = drawPageHeader(page, font, fontBold, "수익성 분석", "SMP · REC · 가중치 기준", logoImage);
 
   const m = data.solarMetrics;
   const p = data.profitability;
@@ -620,9 +591,8 @@ function drawProfitabilityPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, 
   const rows: [string, string][] = [
     ["SMP 단가", `${m.market.smpPrice}원/kWh (${m.market.smpDate})`],
     ["REC 단가", `${m.market.recPrice.toLocaleString("ko-KR")}원/MWh (${m.market.recDate})`],
-    ["REC 가중치", `${formatRecWeightDisplay(m.recWeight)} — ${m.recWeightReason}`],
+    ["REC 가중치", formatRecWeightDisplay(m.recWeight)],
     ["연간 발전량", data.annualGeneration],
-    ["발전량 산출", `${yearlyGenerationPerKw.toLocaleString("ko-KR")}kWh/kW·년 × ${m.capacityKw.toFixed(1)}kW`],
     ["SMP 수익", p.smpRevenue],
     ["REC 수익", p.recRevenue],
     ["예상 연매출", p.totalRevenue],
@@ -636,21 +606,23 @@ function drawProfitabilityPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, 
     ]);
   }
 
-  y -= 8;
+  y -= 12;
   page.drawRectangle({
     x: MARGIN,
-    y: y - 36,
+    y: y - 40,
     width: PAGE.width - MARGIN * 2,
-    height: 36,
+    height: 40,
     color: rgb(0.99, 0.96, 0.9),
     borderColor: rgb(0.92, 0.78, 0.45),
     borderWidth: 0.5,
   });
   page.drawText(
-    "⚠ 예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.",
+    sanitizePdfText(
+      "※ 예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.",
+    ),
     {
       x: MARGIN + 10,
-      y: y - 22,
+      y: y - 24,
       size: 8,
       font,
       color: rgb(0.45, 0.32, 0.05),
@@ -658,7 +630,7 @@ function drawProfitabilityPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, 
     },
   );
 
-  drawPageFooter(page, font, 5, TOTAL_PAGES);
+  drawPageFooter(page, font, pageNum, totalPages);
 }
 
 function drawContactPage(
@@ -667,52 +639,83 @@ function drawContactPage(
   fontBold: PDFFont,
   data: ResolvedSiteReview,
   qrImage: PDFImage | null,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
 ) {
-  let y = drawPageHeader(page, font, fontBold, "SG SOLAR 상담 안내", company.companyName);
+  let y = drawPageHeader(page, font, fontBold, "SG SOLAR 상담 안내", company.companyName, logoImage);
 
+  const introW = PAGE.width - MARGIN * 2 - (qrImage ? 112 : 0);
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - 56,
+    width: introW,
+    height: 56,
+    color: rgbColor(COLORS.navyLight),
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.75,
+  });
+  page.drawText("SG SOLAR 소개", {
+    x: MARGIN + 12,
+    y: y - 18,
+    size: 10,
+    font: fontBold,
+    color: rgbColor(COLORS.navy),
+  });
   page.drawText(
-    "신재생에너지 전문기업 SG SOLAR는 태양광 발전사업 컨설팅, 설계·시공, 유지관리까지 원스톱으로 지원합니다.",
+    sanitizePdfText(
+      "신재생에너지 전문기업 SG SOLAR는 태양광 발전사업 컨설팅, 설계·시공, 유지관리까지 원스톱으로 지원합니다.",
+    ),
     {
-      x: MARGIN,
-      y,
-      size: 9,
+      x: MARGIN + 12,
+      y: y - 34,
+      size: 8.5,
       font,
       color: rgbColor(COLORS.text),
-      maxWidth: PAGE.width - MARGIN * 2 - 120,
+      maxWidth: introW - 24,
     },
   );
-  y -= 36;
-
-  const infoLines = [
-    `대표전화: ${company.phone}`,
-    `이메일: ${company.email}`,
-    `웹사이트: ${company.website}`,
-    `상담 링크: ${siteLinks.mainSite}`,
-  ];
-
-  for (const line of infoLines) {
-    page.drawText(line, { x: MARGIN, y, size: 10, font, color: rgbColor(COLORS.text) });
-    y -= 16;
-  }
 
   if (qrImage) {
     page.drawImage(qrImage, {
       x: PAGE.width - MARGIN - 96,
-      y: PAGE.height - 220,
+      y: y - 96,
       width: 96,
       height: 96,
     });
     page.drawText("웹사이트 QR", {
       x: PAGE.width - MARGIN - 96,
-      y: PAGE.height - 232,
+      y: y - 108,
       size: 7,
       font,
       color: rgbColor(COLORS.slate),
     });
   }
 
-  y -= 12;
-  page.drawText("유사 시공사례 (자동 매칭)", {
+  y -= 72;
+
+  const contactItems = [
+    { label: "대표전화", value: company.phone },
+    { label: "이메일", value: company.email },
+    { label: "웹사이트", value: company.website },
+  ];
+  const itemW = (PAGE.width - MARGIN * 2 - 16) / 3;
+  for (let i = 0; i < contactItems.length; i++) {
+    drawMetricCard(
+      page,
+      font,
+      fontBold,
+      MARGIN + i * (itemW + 8),
+      y,
+      itemW,
+      64,
+      contactItems[i].label,
+      contactItems[i].value,
+    );
+  }
+
+  y -= 84;
+  page.drawText("유사 시공사례", {
     x: MARGIN,
     y,
     size: 11,
@@ -722,6 +725,8 @@ function drawContactPage(
   y -= 18;
 
   const cases = data.recommendedCases.slice(0, 3);
+  const caseW = (PAGE.width - MARGIN * 2 - 16) / Math.min(cases.length || 1, 3);
+
   if (cases.length === 0) {
     page.drawText("해당 지역·유형과 유사한 시공사례를 상담 시 안내드립니다.", {
       x: MARGIN,
@@ -731,46 +736,61 @@ function drawContactPage(
       color: rgbColor(COLORS.slate),
     });
   } else {
-    for (const item of cases) {
+    for (let i = 0; i < cases.length; i++) {
+      const item = cases[i];
+      const cx = MARGIN + i * (caseW + 8);
       page.drawRectangle({
-        x: MARGIN,
-        y: y - 52,
-        width: PAGE.width - MARGIN * 2,
-        height: 52,
+        x: cx,
+        y: y - 72,
+        width: caseW,
+        height: 72,
         borderColor: rgbColor(COLORS.border),
-        borderWidth: 0.5,
+        borderWidth: 0.75,
         color: rgbColor(COLORS.white),
       });
-      page.drawText(item.title, {
-        x: MARGIN + 10,
-        y: y - 18,
-        size: 9,
+      page.drawText(sanitizePdfText(item.title), {
+        x: cx + 10,
+        y: y - 20,
+        size: 8.5,
         font: fontBold,
-        color: rgbColor(COLORS.text),
-        maxWidth: PAGE.width - MARGIN * 2 - 20,
+        color: rgbColor(COLORS.navy),
+        maxWidth: caseW - 20,
       });
-      page.drawText(`${item.capacity} · ${item.region} — ${item.recommendReason}`, {
-        x: MARGIN + 10,
-        y: y - 34,
+      page.drawText(sanitizePdfText(item.capacity), {
+        x: cx + 10,
+        y: y - 36,
+        size: 8,
+        font,
+        color: rgbColor(COLORS.text),
+      });
+      page.drawText(sanitizePdfText(item.region), {
+        x: cx + 10,
+        y: y - 50,
         size: 8,
         font,
         color: rgbColor(COLORS.slate),
-        maxWidth: PAGE.width - MARGIN * 2 - 20,
       });
-      y -= 60;
+      page.drawText(sanitizePdfText(item.recommendReason), {
+        x: cx + 10,
+        y: y - 64,
+        size: 7.5,
+        font,
+        color: rgbColor(COLORS.slate),
+        maxWidth: caseW - 20,
+      });
     }
+    y -= 84;
   }
 
-  y -= 8;
   page.drawText("무료 입지검토 상담을 원하시면 위 연락처 또는 QR 코드를 이용해 주세요.", {
     x: MARGIN,
-    y: Math.max(y, 80),
+    y: Math.max(y - 8, 72),
     size: 9,
     font: fontBold,
     color: rgbColor(COLORS.navy),
   });
 
-  drawPageFooter(page, font, 6, TOTAL_PAGES);
+  drawPageFooter(page, font, pageNum, totalPages);
 }
 
 export async function generateSiteReviewPdf(
@@ -780,39 +800,57 @@ export async function generateSiteReviewPdf(
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const fontBytes = await loadKoreanFontBytes();
-  const font = await pdfDoc.embedFont(fontBytes);
-  const fontBold = font;
+  const [regularBytes, boldBytes, logoBytes, mapBytes, qrBytes] = await Promise.all([
+    loadFontBytes(KR_FONT_REGULAR),
+    loadFontBytes(KR_FONT_BOLD),
+    loadBrandLogoBytes(),
+    fetchKakaoStaticMap(data.lat, data.lng),
+    fetchQrCodePng(siteLinks.mainSite, 120),
+  ]);
+
+  const font = await pdfDoc.embedFont(regularBytes);
+  const fontBold = await pdfDoc.embedFont(boldBytes);
 
   pdfDoc.setTitle("SG SOLAR 태양광 입지검토 제안서");
   pdfDoc.setSubject(`${data.address} 입지검토 결과`);
   pdfDoc.setCreator(MARKETING_NAME);
 
-  const [mapBytes, qrBytes] = await Promise.all([
-    fetchKakaoStaticMap(data.lat, data.lng),
-    fetchQrCodePng(siteLinks.mainSite, 120),
-  ]);
-
+  const logoImage = await embedPngImage(pdfDoc, logoBytes);
   const mapImage = await embedPngImage(pdfDoc, mapBytes);
   const qrImage = await embedPngImage(pdfDoc, qrBytes);
 
-  const pages: PDFPage[] = [];
-  for (let i = 0; i < TOTAL_PAGES; i++) {
-    pages.push(pdfDoc.addPage([PAGE.width, PAGE.height]));
-  }
+  const includeOrdinance = hasOrdinanceContent(options.ordinance);
+  const totalPages = includeOrdinance ? 6 : 5;
+  let pageNum = 1;
 
-  drawCoverPage(pages[0], font, fontBold, data, mapImage);
-  drawSiteSummaryPage(pages[1], font, fontBold, data, options.parcels);
-  drawGridPage(pages[2], font, fontBold, data);
-  drawOrdinancePage(
-    pages[3],
+  const cover = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawCoverPage(cover, font, fontBold, data, mapImage, logoImage, pageNum++, totalPages);
+
+  const summary = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawSiteSummaryPage(
+    summary,
     font,
     fontBold,
-    options.ordinance,
-    data.address.split(" ")[1] ?? data.address,
+    data,
+    options.parcels,
+    logoImage,
+    pageNum++,
+    totalPages,
   );
-  drawProfitabilityPage(pages[4], font, fontBold, data);
-  drawContactPage(pages[5], font, fontBold, data, qrImage);
+
+  const grid = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawGridPage(grid, font, fontBold, data, logoImage, pageNum++, totalPages);
+
+  if (includeOrdinance && options.ordinance) {
+    const ordinance = pdfDoc.addPage([PAGE.width, PAGE.height]);
+    drawOrdinancePage(ordinance, font, fontBold, options.ordinance, logoImage, pageNum++, totalPages);
+  }
+
+  const profit = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawProfitabilityPage(profit, font, fontBold, data, logoImage, pageNum++, totalPages);
+
+  const contact = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawContactPage(contact, font, fontBold, data, qrImage, logoImage, pageNum, totalPages);
 
   return pdfDoc.save();
 }

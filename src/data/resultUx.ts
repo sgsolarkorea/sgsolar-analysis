@@ -273,20 +273,26 @@ export function inferDefaultInstallType(recommendation: string): InstallTypeOpti
   return resolveDefaultInstallType(recommendation, [], []);
 }
 
+export function formatInstallTypeDisplayLabel(installType: InstallTypeOption): string {
+  switch (installType) {
+    case "토지형":
+      return "토지형 (15° 고정형)";
+    case "지붕형":
+      return "지붕형 (12° 고정형)";
+    case "축사형":
+      return "축사형 (12° 고정형)";
+    case "공장형":
+      return "공장형 (12° 고정형)";
+    case "상가형":
+      return "상가형 (12° 고정형)";
+    default:
+      return installType;
+  }
+}
+
 export function deriveSiteRecommendation(
   installType: InstallTypeOption,
-  buildingInfo: InfoField[],
+  _buildingInfo: InfoField[],
 ): string {
-  const buildingUse = getFieldValue(buildingInfo, "건물 용도");
-
-  if (installType === "토지형") return "토지형 (경사 12° 고정형)";
-  if (installType === "축사형") return "축사형 (경사 12° 고정형)";
-  if (installType === "공장형") return "공장형 (경사 12° 고정형)";
-  if (installType === "상가형") return "상가형 (경사 12° 고정형)";
-
-  if (buildingUse.includes("단독") || buildingUse.includes("주택")) {
-    return "지붕형 (경사 12° 고정형)";
-  }
-
-  return "옥상형 (경사 12° 고정형)";
+  return formatInstallTypeDisplayLabel(installType);
 }

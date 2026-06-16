@@ -4,6 +4,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import {
   INSTALL_TYPE_OPTIONS,
   INSTALL_TYPE_UI_MESSAGES,
+  formatInstallTypeDisplayLabel,
   type InstallTypeOption,
 } from "@/data/resultUx";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
@@ -44,7 +45,9 @@ export default function InstallTypeSelector({ apiRecommendation }: InstallTypeSe
 
       <div className="mt-4 rounded-xl border border-navy/20 bg-navy-light px-4 py-4">
         <p className="text-sm font-semibold text-slate-900">추천 설치유형 (선택 기준)</p>
-        <p className="mt-2 text-base font-bold text-navy">{metrics.installType}</p>
+        <p className="mt-2 text-base font-bold text-navy">
+          {formatInstallTypeDisplayLabel(metrics.installType as InstallTypeOption)}
+        </p>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
           {INSTALL_TYPE_UI_MESSAGES[metrics.installType as InstallTypeOption]}
         </p>

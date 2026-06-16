@@ -5,7 +5,7 @@ import {
   formatRevenueDisplay,
   getFieldValue,
 } from "@/lib/solar/calculate";
-import type { SearchHistoryEntry } from "@/types/searchHistory";
+import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 
 function formatModuleCountDisplay(count: number): string {
@@ -33,7 +33,7 @@ export function buildSearchHistoryEntry(
     zoning: getFieldValue(data.landInfo, "용도지역"),
     landArea: getFieldValue(data.landInfo, "면적"),
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
-    installType: metrics.installType,
+    installType: formatInstallTypeDisplayLabel(metrics.installType as InstallTypeOption),
     capacity: formatCapacityDisplay(metrics.capacityKw),
     moduleCount: formatModuleCountDisplay(metrics.moduleCount),
     annualGeneration: formatGenerationDisplay(metrics.annualGenerationKwh),
