@@ -38,6 +38,8 @@ interface KepcoDispersedGenerationResponse {
   data?: KepcoDispersedGenerationItem[];
   resultCode?: string;
   resultMessage?: string;
+  errCd?: string;
+  errMsg?: string;
 }
 
 function getKepcoApiKey(): string | null {
@@ -235,6 +237,15 @@ export async function fetchKepcoGridByLocation(input: {
     return null;
   }
 
+  if (payload.errCd) {
+    console.warn("[Grid/KepcoAPI] API error", {
+      address: input.jibunAddress,
+      errCd: payload.errCd,
+      errMsg: payload.errMsg,
+    });
+    return null;
+  }
+
   const items = Array.isArray(payload.data) ? payload.data : [];
   if (!items.length) {
     console.info("[Grid/KepcoAPI] Empty data", {
@@ -257,5 +268,101 @@ export async function fetchKepcoGridByLocation(input: {
   return {
     dataAsOfDate: extractDataAsOfDate(items),
     poles,
+  };
+}
+
+export interface KepcoDispersedGenerationDebugResult {
+  keyConfigured: boolean;
+  parsed: ReturnType<typeof parseKepcoAddress>;
+  regionCodes: { metroCd: string | null; cityCd: string | null } | null;
+  requestParams: Record<string, string> | null;
+  rawResponse: KepcoDispersedGenerationResponse | null;
+  selectedItem: KepcoDispersedGenerationItem | null;
+  mappedPoles: GridPoleOption[];
+}
+
+/** Production 진단용 — API 키·원본 응답 확인 (키 값 미노출) */
+export async function debugKepcoDispersedGeneration(input: {
+  jibunAddress: string;
+  pnu?: string;
+}): Promise<KepcoDispersedGenerationDebugResult> {
+  const apiKey = getKepcoApiKey();
+  const parsed = parseKepcoAddress(input.jibunAddress, input.pnu);
+
+  if (!apiKey || !parsed) {
+    return {
+      keyConfigured: !!apiKey,
+      parsed,
+      regionCodes: null,
+      requestParams: null,
+      rawResponse: null,
+      selectedItem: null,
+      mappedPoles: [],
+    };
+  }
+
+  const regionCodes = await resolveKepcoRegionCodes({
+    sido: parsed.sido,
+    sigungu: parsed.sigungu,
+    sigunguCd: parsed.sigunguCd,
+    apiKey,
+  });
+
+  if (!regionCodes.metroCd || !regionCodes.cityCd) {
+    return {
+      keyConfigured: true,
+      parsed,
+      regionCodes,
+      requestParams: null,
+      rawResponse: null,
+      selectedItem: null,
+      mappedPoles: [],
+    };
+  }
+
+  const requestParams: Record<string, string> = {
+    returnType: "json",
+    metroCd: regionCodes.metroCd,
+    cityCd: regionCodes.cityCd,
+    addrLidong: parsed.addrLidong,
+    addrLi: parsed.addrLi,
+    addrJibun: parsed.addrJibun,
+  };
+
+  const url = new URL(getKepcoDispersedGenerationUrl());
+  url.searchParams.set("apiKey", apiKey);
+  for (const [key, value] of Object.entries(requestParams)) {
+    if (value) url.searchParams.set(key, value);
+  }
+
+  let rawResponse: KepcoDispersedGenerationResponse | null = null;
+  try {
+    const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
+    if (response.ok) {
+      rawResponse = (await response.json()) as KepcoDispersedGenerationResponse;
+    }
+  } catch {
+    rawResponse = null;
+  }
+
+  const items = Array.isArray(rawResponse?.data) ? rawResponse!.data! : [];
+  const target = {
+    addrLidong: parsed.addrLidong,
+    addrLi: parsed.addrLi,
+    addrJibun: parsed.addrJibun,
+  };
+  const selectedItem = selectBestDispersedItem(items, target);
+  const mappedPoles = items.length
+    ? mapKepcoResponseToPoles(items, input.jibunAddress, target)
+    : [];
+
+  return {
+    keyConfigured: true,
+    parsed,
+    regionCodes,
+    requestParams,
+    rawResponse,
+    selectedItem,
+    mappedPoles,
   };
 }

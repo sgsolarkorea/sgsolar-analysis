@@ -1,9 +1,9 @@
 const DEFAULT_KEPCO_API_ORIGIN = "https://bigdata.kepco.co.kr";
 
-/** 자주 쓰는 시군구 — API 실패 시 폴백 (metroCd:시군구명 → cityCd) */
+/** 자주 쓰는 시군구 — commonCode API 실패 시 최후 폴백 */
 const STATIC_CITY_CODES: Record<string, string> = {
-  "44:아산시": "131",
-  "44:아산": "131",
+  "44:홍성군": "131",
+  "44:홍성": "131",
 };
 
 /** 시도명 → KEPCO metroCd (PNU 없을 때 폴백) */
@@ -184,17 +184,17 @@ export async function resolveKepcoRegionCodes(input: {
     return { metroCd: null, cityCd: null };
   }
 
-  const staticCity = staticCityLookup(metroCd, input.sigungu);
-  if (staticCity) {
-    return { metroCd, cityCd: staticCity };
-  }
-
   try {
     const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey);
     const cityCd = matchCityCode(input.sigungu, cityCodes);
     if (cityCd) return { metroCd, cityCd };
   } catch (error) {
     console.warn("[Grid/KepcoAPI] cityCd lookup failed:", error);
+  }
+
+  const staticCity = staticCityLookup(metroCd, input.sigungu);
+  if (staticCity) {
+    return { metroCd, cityCd: staticCity };
   }
 
   return { metroCd, cityCd: null };
