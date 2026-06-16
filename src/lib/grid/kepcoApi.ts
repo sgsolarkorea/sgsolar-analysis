@@ -1,6 +1,7 @@
 import { parseKepcoAddress } from "@/lib/grid/kepcoAddress";
 import {
   getKepcoDispersedGenerationUrl,
+  kepcoMetroCandidates,
   resolveKepcoRegionCodes,
 } from "@/lib/grid/kepcoRegionCodes";
 import { buildPoleLabel } from "@/lib/grid/poleFromAddress";
@@ -56,6 +57,38 @@ function parsePowerMw(value: string | number | null | undefined): number | null 
   if (!Number.isFinite(num)) return null;
   // KEPCO 분산전원 API 용량 단위는 kW — MW로 변환
   return Math.round((num / 1000) * 1000) / 1000;
+}
+
+function buildDispersedParamAttempts(
+  metroCandidates: string[],
+  cityCd: string,
+  parsed: { addrLidong: string; addrLi: string; addrJibun: string },
+): Record<string, string | undefined>[] {
+  const attempts: Record<string, string | undefined>[] = [];
+  const seen = new Set<string>();
+
+  for (const metroCd of metroCandidates) {
+    const variants: Record<string, string | undefined>[] = [
+      {
+        metroCd,
+        cityCd,
+        addrLidong: parsed.addrLidong,
+        addrLi: parsed.addrLi,
+        addrJibun: parsed.addrJibun,
+      },
+      { metroCd, cityCd, addrLidong: parsed.addrLidong, addrLi: parsed.addrLi },
+      { metroCd, cityCd, addrLidong: parsed.addrLidong },
+      { metroCd, cityCd },
+    ];
+    for (const variant of variants) {
+      const key = JSON.stringify(variant);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      attempts.push(variant);
+    }
+  }
+
+  return attempts;
 }
 
 function distributionLineName(item: KepcoDispersedGenerationItem): string {
@@ -206,7 +239,7 @@ export async function fetchKepcoGridByLocation(input: {
     return null;
   }
 
-  const { metroCd, cityCd, cityNm } = await resolveKepcoRegionCodes({
+  const { metroCd, cityCd, cityNm, kepcoMetroCd } = await resolveKepcoRegionCodes({
     sido: parsed.sido,
     sigungu: parsed.sigungu,
     sigunguCd: parsed.sigunguCd,
@@ -224,20 +257,12 @@ export async function fetchKepcoGridByLocation(input: {
     return null;
   }
 
-  const baseParams = {
-    metroCd,
-    cityCd,
+  const metroCandidates = kepcoMetroCandidates(kepcoMetroCd, metroCd);
+  const paramAttempts = buildDispersedParamAttempts(metroCandidates, cityCd, {
     addrLidong: parsed.addrLidong,
     addrLi: parsed.addrLi,
     addrJibun: parsed.addrJibun,
-  };
-
-  const paramAttempts: Record<string, string | undefined>[] = [
-    baseParams,
-    { metroCd, cityCd, addrLidong: parsed.addrLidong, addrLi: parsed.addrLi },
-    { metroCd, cityCd, addrLidong: parsed.addrLidong },
-    { metroCd, cityCd },
-  ];
+  });
 
   let payload: KepcoDispersedGenerationResponse | null = null;
   let httpStatus = 0;
@@ -304,7 +329,12 @@ export async function fetchKepcoGridByLocation(input: {
 export interface KepcoDispersedGenerationDebugResult {
   keyConfigured: boolean;
   parsed: ReturnType<typeof parseKepcoAddress>;
-  regionCodes: { metroCd: string | null; cityCd: string | null; cityNm?: string | null } | null;
+  regionCodes: {
+    metroCd: string | null;
+    cityCd: string | null;
+    cityNm?: string | null;
+    kepcoMetroCd?: string | null;
+  } | null;
   requestParams: Record<string, string> | null;
   httpStatus: number | null;
   rawResponse: KepcoDispersedGenerationResponse | null;
@@ -353,26 +383,18 @@ export async function debugKepcoDispersedGeneration(input: {
     };
   }
 
-  const requestParams: Record<string, string> = {
-    returnType: "json",
-    metroCd: regionCodes.metroCd,
-    cityCd: regionCodes.cityCd,
+  const metroCandidates = kepcoMetroCandidates(regionCodes.kepcoMetroCd, regionCodes.metroCd);
+  const paramAttempts = buildDispersedParamAttempts(metroCandidates, regionCodes.cityCd, {
     addrLidong: parsed.addrLidong,
     addrLi: parsed.addrLi,
     addrJibun: parsed.addrJibun,
+  });
+  const requestParams: Record<string, string> = {
+    returnType: "json",
+    ...Object.fromEntries(
+      Object.entries(paramAttempts[0] ?? {}).filter(([, value]) => Boolean(value)),
+    ),
   };
-
-  const paramAttempts: Record<string, string | undefined>[] = [
-    requestParams,
-    {
-      metroCd: regionCodes.metroCd,
-      cityCd: regionCodes.cityCd,
-      addrLidong: parsed.addrLidong,
-      addrLi: parsed.addrLi,
-    },
-    { metroCd: regionCodes.metroCd, cityCd: regionCodes.cityCd, addrLidong: parsed.addrLidong },
-    { metroCd: regionCodes.metroCd, cityCd: regionCodes.cityCd },
-  ];
 
   let rawResponse: KepcoDispersedGenerationResponse | null = null;
   let httpStatus: number | null = null;

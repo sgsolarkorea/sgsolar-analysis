@@ -61,6 +61,7 @@ interface KepcoCommonCodeResponse {
 }
 
 const cityCodeCache = new Map<string, KepcoCommonCodeItem[]>();
+const lglCityCodeCache = new Map<string, KepcoCommonCodeItem[]>();
 
 export function getKepcoApiOrigin(): string {
   const base = process.env.KEPCO_DATA_API_BASE?.trim();
@@ -109,7 +110,7 @@ function staticCityLookup(metroCd: string, sigungu: string): string | null {
 }
 
 async function fetchCommonCodes(
-  codeTy: "metroCd" | "cityCd",
+  codeTy: "metroCd" | "cityCd" | "lglDngMetroCd" | "lglDngCityCd",
   apiKey: string,
 ): Promise<KepcoCommonCodeItem[]> {
   const origin = getKepcoApiOrigin();
@@ -175,37 +176,97 @@ function matchCityCode(sigungu: string, candidates: KepcoCommonCodeItem[]): stri
   return null;
 }
 
+async function getLglCityCodesForMetro(
+  metroCd: string,
+  apiKey: string,
+  sido?: string,
+): Promise<KepcoCommonCodeItem[]> {
+  const cacheKey = `${metroCd}:${sido ?? ""}`;
+  const cached = lglCityCodeCache.get(cacheKey);
+  if (cached) return cached;
+
+  const allCityCodes = await fetchCommonCodes("lglDngCityCd", apiKey);
+  const normalizedMetro = normalizeMetroCode(metroCd);
+
+  let filtered = allCityCodes.filter(
+    (item) => normalizeMetroCode(item.uppoCd) === normalizedMetro,
+  );
+
+  if (!filtered.length && sido) {
+    const normalizedSido = normalizeRegionName(sido);
+    filtered = allCityCodes.filter((item) => {
+      const uppoNm = normalizeRegionName(item.uppoCdNm ?? "");
+      return uppoNm.includes(normalizedSido);
+    });
+  }
+
+  lglCityCodeCache.set(cacheKey, filtered);
+  return filtered;
+}
+
 export async function resolveKepcoRegionCodes(input: {
   sido: string;
   sigungu: string;
   sigunguCd: string | null;
   apiKey: string;
-}): Promise<{ metroCd: string | null; cityCd: string | null; cityNm: string | null }> {
+}): Promise<{
+  metroCd: string | null;
+  cityCd: string | null;
+  cityNm: string | null;
+  /** commonCode uppoCd — 분산전원 API metroCd 후보 (법정 metroCd와 다를 수 있음) */
+  kepcoMetroCd: string | null;
+}> {
   const metroCd =
     metroCdFromSigunguCd(input.sigunguCd) ?? metroCdFromSido(input.sido);
   if (!metroCd) {
     console.warn("[Grid/KepcoAPI] metroCd unresolved", { sido: input.sido, sigungu: input.sigungu });
-    return { metroCd: null, cityCd: null, cityNm: null };
+    return { metroCd: null, cityCd: null, cityNm: null, kepcoMetroCd: null };
   }
 
   const staticCity = staticCityLookup(metroCd, input.sigungu);
   if (staticCity) {
-    return { metroCd, cityCd: staticCity, cityNm: input.sigungu };
+    return { metroCd, cityCd: staticCity, cityNm: input.sigungu, kepcoMetroCd: metroCd };
   }
 
   try {
+    const lglCityCodes = await getLglCityCodesForMetro(metroCd, input.apiKey, input.sido);
+    const lglCityCd = matchCityCode(input.sigungu, lglCityCodes);
+    if (lglCityCd) {
+      const matched = lglCityCodes.find((item) => item.code?.trim() === lglCityCd);
+      const cityNm = matched?.codeNm?.trim() ?? null;
+      const kepcoMetroCd = matched?.uppoCd?.trim() || metroCd;
+      return { metroCd, cityCd: lglCityCd, cityNm, kepcoMetroCd };
+    }
+
     const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey, input.sido);
     const cityCd = matchCityCode(input.sigungu, cityCodes);
     if (cityCd) {
-      const cityNm =
-        cityCodes.find((item) => item.code?.trim() === cityCd)?.codeNm?.trim() ?? null;
-      return { metroCd, cityCd, cityNm };
+      const matched = cityCodes.find((item) => item.code?.trim() === cityCd);
+      const cityNm = matched?.codeNm?.trim() ?? null;
+      const kepcoMetroCd = matched?.uppoCd?.trim() || metroCd;
+      return { metroCd, cityCd, cityNm, kepcoMetroCd };
     }
   } catch (error) {
     console.warn("[Grid/KepcoAPI] cityCd lookup failed:", error);
   }
 
-  return { metroCd, cityCd: null, cityNm: null };
+  return { metroCd, cityCd: null, cityNm: null, kepcoMetroCd: null };
+}
+
+/** 분산전원 API metroCd 후보 — commonCode uppoCd 우선, 법정 metroCd 폴백 */
+export function kepcoMetroCandidates(
+  kepcoMetroCd: string | null | undefined,
+  legalMetroCd: string | null | undefined,
+): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const code of [kepcoMetroCd, legalMetroCd]) {
+    const normalized = code?.trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
 }
 
 /** 진단용 — metroCd 하위 cityCd 목록 */
@@ -215,6 +276,23 @@ export async function listKepcoCityCodes(
   sido?: string,
 ): Promise<Array<{ code: string; name: string; uppoCd?: string; uppoCdNm?: string }>> {
   const items = await getCityCodesForMetro(metroCd, apiKey, sido);
+  return items
+    .map((item) => ({
+      code: item.code?.trim() ?? "",
+      name: item.codeNm?.trim() ?? "",
+      uppoCd: item.uppoCd,
+      uppoCdNm: item.uppoCdNm,
+    }))
+    .filter((item) => item.code && item.name);
+}
+
+/** 진단용 — metroCd 하위 lglDngCityCd 목록 (분산전원 API용) */
+export async function listKepcoLglCityCodes(
+  metroCd: string,
+  apiKey: string,
+  sido?: string,
+): Promise<Array<{ code: string; name: string; uppoCd?: string; uppoCdNm?: string }>> {
+  const items = await getLglCityCodesForMetro(metroCd, apiKey, sido);
   return items
     .map((item) => ({
       code: item.code?.trim() ?? "",
