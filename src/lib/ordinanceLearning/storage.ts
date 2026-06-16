@@ -152,44 +152,71 @@ export async function listOrdinanceRecords(): Promise<OrdinanceRecord[]> {
 
 export async function enqueueOrdinanceSlug(slug: string): Promise<void> {
   if (shouldUseLocalStorage()) {
-    const queue = await readLocalQueue();
-    if (!queue.includes(slug)) {
-      await writeLocalQueue([...queue, slug]);
+    try {
+      const queue = await readLocalQueue();
+      if (!queue.includes(slug)) {
+        await writeLocalQueue([...queue, slug]);
+      }
+    } catch (error) {
+      console.warn("[OrdinanceLearning] Local queue enqueue failed:", error);
     }
     return;
   }
 
   const redis = getRedisClient();
   if (!redis) {
-    const queue = await readLocalQueue();
-    if (!queue.includes(slug)) {
-      await writeLocalQueue([...queue, slug]);
+    try {
+      const queue = await readLocalQueue();
+      if (!queue.includes(slug)) {
+        await writeLocalQueue([...queue, slug]);
+      }
+    } catch (error) {
+      console.warn("[OrdinanceLearning] Local queue enqueue failed:", error);
     }
     return;
   }
 
-  await redis.lpush(ORDINANCE_QUEUE_KEY, slug);
+  try {
+    await redis.lpush(ORDINANCE_QUEUE_KEY, slug);
+  } catch (error) {
+    console.warn("[OrdinanceLearning] Redis queue enqueue failed:", error);
+  }
 }
 
 export async function dequeueOrdinanceSlug(): Promise<string | null> {
   if (shouldUseLocalStorage()) {
-    const queue = await readLocalQueue();
-    if (!queue.length) return null;
-    const [next, ...rest] = queue;
-    await writeLocalQueue(rest);
-    return next;
+    try {
+      const queue = await readLocalQueue();
+      if (!queue.length) return null;
+      const [next, ...rest] = queue;
+      await writeLocalQueue(rest);
+      return next;
+    } catch (error) {
+      console.warn("[OrdinanceLearning] Local queue dequeue failed:", error);
+      return null;
+    }
   }
 
   const redis = getRedisClient();
   if (!redis) {
-    const queue = await readLocalQueue();
-    if (!queue.length) return null;
-    const [next, ...rest] = queue;
-    await writeLocalQueue(rest);
-    return next;
+    try {
+      const queue = await readLocalQueue();
+      if (!queue.length) return null;
+      const [next, ...rest] = queue;
+      await writeLocalQueue(rest);
+      return next;
+    } catch (error) {
+      console.warn("[OrdinanceLearning] Local queue dequeue failed:", error);
+      return null;
+    }
   }
 
-  return redis.rpop<string>(ORDINANCE_QUEUE_KEY);
+  try {
+    return await redis.rpop<string>(ORDINANCE_QUEUE_KEY);
+  } catch (error) {
+    console.warn("[OrdinanceLearning] Redis queue dequeue failed:", error);
+    return null;
+  }
 }
 
 export async function incrementOrdinanceSearchCount(
