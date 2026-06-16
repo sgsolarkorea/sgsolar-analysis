@@ -196,6 +196,11 @@ export default function GridConnectionSection({
               </div>
             </div>
             <div className="text-right text-sm">
+              {gridInfo.queryBasisLabel && (
+                <p className="text-xs font-medium text-slate-600">
+                  조회 기준: {gridInfo.queryBasisLabel}
+                </p>
+              )}
               <p className="mt-1 text-xs text-slate-500">
                 기준 위치: {gridInfo.referenceLocation}
               </p>
@@ -335,6 +340,11 @@ export default function GridConnectionSection({
 
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
           <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">⚠ {disclaimer}</p>
+          {gridInfo.nearbyNotice && (
+            <p className="mt-1 text-xs leading-relaxed text-amber-900 sm:text-sm">
+              ※ {gridInfo.nearbyNotice}
+            </p>
+          )}
           {getGridDataSourceNotice(gridInfo.dataSource) && (
             <p className="mt-1 text-xs leading-relaxed text-amber-900 sm:text-sm">
               ⚠ {getGridDataSourceNotice(gridInfo.dataSource)}

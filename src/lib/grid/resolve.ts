@@ -12,9 +12,11 @@ import {
 } from "@/lib/grid/evaluate";
 import { fetchKepcoGridByLocation } from "@/lib/grid/kepcoApi";
 import { buildPoleLabel, derivePoleCandidates } from "@/lib/grid/poleFromAddress";
+import { buildQueryBasisLabel, NEARBY_GRID_NOTICE } from "@/lib/grid/queryBasisLabel";
 import { listGridAdminRecords, matchGridAdminRecord } from "@/lib/grid/storage";
 import type {
   GridConnectionInfo,
+  GridDataSource,
   GridLevelCapacity,
   GridPoleOption,
 } from "@/types/gridConnection";
@@ -37,20 +39,27 @@ function buildFromPole(
   pole: GridPoleOption,
   input: ResolveGridInput,
   dataAsOfDate: string | null,
-  dataSource: GridConnectionInfo["dataSource"],
+  dataSource: GridDataSource,
   contacts: GridConnectionInfo["contacts"],
+  options?: {
+    nearbyDistanceKm?: number | null;
+    referenceLocation?: string;
+  },
 ): GridConnectionInfo {
   const expectedMw = Math.round((input.capacityKw / 1000) * 1000) / 1000;
   const remainingMw = pickBottleneckRemainingMw(pole);
   const status = evaluateGridConnectionStatus(remainingMw, expectedMw);
   const margin = formatCapacityMargin(remainingMw, expectedMw);
+  const nearbyDistanceKm = options?.nearbyDistanceKm ?? null;
 
   return {
     status,
     statusLabel: GRID_STATUS_LABELS[status],
     expectedCapacityMw: expectedMw,
     expectedCapacityDisplay: formatMw(expectedMw, "—"),
-    referenceLocation: pole.referenceLocation || input.jibunAddress || input.address,
+    referenceLocation:
+      options?.referenceLocation ??
+      (pole.referenceLocation || input.jibunAddress || input.address),
     dataAsOfDate,
     selectedPoleId: pole.poleId,
     poles: [pole],
@@ -62,6 +71,9 @@ function buildFromPole(
     contacts,
     dataSource,
     dataSourceLabel: getGridDataSourceLabel(dataSource),
+    queryBasisLabel: buildQueryBasisLabel(dataSource, nearbyDistanceKm),
+    nearbyDistanceKm,
+    nearbyNotice: dataSource === "kepco-api-nearby" ? NEARBY_GRID_NOTICE : null,
     substation: pole.substation,
     transformer: pole.transformer,
     distributionLine: pole.distributionLine,
@@ -98,6 +110,9 @@ function buildUnknownState(
     contacts,
     dataSource: "none",
     dataSourceLabel: getGridDataSourceLabel("none"),
+    queryBasisLabel: null,
+    nearbyDistanceKm: null,
+    nearbyNotice: null,
     substation,
     transformer,
     distributionLine,
@@ -132,8 +147,16 @@ export async function resolveGridConnection(input: ResolveGridInput): Promise<Gr
   const kepco = await fetchKepcoGridByLocation(input);
   if (kepco?.poles.length) {
     const pole = selectPole(kepco.poles, input.poleId, input.jibunAddress) ?? kepco.poles[0];
+    const dataSource: GridDataSource =
+      kepco.matchType === "nearby" ? "kepco-api-nearby" : "kepco-api-direct";
     return {
-      ...buildFromPole(pole, input, kepco.dataAsOfDate, "kepco-api", contacts),
+      ...buildFromPole(pole, input, kepco.dataAsOfDate, dataSource, contacts, {
+        nearbyDistanceKm: kepco.nearbyDistanceKm,
+        referenceLocation:
+          kepco.matchType === "nearby" && kepco.nearbyReferenceAddress
+            ? kepco.nearbyReferenceAddress
+            : undefined,
+      }),
       poles: kepco.poles,
       contacts,
     };

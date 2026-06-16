@@ -1,5 +1,9 @@
 import { parseKepcoAddress } from "@/lib/grid/kepcoAddress";
 import {
+  findNearbyKepcoItem,
+  isDirectKepcoMatch,
+} from "@/lib/grid/kepcoNearby";
+import {
   getKepcoDispersedGenerationUrl,
   kepcoMetroCandidates,
   resolveKepcoRegionCodes,
@@ -11,6 +15,9 @@ import type { GridPoleOption } from "@/types/gridConnection";
 export interface KepcoGridApiResult {
   dataAsOfDate: string;
   poles: GridPoleOption[];
+  matchType: "direct" | "nearby";
+  nearbyDistanceKm: number | null;
+  nearbyReferenceAddress: string | null;
 }
 
 export interface KepcoDispersedGenerationItem {
@@ -59,7 +66,7 @@ function parsePowerMw(value: string | number | null | undefined): number | null 
   return Math.round((num / 1000) * 1000) / 1000;
 }
 
-function buildDispersedParamAttempts(
+function buildDirectParamAttempts(
   metroCandidates: string[],
   cityCd: string,
   parsed: { addrLidong: string; addrLi: string; addrJibun: string },
@@ -78,7 +85,6 @@ function buildDispersedParamAttempts(
       },
       { metroCd, cityCd, addrLidong: parsed.addrLidong, addrLi: parsed.addrLi },
       { metroCd, cityCd, addrLidong: parsed.addrLidong },
-      { metroCd, cityCd },
     ];
     for (const variant of variants) {
       const key = JSON.stringify(variant);
@@ -86,6 +92,24 @@ function buildDispersedParamAttempts(
       seen.add(key);
       attempts.push(variant);
     }
+  }
+
+  return attempts;
+}
+
+function buildCityWideParamAttempts(
+  metroCandidates: string[],
+  cityCd: string,
+): Record<string, string | undefined>[] {
+  const attempts: Record<string, string | undefined>[] = [];
+  const seen = new Set<string>();
+
+  for (const metroCd of metroCandidates) {
+    const variant = { metroCd, cityCd };
+    const key = JSON.stringify(variant);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    attempts.push(variant);
   }
 
   return attempts;
@@ -216,6 +240,34 @@ export function mapKepcoItemsForTest(
   return mapKepcoResponseToPoles(items, jibunAddress, target);
 }
 
+async function fetchDispersedItems(
+  apiKey: string,
+  attempts: Record<string, string | undefined>[],
+): Promise<KepcoDispersedGenerationItem[]> {
+  for (const attempt of attempts) {
+    try {
+      const result = await requestDispersedGeneration(apiKey, attempt);
+      if (result.payload.errCd === "401") {
+        console.warn("[Grid/KepcoAPI] Invalid API key", { errMsg: result.payload.errMsg });
+        return [];
+      }
+      const items = Array.isArray(result.payload.data) ? result.payload.data : [];
+      if (items.length) return items;
+    } catch (error) {
+      console.warn("[Grid/KepcoAPI] Network error:", error);
+      return [];
+    }
+  }
+  return [];
+}
+
+function mapSingleItemToPole(
+  item: KepcoDispersedGenerationItem,
+  referenceLocation: string,
+): GridPoleOption {
+  return mapItemToPole(item, referenceLocation);
+}
+
 /**
  * 한전 전력데이터개방포털 분산전원연계정보 API
  * https://www.data.go.kr/data/15147381/openapi.do
@@ -258,42 +310,41 @@ export async function fetchKepcoGridByLocation(input: {
   }
 
   const metroCandidates = kepcoMetroCandidates(kepcoMetroCd, metroCd);
-  const paramAttempts = buildDispersedParamAttempts(metroCandidates, cityCd, {
+  const target = {
     addrLidong: parsed.addrLidong,
     addrLi: parsed.addrLi,
     addrJibun: parsed.addrJibun,
-  });
+  };
+  const referenceLocation = input.jibunAddress || input.address;
 
-  let payload: KepcoDispersedGenerationResponse | null = null;
-  let httpStatus = 0;
+  // 1) 주소 기준 직접 조회
+  const directItems = await fetchDispersedItems(
+    apiKey,
+    buildDirectParamAttempts(metroCandidates, cityCd, target),
+  );
 
-  for (const attempt of paramAttempts) {
-    try {
-      const result = await requestDispersedGeneration(apiKey, attempt);
-      payload = result.payload;
-      httpStatus = result.httpStatus;
-
-      if (payload.errCd === "401") {
-        console.warn("[Grid/KepcoAPI] Invalid API key", { errMsg: payload.errMsg });
-        return null;
-      }
-
-      const items = Array.isArray(payload.data) ? payload.data : [];
-      if (items.length) break;
-    } catch (error) {
-      console.warn("[Grid/KepcoAPI] Network error:", error);
-      return null;
+  if (directItems.length && isDirectKepcoMatch(directItems, target)) {
+    const poles = mapKepcoResponseToPoles(directItems, referenceLocation, target);
+    if (poles.length) {
+      return {
+        dataAsOfDate: extractDataAsOfDate(directItems),
+        poles,
+        matchType: "direct",
+        nearbyDistanceKm: null,
+        nearbyReferenceAddress: null,
+      };
     }
   }
 
-  if (!payload) return null;
+  // 2) 시군구 전체 조회 → 좌표 기반 근접 탐색 (1km → 3km → 5km)
+  const cityItems = await fetchDispersedItems(
+    apiKey,
+    buildCityWideParamAttempts(metroCandidates, cityCd),
+  );
 
-  if (payload.errCd && !Array.isArray(payload.data)) {
-    console.warn("[Grid/KepcoAPI] API error", {
+  if (!cityItems.length) {
+    console.info("[Grid/KepcoAPI] No city-wide data for nearby search", {
       address: input.jibunAddress,
-      httpStatus,
-      errCd: payload.errCd,
-      errMsg: payload.errMsg,
       metroCd,
       cityCd,
       cityNm,
@@ -301,28 +352,29 @@ export async function fetchKepcoGridByLocation(input: {
     return null;
   }
 
-  const items = Array.isArray(payload.data) ? payload.data : [];
-  if (!items.length) {
-    console.info("[Grid/KepcoAPI] Empty data", {
+  const nearby = await findNearbyKepcoItem({
+    siteLat: input.lat,
+    siteLng: input.lng,
+    parsed,
+    items: cityItems,
+    target,
+  });
+
+  if (!nearby) {
+    console.info("[Grid/KepcoAPI] Nearby search found no match within 5km", {
       address: input.jibunAddress,
-      resultCode: payload.resultCode,
-      resultMessage: payload.resultMessage,
+      cityItemCount: cityItems.length,
     });
     return null;
   }
 
-  const referenceLocation = input.jibunAddress || input.address;
-  const poles = mapKepcoResponseToPoles(items, referenceLocation, {
-    addrLidong: parsed.addrLidong,
-    addrLi: parsed.addrLi,
-    addrJibun: parsed.addrJibun,
-  });
-
-  if (!poles.length) return null;
-
+  const pole = mapSingleItemToPole(nearby.item, nearby.referenceAddress);
   return {
-    dataAsOfDate: extractDataAsOfDate(items),
-    poles,
+    dataAsOfDate: extractDataAsOfDate([nearby.item]),
+    poles: [pole],
+    matchType: "nearby",
+    nearbyDistanceKm: nearby.distanceKm,
+    nearbyReferenceAddress: nearby.referenceAddress,
   };
 }
 
@@ -384,11 +436,15 @@ export async function debugKepcoDispersedGeneration(input: {
   }
 
   const metroCandidates = kepcoMetroCandidates(regionCodes.kepcoMetroCd, regionCodes.metroCd);
-  const paramAttempts = buildDispersedParamAttempts(metroCandidates, regionCodes.cityCd, {
+  const target = {
     addrLidong: parsed.addrLidong,
     addrLi: parsed.addrLi,
     addrJibun: parsed.addrJibun,
-  });
+  };
+  const paramAttempts = [
+    ...buildDirectParamAttempts(metroCandidates, regionCodes.cityCd, target),
+    ...buildCityWideParamAttempts(metroCandidates, regionCodes.cityCd),
+  ];
   const requestParams: Record<string, string> = {
     returnType: "json",
     ...Object.fromEntries(
@@ -420,11 +476,6 @@ export async function debugKepcoDispersedGeneration(input: {
   }
 
   const items = Array.isArray(rawResponse?.data) ? rawResponse!.data! : [];
-  const target = {
-    addrLidong: parsed.addrLidong,
-    addrLi: parsed.addrLi,
-    addrJibun: parsed.addrJibun,
-  };
   const selectedItem = selectBestDispersedItem(items, target);
   const mappedPoles = items.length
     ? mapKepcoResponseToPoles(items, input.jibunAddress, target)

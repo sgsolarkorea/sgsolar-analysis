@@ -1,7 +1,11 @@
 /** 계통 연계 판정 상태 — 확정 표현(가능/불가) 사용 금지 */
 export type GridConnectionStatus = "high" | "review" | "difficult" | "unknown";
 
-export type GridDataSource = "kepco-api" | "admin" | "derived" | "none";
+export type GridDataSource =
+  | "kepco-api-direct"
+  | "kepco-api-nearby"
+  | "admin"
+  | "none";
 
 export interface GridLevelCapacity {
   name: string;
@@ -58,6 +62,12 @@ export interface GridConnectionInfo {
   contacts: GridContactInfo;
   dataSource: GridDataSource;
   dataSourceLabel: string;
+  /** 직접/인근 조회 기준 라벨 (예: 해당 위치 기준, 인근 2.4km 변압기 기준) */
+  queryBasisLabel: string | null;
+  /** 인근 조회 시 거리(km) */
+  nearbyDistanceKm: number | null;
+  /** 인근 조회 안내 문구 */
+  nearbyNotice: string | null;
   /** 3개 박스용 — 선택된 전주 기준 */
   substation: GridLevelCapacity;
   transformer: GridLevelCapacity;

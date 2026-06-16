@@ -312,6 +312,28 @@ function drawGridPage(page: PDFPage, font: PDFFont, fontBold: PDFFont, data: Res
     );
     y -= 140;
   } else {
+    if (grid.queryBasisLabel) {
+      page.drawText(`조회 기준: ${grid.queryBasisLabel}`, {
+        x: MARGIN,
+        y,
+        size: 9,
+        font: fontBold,
+        color: rgbColor(COLORS.slate),
+      });
+      y -= 16;
+    }
+    if (grid.nearbyNotice) {
+      page.drawText(`※ ${grid.nearbyNotice}`, {
+        x: MARGIN,
+        y,
+        size: 8,
+        font,
+        color: rgbColor(COLORS.slate),
+        maxWidth: PAGE.width - MARGIN * 2,
+      });
+      y -= 28;
+    }
+
     const cols = [
       { label: "구분", substation: "변전소", transformer: "MTR", dl: "D/L" },
       {

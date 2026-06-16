@@ -9,6 +9,7 @@ export async function POST(request: Request) {
     jibunAddress?: string;
     capacityKw?: number;
     poleId?: string;
+    pnu?: string;
   } | null;
 
   if (body?.lat == null || body?.lng == null || !body.address) {
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
     jibunAddress: body.jibunAddress ?? body.address,
     capacityKw: body.capacityKw ?? 0,
     poleId: body.poleId,
+    pnu: body.pnu,
   });
 
   return NextResponse.json({ gridInfo });
