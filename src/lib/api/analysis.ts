@@ -56,6 +56,8 @@ export async function getGridInfo(input: {
   address: string;
   jibunAddress: string;
   capacityKw: number;
+  pnu?: string;
+  poleId?: string;
 }): Promise<GridInfo> {
   const { resolveGridConnection } = await import("@/lib/grid/resolve");
   return resolveGridConnection(input);
@@ -228,6 +230,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     address: geo.address,
     jibunAddress: geo.jibunAddress,
     capacityKw: solarMetrics.capacityKw,
+    pnu: effectivePnu ?? undefined,
   });
   const regionDistrictAnalysis = resolveRegionDistrictAnalysis(landInfo, landInfoDetail);
 

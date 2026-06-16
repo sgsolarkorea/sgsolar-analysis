@@ -36,6 +36,17 @@ const cases = [
     },
   },
   {
+    name: "아산 방현리 258-7 (KEPCO 파라미터)",
+    input: {
+      lat: 36.79,
+      lng: 127.01,
+      address: "충청남도 아산시 염치읍 방현리 258-7",
+      jibunAddress: "충청남도 아산시 염치읍 방현리 258-7",
+      pnu: "4420025031102580007",
+      capacityKw: 500,
+    },
+  },
+  {
     name: "데이터 없음 (임의 주소)",
     input: {
       lat: 36.5,

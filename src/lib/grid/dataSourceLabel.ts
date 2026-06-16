@@ -3,7 +3,7 @@ import type { GridDataSource } from "@/types/gridConnection";
 export function getGridDataSourceLabel(source: GridDataSource): string {
   switch (source) {
     case "kepco-api":
-      return "데이터 출처 : 공개 데이터 기반 1차 검토";
+      return "데이터 출처 : 한전 분산전원 연계정보 API 기반 1차 검토";
     case "admin":
       return "데이터 출처 : 관리자 등록 데이터";
     case "derived":

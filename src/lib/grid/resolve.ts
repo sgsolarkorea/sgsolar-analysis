@@ -25,6 +25,7 @@ export interface ResolveGridInput {
   address: string;
   jibunAddress: string;
   capacityKw: number;
+  pnu?: string;
   poleId?: string;
 }
 

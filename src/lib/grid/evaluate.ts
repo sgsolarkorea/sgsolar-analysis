@@ -2,6 +2,32 @@ import type { GridConnectionStatus, GridPoleOption } from "@/types/gridConnectio
 
 export const GRID_UNKNOWN_VALUE = "미확인";
 
+/** KEPCO D/L 잔여용량 — vol3 → vol2 → vol1 순 fallback (kW 원값) */
+export function pickDlRemainingKw(input: {
+  vol1?: string | number | null;
+  vol2?: string | number | null;
+  vol3?: string | number | null;
+}): number | null {
+  for (const key of ["vol3", "vol2", "vol1"] as const) {
+    const raw = input[key];
+    if (raw == null || raw === "") continue;
+    const num = typeof raw === "number" ? raw : Number(String(raw).replace(/,/g, ""));
+    if (Number.isFinite(num) && num >= 0) return num;
+  }
+  return null;
+}
+
+/** KEPCO D/L 잔여용량 MW (vol3 → vol2 → vol1) */
+export function pickDlRemainingMw(input: {
+  vol1?: string | number | null;
+  vol2?: string | number | null;
+  vol3?: string | number | null;
+}): number | null {
+  const kw = pickDlRemainingKw(input);
+  if (kw == null) return null;
+  return Math.round((kw / 1000) * 1000) / 1000;
+}
+
 export const GRID_STATUS_LABELS: Record<GridConnectionStatus, string> = {
   high: "연계 가능성 높음",
   review: "추가 확인 필요",
@@ -12,7 +38,7 @@ export const GRID_STATUS_LABELS: Record<GridConnectionStatus, string> = {
 export const GRID_DISCLAIMER_TEXT =
   "본 결과는 공개 데이터 기반 1차 검토이며 실제 계통 연계 가능 여부는 한전 접수 및 선로 검토 후 확정됩니다.";
 
-/** D/L 잔여용량을 1차 기준으로 판정 */
+/** D/L 잔여용량(vol3→vol2→vol1)을 1차 기준으로 판정 */
 export function pickBottleneckRemainingMw(pole: GridPoleOption): number | null {
   const dl = pole.distributionLine.remainingMw;
   if (dl != null && dl >= 0) return dl;
