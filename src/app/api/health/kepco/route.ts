@@ -10,13 +10,16 @@ const DEFAULT_PNU = "4420025031102580007";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const address = searchParams.get("address")?.trim() || DEFAULT_ADDRESS;
-  const pnu = searchParams.get("pnu")?.trim() || DEFAULT_PNU;
+  const pnu = searchParams.has("pnu") ? searchParams.get("pnu")?.trim() || undefined : DEFAULT_PNU;
 
   const debug = await debugKepcoDispersedGeneration({ jibunAddress: address, pnu });
 
   const apiKey =
     process.env.KEPCO_DATA_API_KEY?.trim() || process.env.BIGDATA_KEPCO_API_KEY?.trim();
-  const chungnamCities = apiKey ? await listKepcoCityCodes("44", apiKey) : [];
+  const chungnamCities =
+    apiKey && debug.parsed?.sido
+      ? await listKepcoCityCodes("44", apiKey, debug.parsed.sido)
+      : [];
   const asanCandidates = chungnamCities.filter((item) => item.name.includes("아산"));
 
   const gridInfo = await resolveGridConnection({

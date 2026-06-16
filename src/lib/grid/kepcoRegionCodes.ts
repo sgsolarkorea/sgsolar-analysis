@@ -188,6 +188,11 @@ export async function resolveKepcoRegionCodes(input: {
     return { metroCd: null, cityCd: null, cityNm: null };
   }
 
+  const staticCity = staticCityLookup(metroCd, input.sigungu);
+  if (staticCity) {
+    return { metroCd, cityCd: staticCity, cityNm: input.sigungu };
+  }
+
   try {
     const cityCodes = await getCityCodesForMetro(metroCd, input.apiKey, input.sido);
     const cityCd = matchCityCode(input.sigungu, cityCodes);
@@ -200,11 +205,6 @@ export async function resolveKepcoRegionCodes(input: {
     console.warn("[Grid/KepcoAPI] cityCd lookup failed:", error);
   }
 
-  const staticCity = staticCityLookup(metroCd, input.sigungu);
-  if (staticCity) {
-    return { metroCd, cityCd: staticCity, cityNm: input.sigungu };
-  }
-
   return { metroCd, cityCd: null, cityNm: null };
 }
 
@@ -212,8 +212,9 @@ export async function resolveKepcoRegionCodes(input: {
 export async function listKepcoCityCodes(
   metroCd: string,
   apiKey: string,
+  sido?: string,
 ): Promise<Array<{ code: string; name: string; uppoCd?: string; uppoCdNm?: string }>> {
-  const items = await getCityCodesForMetro(metroCd, apiKey);
+  const items = await getCityCodesForMetro(metroCd, apiKey, sido);
   return items
     .map((item) => ({
       code: item.code?.trim() ?? "",
