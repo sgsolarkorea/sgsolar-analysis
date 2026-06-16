@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { debugKepcoDispersedGeneration } from "@/lib/grid/kepcoApi";
-import { listKepcoCityCodes } from "@/lib/grid/kepcoRegionCodes";
+import { listKepcoCityCodes, listKepcoLglCityCodes } from "@/lib/grid/kepcoRegionCodes";
 import { resolveGridConnection } from "@/lib/grid/resolve";
 
 const DEFAULT_ADDRESS = "충청남도 아산시 염치읍 방현리 258-7";
@@ -21,6 +21,11 @@ export async function GET(request: Request) {
       ? await listKepcoCityCodes("44", apiKey, debug.parsed.sido)
       : [];
   const asanCandidates = chungnamCities.filter((item) => item.name.includes("아산"));
+  const chungnamLglCities =
+    apiKey && debug.parsed?.sido
+      ? await listKepcoLglCityCodes("44", apiKey, debug.parsed.sido)
+      : [];
+  const asanLglCandidates = chungnamLglCities.filter((item) => item.name.includes("아산"));
 
   const gridInfo = await resolveGridConnection({
     lat: 36.79,
@@ -41,8 +46,11 @@ export async function GET(request: Request) {
     selectedItem: debug.selectedItem,
     mappedPoles: debug.mappedPoles,
     asanCandidates,
+    asanLglCandidates,
     chungnamCityCount: chungnamCities.length,
+    chungnamLglCityCount: chungnamLglCities.length,
     chungnamCities: searchParams.get("includeCities") === "1" ? chungnamCities : undefined,
+    chungnamLglCities: searchParams.get("includeCities") === "1" ? chungnamLglCities : undefined,
     gridInfo: {
       dataSource: gridInfo.dataSource,
       dataSourceLabel: gridInfo.dataSourceLabel,
