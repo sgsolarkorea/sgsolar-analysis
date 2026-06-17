@@ -32,6 +32,16 @@ interface LayoutParams {
   tiltDeg: number;
 }
 
+interface OrientedPoly {
+  origin: LatLngPoint;
+  angleRad: number;
+  localPoly: LocalPoint[];
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
 function getLayoutParams(
   installType: InstallTypeOption | string,
   capacityKw: number,
@@ -61,60 +71,7 @@ function makePortraitModuleRect(
   };
 }
 
-function dist(a: LocalPoint, b: LocalPoint): number {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-/** 목표 모듈수만큼 사용 영역 전체에 균등 분산 */
-function selectSpreadSlots(slots: LocalPoint[], count: number): LocalPoint[] {
-  if (slots.length <= count) return slots;
-  const selected: LocalPoint[] = [];
-  const remaining = [...slots];
-
-  const cx = slots.reduce((sum, p) => sum + p.x, 0) / slots.length;
-  const cy = slots.reduce((sum, p) => sum + p.y, 0) / slots.length;
-  let firstIdx = 0;
-  let firstDist = Infinity;
-  for (let i = 0; i < remaining.length; i++) {
-    const d = dist(remaining[i], { x: cx, y: cy });
-    if (d < firstDist) {
-      firstDist = d;
-      firstIdx = i;
-    }
-  }
-  selected.push(remaining[firstIdx]);
-  remaining.splice(firstIdx, 1);
-
-  while (selected.length < count && remaining.length > 0) {
-    let bestIdx = 0;
-    let bestScore = -1;
-    for (let i = 0; i < remaining.length; i++) {
-      const minDist = Math.min(...selected.map((s) => dist(s, remaining[i])));
-      if (minDist > bestScore) {
-        bestScore = minDist;
-        bestIdx = i;
-      }
-    }
-    selected.push(remaining[bestIdx]);
-    remaining.splice(bestIdx, 1);
-  }
-  return selected;
-}
-
-/**
- * 사용 가능 영역 전체에 그리드 슬롯 생성 → 목표 모듈수만큼 균등 분산 배치
- * - 통판형: 모듈 밀착, 행간 없음
- * - Row: 행 내 밀착, 행 간만 이격
- */
-function placeModulesDistributed(
-  polygon: LatLngPoint[],
-  targetCount: number,
-  params: LayoutParams,
-): ModuleRect[] {
-  if (targetCount <= 0 || polygon.length < 3) return [];
-
+function toOrientedPoly(polygon: LatLngPoint[]): OrientedPoly {
   const origin = computeOrientedBounds(polygon).origin;
   const angleRad = computePolygonOrientation(polygon);
   const localPoly = toLocal(polygon, origin).map((p) => {
@@ -134,36 +91,61 @@ function placeModulesDistributed(
     maxY = Math.max(maxY, point.y);
   }
 
-  const { widthM, heightM, colGapM } = getVisualModuleDimensions(params.mode);
-  const rowGapM =
-    params.mode === "row"
-      ? getVisualRowSpacingM(params.kind, params.mode)
-      : getVisualModuleDimensions(params.mode).rowGapM;
+  return { origin, angleRad, localPoly, minX, maxX, minY, maxY };
+}
 
-  const slots: LocalPoint[] = [];
+function resolveModuleScale(
+  polyWidth: number,
+  polyHeight: number,
+  targetCount: number,
+  mode: ModuleLayoutMode,
+): number {
+  const base = moduleLayoutConfig.visualScale;
+  const moduleUnitArea = moduleLayoutConfig.moduleShortM * moduleLayoutConfig.moduleLongM;
+  const polyArea = Math.max(polyWidth * polyHeight, 1);
+  const fillTarget = mode === "flush" ? 0.68 : 0.55;
+  const ideal = Math.sqrt((polyArea * fillTarget) / Math.max(targetCount * moduleUnitArea, 1));
+  return Math.min(Math.max(ideal, base * 0.82), base * 1.18);
+}
+
+/**
+ * 사용 가능 영역 전체를 행 단위로 스캔하며 목표 모듈수 배치.
+ * 통판형: 모듈 밀착·행간 없음. Row: 행 내 밀착·행 간만 이격.
+ */
+function placeModulesInFootprint(
+  polygon: LatLngPoint[],
+  targetCount: number,
+  params: LayoutParams,
+): ModuleRect[] {
+  if (targetCount <= 0 || polygon.length < 3) return [];
+
+  const { origin, angleRad, localPoly, minX, maxX, minY, maxY } = toOrientedPoly(polygon);
+  const polyWidth = maxX - minX;
+  const polyHeight = maxY - minY;
+
+  const scale = resolveModuleScale(polyWidth, polyHeight, targetCount, params.mode);
+  const widthM = moduleLayoutConfig.moduleShortM * scale;
+  const heightM = moduleLayoutConfig.moduleLongM * scale;
+  const colGapM = 0;
+  const rowGapM =
+    params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
+
+  const modules: ModuleRect[] = [];
   let y = minY;
-  while (y + heightM <= maxY + 0.001) {
+
+  while (y + heightM <= maxY + 0.001 && modules.length < targetCount) {
     let x = minX;
-    while (x + widthM <= maxX + 0.001) {
+    while (x + widthM <= maxX + 0.001 && modules.length < targetCount) {
       const center = { x: x + widthM / 2, y: y + heightM / 2 };
       if (pointInPolygon(center, localPoly)) {
-        slots.push({ x, y });
+        modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin, angleRad));
       }
       x += widthM + colGapM;
     }
     y += heightM + rowGapM;
   }
 
-  if (slots.length === 0) {
-    const cx = (minX + maxX) / 2 - widthM / 2;
-    const cy = (minY + maxY) / 2 - heightM / 2;
-    slots.push({ x: cx, y: cy });
-  }
-
-  const selected = selectSpreadSlots(slots, targetCount);
-  return selected.map(({ x, y }) =>
-    makePortraitModuleRect(x, y, widthM, heightM, origin, angleRad),
-  );
+  return modules.slice(0, targetCount);
 }
 
 export function createVirtualParcelRectangle(
@@ -202,7 +184,7 @@ export function computeModuleLayout(input: {
       ? Math.floor(input.moduleCount)
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
-  const modules = placeModulesDistributed(input.boundary, targetModuleCount, params);
+  const modules = placeModulesInFootprint(input.boundary, targetModuleCount, params);
   const origin = computeOrientedBounds(input.boundary).origin;
 
   let bounds = {
@@ -214,8 +196,8 @@ export function computeModuleLayout(input: {
   for (const point of input.boundary) {
     bounds.minLat = Math.min(bounds.minLat, point.lat);
     bounds.maxLat = Math.max(bounds.maxLat, point.lat);
-    bounds.minLng = Math.min(bounds.minLng, point.lng);
     bounds.maxLng = Math.max(bounds.maxLng, point.lng);
+    bounds.minLng = Math.min(bounds.minLng, point.lng);
   }
   for (const mod of modules) {
     for (const corner of mod.corners) {

@@ -361,24 +361,14 @@ function drawModuleLayoutPage(
           borderColor: moduleEdge,
           borderWidth: 0.55,
         });
-        for (let c = 1; c < 4; c++) {
-          const x = minX + (w * c) / 4;
-          page.drawLine({
-            start: { x, y: minY },
-            end: { x, y: maxY },
-            thickness: 0.25,
-            color: cellLine,
-            opacity: 0.5,
-          });
-        }
-        for (let r = 1; r < 3; r++) {
+        for (let r = 1; r <= 2; r++) {
           const yLine = minY + (h * r) / 3;
           page.drawLine({
-            start: { x: minX, y: yLine },
-            end: { x: maxX, y: yLine },
-            thickness: 0.2,
+            start: { x: minX + w * 0.04, y: yLine },
+            end: { x: maxX - w * 0.04, y: yLine },
+            thickness: 0.15,
             color: cellLine,
-            opacity: 0.4,
+            opacity: 0.25,
           });
         }
       }

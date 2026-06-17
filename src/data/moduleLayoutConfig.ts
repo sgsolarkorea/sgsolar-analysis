@@ -12,8 +12,8 @@ export const moduleLayoutConfig = {
   moduleLongM: 2.61,
   tiers: 2,
   tierGapM: 0.05,
-  /** 통판형: 모듈 간 최소 간격 (m) — 밀착 */
-  flushColGapM: 0.01,
+  /** 통판형: 모듈 간격 없음 — 밀착 */
+  flushColGapM: 0,
   /** 통판형: 행 간격 없음 */
   flushRowGapM: 0,
   /** 지붕 setback (m) */
@@ -38,7 +38,7 @@ export const moduleLayoutConfig = {
     moduleCell: "#475569",
     moduleHighlight: "rgba(148, 163, 184, 0.4)",
     boundary: "#f59e0b",
-    boundaryFill: "rgba(245, 158, 11, 0.38)",
+    boundaryFill: "rgba(245, 158, 11, 0.42)",
   },
   disclaimer:
     "본 배치도는 자동 산정된 참고용 가배치도입니다. 실제 설계 시 음영, 구조물, 경사도, 이격거리 및 인허가 조건에 따라 변경될 수 있습니다.",
@@ -78,8 +78,8 @@ export function getVisualModuleDimensions(mode: ModuleLayoutMode): VisualModuleD
     return {
       widthM: moduleLayoutConfig.moduleShortM * scale,
       heightM: moduleLayoutConfig.moduleLongM * scale,
-      colGapM: moduleLayoutConfig.flushColGapM * scale,
-      rowGapM: moduleLayoutConfig.flushRowGapM,
+      colGapM: 0,
+      rowGapM: 0,
     };
   }
   return {

@@ -33,37 +33,30 @@ function CompassRose() {
   );
 }
 
+/** 640W 모듈 1장 — 세로형 패널, 셀 그리드 최소화 */
 function renderSolarModuleSvg(minX: number, minY: number, maxX: number, maxY: number): string {
   const w = maxX - minX;
   const h = maxY - minY;
-  const frame = Math.max(0.6, Math.min(w, h) * 0.04);
+  const frame = Math.max(0.5, Math.min(w, h) * 0.035);
   const ix = minX + frame;
   const iy = minY + frame;
   const iw = w - frame * 2;
   const ih = h - frame * 2;
 
-  const cellLines: string[] = [];
-  const cols = 6;
-  const rows = 10;
-  for (let c = 1; c < cols; c++) {
-    const x = ix + (iw * c) / cols;
-    cellLines.push(
-      `<line x1="${x}" y1="${iy}" x2="${x}" y2="${iy + ih}" stroke="${moduleCell}" stroke-width="0.25" opacity="0.55" />`,
-    );
-  }
-  for (let r = 1; r < rows; r++) {
-    const y = iy + (ih * r) / rows;
-    cellLines.push(
-      `<line x1="${ix}" y1="${y}" x2="${ix + iw}" y2="${y}" stroke="${moduleCell}" stroke-width="0.2" opacity="0.45" />`,
+  const subtleLines: string[] = [];
+  for (let r = 1; r <= 2; r++) {
+    const y = iy + (ih * r) / 3;
+    subtleLines.push(
+      `<line x1="${ix}" y1="${y}" x2="${ix + iw}" y2="${y}" stroke="${moduleCell}" stroke-width="0.2" opacity="0.25" />`,
     );
   }
 
-  const highlightW = iw * 0.35;
+  const highlightW = iw * 0.28;
   return `<g>
-    <rect x="${minX}" y="${minY}" width="${w}" height="${h}" rx="0.4" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.65" />
+    <rect x="${minX}" y="${minY}" width="${w}" height="${h}" rx="0.35" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.55" />
     <rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="url(#panelFace)" stroke="none" />
-    ${cellLines.join("")}
-    <rect x="${ix + iw * 0.08}" y="${iy + ih * 0.06}" width="${highlightW}" height="${ih * 0.12}" rx="0.3" fill="${moduleHighlight}" opacity="0.7" />
+    ${subtleLines.join("")}
+    <rect x="${ix + iw * 0.06}" y="${iy + ih * 0.05}" width="${highlightW}" height="${ih * 0.1}" rx="0.25" fill="${moduleHighlight}" opacity="0.55" />
   </g>`;
 }
 
@@ -127,8 +120,8 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
           <stop offset="100%" stop-color="#0f172a" />
         </linearGradient>
         <linearGradient id="panelFace" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.35" />
-          <stop offset="35%" stop-color="#1e293b" stop-opacity="0.95" />
+          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.3" />
+          <stop offset="40%" stop-color="#1e293b" stop-opacity="0.95" />
           <stop offset="100%" stop-color="#020617" stop-opacity="1" />
         </linearGradient>
       </defs>
