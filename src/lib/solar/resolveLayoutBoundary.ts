@@ -46,7 +46,7 @@ export async function resolveLayoutBoundary(input: {
   const cadastralRing = await resolveCadastralRing(input.pnu, input.lat, input.lng);
 
   if (!isLand) {
-    if (cadastralRing && input.pnu) {
+    if (input.pnu) {
       const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
       if (building?.ring?.length) {
         return {

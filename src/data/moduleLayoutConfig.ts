@@ -90,12 +90,11 @@ export function getVisualModuleDimensions(mode: ModuleLayoutMode): VisualModuleD
   };
 }
 
-/** Row 모드 행간 이격 (m) — 중대형 현장만 */
+/** Row 모드 행간 이격 (m) — 실제 미터 단위 */
 export function getVisualRowSpacingM(
   kind: ModuleLayoutInstallKind,
   mode: ModuleLayoutMode,
 ): number {
   if (mode !== "row") return 0;
-  const spec = moduleLayoutConfig[kind];
-  return spec.rowSpacingM * moduleLayoutConfig.visualScale * 0.42;
+  return moduleLayoutConfig[kind].rowSpacingM;
 }
