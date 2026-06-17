@@ -473,6 +473,12 @@ export interface CadastralPolygonResult {
   ring: Array<{ lat: number; lng: number }>;
 }
 
+function buildSearchBox(lat: number, lng: number, radiusM: number): string {
+  const dLng = radiusM / (111_320 * Math.cos((lat * Math.PI) / 180));
+  const dLat = radiusM / 110_540;
+  return `BOX(${lng - dLng},${lat - dLat},${lng + dLng},${lat + dLat})`;
+}
+
 function cadastralRingFromFeatures(
   features: VworldFeatureWithGeometry[],
   pnu: string,
@@ -504,26 +510,32 @@ export async function fetchCadastralPolygonByPnu(
   const apiKey = process.env.VWORLD_API_KEY?.trim();
   if (!apiKey || !pnu) return null;
 
-  // 도로명 지오코딩 좌표가 필지 밖일 수 있어 PNU 단독 조회를 먼저 시도
-  const geomFilters = [
-    null,
-    `POINT(${lng} ${lat})`,
-    `BUFFER(POINT(${lng} ${lat}), 40)`,
-  ] as const;
+  // 도로명 좌표가 필지 밖일 수 있어 PNU 단독 → POINT → BOX 순으로 시도
+  const queryPlans: Array<{ geomFilter: string | null; attrFilter: boolean; size: number }> = [
+    { geomFilter: null, attrFilter: true, size: 5 },
+    { geomFilter: `POINT(${lng} ${lat})`, attrFilter: true, size: 5 },
+    ...([80, 160, 320] as const).flatMap((radiusM) => {
+      const box = buildSearchBox(lat, lng, radiusM);
+      return [
+        { geomFilter: box, attrFilter: true, size: 10 },
+        { geomFilter: box, attrFilter: false, size: 50 },
+      ];
+    }),
+  ];
 
-  for (const geomFilter of geomFilters) {
+  for (const plan of queryPlans) {
     for (const domain of getApiDomainCandidates()) {
       const params = buildDataApiParams(apiKey, domain);
       params.set("service", "data");
       params.set("request", "GetFeature");
       params.set("data", "LP_PA_CBND_BUBUN");
-      params.set("size", "5");
+      params.set("size", String(plan.size));
       params.set("page", "1");
       params.set("geometry", "true");
       params.set("attribute", "true");
       params.set("crs", "EPSG:4326");
-      params.set("attrFilter", `pnu:EQ:${pnu}`);
-      if (geomFilter) params.set("geomFilter", geomFilter);
+      if (plan.attrFilter) params.set("attrFilter", `pnu:=:${pnu}`);
+      if (plan.geomFilter) params.set("geomFilter", plan.geomFilter);
 
       const data = await fetchVworldJson<
         VworldDataResponse & {
@@ -640,7 +652,7 @@ async function fetchBuildingPolygonFromDataLayer(
   dataLayer: string,
   apiKey: string,
 ): Promise<BuildingPolygonResult | null> {
-  const geomFilters = [null, `POINT(${lng} ${lat})`] as const;
+  const geomFilters = [null, `POINT(${lng} ${lat})`, buildSearchBox(lat, lng, 120)] as const;
 
   for (const geomFilter of geomFilters) {
     for (const domain of getApiDomainCandidates()) {
@@ -653,7 +665,7 @@ async function fetchBuildingPolygonFromDataLayer(
       params.set("geometry", "true");
       params.set("attribute", "true");
       params.set("crs", "EPSG:4326");
-      params.set("attrFilter", `pnu:EQ:${pnu}`);
+      params.set("attrFilter", `pnu:=:${pnu}`);
       if (geomFilter) params.set("geomFilter", geomFilter);
 
       const data = await fetchVworldJson<
