@@ -14,6 +14,7 @@ import {
   computePolygonOrientation,
   localToGeo,
   pointInPolygon,
+  polygonAreaSqm,
   toLocal,
   type LocalPoint,
 } from "@/lib/solar/polygonGeometry";
@@ -160,18 +161,53 @@ function selectSlotsForTarget(
   slots: ModuleSlot[],
   targetCount: number,
   heightM: number,
-): ModuleSlot[] {
-  if (targetCount <= 0 || slots.length === 0) return [];
-  if (slots.length <= targetCount) return slots;
+): { selected: ModuleSlot[]; rowModuleCounts: number[] } {
+  if (targetCount <= 0 || slots.length === 0) {
+    return { selected: [], rowModuleCounts: [] };
+  }
+  if (slots.length <= targetCount) {
+    return {
+      selected: slots,
+      rowModuleCounts: groupSlotsByRow(slots, heightM).map((row) => row.length),
+    };
+  }
 
   const selected: ModuleSlot[] = [];
+  const rowModuleCounts: number[] = [];
   for (const row of groupSlotsByRow(slots, heightM)) {
+    let rowTaken = 0;
     for (const slot of row) {
       selected.push(slot);
-      if (selected.length >= targetCount) return selected;
+      rowTaken++;
+      if (selected.length >= targetCount) {
+        rowModuleCounts.push(rowTaken);
+        return { selected, rowModuleCounts };
+      }
     }
+    if (rowTaken > 0) rowModuleCounts.push(rowTaken);
   }
-  return selected;
+  return { selected, rowModuleCounts };
+}
+
+function moduleRectsFootprintSqm(modules: ModuleRect[]): number {
+  let total = 0;
+  for (const mod of modules) {
+    const origin = mod.corners[0];
+    const local = toLocal([...mod.corners], origin);
+    let sum = 0;
+    for (let i = 0; i < local.length; i++) {
+      const j = (i + 1) % local.length;
+      sum += local[i].x * local[j].y - local[j].x * local[i].y;
+    }
+    total += Math.abs(sum) / 2;
+  }
+  return total;
+}
+
+interface FootprintPlacement {
+  modules: ModuleRect[];
+  validSlotCount: number;
+  rowModuleCounts: number[];
 }
 
 /**
@@ -182,8 +218,10 @@ function placeModulesInFootprint(
   polygon: LatLngPoint[],
   targetCount: number,
   params: LayoutParams,
-): ModuleRect[] {
-  if (targetCount <= 0 || polygon.length < 3) return [];
+): FootprintPlacement {
+  if (targetCount <= 0 || polygon.length < 3) {
+    return { modules: [], validSlotCount: 0, rowModuleCounts: [] };
+  }
 
   const oriented = toOrientedPoly(polygon);
   const scale = moduleLayoutConfig.visualScale;
@@ -193,11 +231,13 @@ function placeModulesInFootprint(
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
   const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
-  const selected = selectSlotsForTarget(slots, targetCount, heightM);
+  const { selected, rowModuleCounts } = selectSlotsForTarget(slots, targetCount, heightM);
 
-  return selected.map((slot) =>
+  const modules = selected.map((slot) =>
     makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
   );
+
+  return { modules, validSlotCount: slots.length, rowModuleCounts };
 }
 
 export function createVirtualParcelRectangle(
@@ -238,7 +278,16 @@ export function computeModuleLayout(input: {
       ? Math.floor(input.moduleCount)
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
-  const modules = placeModulesInFootprint(input.boundary, targetModuleCount, params);
+  const { modules, validSlotCount, rowModuleCounts } = placeModulesInFootprint(
+    input.boundary,
+    targetModuleCount,
+    params,
+  );
+  const usableAreaSqm = polygonAreaSqm(input.boundary);
+  const footprintSqm = moduleRectsFootprintSqm(modules);
+  const polygonUtilizationPct =
+    usableAreaSqm > 0 ? Math.round((footprintSqm / usableAreaSqm) * 1000) / 10 : 0;
+
   const origin =
     input.boundary.length >= 3
       ? computeOrientedBounds(input.boundary).origin
@@ -284,6 +333,10 @@ export function computeModuleLayout(input: {
       rowSpacingM: params.rowSpacingM,
       tiltDeg: params.tiltDeg,
       installType: input.installType,
+      validSlotCount,
+      layoutRowCount: rowModuleCounts.length,
+      rowModuleCounts,
+      polygonUtilizationPct,
     },
   };
 }

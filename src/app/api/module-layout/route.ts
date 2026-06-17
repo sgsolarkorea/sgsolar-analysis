@@ -22,6 +22,10 @@ function buildDiagnostics(input: {
   targetModuleCount: number;
   placedModuleCount: number;
   layoutMode: ModuleLayoutDiagnostics["layoutMode"];
+  validSlotCount: number;
+  layoutRowCount: number;
+  rowModuleCounts: number[];
+  polygonUtilizationPct: number;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   return {
@@ -33,6 +37,11 @@ function buildDiagnostics(input: {
     placedModuleCount: input.placedModuleCount,
     layoutMode: input.layoutMode,
     orientationDegrees: Math.round(((orientationRad * 180) / Math.PI) * 100) / 100,
+    validSlotCount: input.validSlotCount,
+    layoutRowCount: input.layoutRowCount,
+    rowModuleCounts: input.rowModuleCounts,
+    polygonUtilizationPct: input.polygonUtilizationPct,
+    renderModuleCount: input.placedModuleCount,
   };
 }
 
@@ -103,6 +112,10 @@ export async function GET(request: Request) {
     targetModuleCount: layout.stats.targetModuleCount,
     placedModuleCount: layout.stats.placedModuleCount,
     layoutMode: layout.stats.layoutMode,
+    validSlotCount: layout.stats.validSlotCount,
+    layoutRowCount: layout.stats.layoutRowCount,
+    rowModuleCounts: layout.stats.rowModuleCounts,
+    polygonUtilizationPct: layout.stats.polygonUtilizationPct,
   });
 
   if (!overlayOnly && layout.stats.placedModuleCount <= 0) {

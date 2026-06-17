@@ -21,6 +21,14 @@ export interface ModuleLayoutStats {
   rowSpacingM: number;
   tiltDeg: number;
   installType: string;
+  /** Polygon 내부 4꼭짓점 검증 통과 슬롯 수 */
+  validSlotCount: number;
+  /** 실제 배치 Row 수 */
+  layoutRowCount: number;
+  /** Row별 배치 모듈 수 */
+  rowModuleCounts: number[];
+  /** 배치 모듈 footprint / usableArea (%) */
+  polygonUtilizationPct: number;
 }
 
 /** Polygon 인식·배치 진단 (검증용) */
@@ -36,6 +44,12 @@ export interface ModuleLayoutDiagnostics {
   layoutMode: ModuleLayoutMode;
   /** 장축 방향 (도, 0=동쪽 기준 반시계) */
   orientationDegrees: number;
+  validSlotCount: number;
+  layoutRowCount: number;
+  rowModuleCounts: number[];
+  polygonUtilizationPct: number;
+  /** SVG 렌더 대상 (= placedModuleCount, 상한 없음) */
+  renderModuleCount: number;
 }
 
 export interface ModuleLayoutResult {

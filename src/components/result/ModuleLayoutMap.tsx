@@ -19,7 +19,7 @@ interface ModuleLayoutMapProps {
 }
 
 const JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY?.trim() ?? "";
-const { boundaryFill, moduleFrame, moduleCell, moduleHighlight } = moduleLayoutConfig.colors;
+const { boundaryFill, boundary: boundaryStroke, moduleFrame } = moduleLayoutConfig.colors;
 
 function CompassRose() {
   return (
@@ -33,31 +33,9 @@ function CompassRose() {
   );
 }
 
-/** 640W 모듈 1장 — 세로형 패널, 셀 그리드 최소화 */
-function renderSolarModuleSvg(minX: number, minY: number, maxX: number, maxY: number): string {
-  const w = maxX - minX;
-  const h = maxY - minY;
-  const frame = Math.max(0.5, Math.min(w, h) * 0.035);
-  const ix = minX + frame;
-  const iy = minY + frame;
-  const iw = w - frame * 2;
-  const ih = h - frame * 2;
-
-  const subtleLines: string[] = [];
-  for (let r = 1; r <= 2; r++) {
-    const y = iy + (ih * r) / 3;
-    subtleLines.push(
-      `<line x1="${ix}" y1="${y}" x2="${ix + iw}" y2="${y}" stroke="${moduleCell}" stroke-width="0.2" opacity="0.25" />`,
-    );
-  }
-
-  const highlightW = iw * 0.28;
-  return `<g>
-    <rect x="${minX}" y="${minY}" width="${w}" height="${h}" rx="0.35" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.55" />
-    <rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="url(#panelFace)" stroke="none" />
-    ${subtleLines.join("")}
-    <rect x="${ix + iw * 0.06}" y="${iy + ih * 0.05}" width="${highlightW}" height="${ih * 0.1}" rx="0.25" fill="${moduleHighlight}" opacity="0.55" />
-  </g>`;
+/** 640W 모듈 1장 — 회전된 4꼭짓점 Polygon (AABB 사용 시 Row가 막대로 겹쳐 보임) */
+function renderSolarModulePolygon(points: string): string {
+  return `<polygon points="${points}" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.55" stroke-linejoin="miter" />`;
 }
 
 export default function ModuleLayoutMap({ layout, address, jibunAddress }: ModuleLayoutMapProps) {
@@ -90,25 +68,19 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
 
     const boundaryOverlay =
       layout.boundary.length >= 3
-        ? `<polygon points="${layout.boundary.map(toPoint).join(" ")}" fill="${boundaryFill}" stroke="none" />`
+        ? `<polygon points="${layout.boundary.map(toPoint).join(" ")}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" />`
         : "";
 
     const modulePaths = layout.modules
       .map((mod) => {
-        const xs = mod.corners.map((pt) => {
-          const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
-          return projection.containerPointFromCoords(coords).x;
-        });
-        const ys = mod.corners.map((pt) => {
-          const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
-          return projection.containerPointFromCoords(coords).y;
-        });
-        return renderSolarModuleSvg(
-          Math.min(...xs),
-          Math.min(...ys),
-          Math.max(...xs),
-          Math.max(...ys),
-        );
+        const points = mod.corners
+          .map((pt) => {
+            const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
+            const pixel = projection.containerPointFromCoords(coords);
+            return `${pixel.x},${pixel.y}`;
+          })
+          .join(" ");
+        return renderSolarModulePolygon(points);
       })
       .join("");
 
@@ -118,11 +90,6 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
           <stop offset="0%" stop-color="#1e3a5f" />
           <stop offset="45%" stop-color="#172554" />
           <stop offset="100%" stop-color="#0f172a" />
-        </linearGradient>
-        <linearGradient id="panelFace" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.3" />
-          <stop offset="40%" stop-color="#1e293b" stop-opacity="0.95" />
-          <stop offset="100%" stop-color="#020617" stop-opacity="1" />
         </linearGradient>
       </defs>
       ${boundaryOverlay}
