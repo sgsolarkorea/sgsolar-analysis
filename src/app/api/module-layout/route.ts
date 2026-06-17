@@ -28,6 +28,35 @@ function ringsMatch(a: LatLngPoint[], b: LatLngPoint[], tolerance = 1e-9): boole
   return true;
 }
 
+function pointInLatLngPolygon(point: LatLngPoint, polygon: LatLngPoint[]): boolean {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lng;
+    const yi = polygon[i].lat;
+    const xj = polygon[j].lng;
+    const yj = polygon[j].lat;
+    const denominator = yj - yi;
+    const intersects =
+      yi > point.lat !== yj > point.lat &&
+      point.lng <
+        ((xj - xi) * (point.lat - yi)) /
+          (Math.abs(denominator) < 1e-12 ? 1e-12 : denominator) +
+          xi;
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
+
+function countOutsideModules(input: {
+  modules: { corners: LatLngPoint[] }[];
+  boundary: LatLngPoint[];
+}): number {
+  if (input.boundary.length < 3) return 0;
+  return input.modules.filter((mod) =>
+    mod.corners.some((corner) => !pointInLatLngPolygon(corner, input.boundary)),
+  ).length;
+}
+
 function buildDiagnostics(input: {
   geometry: SiteGeometryResult;
   polygonSource: ModuleLayoutDiagnostics["polygonSource"];
@@ -43,6 +72,7 @@ function buildDiagnostics(input: {
   polygonUtilizationPct: number;
   landLayout?: LandBlockPlacementDiagnostics;
   roofLayout?: RoofPlacementDiagnostics;
+  polygonOutsideModuleCount?: number;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
@@ -97,6 +127,18 @@ function buildDiagnostics(input: {
     medianSplitUsed: land?.medianSplitUsed,
     rowGenerationPattern: land?.rowGenerationPattern,
     unusedAreaRatio: land?.unusedAreaRatio,
+    twoTierSetCount: land?.twoTierSetCount,
+    twoTierSetModuleCounts: land?.twoTierSetModuleCounts,
+    innerTierGapM: land?.innerTierGapM,
+    setAisleM: land?.setAisleM,
+    arrayBlockCount: land?.arrayBlockCount,
+    arrayBlocks: land?.arrayBlocks,
+    mainAisleM: land?.mainAisleM,
+    mainAisleApplied: land?.mainAisleApplied,
+    arrayBlockModuleCounts: land?.arrayBlockModuleCounts,
+    arrayBlockRowCounts: land?.arrayBlockRowCounts,
+    arrayBlockBoundingBoxes: land?.arrayBlockBoundingBoxes,
+    polygonOutsideModuleCount: input.polygonOutsideModuleCount,
     roofFillStrategy: roof?.roofFillStrategy,
     roofCenteringApplied: roof?.roofCenteringApplied,
     roofUnusedAreaRatio: roof?.roofUnusedAreaRatio,
@@ -189,6 +231,10 @@ export async function GET(request: Request) {
     polygonUtilizationPct: layout.stats.polygonUtilizationPct,
     landLayout: layout.landLayoutDiagnostics,
     roofLayout: layout.roofLayoutDiagnostics,
+    polygonOutsideModuleCount: countOutsideModules({
+      modules: layout.modules,
+      boundary: layout.boundary,
+    }),
   });
 
   if (!overlayOnly && layout.stats.placedModuleCount <= 0) {

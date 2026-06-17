@@ -16,6 +16,9 @@ export const LAND_DOUBLE_BLOCK_THRESHOLD_KW = 100;
 /** Array 간 통로 (m) — 4~6m 범위 기본값 */
 export const LAND_AISLE_M = 4;
 
+/** Array Block 사이 주 통로 (m) — 수량 미달 시 자동 축소 후보를 둔다 */
+export const LAND_MAIN_AISLE_M = 8;
+
 export const TIER_ROWS_PER_ARRAY = 2;
 
 export type LandLayoutTier = "single" | "double";
@@ -45,10 +48,27 @@ export interface LandBlockPlacementDiagnostics {
   arrayModuleCounts: number[];
   aisleM: number;
   aisleApplied: boolean;
-  fillStrategy: "physical-array";
+  fillStrategy: "physical-array" | "uniform-row-grid" | "two-tier-row-set";
   medianSplitUsed: false;
   rowGenerationPattern: string;
   unusedAreaRatio: number;
+  twoTierSetCount: number;
+  twoTierSetModuleCounts: number[];
+  innerTierGapM: number;
+  setAisleM: number;
+  arrayBlockCount: number;
+  arrayBlocks: Array<{
+    blockIndex: number;
+    arrayIndexes: number[];
+    moduleCount: number;
+    rowCount: number;
+    boundingBox: LocalBBox;
+  }>;
+  mainAisleM: number;
+  mainAisleApplied: boolean;
+  arrayBlockModuleCounts: number[];
+  arrayBlockRowCounts: number[];
+  arrayBlockBoundingBoxes: LocalBBox[];
 }
 
 export interface LandBlockPlacementResult {
@@ -81,6 +101,38 @@ interface LayoutParams {
 
 interface PhysicalArray {
   arrayIndex: number;
+  baseY: number;
+  maxY: number;
+  tiers: [ModuleSlot[], ModuleSlot[]];
+  capacity: number;
+}
+
+export interface LocalBBox {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
+interface PhysicalArrayBlock {
+  blockIndex: number;
+  arrays: PhysicalArray[];
+}
+
+interface UniformRowPlacement {
+  modules: ModuleRect[];
+  validSlotCount: number;
+  rowModuleCounts: number[];
+  twoTierSetModuleCounts: number[];
+  selected: ModuleSlot[];
+  innerTierGapM: number;
+  setAisleM: number;
+  score: number;
+  unusedAreaRatio: number;
+}
+
+interface TwoTierRowSet {
+  setIndex: number;
   baseY: number;
   maxY: number;
   tiers: [ModuleSlot[], ModuleSlot[]];
@@ -210,56 +262,116 @@ function generatePhysicalArrayCandidates(
   return arrays;
 }
 
-function selectPhysicalArrayStack(input: {
+function findFirstCandidateIndex(candidates: PhysicalArray[], minBaseY: number): number {
+  return candidates.findIndex((candidate) => candidate.baseY >= minBaseY - 0.001);
+}
+
+function buildArraySequence(
+  candidates: PhysicalArray[],
+  startIndex: number,
+  minGapM: number,
+  maxArrays = Infinity,
+): PhysicalArray[] {
+  const sequence: PhysicalArray[] = [];
+  let lastMaxY = -Infinity;
+
+  for (let i = startIndex; i < candidates.length && sequence.length < maxArrays; i++) {
+    const candidate = candidates[i];
+    if (candidate.baseY < lastMaxY + minGapM - 0.001) continue;
+    sequence.push(candidate);
+    lastMaxY = candidate.maxY;
+  }
+
+  return sequence;
+}
+
+function bboxForArrays(arrays: PhysicalArray[]): LocalBBox {
+  const slots = arrays.flatMap((array) => [...array.tiers[0], ...array.tiers[1]]);
+  if (slots.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+  return {
+    minX: Math.min(...slots.map((slot) => slot.x)),
+    maxX: Math.max(...slots.map((slot) => slot.x)),
+    minY: Math.min(...arrays.map((array) => array.baseY)),
+    maxY: Math.max(...arrays.map((array) => array.maxY)),
+  };
+}
+
+function selectPhysicalArrayBlocks(input: {
   candidates: PhysicalArray[];
   targetCount: number;
-  minArrays: number;
-  aisleM: number;
+  requireBlockCount: number;
+  intraBlockGapM: number;
+  mainAisleCandidatesM: number[];
   oriented: OrientedPoly;
-}): PhysicalArray[] {
-  const { candidates, targetCount, minArrays, aisleM, oriented } = input;
-  if (candidates.length === 0) return [];
+}): { blocks: PhysicalArrayBlock[]; mainAisleM: number } {
+  const { candidates, targetCount, requireBlockCount, intraBlockGapM, mainAisleCandidatesM, oriented } = input;
+  if (candidates.length === 0) return { blocks: [], mainAisleM: 0 };
+
+  if (requireBlockCount < 2) {
+    const arrays = buildArraySequence(candidates, 0, intraBlockGapM);
+    return { blocks: [{ blockIndex: 0, arrays }], mainAisleM: 0 };
+  }
 
   const polyCenterY = (oriented.minY + oriented.maxY) / 2;
-  let best: { arrays: PhysicalArray[]; score: number } | null = null;
+  let best: { blocks: PhysicalArrayBlock[]; mainAisleM: number; score: number } | null = null;
 
-  for (let start = 0; start < candidates.length; start++) {
-    const stack: PhysicalArray[] = [];
-    let lastMaxY = -Infinity;
+  for (const mainAisleM of mainAisleCandidatesM) {
+    for (let startA = 0; startA < candidates.length; startA++) {
+      const blockAFull = buildArraySequence(candidates, startA, intraBlockGapM);
+      for (let blockASize = 1; blockASize <= blockAFull.length; blockASize++) {
+        const blockA = blockAFull.slice(0, blockASize);
+        const lastA = blockA[blockA.length - 1];
+        const startB = findFirstCandidateIndex(candidates, lastA.maxY + mainAisleM);
+        if (startB < 0) continue;
 
-    for (let i = start; i < candidates.length; i++) {
-      const candidate = candidates[i];
-      if (candidate.baseY < lastMaxY + aisleM - 0.001) continue;
+        const blockBFull = buildArraySequence(candidates, startB, intraBlockGapM);
+        for (let blockBSize = 1; blockBSize <= blockBFull.length; blockBSize++) {
+          const blockB = blockBFull.slice(0, blockBSize);
+          const blocks: PhysicalArrayBlock[] = [
+            { blockIndex: 0, arrays: blockA },
+            { blockIndex: 1, arrays: blockB },
+          ];
+          const arrays = blocks.flatMap((block) => block.arrays);
+          const capacity = arrays.reduce((sum, array) => sum + array.capacity, 0);
+          const placedPotential = Math.min(capacity, targetCount);
+          const shortfall = Math.max(0, targetCount - capacity);
+          const overCapacity = Math.max(0, capacity - targetCount);
+          const minY = Math.min(...arrays.map((array) => array.baseY));
+          const maxY = Math.max(...arrays.map((array) => array.maxY));
+          const centerOffsetY = Math.abs((minY + maxY) / 2 - polyCenterY);
+          const verticalCoverage = (maxY - minY) / Math.max(oriented.maxY - oriented.minY, 1);
+          const balancePenalty = Math.abs(
+            blockA.reduce((sum, array) => sum + array.capacity, 0) -
+              blockB.reduce((sum, array) => sum + array.capacity, 0),
+          );
 
-      stack.push(candidate);
-      lastMaxY = candidate.maxY;
+          const score =
+            placedPotential * 1000 -
+            shortfall * 8000 -
+            Math.abs(targetCount - placedPotential) * 1500 -
+            overCapacity * 0.25 -
+            centerOffsetY * 35 +
+            verticalCoverage * 180 +
+            mainAisleM * 120 -
+            balancePenalty * 0.15;
 
-      if (stack.length < minArrays) continue;
-
-      const capacity = stack.reduce((sum, array) => sum + array.capacity, 0);
-      const placedPotential = Math.min(capacity, targetCount);
-      const shortfall = Math.max(0, targetCount - capacity);
-      const stackMinY = stack[0].baseY;
-      const stackMaxY = stack[stack.length - 1].maxY;
-      const stackCenterY = (stackMinY + stackMaxY) / 2;
-      const centerOffsetY = Math.abs(stackCenterY - polyCenterY);
-      const verticalCoverage = (stackMaxY - stackMinY) / Math.max(oriented.maxY - oriented.minY, 1);
-      const overCapacity = Math.max(0, capacity - targetCount);
-
-      const score =
-        placedPotential * 1000 -
-        shortfall * 5000 -
-        centerOffsetY * 40 +
-        verticalCoverage * 120 -
-        overCapacity * 0.5;
-
-      if (!best || score > best.score) {
-        best = { arrays: [...stack], score };
+          if (!best || score > best.score) {
+            best = { blocks, mainAisleM, score };
+          }
+        }
       }
     }
   }
 
-  return best?.arrays.map((array, i) => ({ ...array, arrayIndex: i })) ?? [];
+  if (!best) return { blocks: [], mainAisleM: 0 };
+
+  return {
+    mainAisleM: best.mainAisleM,
+    blocks: best.blocks.map((block, blockIndex) => ({
+      blockIndex,
+      arrays: block.arrays.map((array, i) => ({ ...array, arrayIndex: blockIndex * 1000 + i })),
+    })),
+  };
 }
 
 function selectCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
@@ -283,6 +395,273 @@ function groupSlotsByRow(slots: ModuleSlot[], heightM: number): ModuleSlot[][] {
   return [...rowMap.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(([, row]) => row.sort((a, b) => a.x - b.x));
+}
+
+function collectUniformRows(
+  oriented: OrientedPoly,
+  widthM: number,
+  heightM: number,
+  rowGapM: number,
+  offsetM: number,
+): ModuleSlot[][] {
+  const rows: ModuleSlot[][] = [];
+  const pitchM = heightM + rowGapM;
+  for (let y = oriented.minY + offsetM; y + heightM <= oriented.maxY + 0.001; y += pitchM) {
+    const row = collectRowSlots(oriented, y, widthM, heightM);
+    if (row.length > 0) rows.push(row);
+  }
+  return rows;
+}
+
+function distributeUniformRowQuotas(rows: ModuleSlot[][], targetCount: number): number[] {
+  const capacities = rows.map((row) => row.length);
+  const totalCap = capacities.reduce((sum, cap) => sum + cap, 0);
+  const effectiveTarget = Math.min(targetCount, totalCap);
+  if (effectiveTarget <= 0 || totalCap <= 0) return capacities.map(() => 0);
+
+  const quotas = capacities.map((cap) => Math.floor((cap / totalCap) * effectiveTarget));
+  let assigned = quotas.reduce((sum, quota) => sum + quota, 0);
+  const order = capacities
+    .map((cap, i) => ({ cap, i }))
+    .sort((a, b) => b.cap - a.cap);
+
+  let idx = 0;
+  while (assigned < effectiveTarget) {
+    const target = order[idx % order.length];
+    if (quotas[target.i] < capacities[target.i]) {
+      quotas[target.i]++;
+      assigned++;
+    }
+    idx++;
+  }
+
+  return quotas;
+}
+
+function selectUniformRows(rows: ModuleSlot[][], targetCount: number): {
+  selected: ModuleSlot[];
+  rowModuleCounts: number[];
+} {
+  const quotas = distributeUniformRowQuotas(rows, targetCount);
+  const selected: ModuleSlot[] = [];
+  const rowModuleCounts: number[] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const quota = quotas[i];
+    if (quota <= 0) continue;
+    const picked = selectCentered(rows[i], quota);
+    selected.push(...picked);
+    rowModuleCounts.push(picked.length);
+  }
+
+  return { selected, rowModuleCounts };
+}
+
+function collectTwoTierRowSets(
+  oriented: OrientedPoly,
+  widthM: number,
+  heightM: number,
+  innerTierGapM: number,
+  setAisleM: number,
+  offsetM: number,
+): TwoTierRowSet[] {
+  const sets: TwoTierRowSet[] = [];
+  const setPitchM = heightM * TIER_ROWS_PER_ARRAY + innerTierGapM + setAisleM;
+  let setIndex = 0;
+
+  for (let y = oriented.minY + offsetM; y + heightM <= oriented.maxY + 0.001; y += setPitchM) {
+    const tier1Y = y;
+    const tier2Y = y + heightM + innerTierGapM;
+    if (tier2Y + heightM > oriented.maxY + 0.001) continue;
+
+    const rawTier1 = collectRowSlots(oriented, tier1Y, widthM, heightM);
+    const rawTier2 = collectRowSlots(oriented, tier2Y, widthM, heightM);
+    const { tier1, tier2 } = alignTierPair(rawTier1, rawTier2, widthM);
+
+    if (tier1.length > 0 && tier2.length > 0) {
+      sets.push({
+        setIndex: setIndex++,
+        baseY: tier1Y,
+        maxY: tier2Y + heightM,
+        tiers: [tier1, tier2],
+        capacity: tier1.length + tier2.length,
+      });
+    }
+  }
+
+  return sets;
+}
+
+function distributeTwoTierSetQuotas(sets: TwoTierRowSet[], targetCount: number): number[] {
+  const capacities = sets.map((set) => set.capacity);
+  const totalCap = capacities.reduce((sum, cap) => sum + cap, 0);
+  const effectiveTarget = Math.min(targetCount, totalCap);
+  if (effectiveTarget <= 0 || totalCap <= 0) return capacities.map(() => 0);
+
+  const quotas = capacities.map((cap) => Math.floor((cap / totalCap) * effectiveTarget));
+  let assigned = quotas.reduce((sum, quota) => sum + quota, 0);
+  const order = capacities
+    .map((cap, i) => ({ cap, i }))
+    .sort((a, b) => b.cap - a.cap);
+
+  let idx = 0;
+  while (assigned < effectiveTarget) {
+    const target = order[idx % order.length];
+    if (quotas[target.i] < capacities[target.i]) {
+      quotas[target.i]++;
+      assigned++;
+    }
+    idx++;
+  }
+
+  return quotas;
+}
+
+function splitTwoTierQuota(set: TwoTierRowSet, quota: number): [number, number] {
+  const [tier1, tier2] = set.tiers;
+  const cap1 = tier1.length;
+  const cap2 = tier2.length;
+  let q1 = Math.min(Math.ceil(quota / TIER_ROWS_PER_ARRAY), cap1);
+  let q2 = Math.min(Math.floor(quota / TIER_ROWS_PER_ARRAY), cap2);
+  let remaining = quota - q1 - q2;
+
+  while (remaining > 0 && (q1 < cap1 || q2 < cap2)) {
+    if (q1 <= q2 && q1 < cap1) q1++;
+    else if (q2 < cap2) q2++;
+    else if (q1 < cap1) q1++;
+    remaining--;
+  }
+
+  return [q1, q2];
+}
+
+function selectTwoTierRowSets(sets: TwoTierRowSet[], targetCount: number): {
+  selected: ModuleSlot[];
+  rowModuleCounts: number[];
+  twoTierSetModuleCounts: number[];
+} {
+  const quotas = distributeTwoTierSetQuotas(sets, targetCount);
+  const selected: ModuleSlot[] = [];
+  const rowModuleCounts: number[] = [];
+  const twoTierSetModuleCounts: number[] = [];
+
+  for (let i = 0; i < sets.length; i++) {
+    const quota = quotas[i];
+    if (quota <= 0) continue;
+
+    const set = sets[i];
+    const [tier1Quota, tier2Quota] = splitTwoTierQuota(set, quota);
+    const tier1Pick = selectCentered(set.tiers[0], tier1Quota);
+    const tier2Pick = selectCentered(set.tiers[1], tier2Quota);
+
+    selected.push(...tier1Pick, ...tier2Pick);
+    rowModuleCounts.push(tier1Pick.length, tier2Pick.length);
+    twoTierSetModuleCounts.push(tier1Pick.length + tier2Pick.length);
+  }
+
+  return { selected, rowModuleCounts, twoTierSetModuleCounts };
+}
+
+function scoreUniformRows(input: {
+  oriented: OrientedPoly;
+  selected: ModuleSlot[];
+  rowModuleCounts: number[];
+  widthM: number;
+  heightM: number;
+  targetCount: number;
+  rowGapM: number;
+}): { score: number; unusedAreaRatio: number } {
+  const { oriented, selected, rowModuleCounts, widthM, heightM, targetCount, rowGapM } = input;
+  const unusedAreaRatio = computeUnusedAreaRatio(oriented, selected, widthM, heightM);
+  if (selected.length === 0) return { score: -Infinity, unusedAreaRatio };
+
+  const xs = selected.flatMap((slot) => [slot.x, slot.x + widthM]);
+  const ys = selected.flatMap((slot) => [slot.y, slot.y + heightM]);
+  const usedW = Math.max(...xs) - Math.min(...xs);
+  const usedH = Math.max(...ys) - Math.min(...ys);
+  const polyW = Math.max(oriented.maxX - oriented.minX, 1);
+  const polyH = Math.max(oriented.maxY - oriented.minY, 1);
+  const xCoverage = usedW / polyW;
+  const yCoverage = usedH / polyH;
+  const rowCount = rowModuleCounts.length;
+  const maxRowShare = Math.max(...rowModuleCounts, 0) / Math.max(selected.length, 1);
+
+  let score = selected.length * 1000;
+  if (selected.length >= targetCount) score += 2000;
+  score -= Math.abs(selected.length - targetCount) * 100;
+  score += rowCount * 80;
+  score += xCoverage * 400 + yCoverage * 800;
+  score += Math.min(rowGapM, 3) * 120;
+  score -= unusedAreaRatio * 300;
+  if (rowCount <= 2) score -= 5000;
+  if (maxRowShare > 0.35) score -= 2500;
+
+  return { score, unusedAreaRatio };
+}
+
+function scoreTwoTierRowSets(input: {
+  oriented: OrientedPoly;
+  selected: ModuleSlot[];
+  rowModuleCounts: number[];
+  twoTierSetModuleCounts: number[];
+  widthM: number;
+  heightM: number;
+  targetCount: number;
+  innerTierGapM: number;
+  setAisleM: number;
+}): { score: number; unusedAreaRatio: number } {
+  const {
+    oriented,
+    selected,
+    rowModuleCounts,
+    twoTierSetModuleCounts,
+    widthM,
+    heightM,
+    targetCount,
+    innerTierGapM,
+    setAisleM,
+  } = input;
+  const unusedAreaRatio = computeUnusedAreaRatio(oriented, selected, widthM, heightM);
+  if (selected.length === 0) return { score: -Infinity, unusedAreaRatio };
+
+  const xs = selected.flatMap((slot) => [slot.x, slot.x + widthM]);
+  const ys = selected.flatMap((slot) => [slot.y, slot.y + heightM]);
+  const usedW = Math.max(...xs) - Math.min(...xs);
+  const usedH = Math.max(...ys) - Math.min(...ys);
+  const polyW = Math.max(oriented.maxX - oriented.minX, 1);
+  const polyH = Math.max(oriented.maxY - oriented.minY, 1);
+  const xCoverage = usedW / polyW;
+  const yCoverage = usedH / polyH;
+  const twoTierSetCount = twoTierSetModuleCounts.length;
+  const maxSetShare = Math.max(...twoTierSetModuleCounts, 0) / Math.max(selected.length, 1);
+
+  let balancePenalty = 0;
+  let oneSidedSetCount = 0;
+  for (let i = 0; i < rowModuleCounts.length; i += TIER_ROWS_PER_ARRAY) {
+    const tier1 = rowModuleCounts[i] ?? 0;
+    const tier2 = rowModuleCounts[i + 1] ?? 0;
+    const setTotal = tier1 + tier2;
+    if (setTotal <= 0) continue;
+    balancePenalty += Math.abs(tier1 - tier2) / setTotal;
+    if (tier1 === 0 || tier2 === 0) oneSidedSetCount++;
+  }
+  const avgBalancePenalty = balancePenalty / Math.max(twoTierSetCount, 1);
+  const aisleVisibilityM = Math.max(0, setAisleM - innerTierGapM);
+
+  let score = selected.length * 1000;
+  if (selected.length >= targetCount) score += 3000;
+  score -= Math.abs(selected.length - targetCount) * 250;
+  score += twoTierSetCount * 180;
+  score += xCoverage * 350 + yCoverage * 700;
+  score += Math.min(aisleVisibilityM, 3.5) * 450;
+  score -= avgBalancePenalty * 2500;
+  score -= oneSidedSetCount * 1200;
+  score -= unusedAreaRatio * 250;
+  if (twoTierSetCount <= 1) score -= 6000;
+  if (maxSetShare > 0.35) score -= 2500;
+  if (setAisleM <= innerTierGapM) score -= 5000;
+
+  return { score, unusedAreaRatio };
 }
 
 function distributeQuotasMaxFill(
@@ -414,6 +793,38 @@ function computeUnusedAreaRatio(
   return Math.round((1 - usedBBox / polyArea) * 1000) / 1000;
 }
 
+function summarizeArrayBlocks(
+  blocks: PhysicalArrayBlock[],
+  arrayModuleCounts: number[],
+): {
+  arrayBlocks: LandBlockPlacementDiagnostics["arrayBlocks"];
+  arrayBlockModuleCounts: number[];
+  arrayBlockRowCounts: number[];
+  arrayBlockBoundingBoxes: LocalBBox[];
+} {
+  let arrayOffset = 0;
+  const summarized = blocks.map((block) => {
+    const moduleCounts = arrayModuleCounts.slice(arrayOffset, arrayOffset + block.arrays.length);
+    arrayOffset += block.arrays.length;
+    const moduleCount = moduleCounts.reduce((sum, count) => sum + count, 0);
+    const rowCount = moduleCounts.reduce((sum, count) => sum + (count > 0 ? TIER_ROWS_PER_ARRAY : 0), 0);
+    return {
+      blockIndex: block.blockIndex,
+      arrayIndexes: block.arrays.map((array) => array.arrayIndex),
+      moduleCount,
+      rowCount,
+      boundingBox: bboxForArrays(block.arrays),
+    };
+  });
+
+  return {
+    arrayBlocks: summarized,
+    arrayBlockModuleCounts: summarized.map((block) => block.moduleCount),
+    arrayBlockRowCounts: summarized.map((block) => block.rowCount),
+    arrayBlockBoundingBoxes: summarized.map((block) => block.boundingBox),
+  };
+}
+
 function makePortraitModuleRect(
   x: number,
   y: number,
@@ -445,13 +856,17 @@ function tryPlacementAtAzimuth(input: {
   params: LayoutParams;
   azimuthDeg: number;
   requireMinArrays: number;
-  aisleM: number;
 }): {
   modules: ModuleRect[];
   validSlotCount: number;
   rowModuleCounts: number[];
+  twoTierSetModuleCounts: number[];
+  innerTierGapM: number;
+  setAisleM: number;
   arrayModuleCounts: number[];
   arrayCount: number;
+  arrayBlocks: PhysicalArrayBlock[];
+  mainAisleM: number;
   layoutTier: LandLayoutTier;
   score: number;
   unusedAreaRatio: number;
@@ -462,74 +877,97 @@ function tryPlacementAtAzimuth(input: {
   const scale = moduleLayoutConfig.visualScale;
   const widthM = moduleLayoutConfig.moduleShortM * scale;
   const heightM = moduleLayoutConfig.moduleLongM * scale;
-  const tierGapM =
+  const baseRowGapM =
     input.params.mode === "row"
       ? getVisualRowSpacingM(input.params.kind, input.params.mode)
       : 0;
+  const innerTierGapCandidatesM =
+    input.params.mode === "row"
+      ? [0.15, 0.25, 0.4, 0.6, 0.8].filter((gap, i, arr) => gap >= 0 && arr.indexOf(gap) === i)
+      : [0];
+  const setAisleCandidatesM =
+    input.params.mode === "row"
+      ? [baseRowGapM, 3.5, 3, 2.5, 2].filter((gap, i, arr) => gap >= 2 && arr.indexOf(gap) === i)
+      : [0];
 
-  const candidates = generatePhysicalArrayCandidates(
-    oriented,
-    widthM,
-    heightM,
-    tierGapM,
-  );
-  const arrays = selectPhysicalArrayStack({
-    candidates,
-    targetCount: input.targetCount,
-    minArrays: input.requireMinArrays,
-    aisleM: input.aisleM,
-    oriented,
-  });
-  const validSlotCount = countValidArraySlots(arrays);
-  if (validSlotCount === 0 || arrays.length === 0) return null;
+  let best: UniformRowPlacement | null = null;
 
-  const picked = selectFromPhysicalArrays(
-    arrays,
-    input.targetCount,
-    input.requireMinArrays,
-  );
-  if (!picked) {
-    return {
-      modules: [],
-      validSlotCount,
-      rowModuleCounts: [],
-      arrayModuleCounts: [],
-      arrayCount: 0,
-      layoutTier: input.requireMinArrays >= 2 ? "double" : "single",
-      score: -1,
-      unusedAreaRatio: 1,
-      singleBlockRejectedReason: "insufficient-physical-arrays",
-    };
+  for (const innerTierGapM of innerTierGapCandidatesM) {
+    for (const setAisleM of setAisleCandidatesM) {
+      if (setAisleM <= innerTierGapM) continue;
+
+      const setPitchM = heightM * TIER_ROWS_PER_ARRAY + innerTierGapM + setAisleM;
+      const offsets = [0, setPitchM * 0.2, setPitchM * 0.4, setPitchM * 0.6, setPitchM * 0.8];
+      for (const offsetM of offsets) {
+        const sets = collectTwoTierRowSets(
+          oriented,
+          widthM,
+          heightM,
+          innerTierGapM,
+          setAisleM,
+          offsetM,
+        );
+        const validSlotCount = sets.reduce((sum, set) => sum + set.capacity, 0);
+        if (validSlotCount === 0) continue;
+
+        const { selected, rowModuleCounts, twoTierSetModuleCounts } = selectTwoTierRowSets(
+          sets,
+          input.targetCount,
+        );
+        if (selected.length === 0) continue;
+
+        const { score: baseScore, unusedAreaRatio } = scoreTwoTierRowSets({
+          oriented,
+          selected,
+          rowModuleCounts,
+          twoTierSetModuleCounts,
+          widthM,
+          heightM,
+          targetCount: input.targetCount,
+          innerTierGapM,
+          setAisleM,
+        });
+        const score = baseScore + azimuthPreferenceScore(input.azimuthDeg);
+        const modules = selected.map((slot) =>
+          makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
+        );
+
+        if (!best || score > best.score) {
+          best = {
+            modules,
+            validSlotCount,
+            rowModuleCounts,
+            twoTierSetModuleCounts,
+            selected,
+            innerTierGapM,
+            setAisleM,
+            score,
+            unusedAreaRatio,
+          };
+        }
+      }
+    }
   }
 
-  const { selected, arrayModuleCounts, rowModuleCounts } = picked;
-  const arrayCount = arrayModuleCounts.filter((n) => n > 0).length;
-
-  if (input.requireMinArrays >= 2 && arrayCount < 2) {
+  if (!best) return null;
+  if (input.requireMinArrays >= 2 && best.rowModuleCounts.length <= 2) {
     return null;
   }
 
-  const modules = selected.map((slot) =>
-    makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
-  );
-
-  const unusedAreaRatio = computeUnusedAreaRatio(oriented, selected, widthM, heightM);
-
-  let score = selected.length * 1000 + azimuthPreferenceScore(input.azimuthDeg);
-  if (selected.length >= input.targetCount) score += 500;
-  if (arrayCount >= input.requireMinArrays) score += 400;
-  score -= unusedAreaRatio * 200;
-  score -= Math.abs(selected.length - input.targetCount) * 5;
-
   return {
-    modules,
-    validSlotCount,
-    rowModuleCounts,
-    arrayModuleCounts,
-    arrayCount,
-    layoutTier: arrayCount >= 2 ? "double" : "single",
-    score,
-    unusedAreaRatio,
+    modules: best.modules,
+    validSlotCount: best.validSlotCount,
+    rowModuleCounts: best.rowModuleCounts,
+    twoTierSetModuleCounts: best.twoTierSetModuleCounts,
+    innerTierGapM: best.innerTierGapM,
+    setAisleM: best.setAisleM,
+    arrayModuleCounts: best.twoTierSetModuleCounts,
+    arrayCount: best.twoTierSetModuleCounts.length,
+    arrayBlocks: [],
+    mainAisleM: 0,
+    layoutTier: best.rowModuleCounts.length >= 2 ? "double" : "single",
+    score: best.score,
+    unusedAreaRatio: best.unusedAreaRatio,
   };
 }
 
@@ -557,7 +995,6 @@ export function placeLandBlockLayout(
       params,
       azimuthDeg,
       requireMinArrays,
-      aisleM,
     });
     if (!attempt || attempt.modules.length === 0) {
       candidateScores[String(azimuthDeg)] = attempt?.score ?? -1;
@@ -580,7 +1017,6 @@ export function placeLandBlockLayout(
         params,
         azimuthDeg,
         requireMinArrays: 1,
-        aisleM: 0,
       });
       if (!attempt || attempt.modules.length === 0) continue;
       candidateScores[`${azimuthDeg}-fallback`] = attempt.score;
@@ -593,8 +1029,8 @@ export function placeLandBlockLayout(
 
   const rowPattern =
     requireMinArrays >= 2
-      ? `tier×${TIER_ROWS_PER_ARRAY}-array+aisle${aisleM}m-stack`
-      : `tier×${TIER_ROWS_PER_ARRAY}-array-single`;
+      ? "two-tier-row-set-south-facing"
+      : "two-tier-row-set-single";
 
   if (!best) {
     return {
@@ -618,11 +1054,22 @@ export function placeLandBlockLayout(
         tierRowsPerArray: TIER_ROWS_PER_ARRAY,
         arrayModuleCounts: [],
         aisleM,
-        aisleApplied: aisleM > 0,
-        fillStrategy: "physical-array",
+        aisleApplied: false,
+        fillStrategy: "two-tier-row-set",
         medianSplitUsed: false,
         rowGenerationPattern: rowPattern,
         unusedAreaRatio: 1,
+        twoTierSetCount: 0,
+        twoTierSetModuleCounts: [],
+        innerTierGapM: 0,
+        setAisleM: 0,
+        arrayBlockCount: 0,
+        arrayBlocks: [],
+        mainAisleM: requireMinArrays >= 2 ? LAND_MAIN_AISLE_M : 0,
+        mainAisleApplied: false,
+        arrayBlockModuleCounts: [],
+        arrayBlockRowCounts: [],
+        arrayBlockBoundingBoxes: [],
       },
     };
   }
@@ -644,7 +1091,7 @@ export function placeLandBlockLayout(
       candidateScores,
       capacityLayoutRule,
       singleBlockRejectedReason:
-        requireMinArrays >= 2 && best.arrayCount < 2
+        requireMinArrays >= 2 && best.rowModuleCounts.length <= 2
           ? (rejectReason ?? best.singleBlockRejectedReason)
           : undefined,
       unusedAreaReason:
@@ -654,11 +1101,22 @@ export function placeLandBlockLayout(
       tierRowsPerArray: TIER_ROWS_PER_ARRAY,
       arrayModuleCounts,
       aisleM,
-      aisleApplied: aisleM > 0 && best.arrayCount >= 2,
-      fillStrategy: "physical-array",
+      aisleApplied: best.setAisleM > best.innerTierGapM,
+      fillStrategy: "two-tier-row-set",
       medianSplitUsed: false,
       rowGenerationPattern: rowPattern,
       unusedAreaRatio: best.unusedAreaRatio,
+      twoTierSetCount: best.twoTierSetModuleCounts.length,
+      twoTierSetModuleCounts: best.twoTierSetModuleCounts,
+      innerTierGapM: best.innerTierGapM,
+      setAisleM: best.setAisleM,
+      arrayBlockCount: 0,
+      arrayBlocks: [],
+      mainAisleM: 0,
+      mainAisleApplied: false,
+      arrayBlockModuleCounts: [],
+      arrayBlockRowCounts: [],
+      arrayBlockBoundingBoxes: [],
     },
   };
 }

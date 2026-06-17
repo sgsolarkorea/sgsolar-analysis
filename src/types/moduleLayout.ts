@@ -86,6 +86,26 @@ export interface ModuleLayoutDiagnostics {
   medianSplitUsed?: boolean;
   rowGenerationPattern?: string;
   unusedAreaRatio?: number;
+  /** 토지형 Phase 3.3 — two-tier row set diagnostics */
+  twoTierSetCount?: number;
+  twoTierSetModuleCounts?: number[];
+  innerTierGapM?: number;
+  setAisleM?: number;
+  /** 토지형 Phase 3.2 — Array Block diagnostics */
+  arrayBlockCount?: number;
+  arrayBlocks?: Array<{
+    blockIndex: number;
+    arrayIndexes: number[];
+    moduleCount: number;
+    rowCount: number;
+    boundingBox: { minX: number; maxX: number; minY: number; maxY: number };
+  }>;
+  mainAisleM?: number;
+  mainAisleApplied?: boolean;
+  arrayBlockModuleCounts?: number[];
+  arrayBlockRowCounts?: number[];
+  arrayBlockBoundingBoxes?: Array<{ minX: number; maxX: number; minY: number; maxY: number }>;
+  polygonOutsideModuleCount?: number;
   /** 건물형 Phase 3.1 */
   roofFillStrategy?: "centered" | "distributed";
   roofCenteringApplied?: boolean;
