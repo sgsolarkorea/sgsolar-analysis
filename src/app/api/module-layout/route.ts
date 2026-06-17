@@ -48,13 +48,32 @@ export async function GET(request: Request) {
     landAreaSqm,
   });
 
+  if (boundary.length < 3) {
+    return NextResponse.json(
+      {
+        error:
+          "필지·건물 경계를 불러오지 못했습니다. VWorld 폴리곤 조회를 확인해 주세요.",
+      },
+      { status: 503 },
+    );
+  }
+
   const layout = computeModuleLayout({
     boundary,
     polygonSource,
     capacityKw,
     installType,
     moduleCount: Number.isFinite(moduleCount) ? moduleCount : undefined,
+    centerLat: lat,
+    centerLng: lng,
   });
+
+  if (layout.stats.placedModuleCount <= 0) {
+    return NextResponse.json(
+      { error: "배치 가능한 모듈 영역을 찾지 못했습니다." },
+      { status: 503 },
+    );
+  }
 
   return NextResponse.json(layout);
 }

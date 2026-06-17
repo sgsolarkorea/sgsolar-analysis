@@ -473,6 +473,28 @@ export interface CadastralPolygonResult {
   ring: Array<{ lat: number; lng: number }>;
 }
 
+function cadastralRingFromFeatures(
+  features: VworldFeatureWithGeometry[],
+  pnu: string,
+): CadastralPolygonResult | null {
+  for (const feature of features) {
+    const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+    if (featurePnu && featurePnu !== pnu) continue;
+
+    const ringCoords = extractPolygonRingFromGeometry(feature.geometry);
+    if (!ringCoords?.length) continue;
+
+    const ring = ringCoords.map(([lngCoord, latCoord]) => ({
+      lat: latCoord,
+      lng: lngCoord,
+    }));
+
+    return { pnu: featurePnu || pnu, ring };
+  }
+
+  return null;
+}
+
 /** PNU → 연속지적도 필지 경계 폴리곤 (lat/lng 링) */
 export async function fetchCadastralPolygonByPnu(
   pnu: string,
@@ -482,40 +504,36 @@ export async function fetchCadastralPolygonByPnu(
   const apiKey = process.env.VWORLD_API_KEY?.trim();
   if (!apiKey || !pnu) return null;
 
-  for (const domain of getApiDomainCandidates()) {
-    const params = buildDataApiParams(apiKey, domain);
-    params.set("service", "data");
-    params.set("request", "GetFeature");
-    params.set("data", "LP_PA_CBND_BUBUN");
-    params.set("size", "5");
-    params.set("page", "1");
-    params.set("geometry", "true");
-    params.set("attribute", "true");
-    params.set("crs", "EPSG:4326");
-    params.set("attrFilter", `pnu:EQ:${pnu}`);
-    params.set("geomFilter", `POINT(${lng} ${lat})`);
+  // 도로명 지오코딩 좌표가 필지 밖일 수 있어 PNU 단독 조회를 먼저 시도
+  const geomFilters = [
+    null,
+    `POINT(${lng} ${lat})`,
+    `BUFFER(POINT(${lng} ${lat}), 40)`,
+  ] as const;
 
-    const data = await fetchVworldJson<
-      VworldDataResponse & {
-        response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
-      }
-    >(`${VWORLD_DATA_API}?${params.toString()}`, "cadastral-polygon");
+  for (const geomFilter of geomFilters) {
+    for (const domain of getApiDomainCandidates()) {
+      const params = buildDataApiParams(apiKey, domain);
+      params.set("service", "data");
+      params.set("request", "GetFeature");
+      params.set("data", "LP_PA_CBND_BUBUN");
+      params.set("size", "5");
+      params.set("page", "1");
+      params.set("geometry", "true");
+      params.set("attribute", "true");
+      params.set("crs", "EPSG:4326");
+      params.set("attrFilter", `pnu:EQ:${pnu}`);
+      if (geomFilter) params.set("geomFilter", geomFilter);
 
-    const features = data?.response?.result?.featureCollection?.features ?? [];
+      const data = await fetchVworldJson<
+        VworldDataResponse & {
+          response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+        }
+      >(`${VWORLD_DATA_API}?${params.toString()}`, "cadastral-polygon");
 
-    for (const feature of features) {
-      const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
-      if (featurePnu && featurePnu !== pnu) continue;
-
-      const ringCoords = extractPolygonRingFromGeometry(feature.geometry);
-      if (!ringCoords?.length) continue;
-
-      const ring = ringCoords.map(([lngCoord, latCoord]) => ({
-        lat: latCoord,
-        lng: lngCoord,
-      }));
-
-      return { pnu: featurePnu || pnu, ring };
+      const features = data?.response?.result?.featureCollection?.features ?? [];
+      const result = cadastralRingFromFeatures(features, pnu);
+      if (result) return result;
     }
   }
 
@@ -622,33 +640,37 @@ async function fetchBuildingPolygonFromDataLayer(
   dataLayer: string,
   apiKey: string,
 ): Promise<BuildingPolygonResult | null> {
-  for (const domain of getApiDomainCandidates()) {
-    const params = buildDataApiParams(apiKey, domain);
-    params.set("service", "data");
-    params.set("request", "GetFeature");
-    params.set("data", dataLayer);
-    params.set("size", "20");
-    params.set("page", "1");
-    params.set("geometry", "true");
-    params.set("attribute", "true");
-    params.set("crs", "EPSG:4326");
-    params.set("attrFilter", `pnu:EQ:${pnu}`);
-    params.set("geomFilter", `POINT(${lng} ${lat})`);
+  const geomFilters = [null, `POINT(${lng} ${lat})`] as const;
 
-    const data = await fetchVworldJson<
-      VworldDataResponse & {
-        response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+  for (const geomFilter of geomFilters) {
+    for (const domain of getApiDomainCandidates()) {
+      const params = buildDataApiParams(apiKey, domain);
+      params.set("service", "data");
+      params.set("request", "GetFeature");
+      params.set("data", dataLayer);
+      params.set("size", "20");
+      params.set("page", "1");
+      params.set("geometry", "true");
+      params.set("attribute", "true");
+      params.set("crs", "EPSG:4326");
+      params.set("attrFilter", `pnu:EQ:${pnu}`);
+      if (geomFilter) params.set("geomFilter", geomFilter);
+
+      const data = await fetchVworldJson<
+        VworldDataResponse & {
+          response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+        }
+      >(`${VWORLD_DATA_API}?${params.toString()}`, `building-polygon-${dataLayer}`);
+
+      const features = data?.response?.result?.featureCollection?.features ?? [];
+      const matching = features.filter((feature) => {
+        const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+        return !featurePnu || featurePnu === pnu;
+      });
+      const ring = pickLargestBuildingRing(matching);
+      if (ring?.length) {
+        return { pnu, ring };
       }
-    >(`${VWORLD_DATA_API}?${params.toString()}`, `building-polygon-${dataLayer}`);
-
-    const features = data?.response?.result?.featureCollection?.features ?? [];
-    const matching = features.filter((feature) => {
-      const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
-      return !featurePnu || featurePnu === pnu;
-    });
-    const ring = pickLargestBuildingRing(matching);
-    if (ring?.length) {
-      return { pnu, ring };
     }
   }
 

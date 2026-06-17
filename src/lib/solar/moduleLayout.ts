@@ -281,6 +281,8 @@ export function computeModuleLayout(input: {
   capacityKw: number;
   installType: InstallTypeOption | string;
   moduleCount?: number;
+  centerLat?: number;
+  centerLng?: number;
 }): ModuleLayoutResult {
   const params = getLayoutParams(input.installType, input.capacityKw);
   const targetModuleCount =
@@ -292,7 +294,10 @@ export function computeModuleLayout(input: {
   const origin =
     input.boundary.length >= 3
       ? computeOrientedBounds(input.boundary).origin
-      : { lat: 0, lng: 0 };
+      : {
+          lat: input.centerLat ?? 0,
+          lng: input.centerLng ?? 0,
+        };
 
   let bounds = {
     minLat: Infinity,
