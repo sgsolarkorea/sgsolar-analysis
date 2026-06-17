@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getCachedAnalyzeSolarSite } from "@/lib/api/analysis";
 import {
   KakaoAddressNotFoundError,
@@ -123,7 +124,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                   lng={data.lng}
                 />
                 <div className="mt-8">
-                  <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
+                  <Suspense fallback={null}>
+                    <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
+                  </Suspense>
                 </div>
               </section>
 

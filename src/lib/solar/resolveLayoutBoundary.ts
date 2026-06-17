@@ -12,7 +12,10 @@ import type { LatLngPoint, ModuleLayoutPolygonSource } from "@/types/moduleLayou
 export type LayoutFootprintKind = "building" | "parcel" | "virtual";
 
 export interface ResolvedLayoutBoundary {
+  /** setback 적용 후 배치 경계 */
   boundary: LatLngPoint[];
+  /** setback 적용 전 원본 Polygon */
+  sourceBoundary: LatLngPoint[];
   polygonSource: ModuleLayoutPolygonSource;
   footprintKind: LayoutFootprintKind;
 }
@@ -50,6 +53,7 @@ export async function resolveLayoutBoundary(input: {
       const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
       if (building?.ring?.length) {
         return {
+          sourceBoundary: building.ring,
           boundary: applySetback(building.ring, moduleLayoutConfig.roofSetbackM),
           polygonSource: "building",
           footprintKind: "building",
@@ -59,6 +63,7 @@ export async function resolveLayoutBoundary(input: {
 
     if (cadastralRing) {
       return {
+        sourceBoundary: cadastralRing,
         boundary: applySetback(cadastralRing, moduleLayoutConfig.roofSetbackM),
         polygonSource: "cadastral",
         footprintKind: "parcel",
@@ -66,6 +71,7 @@ export async function resolveLayoutBoundary(input: {
     }
 
     return {
+      sourceBoundary: [],
       boundary: [],
       polygonSource: "cadastral",
       footprintKind: "parcel",
@@ -74,6 +80,7 @@ export async function resolveLayoutBoundary(input: {
 
   if (cadastralRing) {
     return {
+      sourceBoundary: cadastralRing,
       boundary: applySetback(cadastralRing, moduleLayoutConfig.landSetbackM),
       polygonSource: "cadastral",
       footprintKind: "parcel",
@@ -82,14 +89,17 @@ export async function resolveLayoutBoundary(input: {
 
   if (input.pnu) {
     return {
+      sourceBoundary: [],
       boundary: [],
       polygonSource: "cadastral",
       footprintKind: "parcel",
     };
   }
 
+  const virtualRing = createVirtualParcelRectangle(center, input.capacityKw, input.installType);
   return {
-    boundary: createVirtualParcelRectangle(center, input.capacityKw, input.installType),
+    sourceBoundary: virtualRing,
+    boundary: virtualRing,
     polygonSource: "virtual",
     footprintKind: "virtual",
   };

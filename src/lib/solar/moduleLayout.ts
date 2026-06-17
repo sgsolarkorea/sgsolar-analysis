@@ -14,7 +14,6 @@ import {
   computePolygonOrientation,
   localToGeo,
   pointInPolygon,
-  polygonAreaSqm,
   toLocal,
   type LocalPoint,
 } from "@/lib/solar/polygonGeometry";
@@ -99,18 +98,6 @@ function toOrientedPoly(polygon: LatLngPoint[]): OrientedPoly {
   return { origin, angleRad, localPoly, minX, maxX, minY, maxY };
 }
 
-function resolveModuleScale(
-  polyArea: number,
-  targetCount: number,
-  mode: ModuleLayoutMode,
-): number {
-  const base = moduleLayoutConfig.visualScale;
-  const moduleUnitArea = moduleLayoutConfig.moduleShortM * moduleLayoutConfig.moduleLongM;
-  const fillTarget = mode === "flush" ? 0.9 : 0.875;
-  const ideal = Math.sqrt((polyArea * fillTarget) / Math.max(targetCount * moduleUnitArea, 1));
-  return Math.min(Math.max(ideal, base * 0.82), base * 1.18);
-}
-
 /** 모듈 4꼭짓점 모두 Polygon 내부 — 외부·도로 침범 방지 */
 function moduleFitsInPolygon(
   x: number,
@@ -168,86 +155,28 @@ function groupSlotsByRow(slots: ModuleSlot[], heightM: number): ModuleSlot[][] {
     .map(([, row]) => row.sort((a, b) => a.x - b.x));
 }
 
-/** 통판형: 행 단위로 연속 채우며 목표 모듈수까지 배치 */
-function selectFlushSlots(slots: ModuleSlot[], targetCount: number, heightM: number): ModuleSlot[] {
-  if (slots.length <= targetCount) return slots;
-
-  const selected: ModuleSlot[] = [];
-  for (const row of groupSlotsByRow(slots, heightM)) {
-    for (const slot of row) {
-      selected.push(slot);
-      if (selected.length >= targetCount) return selected;
-    }
-  }
-  return selected;
-}
-
-/** Row: 행 내 밀착, 행 간 이격 유지하며 목표 모듈수까지 배치 */
-function selectRowSlots(slots: ModuleSlot[], targetCount: number, heightM: number): ModuleSlot[] {
-  if (slots.length <= targetCount) return slots;
-
-  const selected: ModuleSlot[] = [];
-  for (const row of groupSlotsByRow(slots, heightM)) {
-    for (const slot of row) {
-      selected.push(slot);
-      if (selected.length >= targetCount) return selected;
-    }
-  }
-  return selected;
-}
-
-function countSlotsAtScale(
-  oriented: OrientedPoly,
-  scale: number,
-  params: LayoutParams,
-): ModuleSlot[] {
-  const widthM = moduleLayoutConfig.moduleShortM * scale;
-  const heightM = moduleLayoutConfig.moduleLongM * scale;
-  const rowGapM =
-    params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
-  return collectValidSlots(oriented, widthM, heightM, rowGapM);
-}
-
-function findOptimalScale(
-  oriented: OrientedPoly,
+/** 장축 Row 순서로 유효 슬롯 채우기 — 목표 초과 시 경계 밖 배치 없음 */
+function selectSlotsForTarget(
+  slots: ModuleSlot[],
   targetCount: number,
-  params: LayoutParams,
-  polyArea: number,
-): number {
-  const base = moduleLayoutConfig.visualScale;
-  let lo = base * 0.72;
-  let hi = base * 1.22;
-  let best = resolveModuleScale(polyArea, targetCount, params.mode);
+  heightM: number,
+): ModuleSlot[] {
+  if (targetCount <= 0 || slots.length === 0) return [];
+  if (slots.length <= targetCount) return slots;
 
-  for (let i = 0; i < 18; i++) {
-    const mid = (lo + hi) / 2;
-    const slots = countSlotsAtScale(oriented, mid, params);
-
-    if (slots.length >= targetCount) {
-      best = mid;
-      lo = mid;
-    } else {
-      hi = mid;
+  const selected: ModuleSlot[] = [];
+  for (const row of groupSlotsByRow(slots, heightM)) {
+    for (const slot of row) {
+      selected.push(slot);
+      if (selected.length >= targetCount) return selected;
     }
   }
-
-  let refined = best;
-  for (let step = 0; step < 12; step++) {
-    const next = refined * 1.015;
-    const slots = countSlotsAtScale(oriented, next, params);
-    if (slots.length >= targetCount) {
-      refined = next;
-    } else {
-      break;
-    }
-  }
-
-  return refined;
+  return selected;
 }
 
 /**
- * Polygon 내부 행 단위 스캔 → 목표 모듈수 배치.
- * 통판형: 행 내·행 간 밀착. Row: 행 내 밀착 + 행 간 2.45m(지붕)/3m(토지).
+ * Polygon 전체 후보 스캔 → 4꼭짓점 검증 → Row 단위 배치.
+ * 모듈 크기는 고정(visualScale) — 목표 수량 맞추려 축척을 키우지 않음.
  */
 function placeModulesInFootprint(
   polygon: LatLngPoint[],
@@ -257,18 +186,14 @@ function placeModulesInFootprint(
   if (targetCount <= 0 || polygon.length < 3) return [];
 
   const oriented = toOrientedPoly(polygon);
-  const polyArea = polygonAreaSqm(polygon);
-  const scale = findOptimalScale(oriented, targetCount, params, polyArea);
+  const scale = moduleLayoutConfig.visualScale;
   const widthM = moduleLayoutConfig.moduleShortM * scale;
   const heightM = moduleLayoutConfig.moduleLongM * scale;
   const rowGapM =
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
   const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
-  const selected =
-    params.mode === "row"
-      ? selectRowSlots(slots, targetCount, heightM)
-      : selectFlushSlots(slots, targetCount, heightM);
+  const selected = selectSlotsForTarget(slots, targetCount, heightM);
 
   return selected.map((slot) =>
     makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ModuleLayoutMap from "@/components/result/ModuleLayoutMap";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
@@ -18,6 +19,8 @@ interface ModuleLayoutSectionProps {
 }
 
 export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLayoutSectionProps) {
+  const searchParams = useSearchParams();
+  const polygonDebug = searchParams.get("polygonDebug") === "1";
   const { metrics, installType, primaryParcel, buildingInfo, landInfo } = useResultMetrics();
   const [layout, setLayout] = useState<ModuleLayoutResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,7 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     if (primaryParcel.pnu) params.set("pnu", primaryParcel.pnu);
     if (buildingAreaSqm != null) params.set("buildingAreaSqm", String(buildingAreaSqm));
     if (landAreaSqm != null) params.set("landAreaSqm", String(landAreaSqm));
+    if (polygonDebug) params.set("overlayOnly", "1");
 
     fetch(`/api/module-layout?${params.toString()}`)
       .then(async (res) => {
@@ -75,15 +79,22 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     installType,
     buildingInfo,
     landInfo,
+    polygonDebug,
   ]);
 
-  const targetModules = metrics.moduleCount;
+  const targetModules = layout?.stats.targetModuleCount ?? metrics.moduleCount;
+  const placedModules = layout?.stats.placedModuleCount ?? 0;
+  const placementMismatch = !polygonDebug && placedModules !== targetModules;
 
   return (
     <section id="module-layout" className="scroll-mt-24">
       <SectionHeader
-        title="예상 모듈 가배치도"
-        description="위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
+        title={polygonDebug ? "Polygon 검증 (Overlay 전용)" : "예상 모듈 가배치도"}
+        description={
+          polygonDebug
+            ? "VWorld Polygon 경계만 표시합니다. 모듈은 숨깁니다."
+            : "위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
+        }
       />
 
       {loading && (
@@ -102,25 +113,48 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
         <>
           <ModuleLayoutMap layout={layout} address={address} jibunAddress={jibunAddress} />
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <MetricCard
-              label="예상 설치용량"
-              value={formatUnifiedCapacityKw(metrics.capacityKw)}
-            />
-            <MetricCard
-              label="예상 모듈 수"
-              value={`${targetModules.toLocaleString("ko-KR")}장`}
-            />
-            <MetricCard label="모듈 사양" value={`${moduleLayoutConfig.modulePowerW}W`} />
-            <MetricCard
-              label="설치유형"
-              value={formatInstallTypeShortLabel(installType as InstallTypeOption)}
-            />
-          </div>
+          {polygonDebug && layout.diagnostics && (
+            <pre className="mt-3 overflow-x-auto rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+              {JSON.stringify(layout.diagnostics, null, 2)}
+            </pre>
+          )}
 
-          <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
-            ※ {moduleLayoutConfig.disclaimer}
-          </p>
+          {!polygonDebug && (
+            <>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricCard
+                  label="예상 설치용량"
+                  value={formatUnifiedCapacityKw(metrics.capacityKw)}
+                />
+                <MetricCard
+                  label="예상 모듈 수"
+                  value={`${targetModules.toLocaleString("ko-KR")}장`}
+                />
+                {placementMismatch && (
+                  <MetricCard
+                    label="가배치 반영"
+                    value={`${placedModules.toLocaleString("ko-KR")}장`}
+                  />
+                )}
+                <MetricCard label="모듈 사양" value={`${moduleLayoutConfig.modulePowerW}W`} />
+                <MetricCard
+                  label="설치유형"
+                  value={formatInstallTypeShortLabel(installType as InstallTypeOption)}
+                />
+              </div>
+
+              {placementMismatch && (
+                <p className="mt-3 text-sm font-medium leading-relaxed text-amber-800">
+                  ※ 필지 형상, 이격거리, 음영, 구조물, 인허가 조건에 따라 실제 배치 가능 수량은
+                  달라질 수 있습니다.
+                </p>
+              )}
+
+              <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
+                ※ {moduleLayoutConfig.disclaimer}
+              </p>
+            </>
+          )}
         </>
       )}
     </section>
