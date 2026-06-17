@@ -94,6 +94,11 @@ export const disclaimer = {
     "시장단가는 매일 변동되며 실제 거래금액은 계약조건 및 가중치에 따라 달라질 수 있습니다.",
   construction:
     "예상 시공비는 참고용이며 현장 실사 후 최종 확정됩니다.",
+  constructionBuildingExtra:
+    "구조 안전성 검토 및 보강 여부에 따라 추가 비용이 발생할 수 있습니다.",
+  constructionLandExtra:
+    "토목 설계, 토목공사 및 한전 인입 조건에 따라 추가 비용이 발생할 수 있습니다.",
+  /** @deprecated constructionBuildingExtra / constructionLandExtra 사용 */
   constructionExtra:
     "구조보강, 토목공사, 한전 인입, 감리, 안전관리, 구조검토 비용 발생 시 별도입니다.",
   revenue:

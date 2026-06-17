@@ -8,7 +8,7 @@ import {
   hasDetailedGridData,
   GRID_UNKNOWN_VALUE,
 } from "@/lib/grid/display";
-import { formatDlRemainingMw, formatMw, formatRemainingWithStatus } from "@/lib/grid/evaluate";
+import { formatDlRemainingMwKw, formatMw, formatRemainingWithStatus, formatSolarCapacityMwKw } from "@/lib/grid/evaluate";
 import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
@@ -122,11 +122,20 @@ function CapacityRowsCard({
   );
 }
 
-function SingleValueCard({ title, value }: { title: string; value: string }) {
+function SingleValueCard({
+  title,
+  value,
+  subValue,
+}: {
+  title: string;
+  value: string;
+  subValue?: string;
+}) {
   return (
     <div className="flex h-full min-h-[120px] flex-col justify-center rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <p className="text-sm font-bold text-slate-800">{title}</p>
       <p className="mt-3 text-xl font-bold text-navy sm:text-2xl">{value}</p>
+      {subValue && <p className="mt-1 text-sm font-medium text-slate-500">{subValue}</p>}
     </div>
   );
 }
@@ -203,6 +212,10 @@ export default function GridConnectionSection({
   const fmtCum = (mw: number | null) => formatMw(mw);
   const fmtRem = (mw: number | null) => formatMw(mw);
   const fmtName = (name: string) => formatGridLevelName(name, hasDetails);
+  const expectedCapacityMw =
+    Math.round((metrics.capacityKw / 1000) * 1000) / 1000;
+  const solarCapacityDisplay = formatSolarCapacityMwKw(metrics.capacityKw);
+  const dlRemainingDisplay = formatDlRemainingMwKw(gridInfo.distributionLine.remainingMw);
 
   return (
     <section id="grid" className="scroll-mt-24">
@@ -303,18 +316,16 @@ export default function GridConnectionSection({
                 transformer={fmtRem(gridInfo.transformer.remainingMw)}
                 dl={fmtRem(gridInfo.distributionLine.remainingMw)}
                 warnRemaining
-                expectedCapacityMw={gridInfo.expectedCapacityMw}
+                expectedCapacityMw={expectedCapacityMw}
                 substationMw={gridInfo.substation.remainingMw}
                 transformerMw={gridInfo.transformer.remainingMw}
                 dlMw={gridInfo.distributionLine.remainingMw}
               />
-              <SingleValueCard
-                title="태양광 설치용량"
-                value={gridInfo.expectedCapacityDisplay}
-              />
+              <SingleValueCard title="태양광 설치용량" value={solarCapacityDisplay} />
               <SingleValueCard
                 title="D/L 잔여용량"
-                value={formatDlRemainingMw(gridInfo.distributionLine.remainingMw)}
+                value={dlRemainingDisplay.primary}
+                subValue={dlRemainingDisplay.secondary}
               />
             </div>
 

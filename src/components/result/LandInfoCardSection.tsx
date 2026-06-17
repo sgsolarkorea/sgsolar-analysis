@@ -31,7 +31,7 @@ function buildCards(detail: LandInfoDetail): CardItem[] {
   }
 
   if (detail.priceReferenceDate) {
-    cards.push({ label: "데이터 기준일", value: detail.priceReferenceDate });
+    cards.push({ label: "지적도 업데이트 기준일", value: detail.priceReferenceDate });
   }
 
   if (detail.ownershipType) {

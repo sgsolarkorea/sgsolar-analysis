@@ -186,11 +186,9 @@ export const GRADE_MESSAGES: Record<Grade, string> = {
 
 export const CONSULTATION_INSTALL_TYPE_OPTIONS = [
   { value: "", label: "선택" },
-  { value: "지붕형", label: "지붕형" },
   { value: "토지형", label: "토지형" },
-  { value: "축사형", label: "축사형" },
-  { value: "공장형", label: "공장형" },
-  { value: "상가형", label: "상가형" },
+  { value: "지붕형", label: "지붕형" },
+  { value: "상계거래(가정용)", label: "상계거래(가정용)" },
 ] as const;
 
 /** @deprecated 상담폼은 CONSULTATION_INSTALL_TYPE_OPTIONS 사용 */

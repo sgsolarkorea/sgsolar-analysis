@@ -9,7 +9,7 @@ export default function SectionHeader({ title, description }: SectionHeaderProps
       <h2 className="border-l-4 border-navy pl-3 text-lg font-bold text-slate-900 sm:text-xl">
         {title}
       </h2>
-      {description && <p className="mt-1 text-sm text-slate-600">{description}</p>}
+      {description && <p className="mt-1 text-sm font-medium text-slate-600">{description}</p>}
     </div>
   );
 }

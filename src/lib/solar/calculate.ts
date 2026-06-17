@@ -21,12 +21,7 @@ export function installTypeToCategory(type: InstallTypeOption): SolarInstallCate
   switch (type) {
     case "토지형":
       return "land";
-    case "축사형":
-      return "barn";
-    case "공장형":
-      return "factory";
-    case "상가형":
-      return "commercial";
+    case "상계거래(가정용)":
     case "지붕형":
       return "roof";
     default:
@@ -220,7 +215,7 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     constructionCostPerKw,
     constructionCostWon,
     constructionDisclaimer: disclaimer.construction,
-    separateWorkNote: disclaimer.constructionExtra,
+    separateWorkNote: isLand ? disclaimer.constructionLandExtra : disclaimer.constructionBuildingExtra,
     paybackYears,
     recUnitNote: disclaimer.recUnit,
     annualNetProfitWon,

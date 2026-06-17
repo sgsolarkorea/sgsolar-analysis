@@ -80,9 +80,7 @@ export default function MonthlyGenerationChart({
           )}
         </p>
         <p className="mt-2 break-words text-xs leading-relaxed text-slate-500">
-          단위: kWh · 막대 위 숫자는 월별 예상 발전량 · 월별 합계{" "}
-          {computedTotal.toLocaleString("ko-KR")} kWh = 연간{" "}
-          {annualKwh.toLocaleString("ko-KR")} kWh
+          단위 : kWh · 막대 위 숫자는 월별 예상 발전량입니다.
         </p>
       </div>
     </section>

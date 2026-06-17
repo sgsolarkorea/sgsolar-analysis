@@ -30,7 +30,9 @@ import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { primaryParcelFromReview } from "@/lib/api/parcelLookup";
+import MountainLandWarningBanner from "@/components/result/MountainLandWarningBanner";
 import MultiParcelSection from "@/components/result/MultiParcelSection";
+import { isMountainOrForestSite } from "@/lib/site/mountainLand";
 
 interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
@@ -74,6 +76,11 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   const multiParcelEnabled = data.solarMetrics.installType === "토지형";
 
   const searchHistory = await recordSearchHistory(data, params.address ?? data.address);
+  const showMountainWarning = isMountainOrForestSite(
+    data.address,
+    data.jibunAddress,
+    getFieldValue(data.landInfo, "지목"),
+  );
 
   return (
     <div className="pb-28 md:pb-20">
@@ -101,6 +108,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             consultationBase={consultationBase}
           >
             <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
+              {showMountainWarning && <MountainLandWarningBanner />}
+
               <section id="site-location" className="scroll-mt-24 mt-8 sm:mt-0">
                 <SectionHeader
                   title="입지 위치"
@@ -132,7 +141,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
               <ResultCapacitySection recommendation={data.recommendation} />
               <ResultGenerationSection />
-              <ResultRevenueSection />
+              <ResultRevenueSection showMountainRecNote={showMountainWarning} />
 
               <GridConnectionSection
                 initialGridInfo={data.gridInfo}

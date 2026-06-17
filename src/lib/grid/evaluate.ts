@@ -215,6 +215,36 @@ export function formatDlRemainingMw(
   return `${value.toLocaleString("ko-KR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}MW`;
 }
 
+/** 태양광 설치용량 — MW + kW 동시 표기 (소용량 0MW 방지) */
+export function formatSolarCapacityMwKw(
+  capacityKw: number,
+  fallback = GRID_UNKNOWN_VALUE,
+): string {
+  if (capacityKw <= 0 || !Number.isFinite(capacityKw)) return fallback;
+  const mw = Math.round((capacityKw / 1000) * 1000) / 1000;
+  const mwStr = mw.toLocaleString("ko-KR", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  });
+  const kwStr = capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 });
+  return `${mwStr}MW (${kwStr}kW)`;
+}
+
+/** D/L 잔여용량 MW + kW 병기 (D/L 카드 전용) */
+export function formatDlRemainingMwKw(
+  value: number | null | undefined,
+  fallback = GRID_UNKNOWN_VALUE,
+): { primary: string; secondary?: string } {
+  if (value == null || !Number.isFinite(value)) {
+    return { primary: fallback };
+  }
+  const kw = Math.round(value * 1000);
+  return {
+    primary: formatDlRemainingMw(value),
+    secondary: `(${kw.toLocaleString("ko-KR")}kW)`,
+  };
+}
+
 export function formatCapacityMargin(
   remainingMw: number | null,
   expectedMw: number,

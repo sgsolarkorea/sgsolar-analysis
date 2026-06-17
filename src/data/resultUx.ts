@@ -218,53 +218,44 @@ export function resolveProgressSteps(
 }
 
 export const INSTALL_TYPE_OPTIONS = [
-  "지붕형",
   "토지형",
-  "축사형",
-  "공장형",
-  "상가형",
+  "지붕형",
+  "상계거래(가정용)",
 ] as const;
 
 export type InstallTypeOption = (typeof INSTALL_TYPE_OPTIONS)[number];
 
 export const INSTALL_TYPE_UI_MESSAGES: Record<InstallTypeOption, string> = {
-  지붕형: "건물 지붕·옥상 활용 설치 유형으로 1차 검토됩니다.",
   토지형: "유휴 토지·발전사업용 설치 유형으로 1차 검토됩니다.",
-  축사형: "축사 지붕 활용 대형 설치 유형으로 1차 검토됩니다.",
-  공장형: "공장·창고 지붕 자가소비·발전 병행 유형으로 1차 검토됩니다.",
-  상가형: "상가·근린시설 지붕 소규모 설치 유형으로 1차 검토됩니다.",
+  지붕형: "건물 지붕·옥상 활용 설치 유형으로 1차 검토됩니다.",
+  "상계거래(가정용)":
+    "가정용 상계거래 방식으로 전기요금 절감 효과를 1차 검토합니다.",
 };
 
+export const RESIDENTIAL_AREA_THRESHOLD_SQM = 49.5868;
+
 export function resolveDefaultInstallType(
-  recommendation: string,
+  _recommendation: string,
   landInfo: InfoField[],
   buildingInfo: InfoField[],
-  options?: { hasRoadAddress?: boolean },
+  _options?: { hasRoadAddress?: boolean },
 ): InstallTypeOption {
+  void landInfo;
   const buildingArea = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
-  const landArea = parseAreaSqm(getFieldValue(landInfo, "면적"));
   const hasBuilding = hasBuildingRecord(buildingInfo);
-  const text = recommendation.toLowerCase();
 
-  if (text.includes("축사")) return "축사형";
-  if (text.includes("공장")) return "공장형";
-  if (text.includes("상가") || text.includes("근린")) return "상가형";
-
-  if (buildingArea != null && buildingArea > 0) return "지붕형";
-  if (hasBuilding) return "지붕형";
-
-  const blockLandOnlyFallback =
-    options?.hasRoadAddress === true && !hasBuilding && buildingArea == null;
-
-  if (text.includes("토지") && landArea != null && landArea > 0 && !blockLandOnlyFallback) {
-    return "토지형";
-  }
-  if (landArea != null && landArea > 0 && !hasBuilding && !blockLandOnlyFallback) {
+  if (!hasBuilding) {
     return "토지형";
   }
 
-  if (text.includes("옥상") || text.includes("지붕")) return "지붕형";
-  if (options?.hasRoadAddress) return "지붕형";
+  if (
+    buildingArea != null &&
+    buildingArea > 0 &&
+    buildingArea < RESIDENTIAL_AREA_THRESHOLD_SQM
+  ) {
+    return "상계거래(가정용)";
+  }
+
   return "지붕형";
 }
 
@@ -279,12 +270,8 @@ export function formatInstallTypeDisplayLabel(installType: InstallTypeOption): s
       return "토지형 (15° 고정형)";
     case "지붕형":
       return "지붕형 (12° 고정형)";
-    case "축사형":
-      return "축사형 (12° 고정형)";
-    case "공장형":
-      return "공장형 (12° 고정형)";
-    case "상가형":
-      return "상가형 (12° 고정형)";
+    case "상계거래(가정용)":
+      return "상계거래(가정용)";
     default:
       return installType;
   }

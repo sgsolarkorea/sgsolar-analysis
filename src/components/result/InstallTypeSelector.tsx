@@ -23,7 +23,7 @@ export default function InstallTypeSelector({ apiRecommendation }: InstallTypeSe
         description="관심 있는 설치 유형을 선택하면 추천 안내 및 설치용량 산정 기준이 변경됩니다."
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {INSTALL_TYPE_OPTIONS.map((type) => {
           const isSelected = installType === type;
           return (

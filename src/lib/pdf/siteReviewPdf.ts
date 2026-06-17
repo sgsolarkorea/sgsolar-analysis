@@ -8,7 +8,9 @@ import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
-import { formatDlRemainingMw, formatRemainingWithStatus } from "@/lib/grid/evaluate";
+import { formatDlRemainingMwKw, formatRemainingWithStatus, formatSolarCapacityMwKw } from "@/lib/grid/evaluate";
+import { isHouseholdInstallType, formatHouseholdMonthlySavings, HOUSEHOLD_SAVINGS_DISCLAIMER, HOUSEHOLD_SAVINGS_PER_KW } from "@/lib/solar/householdSavings";
+import { isMountainOrForestSite, MOUNTAIN_REC_WEIGHT_NOTE } from "@/lib/site/mountainLand";
 import {
   COLORS,
   MARGIN,
@@ -255,10 +257,22 @@ function drawSiteSummaryPage(
     { label: "면적", value: area },
     { label: "예상 설치용량", value: data.capacity },
     { label: "예상 발전량", value: data.annualGeneration },
-    { label: "예상 연매출", value: data.annualRevenue },
+    {
+      label: isHouseholdInstallType(data.solarMetrics.installType) ? "월 예상 절감액" : "예상 연매출",
+      value: isHouseholdInstallType(data.solarMetrics.installType)
+        ? formatHouseholdMonthlySavings(data.solarMetrics.capacityKw)
+        : data.annualRevenue,
+    },
     { label: "예상 시공비", value: data.constructionCost },
     { label: "설치 유형", value: data.recommendation },
   ];
+
+  if (data.landInfoDetail.priceReferenceDate) {
+    metrics.splice(3, 0, {
+      label: "지적도 업데이트 기준일",
+      value: data.landInfoDetail.priceReferenceDate,
+    });
+  }
 
   for (let i = 0; i < metrics.length; i += 2) {
     const rowY = y - (Math.floor(i / 2) + 1) * (cardH + 10);
@@ -354,8 +368,14 @@ function drawGridPage(
       ["변전소", fmtName(grid.substation.name)],
       ["변압기 (MTR)", fmtName(grid.transformer.name)],
       ["배전선로 (D/L)", fmtName(grid.distributionLine.name)],
-      ["태양광 설치용량", grid.expectedCapacityDisplay],
-      ["D/L 잔여용량", formatDlRemainingMw(grid.distributionLine.remainingMw)],
+      ["태양광 설치용량", formatSolarCapacityMwKw(data.solarMetrics.capacityKw, "—")],
+      [
+        "D/L 잔여용량",
+        (() => {
+          const dl = formatDlRemainingMwKw(grid.distributionLine.remainingMw);
+          return dl.secondary ? `${dl.primary}\n${dl.secondary}` : dl.primary;
+        })(),
+      ],
       ["검토결과", grid.reviewResult],
       ["데이터 출처", grid.dataSourceLabel],
     ];
@@ -570,11 +590,24 @@ function drawProfitabilityPage(
   pageNum: number,
   totalPages: number,
 ) {
-  let y = drawPageHeader(page, font, fontBold, "수익성 분석", "SMP · REC · 가중치 기준", logoImage);
+  const isHousehold = isHouseholdInstallType(data.solarMetrics.installType);
+  let y = drawPageHeader(
+    page,
+    font,
+    fontBold,
+    isHousehold ? "전기요금 절감 안내" : "수익성 분석",
+    isHousehold ? "상계거래(가정용) 기준" : "SMP · REC · 가중치 기준",
+    logoImage,
+  );
 
   const m = data.solarMetrics;
   const p = data.profitability;
   const colW = (PAGE.width - MARGIN * 2) / 2;
+  const showMountainNote = isMountainOrForestSite(
+    data.address,
+    data.jibunAddress,
+    getFieldValue(data.landInfo, "지목"),
+  );
 
   y = drawTableRow(
     page,
@@ -588,16 +621,29 @@ function drawProfitabilityPage(
     true,
   );
 
-  const rows: [string, string][] = [
-    ["SMP 단가", `${m.market.smpPrice}원/kWh (${m.market.smpDate})`],
-    ["REC 단가", `${m.market.recPrice.toLocaleString("ko-KR")}원/MWh (${m.market.recDate})`],
-    ["REC 가중치", formatRecWeightDisplay(m.recWeight)],
-    ["연간 발전량", data.annualGeneration],
-    ["SMP 수익", p.smpRevenue],
-    ["REC 수익", p.recRevenue],
-    ["예상 연매출", p.totalRevenue],
-    ["예상 시공비", p.estimatedInstallCost],
-  ];
+  const rows: [string, string][] = isHousehold
+    ? [
+        ["예상 설치용량", data.capacity],
+        ["월 예상 절감액", formatHouseholdMonthlySavings(m.capacityKw)],
+        [
+          "절감 기준",
+          `설치용량(kW) × ${HOUSEHOLD_SAVINGS_PER_KW.toLocaleString("ko-KR")}원/월`,
+        ],
+        ["참고 (3·6·9kW)", "약 5·10·15만원/월"],
+      ]
+    : [
+        ["SMP 단가", `${m.market.smpPrice}원/kWh (${m.market.smpDate})`],
+        ["REC 단가", `${m.market.recPrice.toLocaleString("ko-KR")}원/MWh (${m.market.recDate})`],
+        [
+          "REC 가중치",
+          `${formatRecWeightDisplay(m.recWeight)}${showMountainNote ? ` · ${MOUNTAIN_REC_WEIGHT_NOTE}` : ""}`,
+        ],
+        ["연간 발전량", data.annualGeneration],
+        ["SMP 수익", p.smpRevenue],
+        ["REC 수익", p.recRevenue],
+        ["예상 연매출", p.totalRevenue],
+        ["예상 시공비", p.estimatedInstallCost],
+      ];
 
   for (const [label, value] of rows) {
     y = drawTableRow(page, font, fontBold, y, [
@@ -618,7 +664,9 @@ function drawProfitabilityPage(
   });
   page.drawText(
     sanitizePdfText(
-      "※ 예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.",
+      isHousehold
+        ? `※ ${HOUSEHOLD_SAVINGS_DISCLAIMER}`
+        : "※ 예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.",
     ),
     {
       x: MARGIN + 10,
