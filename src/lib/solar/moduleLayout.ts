@@ -157,37 +157,149 @@ function groupSlotsByRow(slots: ModuleSlot[], heightM: number): ModuleSlot[][] {
     .map(([, row]) => row.sort((a, b) => a.x - b.x));
 }
 
-/** 장축 Row 순서로 유효 슬롯 채우기 — 목표 초과 시 경계 밖 배치 없음 */
-function selectSlotsForTarget(
+function selectCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
+  if (count <= 0 || slots.length === 0) return [];
+  if (slots.length <= count) return [...slots];
+  const start = Math.floor((slots.length - count) / 2);
+  return slots.slice(start, start + count);
+}
+
+function polygonLocalCentroid(localPoly: LocalPoint[]): LocalPoint {
+  let sx = 0;
+  let sy = 0;
+  for (const p of localPoly) {
+    sx += p.x;
+    sy += p.y;
+  }
+  return { x: sx / localPoly.length, y: sy / localPoly.length };
+}
+
+function distributeRowQuotas(rowCaps: number[], target: number): number[] {
+  const total = rowCaps.reduce((a, b) => a + b, 0);
+  if (total === 0) return rowCaps.map(() => 0);
+  const effective = Math.min(target, total);
+  const quotas = rowCaps.map((cap) => Math.floor((cap / total) * effective));
+  let assigned = quotas.reduce((a, b) => a + b, 0);
+  const order = rowCaps.map((cap, i) => ({ i, cap })).sort((a, b) => b.cap - a.cap);
+  let qi = 0;
+  while (assigned < effective) {
+    quotas[order[qi % order.length].i]++;
+    assigned++;
+    qi++;
+  }
+  return quotas;
+}
+
+export interface RoofPlacementDiagnostics {
+  roofFillStrategy: "centered" | "distributed";
+  roofCenteringApplied: boolean;
+  roofUnusedAreaRatio: number;
+  selectedSlotBoundingBox: { minX: number; maxX: number; minY: number; maxY: number };
+  roofPolygonBoundingBox: { minX: number; maxX: number; minY: number; maxY: number };
+  centerOffsetM: number;
+  sequentialFillRejectedReason: string;
+}
+
+interface BBox {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
+function slotsBBox(slots: ModuleSlot[], widthM: number, heightM: number): BBox {
+  if (slots.length === 0) {
+    return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+  }
+  const xs = slots.flatMap((s) => [s.x, s.x + widthM]);
+  const ys = slots.flatMap((s) => [s.y, s.y + heightM]);
+  return {
+    minX: Math.min(...xs),
+    maxX: Math.max(...xs),
+    minY: Math.min(...ys),
+    maxY: Math.max(...ys),
+  };
+}
+
+function bboxCenter(b: BBox): LocalPoint {
+  return { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 };
+}
+
+/** 지붕 Polygon 중심 기준 균등·중앙 배치 — 좌하단 순차 채우기 금지 */
+function selectSlotsRoofCentered(
   slots: ModuleSlot[],
   targetCount: number,
   heightM: number,
-): { selected: ModuleSlot[]; rowModuleCounts: number[] } {
+  localPoly: LocalPoint[],
+  widthM: number,
+): { selected: ModuleSlot[]; rowModuleCounts: number[]; diagnostics: RoofPlacementDiagnostics } {
+  const emptyDiag: RoofPlacementDiagnostics = {
+    roofFillStrategy: "centered",
+    roofCenteringApplied: false,
+    roofUnusedAreaRatio: 1,
+    selectedSlotBoundingBox: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
+    roofPolygonBoundingBox: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
+    centerOffsetM: 0,
+    sequentialFillRejectedReason: "bottom-left-sequential-fill-not-used",
+  };
+
   if (targetCount <= 0 || slots.length === 0) {
-    return { selected: [], rowModuleCounts: [] };
+    return { selected: [], rowModuleCounts: [], diagnostics: emptyDiag };
   }
-  if (slots.length <= targetCount) {
-    return {
-      selected: slots,
-      rowModuleCounts: groupSlotsByRow(slots, heightM).map((row) => row.length),
-    };
-  }
+
+  const centroid = polygonLocalCentroid(localPoly);
+  const rows = groupSlotsByRow(slots, heightM);
+  const rowsByCentrality = rows
+    .map((row) => ({
+      row,
+      distY: Math.abs((row[0]?.y ?? 0) + heightM / 2 - centroid.y),
+    }))
+    .sort((a, b) => a.distY - b.distY);
+
+  const rowCaps = rowsByCentrality.map((r) => r.row.length);
+  const quotas = distributeRowQuotas(rowCaps, targetCount);
 
   const selected: ModuleSlot[] = [];
   const rowModuleCounts: number[] = [];
-  for (const row of groupSlotsByRow(slots, heightM)) {
-    let rowTaken = 0;
-    for (const slot of row) {
-      selected.push(slot);
-      rowTaken++;
-      if (selected.length >= targetCount) {
-        rowModuleCounts.push(rowTaken);
-        return { selected, rowModuleCounts };
-      }
-    }
-    if (rowTaken > 0) rowModuleCounts.push(rowTaken);
+
+  for (let i = 0; i < rowsByCentrality.length; i++) {
+    const quota = quotas[i];
+    if (quota <= 0) continue;
+    const row = rowsByCentrality[i].row;
+    const sortedByX = [...row].sort((a, b) => a.x - b.x);
+    const pick = selectCentered(sortedByX, quota);
+    selected.push(...pick);
+    rowModuleCounts.push(pick.length);
   }
-  return { selected, rowModuleCounts };
+
+  const polyBBox = {
+    minX: Math.min(...localPoly.map((p) => p.x)),
+    maxX: Math.max(...localPoly.map((p) => p.x)),
+    minY: Math.min(...localPoly.map((p) => p.y)),
+    maxY: Math.max(...localPoly.map((p) => p.y)),
+  };
+  const selBBox = slotsBBox(selected, widthM, heightM);
+  const polyCenter = bboxCenter(polyBBox);
+  const selCenter = bboxCenter(selBBox);
+  const centerOffsetM = Math.hypot(selCenter.x - polyCenter.x, selCenter.y - polyCenter.y);
+
+  const polyArea = (polyBBox.maxX - polyBBox.minX) * (polyBBox.maxY - polyBBox.minY) || 1;
+  const selArea =
+    (selBBox.maxX - selBBox.minX) * (selBBox.maxY - selBBox.minY) || 0;
+
+  return {
+    selected,
+    rowModuleCounts,
+    diagnostics: {
+      roofFillStrategy: "centered",
+      roofCenteringApplied: true,
+      roofUnusedAreaRatio: Math.round((1 - selArea / polyArea) * 1000) / 1000,
+      selectedSlotBoundingBox: selBBox,
+      roofPolygonBoundingBox: polyBBox,
+      centerOffsetM: Math.round(centerOffsetM * 100) / 100,
+      sequentialFillRejectedReason: "bottom-left-sequential-fill-not-used",
+    },
+  };
 }
 
 function moduleRectsFootprintSqm(modules: ModuleRect[]): number {
@@ -209,6 +321,7 @@ interface FootprintPlacement {
   modules: ModuleRect[];
   validSlotCount: number;
   rowModuleCounts: number[];
+  roofDiagnostics?: RoofPlacementDiagnostics;
 }
 
 /**
@@ -232,13 +345,24 @@ function placeModulesInFootprint(
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
   const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
-  const { selected, rowModuleCounts } = selectSlotsForTarget(slots, targetCount, heightM);
+  const { selected, rowModuleCounts, diagnostics } = selectSlotsRoofCentered(
+    slots,
+    targetCount,
+    heightM,
+    oriented.localPoly,
+    widthM,
+  );
 
   const modules = selected.map((slot) =>
     makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
   );
 
-  return { modules, validSlotCount: slots.length, rowModuleCounts };
+  return {
+    modules,
+    validSlotCount: slots.length,
+    rowModuleCounts,
+    roofDiagnostics: diagnostics,
+  };
 }
 
 export function createVirtualParcelRectangle(
@@ -283,6 +407,7 @@ export function computeModuleLayout(input: {
   let validSlotCount: number;
   let rowModuleCounts: number[];
   let landDiagnostics: LandBlockPlacementDiagnostics | undefined;
+  let roofDiagnostics: RoofPlacementDiagnostics | undefined;
 
   if (params.kind === "land") {
     const landResult = placeLandBlockLayout(
@@ -300,6 +425,7 @@ export function computeModuleLayout(input: {
     modules = legacy.modules;
     validSlotCount = legacy.validSlotCount;
     rowModuleCounts = legacy.rowModuleCounts;
+    roofDiagnostics = legacy.roofDiagnostics;
   }
   const usableAreaSqm = polygonAreaSqm(input.boundary);
   const footprintSqm = moduleRectsFootprintSqm(modules);
@@ -362,5 +488,6 @@ export function computeModuleLayout(input: {
       capacityLayoutRule: landDiagnostics?.capacityLayoutRule,
     },
     landLayoutDiagnostics: landDiagnostics,
+    roofLayoutDiagnostics: roofDiagnostics,
   };
 }

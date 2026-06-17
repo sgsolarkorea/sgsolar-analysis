@@ -1,5 +1,5 @@
 /**
- * Phase 3 — 토지형 2단 배치 검증
+ * Phase 3.1 — physical array + roof centered fill verification
  * Usage: node scripts/verify-land-double-block.mjs [baseUrl]
  */
 const base = process.argv[2] ?? "http://localhost:3000";
@@ -14,7 +14,7 @@ const sites = [
     capacityKw: 269.44,
     moduleCount: 421,
     installType: "토지형",
-    expectDouble: true,
+    expectPhysicalArray: true,
   },
   {
     name: "sacheon-733",
@@ -23,7 +23,7 @@ const sites = [
     capacityKw: 644.48,
     moduleCount: 1007,
     installType: "토지형",
-    expectDouble: true,
+    expectPhysicalArray: true,
   },
   {
     name: "seosan-698-6",
@@ -34,7 +34,7 @@ const sites = [
     capacityKw: 378.88,
     moduleCount: 592,
     installType: "토지형",
-    expectDouble: true,
+    expectPhysicalArray: true,
   },
   {
     name: "jeonju-9-3",
@@ -46,8 +46,8 @@ const sites = [
     moduleCount: 47,
     buildingAreaSqm: 206.2,
     installType: "지붕형",
-    expectDouble: false,
-    expectLandRule: false,
+    expectPhysicalArray: false,
+    expectRoofCentered: true,
   },
 ];
 
@@ -84,13 +84,21 @@ for (const site of sites) {
   const data = await res.json();
   const d = data.diagnostics ?? {};
   const isLand = installType === "토지형";
+
   const pass =
     res.ok &&
-    (site.expectLandRule === false
-      ? d.capacityLayoutRule == null && d.layoutTier == null
-      : site.expectDouble
-        ? d.layoutTier === "double" && (d.blockCount ?? 0) >= 2
-        : d.layoutTier === "single");
+    d.placedModuleCount === site.moduleCount &&
+    (isLand
+      ? site.expectPhysicalArray
+        ? d.fillStrategy === "physical-array" &&
+          d.medianSplitUsed === false &&
+          (d.arrayCount ?? 0) >= 2 &&
+          d.aisleApplied === true
+        : true
+      : site.expectRoofCentered
+        ? d.roofCenteringApplied === true &&
+          d.sequentialFillRejectedReason === "bottom-left-sequential-fill-not-used"
+        : true);
 
   console.log(
     JSON.stringify(
@@ -100,13 +108,18 @@ for (const site of sites) {
         httpStatus: res.status,
         installType,
         capacityKw,
-        layoutTier: d.layoutTier ?? null,
-        blockCount: d.blockCount ?? null,
-        blockModuleCounts: d.blockModuleCounts ?? null,
-        selectedAzimuthDegrees: d.selectedAzimuthDegrees ?? null,
-        capacityLayoutRule: d.capacityLayoutRule ?? null,
         placed: d.placedModuleCount,
         target: d.targetModuleCount,
+        fillStrategy: d.fillStrategy ?? null,
+        medianSplitUsed: d.medianSplitUsed ?? null,
+        arrayCount: d.arrayCount ?? null,
+        arrayModuleCounts: d.arrayModuleCounts ?? null,
+        aisleM: d.aisleM ?? null,
+        aisleApplied: d.aisleApplied ?? null,
+        unusedAreaRatio: d.unusedAreaRatio ?? null,
+        roofCenteringApplied: d.roofCenteringApplied ?? null,
+        centerOffsetM: d.centerOffsetM ?? null,
+        roofUnusedAreaRatio: d.roofUnusedAreaRatio ?? null,
         pass,
         error: data.error ?? null,
       },

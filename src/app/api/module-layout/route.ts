@@ -10,6 +10,7 @@ import {
 } from "@/lib/solar/polygonGeometry";
 import type { LatLngPoint, ModuleLayoutDiagnostics } from "@/types/moduleLayout";
 import type { LandBlockPlacementDiagnostics } from "@/lib/solar/landBlockLayout";
+import type { RoofPlacementDiagnostics } from "@/lib/solar/moduleLayout";
 
 function parseOptionalNumber(value: string | null): number | undefined {
   if (value == null || value === "") return undefined;
@@ -41,11 +42,13 @@ function buildDiagnostics(input: {
   rowModuleCounts: number[];
   polygonUtilizationPct: number;
   landLayout?: LandBlockPlacementDiagnostics;
+  roofLayout?: RoofPlacementDiagnostics;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
   const g = input.geometry;
   const land = input.landLayout;
+  const roof = input.roofLayout;
   return {
     polygonSource: input.polygonSource,
     boundaryPointCount: input.boundary.length,
@@ -84,6 +87,23 @@ function buildDiagnostics(input: {
     capacityLayoutRule: land?.capacityLayoutRule,
     singleBlockRejectedReason: land?.singleBlockRejectedReason,
     unusedAreaReason: land?.unusedAreaReason,
+    arrayCount: land?.arrayCount,
+    arrayTierCount: land?.arrayTierCount,
+    tierRowsPerArray: land?.tierRowsPerArray,
+    arrayModuleCounts: land?.arrayModuleCounts,
+    aisleM: land?.aisleM,
+    aisleApplied: land?.aisleApplied,
+    fillStrategy: land?.fillStrategy,
+    medianSplitUsed: land?.medianSplitUsed,
+    rowGenerationPattern: land?.rowGenerationPattern,
+    unusedAreaRatio: land?.unusedAreaRatio,
+    roofFillStrategy: roof?.roofFillStrategy,
+    roofCenteringApplied: roof?.roofCenteringApplied,
+    roofUnusedAreaRatio: roof?.roofUnusedAreaRatio,
+    selectedSlotBoundingBox: roof?.selectedSlotBoundingBox,
+    roofPolygonBoundingBox: roof?.roofPolygonBoundingBox,
+    centerOffsetM: roof?.centerOffsetM,
+    sequentialFillRejectedReason: roof?.sequentialFillRejectedReason,
   };
 }
 
@@ -168,6 +188,7 @@ export async function GET(request: Request) {
     rowModuleCounts: layout.stats.rowModuleCounts,
     polygonUtilizationPct: layout.stats.polygonUtilizationPct,
     landLayout: layout.landLayoutDiagnostics,
+    roofLayout: layout.roofLayoutDiagnostics,
   });
 
   if (!overlayOnly && layout.stats.placedModuleCount <= 0) {

@@ -75,6 +75,25 @@ export interface ModuleLayoutDiagnostics {
   capacityLayoutRule?: string;
   singleBlockRejectedReason?: string;
   unusedAreaReason?: string;
+  /** 토지형 Phase 3.1 — physical array diagnostics */
+  arrayCount?: number;
+  arrayTierCount?: number;
+  tierRowsPerArray?: number;
+  arrayModuleCounts?: number[];
+  aisleM?: number;
+  aisleApplied?: boolean;
+  fillStrategy?: string;
+  medianSplitUsed?: boolean;
+  rowGenerationPattern?: string;
+  unusedAreaRatio?: number;
+  /** 건물형 Phase 3.1 */
+  roofFillStrategy?: "centered" | "distributed";
+  roofCenteringApplied?: boolean;
+  roofUnusedAreaRatio?: number;
+  selectedSlotBoundingBox?: { minX: number; maxX: number; minY: number; maxY: number };
+  roofPolygonBoundingBox?: { minX: number; maxX: number; minY: number; maxY: number };
+  centerOffsetM?: number;
+  sequentialFillRejectedReason?: string;
 }
 
 export interface ModuleLayoutResult {
@@ -100,4 +119,5 @@ export interface ModuleLayoutResult {
   /** 건물형: 토지 cadastral 참고용 (가배치 미사용) */
   referenceCadastral?: LatLngPoint[];
   landLayoutDiagnostics?: import("@/lib/solar/landBlockLayout").LandBlockPlacementDiagnostics;
+  roofLayoutDiagnostics?: import("@/lib/solar/moduleLayout").RoofPlacementDiagnostics;
 }
