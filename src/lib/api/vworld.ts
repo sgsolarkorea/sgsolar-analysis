@@ -1,9 +1,12 @@
 import { unavailableLandInfo } from "@/lib/api/infoFallbacks";
 import { ADJACENT_CADASTRAL_FETCH_SIZE } from "@/lib/parcels/constants";
+import { polygonAreaSqm } from "@/lib/solar/polygonGeometry";
+import type { LatLngPoint } from "@/types/moduleLayout";
 import type { LandInfoDetail } from "@/types/landInfo";
 import type { InfoField } from "@/types/siteReview";
 
 const VWORLD_DATA_API = "https://api.vworld.kr/req/data";
+const VWORLD_WFS_API = "https://api.vworld.kr/req/wfs";
 const VWORLD_LAND_API = "https://api.vworld.kr/ned/data/getLandCharacteristics";
 const VWORLD_LAND_PRICE_API = "https://api.vworld.kr/ned/data/getIndvdLandPriceAttr";
 
@@ -578,5 +581,154 @@ export async function fetchAdjacentCadastralParcels(
   }
 
   return [];
+}
+
+const BUILDING_DATA_LAYERS = ["LT_C_SPBD", "LT_L_SPRD", "LT_C_ADBD"] as const;
+const BUILDING_WFS_TYPENAMES = ["lt_c_spbd", "LT_C_SPBD", "lt_c_adbd", "LT_C_ADBD"] as const;
+
+export interface BuildingPolygonResult {
+  pnu: string;
+  ring: LatLngPoint[];
+}
+
+function ringFromFeature(feature: VworldFeatureWithGeometry): LatLngPoint[] | null {
+  const ringCoords = extractPolygonRingFromGeometry(feature.geometry);
+  if (!ringCoords?.length) return null;
+  return ringCoords.map(([lngCoord, latCoord]) => ({
+    lat: latCoord,
+    lng: lngCoord,
+  }));
+}
+
+function pickLargestBuildingRing(features: VworldFeatureWithGeometry[]): LatLngPoint[] | null {
+  let bestRing: LatLngPoint[] | null = null;
+  let bestArea = 0;
+
+  for (const feature of features) {
+    const ring = ringFromFeature(feature);
+    if (!ring?.length) continue;
+    const area = polygonAreaSqm(ring);
+    if (area > bestArea) {
+      bestArea = area;
+      bestRing = ring;
+    }
+  }
+
+  return bestRing;
+}
+
+async function fetchBuildingPolygonFromDataLayer(
+  pnu: string,
+  lat: number,
+  lng: number,
+  dataLayer: string,
+  apiKey: string,
+): Promise<BuildingPolygonResult | null> {
+  for (const domain of getApiDomainCandidates()) {
+    const params = buildDataApiParams(apiKey, domain);
+    params.set("service", "data");
+    params.set("request", "GetFeature");
+    params.set("data", dataLayer);
+    params.set("size", "20");
+    params.set("page", "1");
+    params.set("geometry", "true");
+    params.set("attribute", "true");
+    params.set("crs", "EPSG:4326");
+    params.set("attrFilter", `pnu:EQ:${pnu}`);
+    params.set("geomFilter", `POINT(${lng} ${lat})`);
+
+    const data = await fetchVworldJson<
+      VworldDataResponse & {
+        response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+      }
+    >(`${VWORLD_DATA_API}?${params.toString()}`, `building-polygon-${dataLayer}`);
+
+    const features = data?.response?.result?.featureCollection?.features ?? [];
+    const matching = features.filter((feature) => {
+      const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+      return !featurePnu || featurePnu === pnu;
+    });
+    const ring = pickLargestBuildingRing(matching);
+    if (ring?.length) {
+      return { pnu, ring };
+    }
+  }
+
+  return null;
+}
+
+async function fetchBuildingPolygonFromWfs(
+  pnu: string,
+  lat: number,
+  lng: number,
+  apiKey: string,
+): Promise<BuildingPolygonResult | null> {
+  for (const domain of getApiDomainCandidates()) {
+    for (const typename of BUILDING_WFS_TYPENAMES) {
+      const params = buildDataApiParams(apiKey, domain);
+      params.set("service", "WFS");
+      params.set("request", "GetFeature");
+      params.set("version", "1.1.0");
+      params.set("typename", typename);
+      params.set("srsname", "EPSG:4326");
+      params.set("output", "application/json");
+      params.set("maxfeatures", "50");
+      params.set("attrFilter", `pnu:EQ:${pnu}`);
+      params.set("geomFilter", `POINT(${lng} ${lat})`);
+
+      const data = await fetchVworldJson<
+        VworldDataResponse & {
+          response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+          features?: VworldFeatureWithGeometry[];
+        }
+      >(`${VWORLD_WFS_API}?${params.toString()}`, `building-wfs-${typename}`);
+
+      const features =
+        data?.response?.result?.featureCollection?.features ??
+        data?.features ??
+        [];
+      const matching = features.filter((feature) => {
+        const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+        return !featurePnu || featurePnu === pnu;
+      });
+      const ring = pickLargestBuildingRing(matching);
+      if (ring?.length) {
+        return { pnu, ring };
+      }
+    }
+  }
+
+  return null;
+}
+
+/** PNU → VWorld 건물 폴리곤 (lat/lng 링) — 면적 최대 건물 1건 */
+export async function fetchBuildingPolygonByPnu(
+  pnu: string,
+  lat: number,
+  lng: number,
+): Promise<BuildingPolygonResult | null> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  if (!apiKey || !pnu) return null;
+
+  for (const dataLayer of BUILDING_DATA_LAYERS) {
+    const result = await fetchBuildingPolygonFromDataLayer(pnu, lat, lng, dataLayer, apiKey);
+    if (result?.ring?.length) return result;
+  }
+
+  return fetchBuildingPolygonFromWfs(pnu, lat, lng, apiKey);
+}
+
+/** 좌표 → PNU → 연속지적도 필지 경계 (pnu 미전달 시) */
+export async function fetchCadastralPolygonAtCoordinates(
+  lat: number,
+  lng: number,
+): Promise<CadastralPolygonResult | null> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  const pnu = await fetchPnuByCoordinates(lat, lng, apiKey);
+  if (!pnu) return null;
+
+  return fetchCadastralPolygonByPnu(pnu, lat, lng);
 }
 

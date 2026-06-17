@@ -15,6 +15,7 @@ import {
   computePolygonOrientation,
   localToGeo,
   pointInPolygon,
+  polygonAreaSqm,
   toLocal,
   type LocalPoint,
 } from "@/lib/solar/polygonGeometry";
@@ -40,6 +41,11 @@ interface OrientedPoly {
   maxX: number;
   minY: number;
   maxY: number;
+}
+
+interface ModuleSlot {
+  x: number;
+  y: number;
 }
 
 function getLayoutParams(
@@ -95,17 +101,100 @@ function toOrientedPoly(polygon: LatLngPoint[]): OrientedPoly {
 }
 
 function resolveModuleScale(
-  polyWidth: number,
-  polyHeight: number,
+  polyArea: number,
   targetCount: number,
   mode: ModuleLayoutMode,
 ): number {
   const base = moduleLayoutConfig.visualScale;
   const moduleUnitArea = moduleLayoutConfig.moduleShortM * moduleLayoutConfig.moduleLongM;
-  const polyArea = Math.max(polyWidth * polyHeight, 1);
-  const fillTarget = mode === "flush" ? 0.68 : 0.55;
+  const fillTarget = mode === "flush" ? 0.9 : 0.875;
   const ideal = Math.sqrt((polyArea * fillTarget) / Math.max(targetCount * moduleUnitArea, 1));
   return Math.min(Math.max(ideal, base * 0.82), base * 1.18);
+}
+
+function moduleFitsInPolygon(
+  x: number,
+  y: number,
+  widthM: number,
+  heightM: number,
+  localPoly: LocalPoint[],
+): boolean {
+  const center = { x: x + widthM / 2, y: y + heightM / 2 };
+  if (pointInPolygon(center, localPoly)) return true;
+
+  const corners: LocalPoint[] = [
+    { x, y },
+    { x: x + widthM, y },
+    { x: x + widthM, y: y + heightM },
+    { x, y: y + heightM },
+  ];
+  return corners.every((corner) => pointInPolygon(corner, localPoly));
+}
+
+function collectValidSlots(
+  oriented: OrientedPoly,
+  widthM: number,
+  heightM: number,
+  rowGapM: number,
+): ModuleSlot[] {
+  const { localPoly, minX, maxX, minY, maxY } = oriented;
+  const slots: ModuleSlot[] = [];
+  let y = minY;
+
+  while (y + heightM <= maxY + 0.001) {
+    let x = minX;
+    while (x + widthM <= maxX + 0.001) {
+      if (moduleFitsInPolygon(x, y, widthM, heightM, localPoly)) {
+        slots.push({ x, y });
+      }
+      x += widthM;
+    }
+    y += heightM + rowGapM;
+  }
+
+  return slots;
+}
+
+function selectSpreadSlots(slots: ModuleSlot[], targetCount: number): ModuleSlot[] {
+  if (slots.length <= targetCount) return slots;
+
+  const selected: ModuleSlot[] = [];
+  const step = slots.length / targetCount;
+  for (let i = 0; i < targetCount; i++) {
+    const index = Math.min(Math.floor(i * step + step / 2), slots.length - 1);
+    selected.push(slots[index]);
+  }
+  return selected;
+}
+
+function findOptimalScale(
+  oriented: OrientedPoly,
+  targetCount: number,
+  params: LayoutParams,
+  polyArea: number,
+): number {
+  const base = moduleLayoutConfig.visualScale;
+  let lo = base * 0.72;
+  let hi = base * 1.22;
+  let best = resolveModuleScale(polyArea, targetCount, params.mode);
+
+  for (let i = 0; i < 18; i++) {
+    const mid = (lo + hi) / 2;
+    const widthM = moduleLayoutConfig.moduleShortM * mid;
+    const heightM = moduleLayoutConfig.moduleLongM * mid;
+    const rowGapM =
+      params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
+    const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
+
+    if (slots.length >= targetCount) {
+      best = mid;
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+
+  return best;
 }
 
 /**
@@ -119,33 +208,20 @@ function placeModulesInFootprint(
 ): ModuleRect[] {
   if (targetCount <= 0 || polygon.length < 3) return [];
 
-  const { origin, angleRad, localPoly, minX, maxX, minY, maxY } = toOrientedPoly(polygon);
-  const polyWidth = maxX - minX;
-  const polyHeight = maxY - minY;
-
-  const scale = resolveModuleScale(polyWidth, polyHeight, targetCount, params.mode);
+  const oriented = toOrientedPoly(polygon);
+  const polyArea = polygonAreaSqm(polygon);
+  const scale = findOptimalScale(oriented, targetCount, params, polyArea);
   const widthM = moduleLayoutConfig.moduleShortM * scale;
   const heightM = moduleLayoutConfig.moduleLongM * scale;
-  const colGapM = 0;
   const rowGapM =
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
-  const modules: ModuleRect[] = [];
-  let y = minY;
+  const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
+  const selected = selectSpreadSlots(slots, targetCount);
 
-  while (y + heightM <= maxY + 0.001 && modules.length < targetCount) {
-    let x = minX;
-    while (x + widthM <= maxX + 0.001 && modules.length < targetCount) {
-      const center = { x: x + widthM / 2, y: y + heightM / 2 };
-      if (pointInPolygon(center, localPoly)) {
-        modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin, angleRad));
-      }
-      x += widthM + colGapM;
-    }
-    y += heightM + rowGapM;
-  }
-
-  return modules.slice(0, targetCount);
+  return selected.map((slot) =>
+    makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
+  );
 }
 
 export function createVirtualParcelRectangle(
@@ -185,7 +261,10 @@ export function computeModuleLayout(input: {
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
   const modules = placeModulesInFootprint(input.boundary, targetModuleCount, params);
-  const origin = computeOrientedBounds(input.boundary).origin;
+  const origin =
+    input.boundary.length >= 3
+      ? computeOrientedBounds(input.boundary).origin
+      : { lat: 0, lng: 0 };
 
   let bounds = {
     minLat: Infinity,

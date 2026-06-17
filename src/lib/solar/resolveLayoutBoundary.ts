@@ -1,11 +1,11 @@
-import { fetchCadastralPolygonByPnu } from "@/lib/api/vworld";
+import {
+  fetchBuildingPolygonByPnu,
+  fetchCadastralPolygonAtCoordinates,
+  fetchCadastralPolygonByPnu,
+} from "@/lib/api/vworld";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
-import {
-  applySetback,
-  createBuildingFootprintRectangle,
-  deriveBuildingFootprintInParcel,
-} from "@/lib/solar/polygonGeometry";
+import { applySetback } from "@/lib/solar/polygonGeometry";
 import { createVirtualParcelRectangle } from "@/lib/solar/moduleLayout";
 import type { LatLngPoint, ModuleLayoutPolygonSource } from "@/types/moduleLayout";
 
@@ -15,6 +15,20 @@ export interface ResolvedLayoutBoundary {
   boundary: LatLngPoint[];
   polygonSource: ModuleLayoutPolygonSource;
   footprintKind: LayoutFootprintKind;
+}
+
+async function resolveCadastralRing(
+  pnu: string | null | undefined,
+  lat: number,
+  lng: number,
+): Promise<LatLngPoint[] | null> {
+  if (pnu) {
+    const cadastral = await fetchCadastralPolygonByPnu(pnu, lat, lng);
+    if (cadastral?.ring?.length) return cadastral.ring;
+  }
+
+  const fromCoords = await fetchCadastralPolygonAtCoordinates(lat, lng);
+  return fromCoords?.ring?.length ? fromCoords.ring : null;
 }
 
 export async function resolveLayoutBoundary(input: {
@@ -28,40 +42,47 @@ export async function resolveLayoutBoundary(input: {
 }): Promise<ResolvedLayoutBoundary> {
   const center: LatLngPoint = { lat: input.lat, lng: input.lng };
   const isLand = input.installType === "토지형";
-  const buildingArea = input.buildingAreaSqm ?? 0;
 
-  let cadastralRing: LatLngPoint[] | null = null;
-  if (input.pnu) {
-    const cadastral = await fetchCadastralPolygonByPnu(input.pnu, input.lat, input.lng);
-    if (cadastral?.ring?.length) {
-      cadastralRing = cadastral.ring;
+  const cadastralRing = await resolveCadastralRing(input.pnu, input.lat, input.lng);
+
+  if (!isLand) {
+    if (input.pnu) {
+      const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
+      if (building?.ring?.length) {
+        return {
+          boundary: applySetback(building.ring, moduleLayoutConfig.roofSetbackM),
+          polygonSource: "building",
+          footprintKind: "building",
+        };
+      }
     }
-  }
 
-  if (!isLand && buildingArea > 0) {
     if (cadastralRing) {
-      const footprint = deriveBuildingFootprintInParcel(cadastralRing, buildingArea);
       return {
-        boundary: applySetback(footprint, moduleLayoutConfig.roofSetbackM),
+        boundary: applySetback(cadastralRing, moduleLayoutConfig.roofSetbackM),
         polygonSource: "cadastral",
-        footprintKind: "building",
+        footprintKind: "parcel",
       };
     }
 
     return {
-      boundary: applySetback(
-        createBuildingFootprintRectangle(center, buildingArea),
-        moduleLayoutConfig.roofSetbackM,
-      ),
-      polygonSource: "virtual",
-      footprintKind: "building",
+      boundary: [],
+      polygonSource: "cadastral",
+      footprintKind: "parcel",
     };
   }
 
   if (cadastralRing) {
-    const setback = isLand ? moduleLayoutConfig.landSetbackM : moduleLayoutConfig.roofSetbackM;
     return {
-      boundary: applySetback(cadastralRing, setback),
+      boundary: applySetback(cadastralRing, moduleLayoutConfig.landSetbackM),
+      polygonSource: "cadastral",
+      footprintKind: "parcel",
+    };
+  }
+
+  if (input.pnu) {
+    return {
+      boundary: [],
       polygonSource: "cadastral",
       footprintKind: "parcel",
     };

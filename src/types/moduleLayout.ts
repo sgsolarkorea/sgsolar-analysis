@@ -7,7 +7,7 @@ export interface ModuleRect {
   corners: [LatLngPoint, LatLngPoint, LatLngPoint, LatLngPoint];
 }
 
-export type ModuleLayoutPolygonSource = "cadastral" | "virtual";
+export type ModuleLayoutPolygonSource = "building" | "cadastral" | "virtual";
 
 export type ModuleLayoutMode = "flush" | "row";
 

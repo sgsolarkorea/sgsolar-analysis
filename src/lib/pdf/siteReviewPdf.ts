@@ -435,7 +435,11 @@ function drawModuleLayoutPage(
 
   y -= 74;
   const polygonLabel =
-    layout.polygonSource === "cadastral" ? "연속지적도 경계" : "추정 설치면적(참고)";
+    layout.polygonSource === "building"
+      ? "건물 경계"
+      : layout.polygonSource === "cadastral"
+        ? "연속지적도 경계"
+        : "추정 설치면적(참고)";
   const layoutModeLabel =
     layout.stats.layoutMode === "row"
       ? `Row 배치 (행간 ${layout.stats.rowSpacingM}m)`
