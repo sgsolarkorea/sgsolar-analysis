@@ -360,8 +360,8 @@ function placeModulesInFootprint(
   const oriented = toOrientedPoly(polygon);
   const orientationCandidates = [oriented.angleRad, oriented.angleRad + Math.PI / 2];
   const scale = moduleLayoutConfig.visualScale;
-  const widthM = moduleLayoutConfig.moduleLongM * scale;
-  const heightM = moduleLayoutConfig.moduleShortM * scale;
+  const widthM = moduleLayoutConfig.moduleShortM * scale;
+  const heightM = moduleLayoutConfig.moduleLongM * scale;
   const rowGapM =
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 

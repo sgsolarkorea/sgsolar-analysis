@@ -93,6 +93,7 @@ export interface ModuleLayoutDiagnostics {
   twoTierSetModuleCounts?: number[];
   innerTierGapM?: number;
   setAisleM?: number;
+  visualScale?: number;
   /** 토지형 Phase 3.2 — Array Block diagnostics */
   arrayBlockCount?: number;
   arrayBlocks?: Array<{

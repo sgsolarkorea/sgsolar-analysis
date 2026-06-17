@@ -58,6 +58,7 @@ export interface LandBlockPlacementDiagnostics {
   twoTierSetModuleCounts: number[];
   innerTierGapM: number;
   setAisleM: number;
+  visualScale: number;
   arrayBlockCount: number;
   arrayBlocks: Array<{
     blockIndex: number;
@@ -129,6 +130,7 @@ interface UniformRowPlacement {
   selected: ModuleSlot[];
   innerTierGapM: number;
   setAisleM: number;
+  visualScale: number;
   score: number;
   rowDirectionAspect: number;
   unusedAreaRatio: number;
@@ -903,6 +905,7 @@ function tryPlacementAtAzimuth(input: {
   twoTierSetModuleCounts: number[];
   innerTierGapM: number;
   setAisleM: number;
+  visualScale: number;
   arrayModuleCounts: number[];
   arrayCount: number;
   arrayBlocks: PhysicalArrayBlock[];
@@ -915,81 +918,90 @@ function tryPlacementAtAzimuth(input: {
 } | null {
   const angleRad = panelAzimuthToLayoutAngleRad(input.azimuthDeg);
   const oriented = toOrientedPolyAtAngle(input.polygon, angleRad);
-  const scale = moduleLayoutConfig.visualScale;
-  const widthM = moduleLayoutConfig.moduleShortM * scale;
-  const heightM = moduleLayoutConfig.moduleLongM * scale;
   const baseRowGapM =
     input.params.mode === "row"
       ? getVisualRowSpacingM(input.params.kind, input.params.mode)
       : 0;
+  const visualScaleCandidates =
+    input.params.mode === "row"
+      ? [0.86, 0.82, 0.78, 0.74, moduleLayoutConfig.visualScale].filter(
+          (scale, i, arr) => scale > 0 && arr.indexOf(scale) === i,
+        )
+      : [moduleLayoutConfig.visualScale];
   const innerTierGapCandidatesM =
     input.params.mode === "row"
-      ? [0.15, 0.25, 0.4, 0.6, 0.8].filter((gap, i, arr) => gap >= 0 && arr.indexOf(gap) === i)
+      ? [0.05, 0.1, 0.15, 0.25, 0.4].filter((gap, i, arr) => gap >= 0 && arr.indexOf(gap) === i)
       : [0];
   const setAisleCandidatesM =
     input.params.mode === "row"
-      ? [baseRowGapM, 3.5, 3, 2.5, 2].filter((gap, i, arr) => gap >= 2 && arr.indexOf(gap) === i)
+      ? [1.2, 1.5, 2, 2.5, baseRowGapM].filter((gap, i, arr) => gap >= 1 && arr.indexOf(gap) === i)
       : [0];
 
   let best: UniformRowPlacement | null = null;
 
-  for (const innerTierGapM of innerTierGapCandidatesM) {
-    for (const setAisleM of setAisleCandidatesM) {
-      if (setAisleM <= innerTierGapM) continue;
+  for (const visualScale of visualScaleCandidates) {
+    const widthM = moduleLayoutConfig.moduleShortM * visualScale;
+    const heightM = moduleLayoutConfig.moduleLongM * visualScale;
+    for (const innerTierGapM of innerTierGapCandidatesM) {
+      for (const setAisleM of setAisleCandidatesM) {
+        if (setAisleM <= innerTierGapM) continue;
 
-      const setPitchM = heightM * TIER_ROWS_PER_ARRAY + innerTierGapM + setAisleM;
-      const offsets = [0, setPitchM * 0.2, setPitchM * 0.4, setPitchM * 0.6, setPitchM * 0.8];
-      for (const offsetM of offsets) {
-        const sets = collectTwoTierRowSets(
-          oriented,
-          widthM,
-          heightM,
-          innerTierGapM,
-          setAisleM,
-          offsetM,
-        );
-        const validSlotCount = sets.reduce((sum, set) => sum + set.capacity, 0);
-        if (validSlotCount === 0) continue;
-
-        const { selected, rowModuleCounts, twoTierSetModuleCounts } = selectTwoTierRowSets(
-          sets,
-          input.targetCount,
-        );
-        if (selected.length === 0) continue;
-
-        const { score: baseScore, unusedAreaRatio } = scoreTwoTierRowSets({
-          oriented,
-          selected,
-          rowModuleCounts,
-          twoTierSetModuleCounts,
-          widthM,
-          heightM,
-          targetCount: input.targetCount,
-          innerTierGapM,
-          setAisleM,
-        });
-        const rowDirectionAspect = computeRowDirectionAspect(oriented);
-        const score =
-          baseScore +
-          azimuthPreferenceScore(input.azimuthDeg) +
-          azimuthShapePreferenceScore(input.azimuthDeg, rowDirectionAspect);
-        const modules = selected.map((slot) =>
-          makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
-        );
-
-        if (!best || score > best.score) {
-          best = {
-            modules,
-            validSlotCount,
-            rowModuleCounts,
-            twoTierSetModuleCounts,
-            selected,
+        const setPitchM = heightM * TIER_ROWS_PER_ARRAY + innerTierGapM + setAisleM;
+        const offsets = [0, setPitchM * 0.2, setPitchM * 0.4, setPitchM * 0.6, setPitchM * 0.8];
+        for (const offsetM of offsets) {
+          const sets = collectTwoTierRowSets(
+            oriented,
+            widthM,
+            heightM,
             innerTierGapM,
             setAisleM,
-            score,
-            rowDirectionAspect,
-            unusedAreaRatio,
-          };
+            offsetM,
+          );
+          const validSlotCount = sets.reduce((sum, set) => sum + set.capacity, 0);
+          if (validSlotCount === 0) continue;
+
+          const { selected, rowModuleCounts, twoTierSetModuleCounts } = selectTwoTierRowSets(
+            sets,
+            input.targetCount,
+          );
+          if (selected.length === 0) continue;
+
+          const { score: baseScore, unusedAreaRatio } = scoreTwoTierRowSets({
+            oriented,
+            selected,
+            rowModuleCounts,
+            twoTierSetModuleCounts,
+            widthM,
+            heightM,
+            targetCount: input.targetCount,
+            innerTierGapM,
+            setAisleM,
+          });
+          const rowDirectionAspect = computeRowDirectionAspect(oriented);
+          const score =
+            baseScore +
+            azimuthPreferenceScore(input.azimuthDeg) +
+            azimuthShapePreferenceScore(input.azimuthDeg, rowDirectionAspect) +
+            visualScale * 5000;
+          const modules = selected.map((slot) =>
+            makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
+          );
+
+          if (!best || score > best.score) {
+            best = {
+              modules,
+              validSlotCount,
+              rowModuleCounts,
+              twoTierSetModuleCounts,
+              selected,
+              innerTierGapM,
+              setAisleM,
+              visualScale,
+              score,
+              rowDirectionAspect,
+              unusedAreaRatio,
+            };
+          }
         }
       }
     }
@@ -1007,6 +1019,7 @@ function tryPlacementAtAzimuth(input: {
     twoTierSetModuleCounts: best.twoTierSetModuleCounts,
     innerTierGapM: best.innerTierGapM,
     setAisleM: best.setAisleM,
+    visualScale: best.visualScale,
     arrayModuleCounts: best.twoTierSetModuleCounts,
     arrayCount: best.twoTierSetModuleCounts.length,
     arrayBlocks: [],
@@ -1116,6 +1129,7 @@ export function placeLandBlockLayout(
         twoTierSetModuleCounts: [],
         innerTierGapM: 0,
         setAisleM: 0,
+        visualScale: moduleLayoutConfig.visualScale,
         arrayBlockCount: 0,
         arrayBlocks: [],
         mainAisleM: requireMinArrays >= 2 ? LAND_MAIN_AISLE_M : 0,
@@ -1170,6 +1184,7 @@ export function placeLandBlockLayout(
       twoTierSetModuleCounts: best.twoTierSetModuleCounts,
       innerTierGapM: best.innerTierGapM,
       setAisleM: best.setAisleM,
+      visualScale: best.visualScale,
       arrayBlockCount: 0,
       arrayBlocks: [],
       mainAisleM: 0,

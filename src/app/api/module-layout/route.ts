@@ -133,6 +133,7 @@ function buildDiagnostics(input: {
     twoTierSetModuleCounts: land?.twoTierSetModuleCounts,
     innerTierGapM: land?.innerTierGapM,
     setAisleM: land?.setAisleM,
+    visualScale: land?.visualScale,
     arrayBlockCount: land?.arrayBlockCount,
     arrayBlocks: land?.arrayBlocks,
     mainAisleM: land?.mainAisleM,
