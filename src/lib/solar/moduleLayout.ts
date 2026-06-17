@@ -1,9 +1,12 @@
 import type { InstallTypeOption } from "@/data/resultUx";
 import {
   getVisualModuleDimensions,
+  getVisualRowSpacingM,
   moduleLayoutConfig,
   resolveModuleLayoutKind,
+  resolveModuleLayoutMode,
   type ModuleLayoutInstallKind,
+  type ModuleLayoutMode,
 } from "@/data/moduleLayoutConfig";
 import { areaPerKwByType, modulePowerW } from "@/data/solarConfig";
 import { installTypeToCategory } from "@/lib/solar/calculate";
@@ -27,14 +30,19 @@ interface LocalPoint {
 
 interface LayoutParams {
   kind: ModuleLayoutInstallKind;
+  mode: ModuleLayoutMode;
   rowSpacingM: number;
   tiltDeg: number;
 }
 
-function getLayoutParams(installType: InstallTypeOption | string): LayoutParams {
+function getLayoutParams(
+  installType: InstallTypeOption | string,
+  capacityKw: number,
+): LayoutParams {
   const kind = resolveModuleLayoutKind(installType);
+  const mode = resolveModuleLayoutMode(installType, capacityKw);
   const spec = moduleLayoutConfig[kind];
-  return { kind, rowSpacingM: spec.rowSpacingM, tiltDeg: spec.tiltDeg };
+  return { kind, mode, rowSpacingM: spec.rowSpacingM, tiltDeg: spec.tiltDeg };
 }
 
 function toLocal(ring: LatLngPoint[], origin: LatLngPoint): LocalPoint[] {
@@ -90,21 +98,6 @@ function expandBounds(
   };
 }
 
-function pointInPolygon(point: LocalPoint, polygon: LocalPoint[]): boolean {
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].x;
-    const yi = polygon[i].y;
-    const xj = polygon[j].x;
-    const yj = polygon[j].y;
-    const intersect =
-      yi > point.y !== yj > point.y &&
-      point.x < ((xj - xi) * (point.y - yi)) / (yj - yi + Number.EPSILON) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
 function makePortraitModuleRect(
   x: number,
   y: number,
@@ -123,19 +116,7 @@ function makePortraitModuleRect(
   };
 }
 
-/** 행(Row) 단위 배치 — 목표 모듈수 우선, 마지막 행 부분 채움 허용 */
-function placeModulesRowBased(
-  polygon: LatLngPoint[],
-  targetCount: number,
-  params: LayoutParams,
-  origin: LatLngPoint,
-): ModuleRect[] {
-  if (targetCount <= 0) return [];
-
-  const { widthM, heightM, colGapM, rowGapM } = getVisualModuleDimensions();
-  const visualRowGap = rowGapM + params.rowSpacingM * moduleLayoutConfig.visualScale * 0.15;
-
-  const localPoly = toLocal(polygon, origin);
+function polygonExtents(localPoly: LocalPoint[]) {
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
@@ -146,62 +127,98 @@ function placeModulesRowBased(
     minY = Math.min(minY, point.y);
     maxY = Math.max(maxY, point.y);
   }
+  return { minX, maxX, minY, maxY };
+}
 
+function maxModulesPerRow(
+  polyWidth: number,
+  widthM: number,
+  colGapM: number,
+  fallback: number,
+): number {
+  const fit = Math.floor((polyWidth + colGapM) / (widthM + colGapM));
+  return Math.max(3, fit > 0 ? fit : fallback);
+}
+
+function buildRowCounts(targetCount: number, modulesPerRow: number): number[] {
+  const rows: number[] = [];
+  let remaining = targetCount;
+  while (remaining > 0) {
+    rows.push(Math.min(modulesPerRow, remaining));
+    remaining -= rows[rows.length - 1];
+  }
+  return rows;
+}
+
+/**
+ * 통판형 / Row 공통 — 행 단위 배치.
+ * - 통판형: 모듈끼리 최소 간격, 행 간도 좁게
+ * - Row: 행 내 모듈 밀착, 행 간만 이격
+ */
+function placeModules(
+  polygon: LatLngPoint[],
+  targetCount: number,
+  params: LayoutParams,
+  origin: LatLngPoint,
+): ModuleRect[] {
+  if (targetCount <= 0) return [];
+
+  const { widthM, heightM, colGapM } = getVisualModuleDimensions(params.mode);
+  const rowGapM =
+    params.mode === "row"
+      ? getVisualRowSpacingM(params.kind, params.mode)
+      : getVisualModuleDimensions(params.mode).rowGapM;
+
+  const localPoly = toLocal(polygon, origin);
+  const { minX, maxX, minY, maxY } = polygonExtents(localPoly);
   const centerX = (minX + maxX) / 2;
   const centerY = (minY + maxY) / 2;
-  const polyWidth = Math.max(maxX - minX - moduleLayoutConfig.boundaryInsetM * 2, widthM * 2);
-
-  let modulesPerRow = Math.max(
-    3,
-    Math.min(
-      moduleLayoutConfig.defaultModulesPerRow,
-      Math.floor((polyWidth + colGapM) / (widthM + colGapM)),
-    ),
+  const polyWidth = Math.max(
+    maxX - minX - moduleLayoutConfig.boundaryInsetM * 2,
+    widthM * 3,
   );
 
-  const totalRows = Math.ceil(targetCount / modulesPerRow);
-  const gridHeight = totalRows * heightM + Math.max(0, totalRows - 1) * visualRowGap;
+  let modulesPerRow = maxModulesPerRow(
+    polyWidth,
+    widthM,
+    colGapM,
+    moduleLayoutConfig.defaultModulesPerRow,
+  );
+  modulesPerRow = Math.min(modulesPerRow, moduleLayoutConfig.defaultModulesPerRow);
+
+  let rowCounts = buildRowCounts(targetCount, modulesPerRow);
+  let gridHeight =
+    rowCounts.length * heightM + Math.max(0, rowCounts.length - 1) * rowGapM;
   let startY = centerY - gridHeight / 2;
 
   const modules: ModuleRect[] = [];
 
-  for (let row = 0; row < totalRows && modules.length < targetCount; row += 1) {
-    const remaining = targetCount - modules.length;
-    const countThisRow = Math.min(modulesPerRow, remaining);
-    const rowWidth = countThisRow * widthM + Math.max(0, countThisRow - 1) * colGapM;
-    let startX = centerX - rowWidth / 2;
-    const y = startY + row * (heightM + visualRowGap);
-
-    for (let col = 0; col < countThisRow; col += 1) {
-      const x = startX + col * (widthM + colGapM);
-      const center = { x: x + widthM / 2, y: y + heightM / 2 };
-      const inside = pointInPolygon(center, localPoly);
-
-      if (inside || modules.length >= Math.floor(targetCount * 0.85)) {
-        modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin));
-      }
-    }
-  }
-
-  if (modules.length < targetCount) {
-    modulesPerRow = Math.max(3, Math.min(modulesPerRow + 2, targetCount));
-    const retryRows = Math.ceil(targetCount / modulesPerRow);
-    const retryHeight = retryRows * heightM + Math.max(0, retryRows - 1) * visualRowGap;
-    startY = centerY - retryHeight / 2;
+  const placeRows = (counts: number[], baseY: number) => {
     modules.length = 0;
-
-    for (let row = 0; row < retryRows && modules.length < targetCount; row += 1) {
-      const remaining = targetCount - modules.length;
-      const countThisRow = Math.min(modulesPerRow, remaining);
+    let y = baseY;
+    for (const countThisRow of counts) {
       const rowWidth = countThisRow * widthM + Math.max(0, countThisRow - 1) * colGapM;
       const startX = centerX - rowWidth / 2;
-      const y = startY + row * (heightM + visualRowGap);
-
       for (let col = 0; col < countThisRow; col += 1) {
         const x = startX + col * (widthM + colGapM);
         modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin));
       }
+      y += heightM + rowGapM;
     }
+  };
+
+  placeRows(rowCounts, startY);
+
+  if (modules.length < targetCount) {
+    modulesPerRow = Math.min(
+      maxModulesPerRow(polyWidth, widthM, colGapM, modulesPerRow + 2),
+      targetCount,
+    );
+    rowCounts = buildRowCounts(targetCount, modulesPerRow);
+    gridHeight =
+      rowCounts.length * heightM + Math.max(0, rowCounts.length - 1) * rowGapM;
+    startY = centerY - gridHeight / 2;
+    placeRows(rowCounts, startY);
   }
 
   return modules.slice(0, targetCount);
@@ -235,19 +252,14 @@ export function computeModuleLayout(input: {
   installType: InstallTypeOption | string;
   moduleCount?: number;
 }): ModuleLayoutResult {
-  const params = getLayoutParams(input.installType);
+  const params = getLayoutParams(input.installType, input.capacityKw);
   const targetModuleCount =
     input.moduleCount != null && input.moduleCount > 0
       ? Math.floor(input.moduleCount)
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
   const origin = centroid(input.boundary);
-  const modules = placeModulesRowBased(
-    input.boundary,
-    targetModuleCount,
-    params,
-    origin,
-  );
+  const modules = placeModules(input.boundary, targetModuleCount, params, origin);
 
   let bounds = boundsFromRing(input.boundary);
   for (const mod of modules) {
@@ -265,7 +277,8 @@ export function computeModuleLayout(input: {
       targetModuleCount,
       placedModuleCount: modules.length,
       modulePowerW: moduleLayoutConfig.modulePowerW,
-      tiers: moduleLayoutConfig.tiers,
+      layoutMode: params.mode,
+      tiers: params.mode === "row" && params.kind === "land" ? 2 : 1,
       rowSpacingM: params.rowSpacingM,
       tiltDeg: params.tiltDeg,
       installType: input.installType,

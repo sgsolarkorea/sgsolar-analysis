@@ -19,6 +19,7 @@ interface ModuleLayoutMapProps {
 }
 
 const JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY?.trim() ?? "";
+const { boundaryFill, moduleFrame, moduleCell, moduleHighlight } = moduleLayoutConfig.colors;
 
 function CompassRose() {
   return (
@@ -30,6 +31,40 @@ function CompassRose() {
       <span className="mt-0.5 block h-3 w-0 border-x-[5px] border-b-[8px] border-x-transparent border-b-navy" />
     </div>
   );
+}
+
+function renderSolarModuleSvg(minX: number, minY: number, maxX: number, maxY: number): string {
+  const w = maxX - minX;
+  const h = maxY - minY;
+  const frame = Math.max(0.6, Math.min(w, h) * 0.04);
+  const ix = minX + frame;
+  const iy = minY + frame;
+  const iw = w - frame * 2;
+  const ih = h - frame * 2;
+
+  const cellLines: string[] = [];
+  const cols = 6;
+  const rows = 10;
+  for (let c = 1; c < cols; c++) {
+    const x = ix + (iw * c) / cols;
+    cellLines.push(
+      `<line x1="${x}" y1="${iy}" x2="${x}" y2="${iy + ih}" stroke="${moduleCell}" stroke-width="0.25" opacity="0.55" />`,
+    );
+  }
+  for (let r = 1; r < rows; r++) {
+    const y = iy + (ih * r) / rows;
+    cellLines.push(
+      `<line x1="${ix}" y1="${y}" x2="${ix + iw}" y2="${y}" stroke="${moduleCell}" stroke-width="0.2" opacity="0.45" />`,
+    );
+  }
+
+  const highlightW = iw * 0.35;
+  return `<g>
+    <rect x="${minX}" y="${minY}" width="${w}" height="${h}" rx="0.4" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.65" />
+    <rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="url(#panelFace)" stroke="none" />
+    ${cellLines.join("")}
+    <rect x="${ix + iw * 0.08}" y="${iy + ih * 0.06}" width="${highlightW}" height="${ih * 0.12}" rx="0.3" fill="${moduleHighlight}" opacity="0.7" />
+  </g>`;
 }
 
 export default function ModuleLayoutMap({ layout, address, jibunAddress }: ModuleLayoutMapProps) {
@@ -60,9 +95,13 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       return `${pixel.x},${pixel.y}`;
     };
 
+    const boundaryOverlay =
+      layout.boundary.length >= 3
+        ? `<polygon points="${layout.boundary.map(toPoint).join(" ")}" fill="${boundaryFill}" stroke="none" />`
+        : "";
+
     const modulePaths = layout.modules
-      .map((mod, index) => {
-        const points = mod.corners.map(toPoint).join(" ");
+      .map((mod) => {
         const xs = mod.corners.map((pt) => {
           const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
           return projection.containerPointFromCoords(coords).x;
@@ -71,40 +110,29 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
           const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
           return projection.containerPointFromCoords(coords).y;
         });
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-        const cellLines: string[] = [];
-        const colCount = 4;
-        for (let c = 1; c < colCount; c++) {
-          const x = minX + ((maxX - minX) * c) / colCount;
-          cellLines.push(
-            `<line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="#64748b" stroke-width="0.35" opacity="0.5" />`,
-          );
-        }
-        const rowCount = 2;
-        for (let r = 1; r < rowCount; r++) {
-          const y = minY + ((maxY - minY) * r) / rowCount;
-          cellLines.push(
-            `<line x1="${minX}" y1="${y}" x2="${maxX}" y2="${y}" stroke="#94a3b8" stroke-width="0.3" opacity="0.4" />`,
-          );
-        }
-        return `<g>
-          <polygon points="${points}" fill="url(#panelGrad)" fill-opacity="0.96" stroke="#0f172a" stroke-width="0.5" />
-          ${cellLines.join("")}
-        </g>`;
+        return renderSolarModuleSvg(
+          Math.min(...xs),
+          Math.min(...ys),
+          Math.max(...xs),
+          Math.max(...ys),
+        );
       })
       .join("");
 
     svg.innerHTML = `
       <defs>
         <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#334155" />
-          <stop offset="40%" stop-color="#1e293b" />
+          <stop offset="0%" stop-color="#1e3a5f" />
+          <stop offset="45%" stop-color="#172554" />
           <stop offset="100%" stop-color="#0f172a" />
         </linearGradient>
+        <linearGradient id="panelFace" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.35" />
+          <stop offset="35%" stop-color="#1e293b" stop-opacity="0.95" />
+          <stop offset="100%" stop-color="#020617" stop-opacity="1" />
+        </linearGradient>
       </defs>
+      ${boundaryOverlay}
       ${modulePaths}
     `;
   }, [layout]);

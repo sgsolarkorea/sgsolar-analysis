@@ -324,11 +324,23 @@ function drawModuleLayoutPage(
     };
 
     if (layout.boundary.length >= 3) {
-      /* 필지 경계선은 표시하지 않음 */
+      const boundaryPath =
+        layout.boundary
+          .map((point, index) => {
+            const p = toPdfPoint(point.lat, point.lng);
+            return `${index === 0 ? "M" : "L"} ${p.x} ${p.y}`;
+          })
+          .join(" ") + " Z";
+      page.drawSvgPath(boundaryPath, {
+        color: rgb(0.96, 0.62, 0.04),
+        opacity: 0.22,
+        borderWidth: 0,
+      });
     }
 
-    const moduleFill = rgb(0.12, 0.16, 0.23);
-    const moduleEdge = rgb(0.07, 0.09, 0.15);
+    const moduleFill = rgb(0.09, 0.16, 0.33);
+    const moduleEdge = rgb(0.05, 0.09, 0.18);
+    const cellLine = rgb(0.28, 0.35, 0.48);
     for (const mod of layout.modules) {
       const corners = mod.corners.map((point) => toPdfPoint(point.lat, point.lng));
       if (corners.length >= 4) {
@@ -338,15 +350,37 @@ function drawModuleLayoutPage(
         const maxX = Math.max(...xs);
         const minY = Math.min(...ys);
         const maxY = Math.max(...ys);
+        const w = Math.max(maxX - minX, 1);
+        const h = Math.max(maxY - minY, 2);
         page.drawRectangle({
           x: minX,
           y: minY,
-          width: Math.max(maxX - minX, 1),
-          height: Math.max(maxY - minY, 2),
+          width: w,
+          height: h,
           color: moduleFill,
           borderColor: moduleEdge,
-          borderWidth: 0.5,
+          borderWidth: 0.55,
         });
+        for (let c = 1; c < 4; c++) {
+          const x = minX + (w * c) / 4;
+          page.drawLine({
+            start: { x, y: minY },
+            end: { x, y: maxY },
+            thickness: 0.25,
+            color: cellLine,
+            opacity: 0.5,
+          });
+        }
+        for (let r = 1; r < 3; r++) {
+          const yLine = minY + (h * r) / 3;
+          page.drawLine({
+            start: { x: minX, y: yLine },
+            end: { x: maxX, y: yLine },
+            thickness: 0.2,
+            color: cellLine,
+            opacity: 0.4,
+          });
+        }
       }
     }
 
@@ -412,9 +446,13 @@ function drawModuleLayoutPage(
   y -= 74;
   const polygonLabel =
     layout.polygonSource === "cadastral" ? "연속지적도 경계" : "추정 설치면적(참고)";
+  const layoutModeLabel =
+    layout.stats.layoutMode === "row"
+      ? `Row 배치 (행간 ${layout.stats.rowSpacingM}m)`
+      : "통판형";
   page.drawText(
     sanitizePdfText(
-      `경계 출처: ${polygonLabel} · 열간격 ${layout.stats.rowSpacingM}m · 경사 ${layout.stats.tiltDeg}° · 목표 ${layout.stats.targetModuleCount.toLocaleString("ko-KR")}장`,
+      `경계 출처: ${polygonLabel} · ${layoutModeLabel} · 경사 ${layout.stats.tiltDeg}° · 목표 ${layout.stats.targetModuleCount.toLocaleString("ko-KR")}장`,
     ),
     {
       x: MARGIN,

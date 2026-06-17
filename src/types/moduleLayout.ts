@@ -9,11 +9,14 @@ export interface ModuleRect {
 
 export type ModuleLayoutPolygonSource = "cadastral" | "virtual";
 
+export type ModuleLayoutMode = "flush" | "row";
+
 export interface ModuleLayoutStats {
   capacityKw: number;
   targetModuleCount: number;
   placedModuleCount: number;
   modulePowerW: number;
+  layoutMode: ModuleLayoutMode;
   tiers: number;
   rowSpacingM: number;
   tiltDeg: number;
