@@ -47,7 +47,7 @@ export async function resolveLayoutBoundary(input: {
       const parcelArea = polygonAreaSqm(cadastralRing);
       const buildingRatio = parcelArea > 0 ? buildingArea / parcelArea : 1;
       const footprint =
-        buildingRatio >= 0.85
+        buildingRatio >= 0.5
           ? applySetback(cadastralRing, moduleLayoutConfig.roofSetbackM)
           : deriveBuildingFootprintInParcel(cadastralRing, buildingArea);
       const usable = applySetback(footprint, moduleLayoutConfig.roofSetbackM);

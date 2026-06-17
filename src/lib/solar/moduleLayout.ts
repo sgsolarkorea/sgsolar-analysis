@@ -61,14 +61,46 @@ function makePortraitModuleRect(
   };
 }
 
-function evenlySample<T>(items: T[], count: number): T[] {
-  if (items.length <= count) return items;
-  const result: T[] = [];
-  const step = items.length / count;
-  for (let i = 0; i < count; i += 1) {
-    result.push(items[Math.min(items.length - 1, Math.floor(i * step + step / 2))]);
+function dist(a: LocalPoint, b: LocalPoint): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/** 목표 모듈수만큼 사용 영역 전체에 균등 분산 */
+function selectSpreadSlots(slots: LocalPoint[], count: number): LocalPoint[] {
+  if (slots.length <= count) return slots;
+  const selected: LocalPoint[] = [];
+  const remaining = [...slots];
+
+  const cx = slots.reduce((sum, p) => sum + p.x, 0) / slots.length;
+  const cy = slots.reduce((sum, p) => sum + p.y, 0) / slots.length;
+  let firstIdx = 0;
+  let firstDist = Infinity;
+  for (let i = 0; i < remaining.length; i++) {
+    const d = dist(remaining[i], { x: cx, y: cy });
+    if (d < firstDist) {
+      firstDist = d;
+      firstIdx = i;
+    }
   }
-  return result;
+  selected.push(remaining[firstIdx]);
+  remaining.splice(firstIdx, 1);
+
+  while (selected.length < count && remaining.length > 0) {
+    let bestIdx = 0;
+    let bestScore = -1;
+    for (let i = 0; i < remaining.length; i++) {
+      const minDist = Math.min(...selected.map((s) => dist(s, remaining[i])));
+      if (minDist > bestScore) {
+        bestScore = minDist;
+        bestIdx = i;
+      }
+    }
+    selected.push(remaining[bestIdx]);
+    remaining.splice(bestIdx, 1);
+  }
+  return selected;
 }
 
 /**
@@ -128,7 +160,7 @@ function placeModulesDistributed(
     slots.push({ x: cx, y: cy });
   }
 
-  const selected = evenlySample(slots, targetCount);
+  const selected = selectSpreadSlots(slots, targetCount);
   return selected.map(({ x, y }) =>
     makePortraitModuleRect(x, y, widthM, heightM, origin, angleRad),
   );

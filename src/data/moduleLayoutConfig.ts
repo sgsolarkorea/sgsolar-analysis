@@ -38,7 +38,7 @@ export const moduleLayoutConfig = {
     moduleCell: "#475569",
     moduleHighlight: "rgba(148, 163, 184, 0.4)",
     boundary: "#f59e0b",
-    boundaryFill: "rgba(245, 158, 11, 0.32)",
+    boundaryFill: "rgba(245, 158, 11, 0.38)",
   },
   disclaimer:
     "본 배치도는 자동 산정된 참고용 가배치도입니다. 실제 설계 시 음영, 구조물, 경사도, 이격거리 및 인허가 조건에 따라 변경될 수 있습니다.",
