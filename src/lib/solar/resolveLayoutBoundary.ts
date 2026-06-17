@@ -27,8 +27,12 @@ async function resolveCadastralRing(
     if (cadastral?.ring?.length) return cadastral.ring;
   }
 
-  const fromCoords = await fetchCadastralPolygonAtCoordinates(lat, lng);
-  return fromCoords?.ring?.length ? fromCoords.ring : null;
+  if (!pnu) {
+    const fromCoords = await fetchCadastralPolygonAtCoordinates(lat, lng);
+    return fromCoords?.ring?.length ? fromCoords.ring : null;
+  }
+
+  return null;
 }
 
 export async function resolveLayoutBoundary(input: {
@@ -46,7 +50,7 @@ export async function resolveLayoutBoundary(input: {
   const cadastralRing = await resolveCadastralRing(input.pnu, input.lat, input.lng);
 
   if (!isLand) {
-    if (input.pnu) {
+    if (cadastralRing && input.pnu) {
       const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
       if (building?.ring?.length) {
         return {
