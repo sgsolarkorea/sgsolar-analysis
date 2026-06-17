@@ -122,11 +122,12 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                   lat={data.lat}
                   lng={data.lng}
                 />
+                <div className="mt-8">
+                  <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
+                </div>
               </section>
 
               <ResultSiteOverview recommendation={data.recommendation} address={data.address} />
-
-              <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
 
               <MultiParcelSection />
 

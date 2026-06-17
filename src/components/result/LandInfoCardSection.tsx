@@ -90,7 +90,7 @@ export default function LandInfoCardSection({ detail }: LandInfoCardSectionProps
         ))}
       </div>
 
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
+      <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
         공시지가·소유구분은 VWorld API 제공 범위 내에서 표시하며, 미제공 항목은 현장 확인이 필요합니다.
       </p>
     </section>

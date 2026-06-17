@@ -111,10 +111,10 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
             />
           </div>
 
-          <p className="mt-3 text-xs leading-relaxed text-slate-500">
+          <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
             경계 출처: {polygonLabel} · 열간격 {layout.stats.rowSpacingM}m · 경사 {layout.stats.tiltDeg}°
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">※ {moduleLayoutConfig.disclaimer}</p>
+          <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500">※ {moduleLayoutConfig.disclaimer}</p>
         </>
       )}
     </section>

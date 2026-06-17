@@ -51,7 +51,7 @@ export default function RegionDistrictSection({ analysis }: RegionDistrictSectio
       </div>
 
       {analysis.sourceNote && (
-        <p className="mt-3 text-xs leading-relaxed text-slate-500">{analysis.sourceNote}</p>
+        <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">{analysis.sourceNote}</p>
       )}
     </section>
   );

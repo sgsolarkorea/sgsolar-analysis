@@ -215,34 +215,30 @@ export function formatDlRemainingMw(
   return `${value.toLocaleString("ko-KR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}MW`;
 }
 
-/** 태양광 설치용량 — MW + kW 동시 표기 (소용량 0MW 방지) */
-export function formatSolarCapacityMwKw(
+/** 태양광 설치용량 — kW 단일 표기 (예: 30.5kW) */
+export function formatSolarCapacityKw(
   capacityKw: number,
   fallback = GRID_UNKNOWN_VALUE,
 ): string {
   if (capacityKw <= 0 || !Number.isFinite(capacityKw)) return fallback;
-  const mw = Math.round((capacityKw / 1000) * 1000) / 1000;
-  const mwStr = mw.toLocaleString("ko-KR", {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  });
   const kwStr = capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 });
-  return `${mwStr}MW (${kwStr}kW)`;
+  return `${kwStr}kW`;
 }
 
-/** D/L 잔여용량 MW + kW 병기 (D/L 카드 전용) */
-export function formatDlRemainingMwKw(
-  value: number | null | undefined,
+/** 계통 잔여·누적용량 — 1MW 이상 MW(소수1), 미만 kW */
+export function formatGridCapacityMwOrKw(
+  valueMw: number | null | undefined,
   fallback = GRID_UNKNOWN_VALUE,
-): { primary: string; secondary?: string } {
-  if (value == null || !Number.isFinite(value)) {
-    return { primary: fallback };
+): string {
+  if (valueMw == null || !Number.isFinite(valueMw)) return fallback;
+  if (valueMw >= 1) {
+    return `${valueMw.toLocaleString("ko-KR", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    })}MW`;
   }
-  const kw = Math.round(value * 1000);
-  return {
-    primary: formatDlRemainingMw(value),
-    secondary: `(${kw.toLocaleString("ko-KR")}kW)`,
-  };
+  const kw = Math.round(valueMw * 1000);
+  return `${kw.toLocaleString("ko-KR")}kW`;
 }
 
 export function formatCapacityMargin(
@@ -264,7 +260,7 @@ export function formatRemainingWithStatus(
   remainingMw: number | null | undefined,
   expectedCapacityMw: number,
 ): string {
-  const base = formatMw(remainingMw);
+  const base = formatGridCapacityMwOrKw(remainingMw);
   if (remainingMw == null || !Number.isFinite(remainingMw) || expectedCapacityMw <= 0) {
     return base;
   }

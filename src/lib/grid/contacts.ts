@@ -11,6 +11,17 @@ const OPERATIONS_ROLE = "배전계통 담당자";
 /** 시·군·구 키워드 → 관할 한전 지사 연락처 (KEPCO API 미제공, 내부 참고용) */
 const BRANCH_RULES: BranchRule[] = [
   {
+    keywords: ["전주", "완산", "덕진", "전북"],
+    contacts: {
+      kepcoBranch: "한국전력 전주지사",
+      branchPhone: "063-280-6114",
+      supplyDepartment: SUPPLY_ROLE,
+      supplyPhone: "063-280-6234",
+      operationsDepartment: OPERATIONS_ROLE,
+      operationsPhone: "063-280-6281",
+    },
+  },
+  {
     keywords: ["아산"],
     contacts: {
       kepcoBranch: "한국전력 아산지사",
@@ -78,15 +89,13 @@ const BRANCH_RULES: BranchRule[] = [
   },
 ];
 
-const KEPCO_MAIN_PHONE = "국번없이 123";
-
 const DEFAULT_CONTACTS: GridContactInfo = {
   kepcoBranch: "한국전력 관할 지사",
-  branchPhone: KEPCO_MAIN_PHONE,
+  branchPhone: "—",
   supplyDepartment: SUPPLY_ROLE,
-  supplyPhone: KEPCO_MAIN_PHONE,
+  supplyPhone: "—",
   operationsDepartment: OPERATIONS_ROLE,
-  operationsPhone: KEPCO_MAIN_PHONE,
+  operationsPhone: "—",
 };
 
 function extractSigunguToken(haystack: string): string | null {
@@ -96,14 +105,14 @@ function extractSigunguToken(haystack: string): string | null {
 
 /** admin·레거시 JSON에 supplyPhone 누락 시 지사 대표번호로 보완 */
 export function normalizeGridContacts(contacts: Partial<GridContactInfo>): GridContactInfo {
-  const branchPhone = contacts.branchPhone?.trim() || KEPCO_MAIN_PHONE;
+  const branchPhone = contacts.branchPhone?.trim() || DEFAULT_CONTACTS.branchPhone;
   return {
     kepcoBranch: contacts.kepcoBranch?.trim() || DEFAULT_CONTACTS.kepcoBranch,
     branchPhone,
     supplyDepartment: contacts.supplyDepartment?.trim() || SUPPLY_ROLE,
-    supplyPhone: contacts.supplyPhone?.trim() || KEPCO_MAIN_PHONE,
+    supplyPhone: contacts.supplyPhone?.trim() || branchPhone,
     operationsDepartment: contacts.operationsDepartment?.trim() || OPERATIONS_ROLE,
-    operationsPhone: contacts.operationsPhone?.trim() || KEPCO_MAIN_PHONE,
+    operationsPhone: contacts.operationsPhone?.trim() || branchPhone,
   };
 }
 

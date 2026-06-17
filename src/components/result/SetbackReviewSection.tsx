@@ -60,7 +60,7 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
         </div>
       </div>
 
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
+      <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
         실측 거리는 현장·GIS 기반 자동 측정 연동 예정이며, 현재는 참고용 기준값입니다.
       </p>
     </section>

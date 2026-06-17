@@ -38,11 +38,11 @@ export default function ResultHero({
 
         <dl className="mt-3 space-y-1.5 text-sm">
           <div>
-            <dt className="text-slate-400">도로명주소</dt>
+            <dt className="text-slate-400">입력 주소</dt>
             <dd className="font-medium text-white">{address}</dd>
           </div>
           <div>
-            <dt className="text-slate-400">지번주소</dt>
+            <dt className="text-slate-400">지번 주소</dt>
             <dd className="font-medium text-white">{jibunAddress}</dd>
           </div>
           {buildingName && (

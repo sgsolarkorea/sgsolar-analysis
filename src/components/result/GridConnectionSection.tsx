@@ -8,7 +8,11 @@ import {
   hasDetailedGridData,
   GRID_UNKNOWN_VALUE,
 } from "@/lib/grid/display";
-import { formatDlRemainingMwKw, formatMw, formatRemainingWithStatus, formatSolarCapacityMwKw } from "@/lib/grid/evaluate";
+import {
+  formatGridCapacityMwOrKw,
+  formatRemainingWithStatus,
+  formatSolarCapacityKw,
+} from "@/lib/grid/evaluate";
 import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
@@ -153,9 +157,30 @@ function ContactCard({
     <div className="flex h-full min-h-[120px] flex-col rounded-xl border border-slate-200 bg-slate-50/60 p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</p>
       <p className="mt-3 flex-1 text-base font-bold leading-snug text-slate-900">{primary}</p>
-      <p className="mt-2 text-sm text-slate-700">{secondary ?? "담당 문의"}</p>
+      {secondary && <p className="mt-2 text-sm text-slate-700">{secondary}</p>}
     </div>
   );
+}
+
+function resolveDirectContactLine(
+  directPhone: string,
+  branchPhone: string,
+  roleLabel: string,
+): { primary: string; secondary?: string } {
+  const direct = directPhone?.trim();
+  const branch = branchPhone?.trim();
+  const hasDirect =
+    direct &&
+    direct !== "—" &&
+    direct !== branch &&
+    direct !== "국번없이 123";
+  if (hasDirect) {
+    return { primary: roleLabel, secondary: direct };
+  }
+  return {
+    primary: roleLabel,
+    secondary: branch && branch !== "—" ? `관할 지사 문의 · ${branch}` : "관할 지사 문의",
+  };
 }
 
 export default function GridConnectionSection({
@@ -209,13 +234,24 @@ export default function GridConnectionSection({
   }, [metrics.capacityKw, fetchGrid, selectedPoleId, initialGridInfo.expectedCapacityMw]);
 
   const styles = STATUS_STYLES[gridInfo.status];
-  const fmtCum = (mw: number | null) => formatMw(mw);
-  const fmtRem = (mw: number | null) => formatMw(mw);
+  const fmtCum = (mw: number | null) => formatGridCapacityMwOrKw(mw);
+  const fmtRem = (mw: number | null) => formatGridCapacityMwOrKw(mw);
   const fmtName = (name: string) => formatGridLevelName(name, hasDetails);
   const expectedCapacityMw =
     Math.round((metrics.capacityKw / 1000) * 1000) / 1000;
-  const solarCapacityDisplay = formatSolarCapacityMwKw(metrics.capacityKw);
-  const dlRemainingDisplay = formatDlRemainingMwKw(gridInfo.distributionLine.remainingMw);
+  const solarCapacityDisplay = formatSolarCapacityKw(metrics.capacityKw);
+  const dlRemainingDisplay = formatGridCapacityMwOrKw(gridInfo.distributionLine.remainingMw);
+  const branchPhone = gridInfo.contacts.branchPhone;
+  const supplyContact = resolveDirectContactLine(
+    gridInfo.contacts.supplyPhone,
+    branchPhone,
+    "전력공급부 담당자",
+  );
+  const operationsContact = resolveDirectContactLine(
+    gridInfo.contacts.operationsPhone,
+    branchPhone,
+    "배전계통 담당자",
+  );
 
   return (
     <section id="grid" className="scroll-mt-24">
@@ -322,11 +358,7 @@ export default function GridConnectionSection({
                 dlMw={gridInfo.distributionLine.remainingMw}
               />
               <SingleValueCard title="태양광 설치용량" value={solarCapacityDisplay} />
-              <SingleValueCard
-                title="D/L 잔여용량"
-                value={dlRemainingDisplay.primary}
-                subValue={dlRemainingDisplay.secondary}
-              />
+              <SingleValueCard title="D/L 잔여용량" value={dlRemainingDisplay} />
             </div>
 
             <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
@@ -368,13 +400,13 @@ export default function GridConnectionSection({
             />
             <ContactCard
               title="전력공급부 담당자"
-              primary="전력공급부 담당자"
-              secondary={gridInfo.contacts.supplyPhone}
+              primary={supplyContact.primary}
+              secondary={supplyContact.secondary}
             />
             <ContactCard
               title="배전계통 담당자"
-              primary="배전계통 담당자"
-              secondary={gridInfo.contacts.operationsPhone}
+              primary={operationsContact.primary}
+              secondary={operationsContact.secondary}
             />
           </div>
           {hasDetails && (
@@ -392,14 +424,14 @@ export default function GridConnectionSection({
         </div>
 
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
-          <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">⚠ {disclaimer}</p>
+          <p className="text-sm font-medium leading-relaxed text-amber-900">⚠ {disclaimer}</p>
           {gridInfo.nearbyNotice && (
-            <p className="mt-1 text-xs leading-relaxed text-amber-900 sm:text-sm">
+            <p className="mt-1 text-sm font-medium leading-relaxed text-amber-900">
               ※ {gridInfo.nearbyNotice}
             </p>
           )}
           {getGridDataSourceNotice(gridInfo.dataSource) && (
-            <p className="mt-1 text-xs leading-relaxed text-amber-900 sm:text-sm">
+            <p className="mt-1 text-sm font-medium leading-relaxed text-amber-900">
               ⚠ {getGridDataSourceNotice(gridInfo.dataSource)}
             </p>
           )}

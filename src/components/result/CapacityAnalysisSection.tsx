@@ -50,10 +50,10 @@ export default function CapacityAnalysisSection({
           </span>
         </div>
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
-          <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">
+          <p className="text-sm font-medium leading-relaxed text-amber-900">
             ⚠ {metrics.capacityDisclaimer}
           </p>
-          <p className="mt-2 text-xs leading-relaxed text-amber-900 sm:text-sm">
+          <p className="mt-2 text-sm font-medium leading-relaxed text-amber-900">
             ⚠ 실제 모듈 수량은 배치도, 음영, 지붕 형상, 구조검토 결과에 따라 달라질 수 있습니다.
           </p>
         </div>

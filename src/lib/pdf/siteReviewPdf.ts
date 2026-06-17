@@ -8,7 +8,7 @@ import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
-import { formatDlRemainingMwKw, formatRemainingWithStatus, formatSolarCapacityMwKw } from "@/lib/grid/evaluate";
+import { formatGridCapacityMwOrKw, formatRemainingWithStatus, formatSolarCapacityKw } from "@/lib/grid/evaluate";
 import { isHouseholdInstallType, formatHouseholdMonthlySavings, HOUSEHOLD_SAVINGS_DISCLAIMER, HOUSEHOLD_SAVINGS_PER_KW } from "@/lib/solar/householdSavings";
 import { isMountainOrForestSite, MOUNTAIN_REC_WEIGHT_NOTE } from "@/lib/site/mountainLand";
 import {
@@ -115,51 +115,48 @@ function drawCoverPage(
   const kpiH = 72;
   let kpiY = height - 210;
 
+  const isHousehold = isHouseholdInstallType(data.solarMetrics.installType);
   const kpis = [
     { label: "예상 설치용량", value: data.capacity },
     { label: "예상 발전량", value: data.annualGeneration },
-    { label: "예상 연매출", value: data.annualRevenue },
+    {
+      label: isHousehold ? "월 예상 절감액" : "예상 연매출",
+      value: isHousehold
+        ? formatHouseholdMonthlySavings(data.solarMetrics.capacityKw)
+        : data.annualRevenue,
+    },
+    { label: "예상 시공비", value: data.constructionCost },
+    { label: "추천유형", value: data.recommendation },
+    { label: "REC 가중치", value: formatRecWeightDisplay(data.solarMetrics.recWeight) },
   ];
 
-  for (let i = 0; i < kpis.length; i++) {
-    drawMetricCard(
-      page,
-      font,
-      fontBold,
-      MARGIN + i * (kpiW + 8),
-      kpiY,
-      kpiW,
-      kpiH,
-      kpis[i].label,
-      kpis[i].value,
-    );
+  for (let row = 0; row < 2; row++) {
+    for (let col = 0; col < 3; col++) {
+      const i = row * 3 + col;
+      drawMetricCard(
+        page,
+        font,
+        fontBold,
+        MARGIN + col * (kpiW + 8),
+        kpiY,
+        kpiW,
+        kpiH,
+        kpis[i].label,
+        kpis[i].value,
+      );
+    }
+    kpiY -= kpiH + 12;
   }
 
-  kpiY -= kpiH + 12;
-  drawMetricCard(
-    page,
+  kpiY -= 4;
+  page.drawText(`작성일: ${data.analyzedAt}`, {
+    x: MARGIN,
+    y: kpiY,
+    size: 9,
     font,
-    fontBold,
-    MARGIN,
-    kpiY,
-    (contentW - 8) / 2,
-    kpiH,
-    "예상 시공비",
-    data.constructionCost,
-  );
-  drawMetricCard(
-    page,
-    font,
-    fontBold,
-    MARGIN + (contentW - 8) / 2 + 8,
-    kpiY,
-    (contentW - 8) / 2,
-    kpiH,
-    "작성일",
-    data.analyzedAt,
-  );
-
-  kpiY -= kpiH + 16;
+    color: rgbColor(COLORS.slate),
+  });
+  kpiY -= 16;
   page.drawText("검토 주소", {
     x: MARGIN,
     y: kpiY,
@@ -463,7 +460,11 @@ function drawSiteSummaryPage(
         : data.annualRevenue,
     },
     { label: "예상 시공비", value: data.constructionCost },
-    { label: "설치 유형", value: data.recommendation },
+    { label: "추천유형", value: data.recommendation },
+    {
+      label: "REC 가중치",
+      value: formatRecWeightDisplay(data.solarMetrics.recWeight),
+    },
   ];
 
   if (data.landInfoDetail.priceReferenceDate) {
@@ -567,13 +568,10 @@ function drawGridPage(
       ["변전소", fmtName(grid.substation.name)],
       ["변압기 (MTR)", fmtName(grid.transformer.name)],
       ["배전선로 (D/L)", fmtName(grid.distributionLine.name)],
-      ["태양광 설치용량", formatSolarCapacityMwKw(data.solarMetrics.capacityKw, "—")],
+      ["태양광 설치용량", formatSolarCapacityKw(data.solarMetrics.capacityKw, "—")],
       [
         "D/L 잔여용량",
-        (() => {
-          const dl = formatDlRemainingMwKw(grid.distributionLine.remainingMw);
-          return dl.secondary ? `${dl.primary}\n${dl.secondary}` : dl.primary;
-        })(),
+        formatGridCapacityMwOrKw(grid.distributionLine.remainingMw),
       ],
       ["검토결과", grid.reviewResult],
       ["데이터 출처", grid.dataSourceLabel],

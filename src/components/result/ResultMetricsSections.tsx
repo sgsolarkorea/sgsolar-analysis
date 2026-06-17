@@ -10,9 +10,10 @@ import ConsultationForm from "@/components/result/ConsultationForm";
 import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { MetricCard } from "@/components/ui/InfoCard";
 import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
 import { isHouseholdInstallType } from "@/lib/solar/householdSavings";
+import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
+import { formatHouseholdMonthlySavings } from "@/lib/solar/householdSavings";
 
 interface ResultSiteOverviewProps {
   recommendation: string;
@@ -42,17 +43,16 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
         annualGeneration={annualGeneration}
         annualRevenue={annualRevenue}
         constructionCost={constructionCost}
+        recommendation={recommendation}
+        recWeight={formatRecWeightDisplay(metrics.recWeight)}
         isHousehold={isHousehold}
-        capacityKw={metrics.capacityKw}
+        thirdKpiLabel={isHousehold ? "월 예상 절감액" : undefined}
+        thirdKpiValue={isHousehold ? formatHouseholdMonthlySavings(metrics.capacityKw) : undefined}
       />
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <MetricCard label="추천 유형" value={recommendation} highlight />
-        <MetricCard label="예상 시공비" value={constructionCost} />
-      </div>
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
+      <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
         ⚠ {solarDisclaimer.construction}
       </p>
-      <p className="mt-1 text-xs leading-relaxed text-slate-500">※ {constructionExtra}</p>
+      <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500">※ {constructionExtra}</p>
     </section>
   );
 }

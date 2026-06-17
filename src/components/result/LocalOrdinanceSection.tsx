@@ -113,7 +113,7 @@ function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
         해당 지역({meta.municipalityLabel}) 조례를 수집·검토 중이며, 관리자 승인 후 자동으로 표시됩니다.
         현재는 이격거리 검토와 기본 법령 정보만 참고해 주세요.
       </p>
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-sm font-medium text-slate-500">
         상태: {meta.status === "review" ? "관리자 검토 중" : "AI 생성 대기/진행 중"}
       </p>
     </div>

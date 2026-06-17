@@ -25,7 +25,7 @@ export const moduleLayoutConfig = {
     boundaryFill: "rgba(245, 158, 11, 0.08)",
   },
   disclaimer:
-    "본 가배치도는 1차 참고용이며, 실제 설치 시 지형·음영·구조·이격거리·인허가 조건에 따라 모듈 수량과 배치가 달라질 수 있습니다.",
+    "본 배치도는 자동 산정된 참고용 가배치도입니다. 실제 설계 시 음영, 구조물, 경사도, 이격거리 및 인허가 조건에 따라 변경될 수 있습니다.",
 } as const;
 
 export type ModuleLayoutInstallKind = "land" | "roof";
