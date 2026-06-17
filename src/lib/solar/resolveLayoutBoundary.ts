@@ -5,11 +5,8 @@ import {
   applySetback,
   createBuildingFootprintRectangle,
   deriveBuildingFootprintInParcel,
-  polygonAreaSqm,
 } from "@/lib/solar/polygonGeometry";
-import {
-  createVirtualParcelRectangle,
-} from "@/lib/solar/moduleLayout";
+import { createVirtualParcelRectangle } from "@/lib/solar/moduleLayout";
 import type { LatLngPoint, ModuleLayoutPolygonSource } from "@/types/moduleLayout";
 
 export type LayoutFootprintKind = "building" | "parcel" | "virtual";
@@ -32,7 +29,6 @@ export async function resolveLayoutBoundary(input: {
   const center: LatLngPoint = { lat: input.lat, lng: input.lng };
   const isLand = input.installType === "토지형";
   const buildingArea = input.buildingAreaSqm ?? 0;
-  const landArea = input.landAreaSqm ?? 0;
 
   let cadastralRing: LatLngPoint[] | null = null;
   if (input.pnu) {
@@ -44,15 +40,9 @@ export async function resolveLayoutBoundary(input: {
 
   if (!isLand && buildingArea > 0) {
     if (cadastralRing) {
-      const parcelArea = polygonAreaSqm(cadastralRing);
-      const buildingRatio = parcelArea > 0 ? buildingArea / parcelArea : 1;
-      const footprint =
-        buildingRatio >= 0.5
-          ? applySetback(cadastralRing, moduleLayoutConfig.roofSetbackM)
-          : deriveBuildingFootprintInParcel(cadastralRing, buildingArea);
-      const usable = applySetback(footprint, moduleLayoutConfig.roofSetbackM);
+      const footprint = deriveBuildingFootprintInParcel(cadastralRing, buildingArea);
       return {
-        boundary: usable,
+        boundary: applySetback(footprint, moduleLayoutConfig.roofSetbackM),
         polygonSource: "cadastral",
         footprintKind: "building",
       };
@@ -74,17 +64,6 @@ export async function resolveLayoutBoundary(input: {
       boundary: applySetback(cadastralRing, setback),
       polygonSource: "cadastral",
       footprintKind: "parcel",
-    };
-  }
-
-  if (!isLand && landArea > 0) {
-    return {
-      boundary: applySetback(
-        createVirtualParcelRectangle(center, Math.max(input.capacityKw, 10), input.installType),
-        moduleLayoutConfig.roofSetbackM,
-      ),
-      polygonSource: "virtual",
-      footprintKind: "virtual",
     };
   }
 
