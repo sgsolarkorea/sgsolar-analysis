@@ -114,6 +114,8 @@ function buildDiagnostics(input: {
     selectedAzimuthDegrees: land?.selectedAzimuthDegrees,
     candidateAzimuths: land?.candidateAzimuths,
     candidateScores: land?.candidateScores,
+    candidatePlacedCounts: land?.candidatePlacedCounts,
+    selectedReason: land?.selectedReason,
     capacityLayoutRule: land?.capacityLayoutRule,
     singleBlockRejectedReason: land?.singleBlockRejectedReason,
     unusedAreaReason: land?.unusedAreaReason,

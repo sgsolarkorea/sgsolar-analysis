@@ -78,8 +78,12 @@ function makePortraitModuleRect(
 }
 
 function toOrientedPoly(polygon: LatLngPoint[]): OrientedPoly {
-  const origin = computeOrientedBounds(polygon).origin;
   const angleRad = computePolygonOrientation(polygon);
+  return toOrientedPolyAtAngle(polygon, angleRad);
+}
+
+function toOrientedPolyAtAngle(polygon: LatLngPoint[], angleRad: number): OrientedPoly {
+  const origin = computeOrientedBounds(polygon).origin;
   const localPoly = toLocal(polygon, origin).map((p) => {
     const cos = Math.cos(-angleRad);
     const sin = Math.sin(-angleRad);
@@ -354,30 +358,80 @@ function placeModulesInFootprint(
   }
 
   const oriented = toOrientedPoly(polygon);
+  const orientationCandidates = [oriented.angleRad, oriented.angleRad + Math.PI / 2];
   const scale = moduleLayoutConfig.visualScale;
-  const widthM = moduleLayoutConfig.moduleShortM * scale;
-  const heightM = moduleLayoutConfig.moduleLongM * scale;
+  const widthM = moduleLayoutConfig.moduleLongM * scale;
+  const heightM = moduleLayoutConfig.moduleShortM * scale;
   const rowGapM =
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
-  const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
-  const { selected, rowModuleCounts, diagnostics } = selectSlotsRoofCentered(
-    slots,
-    targetCount,
-    heightM,
-    oriented.localPoly,
-    widthM,
-  );
+  let best:
+    | {
+        oriented: OrientedPoly;
+        slots: ModuleSlot[];
+        selected: ModuleSlot[];
+        rowModuleCounts: number[];
+        diagnostics: RoofPlacementDiagnostics;
+        score: number;
+      }
+    | null = null;
 
-  const modules = selected.map((slot) =>
-    makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
+  for (const angleRad of orientationCandidates) {
+    const candidate = toOrientedPolyAtAngle(polygon, angleRad);
+    const slots = collectValidSlots(candidate, widthM, heightM, rowGapM);
+    const { selected, rowModuleCounts, diagnostics } = selectSlotsRoofCentered(
+      slots,
+      targetCount,
+      heightM,
+      candidate.localPoly,
+      widthM,
+    );
+    const bbox = diagnostics.selectedSlotBoundingBox;
+    const selectedW = Math.max(bbox.maxX - bbox.minX, 0.01);
+    const selectedH = Math.max(bbox.maxY - bbox.minY, 0.01);
+    const aspect = Math.max(selectedW, selectedH) / Math.max(Math.min(selectedW, selectedH), 0.01);
+    const rowCount = rowModuleCounts.length;
+    const avgPerRow = selected.length / Math.max(rowCount, 1);
+    const maxRowShare = Math.max(...rowModuleCounts, 0) / Math.max(selected.length, 1);
+    let score = selected.length * 1000;
+    if (selected.length >= targetCount) score += 1000;
+    score -= Math.abs(selected.length - targetCount) * 200;
+    score -= diagnostics.centerOffsetM * 80;
+    score += avgPerRow * 260;
+    score -= rowCount * 45;
+    score -= aspect * 80;
+    if (rowCount <= 1 || rowCount > 12 || avgPerRow < 4 || maxRowShare > 0.65) score -= 2000;
+
+    if (!best || score > best.score) {
+      best = { oriented: candidate, slots, selected, rowModuleCounts, diagnostics, score };
+    }
+  }
+
+  const placement = best ?? {
+    oriented,
+    slots: [],
+    selected: [],
+    rowModuleCounts: [],
+    diagnostics: selectSlotsRoofCentered([], targetCount, heightM, oriented.localPoly, widthM).diagnostics,
+    score: -Infinity,
+  };
+
+  const modules = placement.selected.map((slot) =>
+    makePortraitModuleRect(
+      slot.x,
+      slot.y,
+      widthM,
+      heightM,
+      placement.oriented.origin,
+      placement.oriented.angleRad,
+    ),
   );
 
   return {
     modules,
-    validSlotCount: slots.length,
-    rowModuleCounts,
-    roofDiagnostics: diagnostics,
+    validSlotCount: placement.slots.length,
+    rowModuleCounts: placement.rowModuleCounts,
+    roofDiagnostics: placement.diagnostics,
   };
 }
 

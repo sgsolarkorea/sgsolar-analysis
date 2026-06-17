@@ -9,7 +9,7 @@ import {
 import type { LatLngPoint, ModuleRect } from "@/types/moduleLayout";
 
 /** 패널 면 방위 (북 기준 시계방향, °) — 남·남동·남서만 허용 */
-export const LAND_CANDIDATE_AZIMUTHS_DEG = [180, 135, 225] as const;
+export const LAND_CANDIDATE_AZIMUTHS_DEG = [180, 225, 135] as const;
 
 export const LAND_DOUBLE_BLOCK_THRESHOLD_KW = 100;
 
@@ -39,6 +39,8 @@ export interface LandBlockPlacementDiagnostics {
   selectedAzimuthDegrees: number;
   candidateAzimuths: number[];
   candidateScores: Record<string, number>;
+  candidatePlacedCounts: Record<string, number>;
+  selectedReason: string;
   capacityLayoutRule: CapacityLayoutRule;
   singleBlockRejectedReason?: string;
   unusedAreaReason?: string;
@@ -128,6 +130,7 @@ interface UniformRowPlacement {
   innerTierGapM: number;
   setAisleM: number;
   score: number;
+  rowDirectionAspect: number;
   unusedAreaRatio: number;
 }
 
@@ -845,9 +848,46 @@ function makePortraitModuleRect(
 }
 
 function azimuthPreferenceScore(azimuthDeg: number): number {
-  if (azimuthDeg === 180) return 200;
-  if (azimuthDeg === 135 || azimuthDeg === 225) return 120;
+  if (azimuthDeg === 180) return 2500;
+  if (azimuthDeg === 225) return 1600;
+  if (azimuthDeg === 135) return 0;
   return 0;
+}
+
+function computeRowDirectionAspect(oriented: OrientedPoly): number {
+  const widthM = Math.max(oriented.maxX - oriented.minX, 0.01);
+  const heightM = Math.max(oriented.maxY - oriented.minY, 0.01);
+  return widthM / heightM;
+}
+
+function azimuthShapePreferenceScore(azimuthDeg: number, rowDirectionAspect: number): number {
+  const followsParcelLongAxis = rowDirectionAspect >= 1.6;
+  if (!followsParcelLongAxis) return 0;
+
+  if (azimuthDeg === 180) return 3000;
+  if (azimuthDeg === 225) return 3000;
+  if (azimuthDeg === 135) return 1200;
+  return 0;
+}
+
+function buildSelectedReason(input: {
+  selectedAzimuthDegrees: number;
+  candidateScores: Record<string, number>;
+  candidatePlacedCounts: Record<string, number>;
+  rowDirectionAspect: number;
+}): string {
+  const { selectedAzimuthDegrees, candidateScores, candidatePlacedCounts, rowDirectionAspect } = input;
+  const placed = candidatePlacedCounts[String(selectedAzimuthDegrees)] ?? 0;
+  const score = candidateScores[String(selectedAzimuthDegrees)] ?? 0;
+  const reasonParts = [
+    `selected-${selectedAzimuthDegrees}`,
+    `placed-${placed}`,
+    `score-${Math.round(score)}`,
+  ];
+  if (selectedAzimuthDegrees === 180) reasonParts.push("due-south-priority");
+  if (selectedAzimuthDegrees === 225) reasonParts.push("southwest-priority-over-135");
+  if (rowDirectionAspect >= 1.6) reasonParts.push("row-direction-follows-parcel-long-axis");
+  return reasonParts.join("|");
 }
 
 function tryPlacementAtAzimuth(input: {
@@ -869,6 +909,7 @@ function tryPlacementAtAzimuth(input: {
   mainAisleM: number;
   layoutTier: LandLayoutTier;
   score: number;
+  rowDirectionAspect: number;
   unusedAreaRatio: number;
   singleBlockRejectedReason?: string;
 } | null {
@@ -927,7 +968,11 @@ function tryPlacementAtAzimuth(input: {
           innerTierGapM,
           setAisleM,
         });
-        const score = baseScore + azimuthPreferenceScore(input.azimuthDeg);
+        const rowDirectionAspect = computeRowDirectionAspect(oriented);
+        const score =
+          baseScore +
+          azimuthPreferenceScore(input.azimuthDeg) +
+          azimuthShapePreferenceScore(input.azimuthDeg, rowDirectionAspect);
         const modules = selected.map((slot) =>
           makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
         );
@@ -942,6 +987,7 @@ function tryPlacementAtAzimuth(input: {
             innerTierGapM,
             setAisleM,
             score,
+            rowDirectionAspect,
             unusedAreaRatio,
           };
         }
@@ -967,6 +1013,7 @@ function tryPlacementAtAzimuth(input: {
     mainAisleM: 0,
     layoutTier: best.rowModuleCounts.length >= 2 ? "double" : "single",
     score: best.score,
+    rowDirectionAspect: best.rowDirectionAspect,
     unusedAreaRatio: best.unusedAreaRatio,
   };
 }
@@ -984,6 +1031,7 @@ export function placeLandBlockLayout(
     : "land-single-block";
 
   const candidateScores: Record<string, number> = {};
+  const candidatePlacedCounts: Record<string, number> = {};
   let best: ReturnType<typeof tryPlacementAtAzimuth> = null;
   let bestAzimuth: number = LAND_CANDIDATE_AZIMUTHS_DEG[0];
   let rejectReason: string | undefined;
@@ -998,10 +1046,12 @@ export function placeLandBlockLayout(
     });
     if (!attempt || attempt.modules.length === 0) {
       candidateScores[String(azimuthDeg)] = attempt?.score ?? -1;
+      candidatePlacedCounts[String(azimuthDeg)] = attempt?.modules.length ?? 0;
       if (attempt?.singleBlockRejectedReason) rejectReason = attempt.singleBlockRejectedReason;
       continue;
     }
     candidateScores[String(azimuthDeg)] = attempt.score;
+    candidatePlacedCounts[String(azimuthDeg)] = attempt.modules.length;
     if (!best || attempt.score > best.score) {
       best = attempt;
       bestAzimuth = azimuthDeg;
@@ -1020,6 +1070,7 @@ export function placeLandBlockLayout(
       });
       if (!attempt || attempt.modules.length === 0) continue;
       candidateScores[`${azimuthDeg}-fallback`] = attempt.score;
+      candidatePlacedCounts[`${azimuthDeg}-fallback`] = attempt.modules.length;
       if (!best || attempt.score > best.score) {
         best = attempt;
         bestAzimuth = azimuthDeg;
@@ -1046,6 +1097,8 @@ export function placeLandBlockLayout(
         selectedAzimuthDegrees: 180,
         candidateAzimuths: [...LAND_CANDIDATE_AZIMUTHS_DEG],
         candidateScores,
+        candidatePlacedCounts,
+        selectedReason: rejectReason ?? "no-valid-two-tier-row-set",
         capacityLayoutRule,
         singleBlockRejectedReason: rejectReason ?? "no-valid-arrays",
         unusedAreaReason: "no-valid-arrays",
@@ -1089,6 +1142,13 @@ export function placeLandBlockLayout(
       selectedAzimuthDegrees: bestAzimuth,
       candidateAzimuths: [...LAND_CANDIDATE_AZIMUTHS_DEG],
       candidateScores,
+      candidatePlacedCounts,
+      selectedReason: buildSelectedReason({
+        selectedAzimuthDegrees: bestAzimuth,
+        candidateScores,
+        candidatePlacedCounts,
+        rowDirectionAspect: best.rowDirectionAspect,
+      }),
       capacityLayoutRule,
       singleBlockRejectedReason:
         requireMinArrays >= 2 && best.rowModuleCounts.length <= 2

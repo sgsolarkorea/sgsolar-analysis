@@ -72,6 +72,8 @@ export interface ModuleLayoutDiagnostics {
   selectedAzimuthDegrees?: number;
   candidateAzimuths?: number[];
   candidateScores?: Record<string, number>;
+  candidatePlacedCounts?: Record<string, number>;
+  selectedReason?: string;
   capacityLayoutRule?: string;
   singleBlockRejectedReason?: string;
   unusedAreaReason?: string;
