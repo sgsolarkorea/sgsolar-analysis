@@ -53,6 +53,12 @@ export interface ModuleLayoutDiagnostics {
   /** layout.boundary ↔ setbackBoundary 좌표 일치 여부 (검증용) */
   boundaryMatchesSetback?: boolean;
   setbackAreaSqm?: number;
+  installType?: string;
+  capacityBasis?: "land" | "buildingRoof";
+  landAreaSqm?: number | null;
+  buildingFootprintAreaSqm?: number | null;
+  roofUsableAreaSqm?: number | null;
+  layoutBoundarySource?: "cadastral" | "building" | "roof" | "virtual";
 }
 
 export interface ModuleLayoutResult {
@@ -75,4 +81,6 @@ export interface ModuleLayoutResult {
   overlayOnly?: boolean;
   overlayRaw?: boolean;
   overlayCompare?: boolean;
+  /** 건물형: 토지 cadastral 참고용 (가배치 미사용) */
+  referenceCadastral?: LatLngPoint[];
 }

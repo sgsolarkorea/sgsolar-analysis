@@ -59,8 +59,17 @@ export interface Profitability {
 export interface SolarMetrics {
   installType: string;
   installCategory: string;
+  capacityBasis?: "land" | "buildingRoof";
   baseAreaSqm: number;
   baseAreaLabel: string;
+  /** 대장 토지면적 (㎡) */
+  landAreaSqm?: number | null;
+  /** 건물/지붕 footprint Polygon 면적 (㎡) */
+  buildingFootprintAreaSqm?: number | null;
+  /** 지붕 setback 후 유효면적 (㎡) — 건물형 */
+  roofUsableAreaSqm?: number | null;
+  /** setback 후 usableArea (㎡) — 토지형 */
+  usableAreaSqm?: number | null;
   areaPerKw: number;
   capacityKw: number;
   modulePowerW: number;
@@ -175,6 +184,7 @@ export interface SiteReviewResult {
 
 export type ResolvedSiteReview = SiteReviewResult & {
   consultationDefaultAddress: string;
+  siteGeometryBundle?: import("@/types/siteGeometry").SiteGeometryBundle;
 };
 
 export const GRADE_MESSAGES: Record<Grade, string> = {

@@ -3,6 +3,7 @@ import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS } from "@/data/resultUx";
 import { computeModuleLayout } from "@/lib/solar/moduleLayout";
 import { resolveLayoutBoundary } from "@/lib/solar/resolveLayoutBoundary";
+import type { SiteGeometryResult } from "@/types/siteGeometry";
 import {
   computePolygonOrientation,
   polygonAreaSqm,
@@ -26,6 +27,7 @@ function ringsMatch(a: LatLngPoint[], b: LatLngPoint[], tolerance = 1e-9): boole
 }
 
 function buildDiagnostics(input: {
+  geometry: SiteGeometryResult;
   polygonSource: ModuleLayoutDiagnostics["polygonSource"];
   boundary: LatLngPoint[];
   sourceBoundary: LatLngPoint[];
@@ -40,6 +42,7 @@ function buildDiagnostics(input: {
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
+  const g = input.geometry;
   return {
     polygonSource: input.polygonSource,
     boundaryPointCount: input.boundary.length,
@@ -62,6 +65,12 @@ function buildDiagnostics(input: {
     rowModuleCounts: input.rowModuleCounts,
     polygonUtilizationPct: input.polygonUtilizationPct,
     renderModuleCount: input.placedModuleCount,
+    installType: String(g.installType),
+    capacityBasis: g.capacityBasis,
+    landAreaSqm: g.landAreaSqm,
+    buildingFootprintAreaSqm: g.buildingFootprintAreaSqm,
+    roofUsableAreaSqm: g.roofUsableAreaSqm,
+    layoutBoundarySource: g.layoutBoundarySource,
   };
 }
 
@@ -101,7 +110,8 @@ export async function GET(request: Request) {
       ? Number(moduleCountRaw)
       : undefined;
 
-  const { boundary, sourceBoundary, setbackBoundary, polygonSource } = await resolveLayoutBoundary({
+  const { boundary, sourceBoundary, setbackBoundary, polygonSource, geometry } =
+    await resolveLayoutBoundary({
     pnu: pnu || undefined,
     lat,
     lng,
@@ -132,6 +142,7 @@ export async function GET(request: Request) {
   });
 
   const diagnostics = buildDiagnostics({
+    geometry,
     polygonSource,
     boundary: layout.boundary,
     sourceBoundary: sourceBoundary.length >= 3 ? sourceBoundary : layout.boundary,
@@ -165,5 +176,9 @@ export async function GET(request: Request) {
     overlayOnly,
     overlayRaw,
     overlayCompare,
+    referenceCadastral:
+      geometry.referenceCadastral && geometry.referenceCadastral.length >= 3
+        ? geometry.referenceCadastral
+        : undefined,
   });
 }

@@ -105,7 +105,9 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
               ? "VWorld 원본 Polygon 검증"
               : polygonDebugOverlay
                 ? "Polygon 검증 (Overlay 전용)"
-                : "예상 모듈 가배치도"
+                : installType === "토지형"
+                  ? "토지 기준 가배치"
+                  : "건물 지붕 기준 가배치"
         }
         description={
           polygonDebugCompare
@@ -114,7 +116,9 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
               ? "VWorld cadastral 원본(sourceBoundary)만 표시합니다. setback·모듈 미적용."
               : polygonDebugOverlay
                 ? "setback 적용 후 layout.boundary만 표시합니다. 모듈은 숨깁니다."
-                : "위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
+                : installType === "토지형"
+                  ? "토지 Polygon 내부 usableArea 기준 1차 모듈 가배치입니다."
+                  : "건물/지붕 Polygon 내부 기준 1차 모듈 가배치입니다. 토지 cadastral은 참고용으로만 표시됩니다."
         }
       />
 
@@ -160,6 +164,57 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
           {!polygonDebugOverlay && !polygonDebugRaw && !polygonDebugCompare && (
             <>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {installType === "토지형" ? (
+                  <>
+                    <MetricCard
+                      label="토지면적"
+                      value={
+                        metrics.landAreaSqm != null && metrics.landAreaSqm > 0
+                          ? `${metrics.landAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                          : "확인 필요"
+                      }
+                    />
+                    <MetricCard
+                      label="usableArea"
+                      value={
+                        layout.diagnostics?.usableAreaSqm != null
+                          ? `${layout.diagnostics.usableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                          : metrics.usableAreaSqm != null
+                            ? `${metrics.usableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                            : "확인 필요"
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    <MetricCard
+                      label="대지면적"
+                      value={
+                        metrics.landAreaSqm != null && metrics.landAreaSqm > 0
+                          ? `${metrics.landAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                          : "확인 필요"
+                      }
+                    />
+                    <MetricCard
+                      label="건물/지붕면적"
+                      value={
+                        metrics.buildingFootprintAreaSqm != null && metrics.buildingFootprintAreaSqm > 0
+                          ? `${metrics.buildingFootprintAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                          : "확인 필요"
+                      }
+                    />
+                    <MetricCard
+                      label="지붕 유효면적"
+                      value={
+                        layout.diagnostics?.roofUsableAreaSqm != null
+                          ? `${layout.diagnostics.roofUsableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                          : metrics.roofUsableAreaSqm != null
+                            ? `${metrics.roofUsableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`
+                            : "확인 필요"
+                      }
+                    />
+                  </>
+                )}
                 <MetricCard
                   label="예상 설치용량"
                   value={formatUnifiedCapacityKw(metrics.capacityKw)}

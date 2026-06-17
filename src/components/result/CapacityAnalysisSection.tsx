@@ -21,6 +21,8 @@ export default function CapacityAnalysisSection({
       ? `${metrics.moduleCount.toLocaleString("ko-KR")}장`
       : "확인 필요";
 
+  const isLand = metrics.capacityBasis === "land" || metrics.installType === "토지형";
+
   return (
     <Wrapper {...wrapperProps}>
       <SectionHeader
@@ -52,6 +54,38 @@ export default function CapacityAnalysisSection({
               : "확인 필요"}
           </span>
         </div>
+        {isLand && metrics.usableAreaSqm != null && metrics.usableAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">usableArea (setback 후)</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.usableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
+        {!isLand && metrics.landAreaSqm != null && metrics.landAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">대지면적 (참고)</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.landAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
+        {!isLand && metrics.buildingFootprintAreaSqm != null && metrics.buildingFootprintAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">건물/지붕면적</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.buildingFootprintAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
+        {!isLand && metrics.roofUsableAreaSqm != null && metrics.roofUsableAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">지붕 유효면적 (setback 후)</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.roofUsableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
           <p className="text-sm font-medium leading-relaxed text-amber-900">
             ⚠ {metrics.capacityDisclaimer}

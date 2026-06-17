@@ -97,6 +97,16 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
 
     const boundaryOverlays: string[] = [];
 
+    if (
+      !compareMode &&
+      layout.referenceCadastral &&
+      layout.referenceCadastral.length >= 3
+    ) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(layout.referenceCadastral)}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" />`,
+      );
+    }
+
     if (compareMode && rawRing) {
       boundaryOverlays.push(
         `<polygon points="${toPoints(rawRing)}" fill="rgba(34, 197, 94, 0.22)" stroke="#16a34a" stroke-width="2.5" vector-effect="non-scaling-stroke" />`,

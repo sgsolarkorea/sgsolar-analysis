@@ -108,6 +108,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             multiParcelEnabled={multiParcelEnabled}
             searchHistoryId={searchHistory.id}
             consultationBase={consultationBase}
+            siteGeometryBundle={data.siteGeometryBundle}
           >
             <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
               {showMountainWarning && <MountainLandWarningBanner />}

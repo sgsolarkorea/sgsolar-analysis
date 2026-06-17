@@ -19,6 +19,8 @@ import {
   formatGenerationDisplay,
   formatRevenueDisplay,
 } from "@/lib/solar/calculate";
+import { resolveSiteGeometryFromBundle } from "@/lib/solar/resolveSiteGeometry";
+import type { SiteGeometryBundle } from "@/types/siteGeometry";
 import type { ConsultationAnalysisContext } from "@/types/consultation";
 import type { ParcelItem } from "@/types/parcelReview";
 import type {
@@ -37,6 +39,7 @@ interface ResultMetricsProviderProps {
   initialMonthlyGeneration: MonthlyGeneration[];
   initialPrimaryParcel: ParcelItem;
   multiParcelEnabled: boolean;
+  siteGeometryBundle?: SiteGeometryBundle;
   searchHistoryId?: string;
   consultationBase: Omit<
     ConsultationAnalysisContext,
@@ -83,6 +86,7 @@ export function ResultMetricsProvider({
   initialMonthlyGeneration,
   initialPrimaryParcel,
   multiParcelEnabled,
+  siteGeometryBundle,
   searchHistoryId,
   consultationBase,
   children,
@@ -112,6 +116,26 @@ export function ResultMetricsProvider({
       };
     }
 
+    const geometryInput =
+      siteGeometryBundle && !useMultiParcelMetrics
+        ? (() => {
+            const g = resolveSiteGeometryFromBundle(siteGeometryBundle, {
+              lat: initialPrimaryParcel.lat,
+              lng: initialPrimaryParcel.lng,
+              capacityKw: initialMetrics.capacityKw,
+              installType,
+            });
+            return {
+              capacityAreaSqm: g.capacityAreaSqm,
+              capacityBasis: g.capacityBasis,
+              displayLandAreaSqm: g.landAreaSqm,
+              displayBuildingFootprintAreaSqm: g.buildingFootprintAreaSqm,
+              displayRoofUsableAreaSqm: g.roofUsableAreaSqm,
+              displayUsableAreaSqm: g.landUsableAreaSqm ?? g.roofUsableAreaSqm,
+            };
+          })()
+        : {};
+
     const result = calculateSolarMetrics({
       installType,
       landInfo,
@@ -119,6 +143,7 @@ export function ResultMetricsProvider({
       market: initialMetrics.market,
       overrideLandAreaSqm: useMultiParcelMetrics ? parcelSummary.totalAreaSqm : undefined,
       parcelCount: useMultiParcelMetrics ? parcelSummary.parcelCount : undefined,
+      ...geometryInput,
     });
 
     return {
@@ -140,6 +165,9 @@ export function ResultMetricsProvider({
     parcelSummary.totalAreaSqm,
     parcelSummary.parcelCount,
     initialPrimaryParcel.areaSqm,
+    siteGeometryBundle,
+    initialPrimaryParcel.lat,
+    initialPrimaryParcel.lng,
   ]);
 
   const addParcel = useCallback((parcel: ParcelItem): boolean => {

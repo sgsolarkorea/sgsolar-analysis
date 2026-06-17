@@ -20,11 +20,17 @@ import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveRegionDistrictAnalysis } from "@/lib/regulatory/resolveRegionDistrictAnalysis";
 import type { LandInfoDetail } from "@/types/landInfo";
 import {
+  fetchSiteGeometryBundle,
+  resolveSiteGeometryFromBundle,
+} from "@/lib/solar/resolveSiteGeometry";
+import {
   calculateSolarMetrics,
   formatCapacityDisplay,
   formatConstructionDisplay,
   formatGenerationDisplay,
   formatRevenueDisplay,
+  getFieldValue,
+  parseAreaSqm,
 } from "@/lib/solar/calculate";
 import { extractAreasForDebug, logSolarCalculationDebug } from "@/lib/solar/debug";
 import { deriveGradeFromCapacity } from "@/lib/solar/grade";
@@ -37,6 +43,7 @@ import type {
   ResolvedSiteReview,
   SolarMetrics,
 } from "@/types/siteReview";
+import type { SiteGeometryBundle } from "@/types/siteGeometry";
 
 export interface ProfitabilityInput {
   address: string;
@@ -69,7 +76,15 @@ function deriveGrade(capacityKw: number): Grade {
 }
 
 export async function calculateSolarProfitability(
-  input: ProfitabilityInput & { hasRoadAddress?: boolean },
+  input: ProfitabilityInput & {
+    hasRoadAddress?: boolean;
+    capacityAreaSqm?: number;
+    capacityBasis?: "land" | "buildingRoof";
+    displayLandAreaSqm?: number | null;
+    displayBuildingFootprintAreaSqm?: number | null;
+    displayRoofUsableAreaSqm?: number | null;
+    displayUsableAreaSqm?: number | null;
+  },
 ): Promise<{
   profitability: Profitability;
   solarMetrics: SolarMetrics;
@@ -86,6 +101,12 @@ export async function calculateSolarProfitability(
     landInfo: input.landInfo,
     buildingInfo: input.buildingInfo,
     market,
+    capacityAreaSqm: input.capacityAreaSqm,
+    capacityBasis: input.capacityBasis,
+    displayLandAreaSqm: input.displayLandAreaSqm,
+    displayBuildingFootprintAreaSqm: input.displayBuildingFootprintAreaSqm,
+    displayRoofUsableAreaSqm: input.displayRoofUsableAreaSqm,
+    displayUsableAreaSqm: input.displayUsableAreaSqm,
   });
 
   const areas = extractAreasForDebug(input.landInfo, input.buildingInfo);
@@ -183,11 +204,38 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     buildingName: geo.buildingName,
   });
 
+  const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
+  const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
+  const defaultInstallType = resolveDefaultInstallType("", landInfo, buildingInfo, {
+    hasRoadAddress: hasRoadAddress(geo.address),
+  });
+
+  const siteGeometryBundle: SiteGeometryBundle = await fetchSiteGeometryBundle({
+    pnu: effectivePnu,
+    lat: geo.lat,
+    lng: geo.lng,
+    landAreaSqm,
+    buildingAreaSqm,
+  });
+
+  const siteGeometry = resolveSiteGeometryFromBundle(siteGeometryBundle, {
+    lat: geo.lat,
+    lng: geo.lng,
+    capacityKw: 1,
+    installType: defaultInstallType,
+  });
+
   const solarResult = await calculateSolarProfitability({
     address: geo.address,
     landInfo,
     buildingInfo,
     hasRoadAddress: hasRoadAddress(geo.address),
+    capacityAreaSqm: siteGeometry.capacityAreaSqm,
+    capacityBasis: siteGeometry.capacityBasis,
+    displayLandAreaSqm: siteGeometry.landAreaSqm,
+    displayBuildingFootprintAreaSqm: siteGeometry.buildingFootprintAreaSqm,
+    displayRoofUsableAreaSqm: siteGeometry.roofUsableAreaSqm,
+    displayUsableAreaSqm: siteGeometry.landUsableAreaSqm ?? siteGeometry.roofUsableAreaSqm,
   });
 
   const { profitability, solarMetrics, monthlyGeneration } = solarResult;
@@ -264,6 +312,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     businessTypeOptions: result.businessTypeOptions,
     ordinanceInfo: result.ordinanceInfo,
     suitability: result.suitability,
+    siteGeometryBundle,
   };
 }
 

@@ -18,6 +18,7 @@ import { calculateIrrPercent, calculateRoiPercent, PROJECT_YEARS } from "@/lib/s
 import { resolveRecWeight } from "@/lib/solar/recWeight";
 import type { MarketPriceData } from "@/lib/api/market";
 import type { InfoField, MonthlyGeneration, Profitability, SolarMetrics } from "@/types/siteReview";
+import type { CapacityBasis } from "@/types/siteGeometry";
 
 export { resolveRecWeight } from "@/lib/solar/recWeight";
 
@@ -83,6 +84,14 @@ export interface CalculateSolarInput {
   overrideLandAreaSqm?: number;
   /** 다중 필지 산식 표시용 */
   parcelCount?: number;
+  /** Polygon 기준 용량 산정 면적 (㎡) — Phase 2 */
+  capacityAreaSqm?: number;
+  capacityBasis?: CapacityBasis;
+  /** 표시용 면적 (대장·Polygon) */
+  displayLandAreaSqm?: number | null;
+  displayBuildingFootprintAreaSqm?: number | null;
+  displayRoofUsableAreaSqm?: number | null;
+  displayUsableAreaSqm?: number | null;
 }
 
 export interface CalculateSolarOutput {
@@ -113,13 +122,24 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
       ? input.overrideLandAreaSqm
       : parsedLandArea;
 
-  const baseAreaSqm = isLand ? (landArea ?? 0) : (buildingArea ?? 0);
+  const registryBaseAreaSqm = isLand ? (landArea ?? 0) : (buildingArea ?? 0);
+  const capacityBasis: CapacityBasis =
+    input.capacityBasis ?? (isLand ? "land" : "buildingRoof");
+  const baseAreaSqm =
+    input.capacityAreaSqm != null && input.capacityAreaSqm > 0
+      ? input.capacityAreaSqm
+      : registryBaseAreaSqm;
+
   const baseAreaLabel =
     isLand && input.parcelCount && input.parcelCount > 1
-      ? `토지면적(총 ${input.parcelCount}필지)`
+      ? `토지 Polygon(총 ${input.parcelCount}필지)`
       : isLand
-        ? "토지면적"
-        : "건축면적";
+        ? input.capacityAreaSqm != null && input.capacityAreaSqm > 0
+          ? "토지 Polygon"
+          : "토지면적"
+        : input.capacityAreaSqm != null && input.capacityAreaSqm > 0
+          ? "건물/지붕 Polygon"
+          : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
   const { targetModuleCount: moduleCount, capacityKw } = resolveTargetCapacity(
@@ -204,8 +224,14 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
   const metrics: SolarMetrics = {
     installType,
     installCategory: category,
+    capacityBasis,
     baseAreaSqm,
     baseAreaLabel,
+    landAreaSqm: input.displayLandAreaSqm ?? parsedLandArea,
+    buildingFootprintAreaSqm:
+      input.displayBuildingFootprintAreaSqm ?? buildingArea,
+    roofUsableAreaSqm: input.displayRoofUsableAreaSqm ?? null,
+    usableAreaSqm: input.displayUsableAreaSqm ?? null,
     areaPerKw,
     capacityKw,
     modulePowerW,
