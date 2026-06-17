@@ -19,7 +19,7 @@ interface ModuleLayoutMapProps {
 }
 
 const JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY?.trim() ?? "";
-const { boundaryFill, boundary: boundaryStroke, moduleFrame } = moduleLayoutConfig.colors;
+const { boundaryFill, boundary: boundaryStroke } = moduleLayoutConfig.colors;
 
 function CompassRose() {
   return (
@@ -33,9 +33,23 @@ function CompassRose() {
   );
 }
 
-/** 640W 모듈 1장 — 회전된 4꼭짓점 Polygon (AABB 사용 시 Row가 막대로 겹쳐 보임) */
+/** 화면 좌표에서 모듈 Polygon을 중심 기준 축소 — 밀착 배치 시 Row가 하나의 띠로 합쳐 보이는 것 방지 */
+function insetScreenCorners(
+  corners: { x: number; y: number }[],
+  ratio = 0.08,
+): { x: number; y: number }[] {
+  const cx = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
+  const cy = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
+  const scale = 1 - ratio;
+  return corners.map((p) => ({
+    x: cx + (p.x - cx) * scale,
+    y: cy + (p.y - cy) * scale,
+  }));
+}
+
+/** 640W 모듈 1장 — 회전된 4꼭짓점 Polygon */
 function renderSolarModulePolygon(points: string): string {
-  return `<polygon points="${points}" fill="url(#panelGrad)" stroke="${moduleFrame}" stroke-width="0.55" stroke-linejoin="miter" />`;
+  return `<polygon points="${points}" fill="url(#panelGrad)" stroke="rgba(148,163,184,0.85)" stroke-width="1" stroke-linejoin="miter" vector-effect="non-scaling-stroke" />`;
 }
 
 export default function ModuleLayoutMap({ layout, address, jibunAddress }: ModuleLayoutMapProps) {
@@ -66,20 +80,25 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       return `${pixel.x},${pixel.y}`;
     };
 
-    const boundaryOverlay =
-      layout.boundary.length >= 3
+    const rawRing =
+      layout.overlayRaw && layout.sourceBoundary && layout.sourceBoundary.length >= 3
+        ? layout.sourceBoundary
+        : null;
+
+    const boundaryOverlay = rawRing
+      ? `<polygon points="${rawRing.map(toPoint).join(" ")}" fill="rgba(34, 197, 94, 0.25)" stroke="#16a34a" stroke-width="2.5" />`
+      : layout.boundary.length >= 3
         ? `<polygon points="${layout.boundary.map(toPoint).join(" ")}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" />`
         : "";
 
     const modulePaths = layout.modules
       .map((mod) => {
-        const points = mod.corners
-          .map((pt) => {
-            const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
-            const pixel = projection.containerPointFromCoords(coords);
-            return `${pixel.x},${pixel.y}`;
-          })
-          .join(" ");
+        const pixels = mod.corners.map((pt) => {
+          const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
+          return projection.containerPointFromCoords(coords);
+        });
+        const inset = insetScreenCorners(pixels);
+        const points = inset.map((p) => `${p.x},${p.y}`).join(" ");
         return renderSolarModulePolygon(points);
       })
       .join("");
@@ -113,7 +132,7 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
             const center = new window.kakao.maps.LatLng(layout.center.lat, layout.center.lng);
             const map = new window.kakao.maps.Map(mapContainerRef.current, {
               center,
-              level: 2,
+              level: 1,
               mapTypeId: window.kakao.maps.MapTypeId.HYBRID,
             });
             const zoomControl = new window.kakao.maps.ZoomControl();
