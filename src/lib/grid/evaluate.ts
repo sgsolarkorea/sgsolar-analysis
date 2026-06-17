@@ -215,14 +215,17 @@ export function formatDlRemainingMw(
   return `${value.toLocaleString("ko-KR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}MW`;
 }
 
-/** 태양광 설치용량 — kW 단일 표기 (예: 30.5kW) */
+/** 태양광 설치용량 — kW 단일 표기 (목표 모듈수 기준, 소수 2자리) */
 export function formatSolarCapacityKw(
   capacityKw: number,
   fallback = GRID_UNKNOWN_VALUE,
 ): string {
   if (capacityKw <= 0 || !Number.isFinite(capacityKw)) return fallback;
-  const kwStr = capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 });
-  return `${kwStr}kW`;
+  const rounded = Math.round(capacityKw * 100) / 100;
+  return `${rounded.toLocaleString("ko-KR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}kW`;
 }
 
 /** 계통 잔여·누적용량 — 1MW 이상 MW(소수1), 미만 kW */

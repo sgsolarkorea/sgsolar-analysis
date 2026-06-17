@@ -97,7 +97,7 @@ export const disclaimer = {
   constructionBuildingExtra:
     "구조 안전성 검토 및 보강 여부에 따라 추가 비용이 발생할 수 있습니다.",
   constructionLandExtra:
-    "토목 설계, 토목공사 및 한전 인입 조건에 따라 추가 비용이 발생할 수 있습니다.",
+    "토목 설계 및 토목공사 조건에 따라 추가 비용이 발생할 수 있습니다.",
   /** @deprecated constructionBuildingExtra / constructionLandExtra 사용 */
   constructionExtra:
     "구조보강, 토목공사, 한전 인입, 감리, 안전관리, 구조검토 비용 발생 시 별도입니다.",

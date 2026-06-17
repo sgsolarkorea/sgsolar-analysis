@@ -10,6 +10,10 @@ import {
 import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS, resolveDefaultInstallType } from "@/data/resultUx";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
+import {
+  formatUnifiedCapacityKw,
+  resolveTargetCapacity,
+} from "@/lib/solar/capacityResolution";
 import { calculateIrrPercent, calculateRoiPercent, PROJECT_YEARS } from "@/lib/solar/profitability";
 import { resolveRecWeight } from "@/lib/solar/recWeight";
 import type { MarketPriceData } from "@/lib/api/market";
@@ -43,7 +47,7 @@ export function getFieldValue(fields: InfoField[], label: string): string {
 }
 
 function formatKw(kw: number): string {
-  return `${kw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW`;
+  return formatUnifiedCapacityKw(kw);
 }
 
 function formatKwh(kwh: number): string {
@@ -118,8 +122,11 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
         : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
-  const capacityKw = Math.round(rawCapacityKw * 10) / 10;
-  const moduleCount = capacityKw > 0 ? Math.floor((capacityKw * 1000) / modulePowerW) : 0;
+  const { targetModuleCount: moduleCount, capacityKw } = resolveTargetCapacity(
+    installType,
+    baseAreaSqm,
+    areaPerKw,
+  );
 
   const { weight: recWeight, reason: recWeightReason } = resolveRecWeight(category, capacityKw);
 
@@ -151,9 +158,11 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
   const irrPercent = calculateIrrPercent(constructionCostWon, totalRevenueWon);
 
   const formula =
-    baseAreaSqm > 0
-      ? `${baseAreaLabel} ${formatSqm(baseAreaSqm)} ÷ ${areaPerKw}㎡/kW = ${formatKw(capacityKw)}`
-      : `${baseAreaLabel} 확인 필요`;
+    baseAreaSqm > 0 && moduleCount > 0
+      ? `${baseAreaLabel} ${formatSqm(baseAreaSqm)} ÷ ${areaPerKw}㎡/kW → 목표 ${moduleCount.toLocaleString("ko-KR")}장 × ${modulePowerW}W = ${formatUnifiedCapacityKw(capacityKw)}`
+      : baseAreaSqm > 0
+        ? `${baseAreaLabel} ${formatSqm(baseAreaSqm)} ÷ ${areaPerKw}㎡/kW = ${formatUnifiedCapacityKw(Math.round(rawCapacityKw * 100) / 100)}`
+        : `${baseAreaLabel} 확인 필요`;
 
   const monthLabels = [
     "1월",

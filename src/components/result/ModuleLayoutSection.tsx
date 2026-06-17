@@ -6,8 +6,9 @@ import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { MetricCard } from "@/components/ui/InfoCard";
 import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
-import { formatInstallTypeDisplayLabel } from "@/data/resultUx";
+import { formatInstallTypeShortLabel } from "@/data/resultUx";
 import type { InstallTypeOption } from "@/data/resultUx";
+import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
 import type { ModuleLayoutResult } from "@/types/moduleLayout";
 
 interface ModuleLayoutSectionProps {
@@ -68,15 +69,13 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     installType,
   ]);
 
-  const placedCount = layout?.stats.placedModuleCount ?? 0;
-  const polygonLabel =
-    layout?.polygonSource === "cadastral" ? "연속지적도 경계" : "추정 설치면적(참고)";
+  const targetModules = metrics.moduleCount;
 
   return (
     <section id="module-layout" className="scroll-mt-24">
       <SectionHeader
         title="예상 모듈 가배치도"
-        description="위성지도 위 필지 경계와 모듈 배치를 1차 참고용으로 표시합니다."
+        description="위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
       />
 
       {loading && (
@@ -98,23 +97,22 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               label="예상 설치용량"
-              value={`${metrics.capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW`}
+              value={formatUnifiedCapacityKw(metrics.capacityKw)}
             />
             <MetricCard
-              label="배치 모듈 수"
-              value={`${placedCount.toLocaleString("ko-KR")}장 / 목표 ${layout.stats.targetModuleCount.toLocaleString("ko-KR")}장`}
+              label="예상 모듈 수"
+              value={`${targetModules.toLocaleString("ko-KR")}장`}
             />
-            <MetricCard label="모듈 사양" value={`${moduleLayoutConfig.modulePowerW}W · ${moduleLayoutConfig.tiers}단 배치`} />
+            <MetricCard label="모듈 사양" value={`${moduleLayoutConfig.modulePowerW}W`} />
             <MetricCard
-              label="설치 유형"
-              value={formatInstallTypeDisplayLabel(installType as InstallTypeOption)}
+              label="설치유형"
+              value={formatInstallTypeShortLabel(installType as InstallTypeOption)}
             />
           </div>
 
           <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
-            경계 출처: {polygonLabel} · 열간격 {layout.stats.rowSpacingM}m · 경사 {layout.stats.tiltDeg}°
+            ※ {moduleLayoutConfig.disclaimer}
           </p>
-          <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500">※ {moduleLayoutConfig.disclaimer}</p>
         </>
       )}
     </section>

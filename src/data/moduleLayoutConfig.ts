@@ -4,13 +4,17 @@ import { modulePowerW } from "@/data/solarConfig";
 export const moduleLayoutConfig = {
   modulePowerW,
   moduleAreaSqm: 2.795,
-  /** 640W 모듈 실측 치수 (m) — 길이 × 너비 */
-  moduleLengthM: 2.278,
-  moduleWidthM: 1.134,
+  /** 지도 위 모듈 크기 축소 (30~40%) */
+  visualScale: 0.35,
+  /** 세로형 패널 — 가로:세로 ≈ 1:2.3 */
+  moduleShortM: 1.134,
+  moduleLongM: 2.61,
   tiers: 2,
   tierGapM: 0.05,
-  colGapM: 0.05,
+  colGapM: 0.08,
   boundaryInsetM: 0.5,
+  /** 행당 기본 모듈 수 (폭 부족 시 자동 조정) */
+  defaultModulesPerRow: 10,
   land: {
     rowSpacingM: 3,
     tiltDeg: 15,
@@ -32,4 +36,20 @@ export type ModuleLayoutInstallKind = "land" | "roof";
 
 export function resolveModuleLayoutKind(installType: string): ModuleLayoutInstallKind {
   return installType === "토지형" ? "land" : "roof";
+}
+
+/** 지도 오버레이용 모듈 치수 (m) */
+export function getVisualModuleDimensions(): {
+  widthM: number;
+  heightM: number;
+  colGapM: number;
+  rowGapM: number;
+} {
+  const scale = moduleLayoutConfig.visualScale;
+  return {
+    widthM: moduleLayoutConfig.moduleShortM * scale,
+    heightM: moduleLayoutConfig.moduleLongM * scale,
+    colGapM: moduleLayoutConfig.colGapM * scale,
+    rowGapM: 0.35,
+  };
 }

@@ -271,6 +271,7 @@ export function inferDefaultInstallType(recommendation: string): InstallTypeOpti
   return resolveDefaultInstallType(recommendation, [], []);
 }
 
+/** 입지 분석 개요 추천유형 등 — 각도 포함 */
 export function formatInstallTypeDisplayLabel(installType: InstallTypeOption): string {
   switch (installType) {
     case "토지형":
@@ -282,6 +283,14 @@ export function formatInstallTypeDisplayLabel(installType: InstallTypeOption): s
     default:
       return installType;
   }
+}
+
+/** 가배치도·PDF·search-history 등 — 유형명만 */
+export function formatInstallTypeShortLabel(installType: InstallTypeOption | string): string {
+  if (INSTALL_TYPE_OPTIONS.includes(installType as InstallTypeOption)) {
+    return installType;
+  }
+  return installType;
 }
 
 export function deriveSiteRecommendation(

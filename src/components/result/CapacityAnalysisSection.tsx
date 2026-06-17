@@ -1,5 +1,6 @@
 import type { SolarMetrics } from "@/types/siteReview";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
 
 interface CapacityAnalysisSectionProps {
   metrics: SolarMetrics;
@@ -16,7 +17,9 @@ export default function CapacityAnalysisSection({
     : { id: "capacity-analysis" as const, className: "scroll-mt-24" };
 
   const moduleCountLabel =
-    metrics.moduleCount > 0 ? `약 ${metrics.moduleCount.toLocaleString("ko-KR")}장` : "확인 필요";
+    metrics.moduleCount > 0
+      ? `${metrics.moduleCount.toLocaleString("ko-KR")}장`
+      : "확인 필요";
 
   return (
     <Wrapper {...wrapperProps}>
@@ -28,7 +31,7 @@ export default function CapacityAnalysisSection({
         <div className="flex flex-col gap-1 bg-navy-light/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm text-slate-500">예상 설치용량</span>
           <span className="text-base font-bold text-navy">
-            {metrics.capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW
+            {formatUnifiedCapacityKw(metrics.capacityKw)}
           </span>
         </div>
         <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">

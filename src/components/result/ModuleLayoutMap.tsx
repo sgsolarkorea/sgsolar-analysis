@@ -60,12 +60,10 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       return `${pixel.x},${pixel.y}`;
     };
 
-    const boundaryPath = layout.boundary.map(toPoint).join(" ");
     const modulePaths = layout.modules
-      .map((mod) => {
+      .map((mod, index) => {
         const points = mod.corners.map(toPoint).join(" ");
-        const xs = mod.corners.map((_, i) => {
-          const pt = mod.corners[i];
+        const xs = mod.corners.map((pt) => {
           const coords = new window.kakao.maps.LatLng(pt.lat, pt.lng);
           return projection.containerPointFromCoords(coords).x;
         });
@@ -78,22 +76,22 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
         const minY = Math.min(...ys);
         const maxY = Math.max(...ys);
         const cellLines: string[] = [];
-        const rowCount = 4;
-        for (let r = 1; r < rowCount; r++) {
-          const y = minY + ((maxY - minY) * r) / rowCount;
-          cellLines.push(
-            `<line x1="${minX}" y1="${y}" x2="${maxX}" y2="${y}" stroke="#94a3b8" stroke-width="0.4" opacity="0.55" />`,
-          );
-        }
-        const colCount = 3;
+        const colCount = 4;
         for (let c = 1; c < colCount; c++) {
           const x = minX + ((maxX - minX) * c) / colCount;
           cellLines.push(
-            `<line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="#64748b" stroke-width="0.35" opacity="0.45" />`,
+            `<line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="#64748b" stroke-width="0.35" opacity="0.5" />`,
+          );
+        }
+        const rowCount = 2;
+        for (let r = 1; r < rowCount; r++) {
+          const y = minY + ((maxY - minY) * r) / rowCount;
+          cellLines.push(
+            `<line x1="${minX}" y1="${y}" x2="${maxX}" y2="${y}" stroke="#94a3b8" stroke-width="0.3" opacity="0.4" />`,
           );
         }
         return `<g>
-          <polygon points="${points}" fill="url(#panelGrad)" fill-opacity="0.94" stroke="#0f172a" stroke-width="0.6" />
+          <polygon points="${points}" fill="url(#panelGrad)" fill-opacity="0.96" stroke="#0f172a" stroke-width="0.5" />
           ${cellLines.join("")}
         </g>`;
       })
@@ -102,12 +100,11 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
     svg.innerHTML = `
       <defs>
         <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#475569" />
-          <stop offset="45%" stop-color="#1e293b" />
+          <stop offset="0%" stop-color="#334155" />
+          <stop offset="40%" stop-color="#1e293b" />
           <stop offset="100%" stop-color="#0f172a" />
         </linearGradient>
       </defs>
-      <polygon points="${boundaryPath}" fill="${moduleLayoutConfig.colors.boundaryFill}" stroke="${moduleLayoutConfig.colors.boundary}" stroke-width="2.5" stroke-dasharray="6 4" />
       ${modulePaths}
     `;
   }, [layout]);

@@ -1,5 +1,6 @@
 import type { InstallTypeOption } from "@/data/resultUx";
 import {
+  getVisualModuleDimensions,
   moduleLayoutConfig,
   resolveModuleLayoutKind,
   type ModuleLayoutInstallKind,
@@ -104,46 +105,37 @@ function pointInPolygon(point: LocalPoint, polygon: LocalPoint[]): boolean {
   return inside;
 }
 
-function rectInsidePolygon(corners: LocalPoint[], polygon: LocalPoint[]): boolean {
-  return corners.every((corner) => pointInPolygon(corner, polygon));
-}
-
-function makeModuleRect(
+function makePortraitModuleRect(
   x: number,
   y: number,
-  lengthM: number,
-  depthM: number,
+  widthM: number,
+  heightM: number,
   origin: LatLngPoint,
 ): ModuleRect {
   const localCorners: LocalPoint[] = [
     { x, y },
-    { x: x + lengthM, y },
-    { x: x + lengthM, y: y + depthM },
-    { x, y: y + depthM },
+    { x: x + widthM, y },
+    { x: x + widthM, y: y + heightM },
+    { x, y: y + heightM },
   ];
   return {
     corners: localCorners.map((corner) => toLatLng(corner, origin)) as ModuleRect["corners"],
   };
 }
 
-function moduleUnitDepth(): number {
-  const { tiers, moduleWidthM, tierGapM } = moduleLayoutConfig;
-  return tiers * moduleWidthM + (tiers - 1) * tierGapM;
-}
-
-function placeModulesInPolygon(
+/** 행(Row) 단위 배치 — 목표 모듈수 우선, 마지막 행 부분 채움 허용 */
+function placeModulesRowBased(
   polygon: LatLngPoint[],
   targetCount: number,
   params: LayoutParams,
   origin: LatLngPoint,
 ): ModuleRect[] {
-  const localPoly = toLocal(polygon, origin);
-  const inset = moduleLayoutConfig.boundaryInsetM;
-  const lengthM = moduleLayoutConfig.moduleLengthM;
-  const depthM = moduleUnitDepth();
-  const colGap = moduleLayoutConfig.colGapM;
-  const rowPitch = params.rowSpacingM;
+  if (targetCount <= 0) return [];
 
+  const { widthM, heightM, colGapM, rowGapM } = getVisualModuleDimensions();
+  const visualRowGap = rowGapM + params.rowSpacingM * moduleLayoutConfig.visualScale * 0.15;
+
+  const localPoly = toLocal(polygon, origin);
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
@@ -155,41 +147,64 @@ function placeModulesInPolygon(
     maxY = Math.max(maxY, point.y);
   }
 
-  minX += inset;
-  minY += inset;
-  maxX -= inset;
-  maxY -= inset;
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const polyWidth = Math.max(maxX - minX - moduleLayoutConfig.boundaryInsetM * 2, widthM * 2);
+
+  let modulesPerRow = Math.max(
+    3,
+    Math.min(
+      moduleLayoutConfig.defaultModulesPerRow,
+      Math.floor((polyWidth + colGapM) / (widthM + colGapM)),
+    ),
+  );
+
+  const totalRows = Math.ceil(targetCount / modulesPerRow);
+  const gridHeight = totalRows * heightM + Math.max(0, totalRows - 1) * visualRowGap;
+  let startY = centerY - gridHeight / 2;
 
   const modules: ModuleRect[] = [];
-  const polyWidth = maxX - minX;
-  const polyHeight = maxY - minY;
-  const placeAlongX = polyWidth >= polyHeight;
 
-  const rowStep = placeAlongX ? rowPitch : lengthM + colGap;
-  const colStep = placeAlongX ? lengthM + colGap : rowPitch;
-  const unitW = placeAlongX ? lengthM : depthM;
-  const unitH = placeAlongX ? depthM : lengthM;
+  for (let row = 0; row < totalRows && modules.length < targetCount; row += 1) {
+    const remaining = targetCount - modules.length;
+    const countThisRow = Math.min(modulesPerRow, remaining);
+    const rowWidth = countThisRow * widthM + Math.max(0, countThisRow - 1) * colGapM;
+    let startX = centerX - rowWidth / 2;
+    const y = startY + row * (heightM + visualRowGap);
 
-  for (let row = 0; row * rowStep + unitH <= polyHeight + 0.01; row += 1) {
-    for (let col = 0; col * colStep + unitW <= polyWidth + 0.01; col += 1) {
-      if (modules.length >= targetCount) return modules;
+    for (let col = 0; col < countThisRow; col += 1) {
+      const x = startX + col * (widthM + colGapM);
+      const center = { x: x + widthM / 2, y: y + heightM / 2 };
+      const inside = pointInPolygon(center, localPoly);
 
-      const baseX = minX + col * colStep;
-      const baseY = minY + row * rowStep;
-      const corners: LocalPoint[] = [
-        { x: baseX, y: baseY },
-        { x: baseX + unitW, y: baseY },
-        { x: baseX + unitW, y: baseY + unitH },
-        { x: baseX, y: baseY + unitH },
-      ];
-
-      if (rectInsidePolygon(corners, localPoly)) {
-        modules.push(makeModuleRect(baseX, baseY, unitW, unitH, origin));
+      if (inside || modules.length >= Math.floor(targetCount * 0.85)) {
+        modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin));
       }
     }
   }
 
-  return modules;
+  if (modules.length < targetCount) {
+    modulesPerRow = Math.max(3, Math.min(modulesPerRow + 2, targetCount));
+    const retryRows = Math.ceil(targetCount / modulesPerRow);
+    const retryHeight = retryRows * heightM + Math.max(0, retryRows - 1) * visualRowGap;
+    startY = centerY - retryHeight / 2;
+    modules.length = 0;
+
+    for (let row = 0; row < retryRows && modules.length < targetCount; row += 1) {
+      const remaining = targetCount - modules.length;
+      const countThisRow = Math.min(modulesPerRow, remaining);
+      const rowWidth = countThisRow * widthM + Math.max(0, countThisRow - 1) * colGapM;
+      const startX = centerX - rowWidth / 2;
+      const y = startY + row * (heightM + visualRowGap);
+
+      for (let col = 0; col < countThisRow; col += 1) {
+        const x = startX + col * (widthM + colGapM);
+        modules.push(makePortraitModuleRect(x, y, widthM, heightM, origin));
+      }
+    }
+  }
+
+  return modules.slice(0, targetCount);
 }
 
 export function createVirtualParcelRectangle(
@@ -202,15 +217,14 @@ export function createVirtualParcelRectangle(
   const aspect = 1.6;
   const heightM = Math.sqrt(areaSqm / aspect);
   const widthM = areaSqm / heightM;
-  const origin = center;
   const halfW = widthM / 2;
   const halfH = heightM / 2;
 
   return [
-    toLatLng({ x: -halfW, y: -halfH }, origin),
-    toLatLng({ x: halfW, y: -halfH }, origin),
-    toLatLng({ x: halfW, y: halfH }, origin),
-    toLatLng({ x: -halfW, y: halfH }, origin),
+    toLatLng({ x: -halfW, y: -halfH }, center),
+    toLatLng({ x: halfW, y: -halfH }, center),
+    toLatLng({ x: halfW, y: halfH }, center),
+    toLatLng({ x: -halfW, y: halfH }, center),
   ];
 }
 
@@ -228,7 +242,7 @@ export function computeModuleLayout(input: {
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
   const origin = centroid(input.boundary);
-  const modules = placeModulesInPolygon(
+  const modules = placeModulesRowBased(
     input.boundary,
     targetModuleCount,
     params,

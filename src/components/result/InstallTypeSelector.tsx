@@ -4,10 +4,11 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import {
   INSTALL_TYPE_OPTIONS,
   INSTALL_TYPE_UI_MESSAGES,
-  formatInstallTypeDisplayLabel,
+  formatInstallTypeShortLabel,
   type InstallTypeOption,
 } from "@/data/resultUx";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
+import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
 
 interface InstallTypeSelectorProps {
   apiRecommendation: string;
@@ -46,16 +47,14 @@ export default function InstallTypeSelector({ apiRecommendation }: InstallTypeSe
       <div className="mt-4 rounded-xl border border-navy/20 bg-navy-light px-4 py-4">
         <p className="text-sm font-semibold text-slate-900">추천 설치유형 (선택 기준)</p>
         <p className="mt-2 text-base font-bold text-navy">
-          {formatInstallTypeDisplayLabel(metrics.installType as InstallTypeOption)}
+          {formatInstallTypeShortLabel(metrics.installType as InstallTypeOption)}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
           {INSTALL_TYPE_UI_MESSAGES[metrics.installType as InstallTypeOption]}
         </p>
         <p className="mt-3 text-sm text-slate-700">
           예상 설치용량:{" "}
-          <strong className="text-navy">
-            {metrics.capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW
-          </strong>
+          <strong className="text-navy">{formatUnifiedCapacityKw(metrics.capacityKw)}</strong>
         </p>
         <p className="mt-2 text-xs text-slate-500">1차 분석 추천: {apiRecommendation}</p>
       </div>

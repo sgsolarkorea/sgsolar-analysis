@@ -1,5 +1,6 @@
 import SectionHeader from "@/components/ui/SectionHeader";
 import { KpiCard } from "@/components/ui/InfoCard";
+import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
 import {
   formatHouseholdMonthlySavings,
   HOUSEHOLD_SAVINGS_DISCLAIMER,
@@ -14,7 +15,7 @@ export default function HouseholdSavingsAnalysis({ capacityKw }: HouseholdSaving
   const monthlySavings = formatHouseholdMonthlySavings(capacityKw);
 
   const cards = [
-    { label: "예상 설치용량", value: `${capacityKw.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}kW` },
+    { label: "예상 설치용량", value: formatUnifiedCapacityKw(capacityKw) },
     { label: "월 예상 절감액", value: monthlySavings },
     { label: "절감 기준", value: `kW당 ${HOUSEHOLD_SAVINGS_PER_KW.toLocaleString("ko-KR")}원/월` },
     { label: "참고 (3·6·9kW)", value: "약 5·10·15만원/월" },

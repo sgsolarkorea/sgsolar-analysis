@@ -31,7 +31,8 @@ import {
   wrapTextByWidth,
 } from "@/lib/pdf/pdfHelpers";
 import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
-import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
+import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
+import { formatInstallTypeDisplayLabel, formatInstallTypeShortLabel, type InstallTypeOption } from "@/data/resultUx";
 import { resolveModuleLayoutForSite } from "@/lib/solar/resolveModuleLayout";
 import type { ModuleLayoutResult } from "@/types/moduleLayout";
 
@@ -156,7 +157,26 @@ function drawCoverPage(
     font,
     color: rgbColor(COLORS.slate),
   });
-  kpiY -= 16;
+  kpiY -= 14;
+  const constructionExtra =
+    data.solarMetrics.installType === "토지형"
+      ? solarDisclaimer.constructionLandExtra
+      : solarDisclaimer.constructionBuildingExtra;
+  for (const line of [
+    `※ ${solarDisclaimer.construction}`,
+    `※ ${constructionExtra}`,
+  ]) {
+    page.drawText(sanitizePdfText(line), {
+      x: MARGIN,
+      y: kpiY,
+      size: 7.5,
+      font,
+      color: rgbColor(COLORS.slate),
+      maxWidth: contentW,
+    });
+    kpiY -= 11;
+  }
+  kpiY -= 3;
   page.drawText("검토 주소", {
     x: MARGIN,
     y: kpiY,
@@ -304,39 +324,28 @@ function drawModuleLayoutPage(
     };
 
     if (layout.boundary.length >= 3) {
-      for (let i = 0; i < layout.boundary.length; i++) {
-        const current = layout.boundary[i];
-        const next = layout.boundary[(i + 1) % layout.boundary.length];
-        const p1 = toPdfPoint(current.lat, current.lng);
-        const p2 = toPdfPoint(next.lat, next.lng);
-        page.drawLine({
-          start: p1,
-          end: p2,
-          thickness: 2,
-          color: rgb(0.96, 0.62, 0.04),
-        });
-      }
+      /* 필지 경계선은 표시하지 않음 */
     }
 
-    const moduleColor = rgb(0.12, 0.16, 0.23);
+    const moduleFill = rgb(0.12, 0.16, 0.23);
+    const moduleEdge = rgb(0.07, 0.09, 0.15);
     for (const mod of layout.modules) {
       const corners = mod.corners.map((point) => toPdfPoint(point.lat, point.lng));
-      for (let i = 0; i < corners.length; i++) {
-        const p1 = corners[i];
-        const p2 = corners[(i + 1) % corners.length];
-        page.drawLine({
-          start: p1,
-          end: p2,
-          thickness: 0.8,
-          color: moduleColor,
-        });
-      }
-      if (corners.length >= 3) {
-        page.drawLine({
-          start: corners[0],
-          end: corners[2],
-          thickness: 0.4,
-          color: rgb(0.2, 0.25, 0.33),
+      if (corners.length >= 4) {
+        const xs = corners.map((p) => p.x);
+        const ys = corners.map((p) => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        page.drawRectangle({
+          x: minX,
+          y: minY,
+          width: Math.max(maxX - minX, 1),
+          height: Math.max(maxY - minY, 2),
+          color: moduleFill,
+          borderColor: moduleEdge,
+          borderWidth: 0.5,
         });
       }
     }
@@ -373,16 +382,16 @@ function drawModuleLayoutPage(
   const stats = [
     { label: "예상 설치용량", value: data.capacity },
     {
-      label: "배치 모듈 수",
-      value: `${layout.stats.placedModuleCount.toLocaleString("ko-KR")}장`,
+      label: "예상 모듈 수",
+      value: `${layout.stats.targetModuleCount.toLocaleString("ko-KR")}장`,
     },
     {
       label: "모듈 사양",
-      value: `${layout.stats.modulePowerW}W · ${layout.stats.tiers}단`,
+      value: `${layout.stats.modulePowerW}W`,
     },
     {
-      label: "설치 유형",
-      value: formatInstallTypeDisplayLabel(layout.stats.installType as InstallTypeOption),
+      label: "설치유형",
+      value: formatInstallTypeShortLabel(layout.stats.installType as InstallTypeOption),
     },
   ];
 
