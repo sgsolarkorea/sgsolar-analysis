@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { fetchCadastralPolygonByPnu } from "@/lib/api/vworld";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS } from "@/data/resultUx";
-import {
-  computeModuleLayout,
-  createVirtualParcelRectangle,
-} from "@/lib/solar/moduleLayout";
-import type { LatLngPoint } from "@/types/moduleLayout";
+import { computeModuleLayout } from "@/lib/solar/moduleLayout";
+import { resolveLayoutBoundary } from "@/lib/solar/resolveLayoutBoundary";
+
+function parseOptionalNumber(value: string | null): number | undefined {
+  if (value == null || value === "") return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,6 +18,8 @@ export async function GET(request: Request) {
   const capacityKw = Number(searchParams.get("capacityKw"));
   const installTypeRaw = searchParams.get("installType")?.trim() ?? "토지형";
   const moduleCountRaw = searchParams.get("moduleCount");
+  const buildingAreaSqm = parseOptionalNumber(searchParams.get("buildingAreaSqm"));
+  const landAreaSqm = parseOptionalNumber(searchParams.get("landAreaSqm"));
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     return NextResponse.json({ error: "lat and lng required" }, { status: 400 });
@@ -34,22 +38,15 @@ export async function GET(request: Request) {
       ? Number(moduleCountRaw)
       : undefined;
 
-  const center: LatLngPoint = { lat, lng };
-  let boundary: LatLngPoint[] = [];
-  let polygonSource: "cadastral" | "virtual" = "virtual";
-
-  if (pnu) {
-    const cadastral = await fetchCadastralPolygonByPnu(pnu, lat, lng);
-    if (cadastral?.ring?.length) {
-      boundary = cadastral.ring;
-      polygonSource = "cadastral";
-    }
-  }
-
-  if (boundary.length < 3) {
-    boundary = createVirtualParcelRectangle(center, capacityKw, installType);
-    polygonSource = "virtual";
-  }
+  const { boundary, polygonSource } = await resolveLayoutBoundary({
+    pnu: pnu || undefined,
+    lat,
+    lng,
+    capacityKw,
+    installType,
+    buildingAreaSqm,
+    landAreaSqm,
+  });
 
   const layout = computeModuleLayout({
     boundary,

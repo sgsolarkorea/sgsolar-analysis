@@ -5,7 +5,7 @@ import type { ParcelSnapshot } from "@/types/parcelReview";
 import type { MunicipalityOrdinanceData } from "@/types/regulatoryReview";
 import { formatParcelShortLabel } from "@/lib/parcels/format";
 import { company, MARKETING_NAME, siteLinks } from "@/data/sampleData";
-import { getFieldValue } from "@/lib/solar/calculate";
+import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { hasDetailedGridData, formatGridLevelName } from "@/lib/grid/display";
 import { formatGridCapacityMwOrKw, formatRemainingWithStatus, formatSolarCapacityKw } from "@/lib/grid/evaluate";
@@ -1105,6 +1105,8 @@ export async function generateSiteReviewPdf(
       capacityKw: data.solarMetrics.capacityKw,
       installType: data.solarMetrics.installType,
       moduleCount: data.solarMetrics.moduleCount,
+      buildingAreaSqm: parseAreaSqm(getFieldValue(data.buildingInfo, "건축면적")) ?? undefined,
+      landAreaSqm: parseAreaSqm(getFieldValue(data.landInfo, "면적")) ?? undefined,
     }),
   ]);
 

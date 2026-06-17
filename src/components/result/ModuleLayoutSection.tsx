@@ -9,6 +9,7 @@ import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
 import { formatInstallTypeShortLabel } from "@/data/resultUx";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
+import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 import type { ModuleLayoutResult } from "@/types/moduleLayout";
 
 interface ModuleLayoutSectionProps {
@@ -17,7 +18,7 @@ interface ModuleLayoutSectionProps {
 }
 
 export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLayoutSectionProps) {
-  const { metrics, installType, primaryParcel } = useResultMetrics();
+  const { metrics, installType, primaryParcel, buildingInfo, landInfo } = useResultMetrics();
   const [layout, setLayout] = useState<ModuleLayoutResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,9 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     setLoading(true);
     setError(null);
 
+    const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
+    const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
+
     const params = new URLSearchParams({
       lat: String(primaryParcel.lat),
       lng: String(primaryParcel.lng),
@@ -35,6 +39,8 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
       moduleCount: String(metrics.moduleCount),
     });
     if (primaryParcel.pnu) params.set("pnu", primaryParcel.pnu);
+    if (buildingAreaSqm != null) params.set("buildingAreaSqm", String(buildingAreaSqm));
+    if (landAreaSqm != null) params.set("landAreaSqm", String(landAreaSqm));
 
     fetch(`/api/module-layout?${params.toString()}`)
       .then(async (res) => {
@@ -67,6 +73,8 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     metrics.capacityKw,
     metrics.moduleCount,
     installType,
+    buildingInfo,
+    landInfo,
   ]);
 
   const targetModules = metrics.moduleCount;
