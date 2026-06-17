@@ -82,6 +82,7 @@ interface LayoutParams {
 interface PhysicalArray {
   arrayIndex: number;
   baseY: number;
+  maxY: number;
   tiers: [ModuleSlot[], ModuleSlot[]];
   capacity: number;
 }
@@ -172,13 +173,12 @@ function alignTierPair(
   return { tier1: aligned1, tier2: aligned2 };
 }
 
-/** Array = Tier 2줄 + aisle band — 슬롯 생성 단계에서 통로 반영 */
-function generatePhysicalArrays(
+/** Array 후보 = Tier 2줄. 후보 선택 단계에서 Array 간 aisle band를 강제한다. */
+function generatePhysicalArrayCandidates(
   oriented: OrientedPoly,
   widthM: number,
   heightM: number,
   tierGapM: number,
-  aisleM: number,
 ): PhysicalArray[] {
   const arrays: PhysicalArray[] = [];
   let y = oriented.minY;
@@ -199,16 +199,67 @@ function generatePhysicalArrays(
       arrays.push({
         arrayIndex: arrayIndex++,
         baseY: tier1Y,
+        maxY: tier2Y + heightM,
         tiers: [tier1, tier2],
         capacity: tier1.length * TIER_ROWS_PER_ARRAY,
       });
-      y = tier2Y + heightM + aisleM;
-    } else {
-      y += scanStep;
     }
+    y += scanStep;
   }
 
   return arrays;
+}
+
+function selectPhysicalArrayStack(input: {
+  candidates: PhysicalArray[];
+  targetCount: number;
+  minArrays: number;
+  aisleM: number;
+  oriented: OrientedPoly;
+}): PhysicalArray[] {
+  const { candidates, targetCount, minArrays, aisleM, oriented } = input;
+  if (candidates.length === 0) return [];
+
+  const polyCenterY = (oriented.minY + oriented.maxY) / 2;
+  let best: { arrays: PhysicalArray[]; score: number } | null = null;
+
+  for (let start = 0; start < candidates.length; start++) {
+    const stack: PhysicalArray[] = [];
+    let lastMaxY = -Infinity;
+
+    for (let i = start; i < candidates.length; i++) {
+      const candidate = candidates[i];
+      if (candidate.baseY < lastMaxY + aisleM - 0.001) continue;
+
+      stack.push(candidate);
+      lastMaxY = candidate.maxY;
+
+      if (stack.length < minArrays) continue;
+
+      const capacity = stack.reduce((sum, array) => sum + array.capacity, 0);
+      const placedPotential = Math.min(capacity, targetCount);
+      const shortfall = Math.max(0, targetCount - capacity);
+      const stackMinY = stack[0].baseY;
+      const stackMaxY = stack[stack.length - 1].maxY;
+      const stackCenterY = (stackMinY + stackMaxY) / 2;
+      const centerOffsetY = Math.abs(stackCenterY - polyCenterY);
+      const verticalCoverage = (stackMaxY - stackMinY) / Math.max(oriented.maxY - oriented.minY, 1);
+      const overCapacity = Math.max(0, capacity - targetCount);
+
+      const score =
+        placedPotential * 1000 -
+        shortfall * 5000 -
+        centerOffsetY * 40 +
+        verticalCoverage * 120 -
+        overCapacity * 0.5;
+
+      if (!best || score > best.score) {
+        best = { arrays: [...stack], score };
+      }
+    }
+  }
+
+  return best?.arrays.map((array, i) => ({ ...array, arrayIndex: i })) ?? [];
 }
 
 function selectCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
@@ -293,7 +344,6 @@ function selectFromPhysicalArrays(
   arrays: PhysicalArray[],
   targetCount: number,
   minArrays: number,
-  heightM: number,
 ): {
   selected: ModuleSlot[];
   arrayModuleCounts: number[];
@@ -417,13 +467,19 @@ function tryPlacementAtAzimuth(input: {
       ? getVisualRowSpacingM(input.params.kind, input.params.mode)
       : 0;
 
-  const arrays = generatePhysicalArrays(
+  const candidates = generatePhysicalArrayCandidates(
     oriented,
     widthM,
     heightM,
     tierGapM,
-    input.aisleM,
   );
+  const arrays = selectPhysicalArrayStack({
+    candidates,
+    targetCount: input.targetCount,
+    minArrays: input.requireMinArrays,
+    aisleM: input.aisleM,
+    oriented,
+  });
   const validSlotCount = countValidArraySlots(arrays);
   if (validSlotCount === 0 || arrays.length === 0) return null;
 
@@ -431,7 +487,6 @@ function tryPlacementAtAzimuth(input: {
     arrays,
     input.targetCount,
     input.requireMinArrays,
-    heightM,
   );
   if (!picked) {
     return {

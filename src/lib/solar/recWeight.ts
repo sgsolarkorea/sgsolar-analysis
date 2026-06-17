@@ -5,12 +5,14 @@ export function truncateRecWeight(weight: number): number {
   return Math.floor(weight * 10_000) / 10_000;
 }
 
-const LAND_UNDER_100_KW = 99.999;
-const LAND_MID_TIER_KW = 2_900.001; // 3,000 - 99.999
 const THRESHOLD_100_KW = 100;
 const THRESHOLD_3000_KW = 3_000;
 
-/** 일반부지(토지형) REC 가중치 — 복합 구간 평균 */
+function truncateRecWeightToTwoDecimals(weight: number): number {
+  return Math.floor(weight * 100) / 100;
+}
+
+/** 일반부지(토지형) REC 가중치 — 100kW 단위 상한 용량 기준 */
 export function resolveLandRecWeight(capacityKw: number): { weight: number; reason: string } {
   if (capacityKw <= 0) {
     return { weight: 0, reason: "용량 없음" };
@@ -18,22 +20,14 @@ export function resolveLandRecWeight(capacityKw: number): { weight: number; reas
   if (capacityKw < THRESHOLD_100_KW) {
     return { weight: 1.2, reason: "100kW 미만 (1.2)" };
   }
-  if (capacityKw <= THRESHOLD_3000_KW) {
-    const raw =
-      (LAND_UNDER_100_KW * 1.2 + (capacityKw - LAND_UNDER_100_KW) * 1.0) / capacityKw;
-    const weight = truncateRecWeight(raw);
-    return {
-      weight,
-      reason: `100~3,000kW 복합가중 (99.999×1.2 + 초과×1.0) ÷ ${capacityKw}kW`,
-    };
-  }
-  const raw =
-    (LAND_UNDER_100_KW * 1.2 + LAND_MID_TIER_KW * 1.0 + (capacityKw - THRESHOLD_3000_KW) * 0.8) /
-    capacityKw;
-  const weight = truncateRecWeight(raw);
+
+  const hundredKwBlocks = Math.max(2, Math.ceil(capacityKw / 100));
+  const referenceCapacityKw = hundredKwBlocks * 100;
+  const raw = (1.2 + (hundredKwBlocks - 1) * 1.0) / hundredKwBlocks;
+  const weight = truncateRecWeightToTwoDecimals(raw);
   return {
     weight,
-    reason: `3,000kW 초과 복합가중 (99.999×1.2 + 2,900.001×1.0 + 초과×0.8) ÷ ${capacityKw}kW`,
+    reason: `${referenceCapacityKw}kW 기준 100kW 단위 상한 가중치 ((1.2 + ${hundredKwBlocks - 1}×1.0) ÷ ${hundredKwBlocks})`,
   };
 }
 

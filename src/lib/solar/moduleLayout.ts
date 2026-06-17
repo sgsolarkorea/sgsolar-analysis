@@ -157,11 +157,27 @@ function groupSlotsByRow(slots: ModuleSlot[], heightM: number): ModuleSlot[][] {
     .map(([, row]) => row.sort((a, b) => a.x - b.x));
 }
 
-function selectCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
+function selectDistributedCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
   if (count <= 0 || slots.length === 0) return [];
   if (slots.length <= count) return [...slots];
-  const start = Math.floor((slots.length - count) / 2);
-  return slots.slice(start, start + count);
+  if (count === 1) return [slots[Math.floor(slots.length / 2)]];
+
+  const margin = Math.max(0, Math.floor((slots.length - count) / 4));
+  const start = margin;
+  const end = slots.length - 1 - margin;
+  const picked: ModuleSlot[] = [];
+  const used = new Set<number>();
+
+  for (let i = 0; i < count; i++) {
+    const t = count === 1 ? 0.5 : i / (count - 1);
+    let idx = Math.round(start + (end - start) * t);
+    while (used.has(idx) && idx < slots.length - 1) idx++;
+    while (used.has(idx) && idx > 0) idx--;
+    used.add(idx);
+    picked.push(slots[idx]);
+  }
+
+  return picked.sort((a, b) => a.x - b.x);
 }
 
 function polygonLocalCentroid(localPoly: LocalPoint[]): LocalPoint {
@@ -267,7 +283,7 @@ function selectSlotsRoofCentered(
     if (quota <= 0) continue;
     const row = rowsByCentrality[i].row;
     const sortedByX = [...row].sort((a, b) => a.x - b.x);
-    const pick = selectCentered(sortedByX, quota);
+    const pick = selectDistributedCentered(sortedByX, quota);
     selected.push(...pick);
     rowModuleCounts.push(pick.length);
   }
