@@ -5,7 +5,7 @@ import {
 } from "@/lib/api/vworld";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
-import { applySetback } from "@/lib/solar/polygonGeometry";
+import { applySetback, closeRing, normalizeRing } from "@/lib/solar/polygonGeometry";
 import { createVirtualParcelRectangle } from "@/lib/solar/moduleLayout";
 import type { LatLngPoint, ModuleLayoutPolygonSource } from "@/types/moduleLayout";
 
@@ -16,8 +16,19 @@ export interface ResolvedLayoutBoundary {
   boundary: LatLngPoint[];
   /** setback 적용 전 원본 Polygon */
   sourceBoundary: LatLngPoint[];
+  /** sourceBoundary에 setback 적용 결과 (boundary와 동일해야 함) */
+  setbackBoundary: LatLngPoint[];
   polygonSource: ModuleLayoutPolygonSource;
   footprintKind: LayoutFootprintKind;
+}
+
+function withSetback(
+  sourceRing: LatLngPoint[],
+  setbackM: number,
+): Pick<ResolvedLayoutBoundary, "sourceBoundary" | "setbackBoundary" | "boundary"> {
+  const sourceBoundary = closeRing(normalizeRing(sourceRing));
+  const setbackBoundary = closeRing(applySetback(sourceBoundary, setbackM));
+  return { sourceBoundary, setbackBoundary, boundary: setbackBoundary };
 }
 
 async function resolveCadastralRing(
@@ -52,9 +63,14 @@ export async function resolveLayoutBoundary(input: {
     if (input.pnu) {
       const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
       if (building?.ring?.length) {
+        const { sourceBoundary, setbackBoundary, boundary } = withSetback(
+          building.ring,
+          moduleLayoutConfig.roofSetbackM,
+        );
         return {
-          sourceBoundary: building.ring,
-          boundary: applySetback(building.ring, moduleLayoutConfig.roofSetbackM),
+          sourceBoundary,
+          setbackBoundary,
+          boundary,
           polygonSource: "building",
           footprintKind: "building",
         };
@@ -62,9 +78,14 @@ export async function resolveLayoutBoundary(input: {
     }
 
     if (cadastralRing) {
+      const { sourceBoundary, setbackBoundary, boundary } = withSetback(
+        cadastralRing,
+        moduleLayoutConfig.roofSetbackM,
+      );
       return {
-        sourceBoundary: cadastralRing,
-        boundary: applySetback(cadastralRing, moduleLayoutConfig.roofSetbackM),
+        sourceBoundary,
+        setbackBoundary,
+        boundary,
         polygonSource: "cadastral",
         footprintKind: "parcel",
       };
@@ -72,6 +93,7 @@ export async function resolveLayoutBoundary(input: {
 
     return {
       sourceBoundary: [],
+      setbackBoundary: [],
       boundary: [],
       polygonSource: "cadastral",
       footprintKind: "parcel",
@@ -79,9 +101,14 @@ export async function resolveLayoutBoundary(input: {
   }
 
   if (cadastralRing) {
+    const { sourceBoundary, setbackBoundary, boundary } = withSetback(
+      cadastralRing,
+      moduleLayoutConfig.landSetbackM,
+    );
     return {
-      sourceBoundary: cadastralRing,
-      boundary: applySetback(cadastralRing, moduleLayoutConfig.landSetbackM),
+      sourceBoundary,
+      setbackBoundary,
+      boundary,
       polygonSource: "cadastral",
       footprintKind: "parcel",
     };
@@ -90,15 +117,17 @@ export async function resolveLayoutBoundary(input: {
   if (input.pnu) {
     return {
       sourceBoundary: [],
+      setbackBoundary: [],
       boundary: [],
       polygonSource: "cadastral",
       footprintKind: "parcel",
     };
   }
 
-  const virtualRing = createVirtualParcelRectangle(center, input.capacityKw, input.installType);
+  const virtualRing = closeRing(createVirtualParcelRectangle(center, input.capacityKw, input.installType));
   return {
     sourceBoundary: virtualRing,
+    setbackBoundary: virtualRing,
     boundary: virtualRing,
     polygonSource: "virtual",
     footprintKind: "virtual",

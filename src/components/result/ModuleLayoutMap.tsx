@@ -80,16 +80,50 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       return `${pixel.x},${pixel.y}`;
     };
 
+    const toPoints = (ring: LatLngPoint[]) => ring.map(toPoint).join(" ");
+
+    const compareMode = layout.overlayCompare === true;
     const rawRing =
-      layout.overlayRaw && layout.sourceBoundary && layout.sourceBoundary.length >= 3
+      compareMode && layout.sourceBoundary && layout.sourceBoundary.length >= 3
         ? layout.sourceBoundary
+        : layout.overlayRaw && layout.sourceBoundary && layout.sourceBoundary.length >= 3
+          ? layout.sourceBoundary
+          : null;
+
+    const setbackRing =
+      compareMode && layout.setbackBoundary && layout.setbackBoundary.length >= 3
+        ? layout.setbackBoundary
         : null;
 
-    const boundaryOverlay = rawRing
-      ? `<polygon points="${rawRing.map(toPoint).join(" ")}" fill="rgba(34, 197, 94, 0.25)" stroke="#16a34a" stroke-width="2.5" />`
-      : layout.boundary.length >= 3
-        ? `<polygon points="${layout.boundary.map(toPoint).join(" ")}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" />`
-        : "";
+    const boundaryOverlays: string[] = [];
+
+    if (compareMode && rawRing) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(rawRing)}" fill="rgba(34, 197, 94, 0.22)" stroke="#16a34a" stroke-width="2.5" vector-effect="non-scaling-stroke" />`,
+      );
+    }
+
+    if (compareMode && setbackRing) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(setbackRing)}" fill="rgba(245, 158, 11, 0.35)" stroke="#f59e0b" stroke-width="2.5" vector-effect="non-scaling-stroke" />`,
+      );
+    }
+
+    if (compareMode && layout.boundary.length >= 3) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(layout.boundary)}" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 4" vector-effect="non-scaling-stroke" />`,
+      );
+    } else if (rawRing) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(rawRing)}" fill="rgba(34, 197, 94, 0.25)" stroke="#16a34a" stroke-width="2.5" vector-effect="non-scaling-stroke" />`,
+      );
+    } else if (layout.boundary.length >= 3) {
+      boundaryOverlays.push(
+        `<polygon points="${toPoints(layout.boundary)}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" vector-effect="non-scaling-stroke" />`,
+      );
+    }
+
+    const boundaryOverlay = boundaryOverlays.join("");
 
     const modulePaths = layout.modules
       .map((mod) => {

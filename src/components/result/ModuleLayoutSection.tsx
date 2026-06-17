@@ -20,7 +20,10 @@ interface ModuleLayoutSectionProps {
 
 export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLayoutSectionProps) {
   const searchParams = useSearchParams();
-  const polygonDebug = searchParams.get("polygonDebug") === "1";
+  const polygonDebug = searchParams.get("polygonDebug");
+  const polygonDebugOverlay = polygonDebug === "1";
+  const polygonDebugRaw = polygonDebug === "raw";
+  const polygonDebugCompare = polygonDebug === "compare";
   const { metrics, installType, primaryParcel, buildingInfo, landInfo } = useResultMetrics();
   const [layout, setLayout] = useState<ModuleLayoutResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +47,10 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     if (primaryParcel.pnu) params.set("pnu", primaryParcel.pnu);
     if (buildingAreaSqm != null) params.set("buildingAreaSqm", String(buildingAreaSqm));
     if (landAreaSqm != null) params.set("landAreaSqm", String(landAreaSqm));
-    if (polygonDebug) params.set("overlayOnly", "1");
+    if (polygonDebugOverlay || polygonDebugRaw || polygonDebugCompare) params.set("overlayOnly", "1");
+    if (polygonDebugCompare) params.set("polygonDebug", "compare");
+    else if (polygonDebugRaw) params.set("polygonDebug", "raw");
+    else if (polygonDebugOverlay) params.set("polygonDebug", "1");
 
     fetch(`/api/module-layout?${params.toString()}`)
       .then(async (res) => {
@@ -79,21 +85,36 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     installType,
     buildingInfo,
     landInfo,
-    polygonDebug,
+    polygonDebugOverlay,
+    polygonDebugRaw,
+    polygonDebugCompare,
   ]);
 
   const targetModules = layout?.stats.targetModuleCount ?? metrics.moduleCount;
   const placedModules = layout?.stats.placedModuleCount ?? 0;
-  const placementMismatch = !polygonDebug && placedModules !== targetModules;
+  const placementMismatch =
+    !polygonDebugOverlay && !polygonDebugRaw && !polygonDebugCompare && placedModules !== targetModules;
 
   return (
     <section id="module-layout" className="scroll-mt-24">
       <SectionHeader
-        title={polygonDebug ? "Polygon 검증 (Overlay 전용)" : "예상 모듈 가배치도"}
+        title={
+          polygonDebugCompare
+            ? "Polygon 3-way 비교"
+            : polygonDebugRaw
+              ? "VWorld 원본 Polygon 검증"
+              : polygonDebugOverlay
+                ? "Polygon 검증 (Overlay 전용)"
+                : "예상 모듈 가배치도"
+        }
         description={
-          polygonDebug
-            ? "VWorld Polygon 경계만 표시합니다. 모듈은 숨깁니다."
-            : "위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
+          polygonDebugCompare
+            ? "녹색=VWorld 원본, 주황=setback, 파란 점선=layout.boundary. 세 Polygon이 형상·위치가 일치하는지 확인합니다."
+            : polygonDebugRaw
+              ? "VWorld cadastral 원본(sourceBoundary)만 표시합니다. setback·모듈 미적용."
+              : polygonDebugOverlay
+                ? "setback 적용 후 layout.boundary만 표시합니다. 모듈은 숨깁니다."
+                : "위성지도 위 목표 모듈수 기준 1차 가배치도입니다."
         }
       />
 
@@ -113,13 +134,30 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
         <>
           <ModuleLayoutMap layout={layout} address={address} jibunAddress={jibunAddress} />
 
-          {polygonDebug && layout.diagnostics && (
+          {polygonDebugCompare && (
+            <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-600">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm border-2 border-green-600 bg-green-500/30" />
+                VWorld 원본
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm border-2 border-amber-500 bg-amber-500/35" />
+                setback (1.2m OBB)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm border-2 border-dashed border-blue-600" />
+                layout.boundary
+              </span>
+            </div>
+          )}
+
+          {(polygonDebugOverlay || polygonDebugRaw || polygonDebugCompare) && layout.diagnostics && (
             <pre className="mt-3 overflow-x-auto rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
               {JSON.stringify(layout.diagnostics, null, 2)}
             </pre>
           )}
 
-          {!polygonDebug && (
+          {!polygonDebugOverlay && !polygonDebugRaw && !polygonDebugCompare && (
             <>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <MetricCard

@@ -80,8 +80,30 @@ function rotateLocal(point: LocalPoint, angleRad: number): LocalPoint {
   };
 }
 
+/** OBB 로컬 → 비회전 로컬 (rotateLocal(·, -θ)의 역변환) */
 function unrotateLocal(point: LocalPoint, angleRad: number): LocalPoint {
-  return rotateLocal(point, -angleRad);
+  return rotateLocal(point, angleRad);
+}
+
+/** GeoJSON 폐합점(첫 점 = 마지막 점) 제거 */
+export function normalizeRing(ring: LatLngPoint[]): LatLngPoint[] {
+  if (ring.length < 2) return ring;
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (Math.abs(first.lat - last.lat) < 1e-12 && Math.abs(first.lng - last.lng) < 1e-12) {
+    return ring.slice(0, -1);
+  }
+  return ring;
+}
+
+export function closeRing(ring: LatLngPoint[]): LatLngPoint[] {
+  if (ring.length < 3) return ring;
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (Math.abs(first.lat - last.lat) < 1e-12 && Math.abs(first.lng - last.lng) < 1e-12) {
+    return ring;
+  }
+  return [...ring, { ...first }];
 }
 
 /** Polygon 장축 방향(라디안) — OBB 기반 */

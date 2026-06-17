@@ -7,7 +7,7 @@ import {
   computePolygonOrientation,
   polygonAreaSqm,
 } from "@/lib/solar/polygonGeometry";
-import type { ModuleLayoutDiagnostics } from "@/types/moduleLayout";
+import type { LatLngPoint, ModuleLayoutDiagnostics } from "@/types/moduleLayout";
 
 function parseOptionalNumber(value: string | null): number | undefined {
   if (value == null || value === "") return undefined;
@@ -15,10 +15,21 @@ function parseOptionalNumber(value: string | null): number | undefined {
   return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
+function ringsMatch(a: LatLngPoint[], b: LatLngPoint[], tolerance = 1e-9): boolean {
+  if (a.length !== b.length || a.length < 3) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (Math.abs(a[i].lat - b[i].lat) > tolerance || Math.abs(a[i].lng - b[i].lng) > tolerance) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function buildDiagnostics(input: {
   polygonSource: ModuleLayoutDiagnostics["polygonSource"];
-  boundary: { lat: number; lng: number }[];
-  sourceBoundary: { lat: number; lng: number }[];
+  boundary: LatLngPoint[];
+  sourceBoundary: LatLngPoint[];
+  setbackBoundary: LatLngPoint[];
   targetModuleCount: number;
   placedModuleCount: number;
   layoutMode: ModuleLayoutDiagnostics["layoutMode"];
@@ -28,11 +39,20 @@ function buildDiagnostics(input: {
   polygonUtilizationPct: number;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
+  const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
   return {
     polygonSource: input.polygonSource,
     boundaryPointCount: input.boundary.length,
-    polygonAreaSqm: Math.round(polygonAreaSqm(input.sourceBoundary) * 100) / 100,
+    polygonAreaSqm: Math.round(polygonAreaSqm(rawRing) * 100) / 100,
     usableAreaSqm: Math.round(polygonAreaSqm(input.boundary) * 100) / 100,
+    setbackAreaSqm:
+      input.setbackBoundary.length >= 3
+        ? Math.round(polygonAreaSqm(input.setbackBoundary) * 100) / 100
+        : undefined,
+    boundaryMatchesSetback:
+      input.setbackBoundary.length >= 3
+        ? ringsMatch(input.boundary, input.setbackBoundary)
+        : undefined,
     targetModuleCount: input.targetModuleCount,
     placedModuleCount: input.placedModuleCount,
     layoutMode: input.layoutMode,
@@ -55,8 +75,14 @@ export async function GET(request: Request) {
   const moduleCountRaw = searchParams.get("moduleCount");
   const buildingAreaSqm = parseOptionalNumber(searchParams.get("buildingAreaSqm"));
   const landAreaSqm = parseOptionalNumber(searchParams.get("landAreaSqm"));
+  const polygonDebug = searchParams.get("polygonDebug");
+  const overlayRaw = polygonDebug === "raw";
+  const overlayCompare = polygonDebug === "compare";
   const overlayOnly =
-    searchParams.get("overlayOnly") === "1" || searchParams.get("polygonDebug") === "1";
+    overlayRaw ||
+    overlayCompare ||
+    searchParams.get("overlayOnly") === "1" ||
+    polygonDebug === "1";
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     return NextResponse.json({ error: "lat and lng required" }, { status: 400 });
@@ -75,7 +101,7 @@ export async function GET(request: Request) {
       ? Number(moduleCountRaw)
       : undefined;
 
-  const { boundary, sourceBoundary, polygonSource } = await resolveLayoutBoundary({
+  const { boundary, sourceBoundary, setbackBoundary, polygonSource } = await resolveLayoutBoundary({
     pnu: pnu || undefined,
     lat,
     lng,
@@ -107,8 +133,9 @@ export async function GET(request: Request) {
 
   const diagnostics = buildDiagnostics({
     polygonSource,
-    boundary,
-    sourceBoundary: sourceBoundary.length >= 3 ? sourceBoundary : boundary,
+    boundary: layout.boundary,
+    sourceBoundary: sourceBoundary.length >= 3 ? sourceBoundary : layout.boundary,
+    setbackBoundary: setbackBoundary.length >= 3 ? setbackBoundary : layout.boundary,
     targetModuleCount: layout.stats.targetModuleCount,
     placedModuleCount: layout.stats.placedModuleCount,
     layoutMode: layout.stats.layoutMode,
@@ -125,10 +152,18 @@ export async function GET(request: Request) {
     );
   }
 
+  const includePolygonDebugFields = overlayRaw || overlayCompare;
+
   return NextResponse.json({
     ...layout,
     modules: overlayOnly ? [] : layout.modules,
+    sourceBoundary:
+      includePolygonDebugFields && sourceBoundary.length >= 3 ? sourceBoundary : undefined,
+    setbackBoundary:
+      includePolygonDebugFields && setbackBoundary.length >= 3 ? setbackBoundary : undefined,
     diagnostics,
     overlayOnly,
+    overlayRaw,
+    overlayCompare,
   });
 }

@@ -50,10 +50,17 @@ export interface ModuleLayoutDiagnostics {
   polygonUtilizationPct: number;
   /** SVG 렌더 대상 (= placedModuleCount, 상한 없음) */
   renderModuleCount: number;
+  /** layout.boundary ↔ setbackBoundary 좌표 일치 여부 (검증용) */
+  boundaryMatchesSetback?: boolean;
+  setbackAreaSqm?: number;
 }
 
 export interface ModuleLayoutResult {
   boundary: LatLngPoint[];
+  /** VWorld 원본 경계 (setback 미적용) */
+  sourceBoundary?: LatLngPoint[];
+  /** sourceBoundary + setback 적용 결과 */
+  setbackBoundary?: LatLngPoint[];
   modules: ModuleRect[];
   center: LatLngPoint;
   bounds: {
@@ -65,4 +72,7 @@ export interface ModuleLayoutResult {
   polygonSource: ModuleLayoutPolygonSource;
   stats: ModuleLayoutStats;
   diagnostics?: ModuleLayoutDiagnostics;
+  overlayOnly?: boolean;
+  overlayRaw?: boolean;
+  overlayCompare?: boolean;
 }
