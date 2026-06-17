@@ -29,6 +29,12 @@ export interface ModuleLayoutStats {
   rowModuleCounts: number[];
   /** 배치 모듈 footprint / usableArea (%) */
   polygonUtilizationPct: number;
+  /** 토지형 Phase 3 — single | double */
+  layoutTier?: "single" | "double";
+  blockCount?: number;
+  blockModuleCounts?: number[];
+  selectedAzimuthDegrees?: number;
+  capacityLayoutRule?: string;
 }
 
 /** Polygon 인식·배치 진단 (검증용) */
@@ -59,6 +65,16 @@ export interface ModuleLayoutDiagnostics {
   buildingFootprintAreaSqm?: number | null;
   roofUsableAreaSqm?: number | null;
   layoutBoundarySource?: "cadastral" | "building" | "roof" | "virtual";
+  layoutTier?: "single" | "double";
+  blockCount?: number;
+  blockModuleCounts?: number[];
+  rowCount?: number;
+  selectedAzimuthDegrees?: number;
+  candidateAzimuths?: number[];
+  candidateScores?: Record<string, number>;
+  capacityLayoutRule?: string;
+  singleBlockRejectedReason?: string;
+  unusedAreaReason?: string;
 }
 
 export interface ModuleLayoutResult {
@@ -83,4 +99,5 @@ export interface ModuleLayoutResult {
   overlayCompare?: boolean;
   /** 건물형: 토지 cadastral 참고용 (가배치 미사용) */
   referenceCadastral?: LatLngPoint[];
+  landLayoutDiagnostics?: import("@/lib/solar/landBlockLayout").LandBlockPlacementDiagnostics;
 }

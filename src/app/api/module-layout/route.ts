@@ -9,6 +9,7 @@ import {
   polygonAreaSqm,
 } from "@/lib/solar/polygonGeometry";
 import type { LatLngPoint, ModuleLayoutDiagnostics } from "@/types/moduleLayout";
+import type { LandBlockPlacementDiagnostics } from "@/lib/solar/landBlockLayout";
 
 function parseOptionalNumber(value: string | null): number | undefined {
   if (value == null || value === "") return undefined;
@@ -39,10 +40,12 @@ function buildDiagnostics(input: {
   layoutRowCount: number;
   rowModuleCounts: number[];
   polygonUtilizationPct: number;
+  landLayout?: LandBlockPlacementDiagnostics;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
   const g = input.geometry;
+  const land = input.landLayout;
   return {
     polygonSource: input.polygonSource,
     boundaryPointCount: input.boundary.length,
@@ -71,6 +74,16 @@ function buildDiagnostics(input: {
     buildingFootprintAreaSqm: g.buildingFootprintAreaSqm,
     roofUsableAreaSqm: g.roofUsableAreaSqm,
     layoutBoundarySource: g.layoutBoundarySource,
+    layoutTier: land?.layoutTier,
+    blockCount: land?.blockCount,
+    blockModuleCounts: land?.blockModuleCounts,
+    rowCount: land?.rowCount,
+    selectedAzimuthDegrees: land?.selectedAzimuthDegrees,
+    candidateAzimuths: land?.candidateAzimuths,
+    candidateScores: land?.candidateScores,
+    capacityLayoutRule: land?.capacityLayoutRule,
+    singleBlockRejectedReason: land?.singleBlockRejectedReason,
+    unusedAreaReason: land?.unusedAreaReason,
   };
 }
 
@@ -154,6 +167,7 @@ export async function GET(request: Request) {
     layoutRowCount: layout.stats.layoutRowCount,
     rowModuleCounts: layout.stats.rowModuleCounts,
     polygonUtilizationPct: layout.stats.polygonUtilizationPct,
+    landLayout: layout.landLayoutDiagnostics,
   });
 
   if (!overlayOnly && layout.stats.placedModuleCount <= 0) {

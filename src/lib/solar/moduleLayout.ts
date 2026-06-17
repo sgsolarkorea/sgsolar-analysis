@@ -18,6 +18,7 @@ import {
   toLocal,
   type LocalPoint,
 } from "@/lib/solar/polygonGeometry";
+import { placeLandBlockLayout, type LandBlockPlacementDiagnostics } from "@/lib/solar/landBlockLayout";
 import type {
   LatLngPoint,
   ModuleLayoutPolygonSource,
@@ -278,11 +279,28 @@ export function computeModuleLayout(input: {
       ? Math.floor(input.moduleCount)
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
-  const { modules, validSlotCount, rowModuleCounts } = placeModulesInFootprint(
-    input.boundary,
-    targetModuleCount,
-    params,
-  );
+  let modules: ModuleRect[];
+  let validSlotCount: number;
+  let rowModuleCounts: number[];
+  let landDiagnostics: LandBlockPlacementDiagnostics | undefined;
+
+  if (params.kind === "land") {
+    const landResult = placeLandBlockLayout(
+      input.boundary,
+      targetModuleCount,
+      { kind: "land", mode: params.mode, rowSpacingM: params.rowSpacingM },
+      input.capacityKw,
+    );
+    modules = landResult.modules;
+    validSlotCount = landResult.validSlotCount;
+    rowModuleCounts = landResult.rowModuleCounts;
+    landDiagnostics = landResult.diagnostics;
+  } else {
+    const legacy = placeModulesInFootprint(input.boundary, targetModuleCount, params);
+    modules = legacy.modules;
+    validSlotCount = legacy.validSlotCount;
+    rowModuleCounts = legacy.rowModuleCounts;
+  }
   const usableAreaSqm = polygonAreaSqm(input.boundary);
   const footprintSqm = moduleRectsFootprintSqm(modules);
   const polygonUtilizationPct =
@@ -329,7 +347,7 @@ export function computeModuleLayout(input: {
       placedModuleCount: modules.length,
       modulePowerW: moduleLayoutConfig.modulePowerW,
       layoutMode: params.mode,
-      tiers: params.mode === "row" && params.kind === "land" ? 2 : 1,
+      tiers: landDiagnostics?.layoutTier === "double" ? 2 : params.mode === "row" && params.kind === "land" ? 2 : 1,
       rowSpacingM: params.rowSpacingM,
       tiltDeg: params.tiltDeg,
       installType: input.installType,
@@ -337,6 +355,12 @@ export function computeModuleLayout(input: {
       layoutRowCount: rowModuleCounts.length,
       rowModuleCounts,
       polygonUtilizationPct,
+      layoutTier: landDiagnostics?.layoutTier,
+      blockCount: landDiagnostics?.blockCount,
+      blockModuleCounts: landDiagnostics?.blockModuleCounts,
+      selectedAzimuthDegrees: landDiagnostics?.selectedAzimuthDegrees,
+      capacityLayoutRule: landDiagnostics?.capacityLayoutRule,
     },
+    landLayoutDiagnostics: landDiagnostics,
   };
 }
