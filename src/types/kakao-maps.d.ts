@@ -11,6 +11,19 @@ declare namespace kakao {
       setMapTypeId(mapTypeId: MapTypeId): void;
       addControl(control: ZoomControl, position: ControlPosition): void;
       relayout(): void;
+      getProjection(): MapProjection;
+    }
+
+    interface MapProjection {
+      containerPointFromCoords(latlng: LatLng): { x: number; y: number };
+    }
+
+    namespace event {
+      function addListener(
+        target: Map,
+        type: string,
+        handler: () => void,
+      ): void;
     }
 
     class Marker {

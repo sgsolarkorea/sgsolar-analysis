@@ -331,14 +331,26 @@ export function drawInfoCard(
   }
 }
 
-export async function fetchKakaoStaticMap(lat: number, lng: number): Promise<Uint8Array | null> {
+export async function fetchKakaoStaticMap(
+  lat: number,
+  lng: number,
+  options?: {
+    size?: string;
+    level?: number;
+    maptype?: "roadmap" | "skyview" | "hybrid";
+    marker?: boolean;
+  },
+): Promise<Uint8Array | null> {
   const apiKey = process.env.KAKAO_REST_API_KEY?.trim();
   if (!apiKey) return null;
 
-  const size = "480x160";
+  const size = options?.size ?? "480x160";
+  const level = options?.level ?? 4;
+  const maptype = options?.maptype ?? "roadmap";
+  const marker = options?.marker !== false ? `&marker=${lng},${lat}` : "";
   const url =
     `https://apis.map.kakao.com/maps/v3/staticmap?center=${lng},${lat}` +
-    `&level=4&size=${size}&marker=${lng},${lat}`;
+    `&level=${level}&size=${size}&maptype=${maptype}${marker}`;
 
   try {
     const response = await fetch(url, {
@@ -350,6 +362,31 @@ export async function fetchKakaoStaticMap(lat: number, lng: number): Promise<Uin
   } catch {
     return null;
   }
+}
+
+const M_PER_DEG_LAT = 110_540;
+
+function mPerDegLng(lat: number): number {
+  return 111_320 * Math.cos((lat * Math.PI) / 180);
+}
+
+/** 정적 위성지도 위 lat/lng → 이미지 픽셀 (Kakao level 기준 근사) */
+export function latLngToStaticMapPixel(
+  lat: number,
+  lng: number,
+  centerLat: number,
+  centerLng: number,
+  level: number,
+  width: number,
+  height: number,
+): { x: number; y: number } {
+  const scale = (156_543.03392 * Math.cos((centerLat * Math.PI) / 180)) / 2 ** (level + 1);
+  const dx = (lng - centerLng) * mPerDegLng(centerLat);
+  const dy = (centerLat - lat) * M_PER_DEG_LAT;
+  return {
+    x: width / 2 + dx / scale,
+    y: height / 2 + dy / scale,
+  };
 }
 
 export async function fetchQrCodePng(data: string, size = 100): Promise<Uint8Array | null> {

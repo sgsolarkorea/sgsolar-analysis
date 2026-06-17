@@ -426,26 +426,34 @@ interface VworldFeatureWithGeometry {
   properties?: Record<string, string>;
 }
 
-function extractCentroidFromGeometry(geometry?: VworldFeatureWithGeometry["geometry"]): {
-  lat: number;
-  lng: number;
-} | null {
+function extractPolygonRingFromGeometry(
+  geometry?: VworldFeatureWithGeometry["geometry"],
+): number[][] | null {
   if (!geometry?.coordinates) return null;
 
   const coords = geometry.coordinates;
-  let ring: number[][] | null = null;
 
   if (geometry.type === "Polygon" && Array.isArray(coords) && Array.isArray(coords[0])) {
-    ring = coords[0] as number[][];
-  } else if (
+    return coords[0] as number[][];
+  }
+
+  if (
     geometry.type === "MultiPolygon" &&
     Array.isArray(coords) &&
     Array.isArray(coords[0]) &&
     Array.isArray((coords[0] as number[][][])[0])
   ) {
-    ring = (coords[0] as number[][][])[0];
+    return (coords[0] as number[][][])[0];
   }
 
+  return null;
+}
+
+function extractCentroidFromGeometry(geometry?: VworldFeatureWithGeometry["geometry"]): {
+  lat: number;
+  lng: number;
+} | null {
+  const ring = extractPolygonRingFromGeometry(geometry);
   if (!ring?.length) return null;
 
   let sumLng = 0;
@@ -456,6 +464,60 @@ function extractCentroidFromGeometry(geometry?: VworldFeatureWithGeometry["geome
   }
 
   return { lng: sumLng / ring.length, lat: sumLat / ring.length };
+}
+
+export interface CadastralPolygonResult {
+  pnu: string;
+  ring: Array<{ lat: number; lng: number }>;
+}
+
+/** PNU → 연속지적도 필지 경계 폴리곤 (lat/lng 링) */
+export async function fetchCadastralPolygonByPnu(
+  pnu: string,
+  lat: number,
+  lng: number,
+): Promise<CadastralPolygonResult | null> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  if (!apiKey || !pnu) return null;
+
+  for (const domain of getApiDomainCandidates()) {
+    const params = buildDataApiParams(apiKey, domain);
+    params.set("service", "data");
+    params.set("request", "GetFeature");
+    params.set("data", "LP_PA_CBND_BUBUN");
+    params.set("size", "5");
+    params.set("page", "1");
+    params.set("geometry", "true");
+    params.set("attribute", "true");
+    params.set("crs", "EPSG:4326");
+    params.set("attrFilter", `pnu:EQ:${pnu}`);
+    params.set("geomFilter", `POINT(${lng} ${lat})`);
+
+    const data = await fetchVworldJson<
+      VworldDataResponse & {
+        response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+      }
+    >(`${VWORLD_DATA_API}?${params.toString()}`, "cadastral-polygon");
+
+    const features = data?.response?.result?.featureCollection?.features ?? [];
+
+    for (const feature of features) {
+      const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+      if (featurePnu && featurePnu !== pnu) continue;
+
+      const ringCoords = extractPolygonRingFromGeometry(feature.geometry);
+      if (!ringCoords?.length) continue;
+
+      const ring = ringCoords.map(([lngCoord, latCoord]) => ({
+        lat: latCoord,
+        lng: lngCoord,
+      }));
+
+      return { pnu: featurePnu || pnu, ring };
+    }
+  }
+
+  return null;
 }
 
 export interface CadastralParcelFeature {

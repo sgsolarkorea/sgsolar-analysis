@@ -24,11 +24,16 @@ import {
   embedPngImage,
   fetchKakaoStaticMap,
   fetchQrCodePng,
+  latLngToStaticMapPixel,
   loadBrandLogoBytes,
   rgbColor,
   sanitizePdfText,
   wrapTextByWidth,
 } from "@/lib/pdf/pdfHelpers";
+import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
+import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
+import { resolveModuleLayoutForSite } from "@/lib/solar/resolveModuleLayout";
+import type { ModuleLayoutResult } from "@/types/moduleLayout";
 
 const KR_FONT_REGULAR =
   "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@latest/korean-400-normal.ttf";
@@ -229,6 +234,200 @@ function drawCoverPage(
       maxWidth: contentW,
     },
   );
+
+  drawPageFooter(page, font, pageNum, totalPages);
+}
+
+const MODULE_MAP_LEVEL = 3;
+const MODULE_MAP_SIZE = { width: 500, height: 300 };
+
+function drawModuleLayoutPage(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  data: ResolvedSiteReview,
+  layout: ModuleLayoutResult,
+  mapImage: PDFImage | null,
+  logoImage: PDFImage | null,
+  pageNum: number,
+  totalPages: number,
+) {
+  let y = drawPageHeader(
+    page,
+    font,
+    fontBold,
+    "예상 모듈 가배치도",
+    "위성지도 기반 1차 모듈 배치 참고",
+    logoImage,
+  );
+
+  const contentW = PAGE.width - MARGIN * 2;
+  const mapH = 300;
+  const mapY = y - mapH;
+
+  page.drawRectangle({
+    x: MARGIN,
+    y: mapY,
+    width: contentW,
+    height: mapH,
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.75,
+    color: rgbColor(COLORS.navyLight),
+  });
+
+  if (mapImage) {
+    page.drawImage(mapImage, {
+      x: MARGIN + 1,
+      y: mapY + 1,
+      width: contentW - 2,
+      height: mapH - 2,
+    });
+
+    const mapDrawW = contentW - 2;
+    const mapDrawH = mapH - 2;
+    const centerLat = layout.center.lat;
+    const centerLng = layout.center.lng;
+
+    const toPdfPoint = (lat: number, lng: number) => {
+      const pixel = latLngToStaticMapPixel(
+        lat,
+        lng,
+        centerLat,
+        centerLng,
+        MODULE_MAP_LEVEL,
+        MODULE_MAP_SIZE.width,
+        MODULE_MAP_SIZE.height,
+      );
+      const scaleX = mapDrawW / MODULE_MAP_SIZE.width;
+      const scaleY = mapDrawH / MODULE_MAP_SIZE.height;
+      return {
+        x: MARGIN + 1 + pixel.x * scaleX,
+        y: mapY + 1 + (mapDrawH - pixel.y * scaleY),
+      };
+    };
+
+    if (layout.boundary.length >= 3) {
+      for (let i = 0; i < layout.boundary.length; i++) {
+        const current = layout.boundary[i];
+        const next = layout.boundary[(i + 1) % layout.boundary.length];
+        const p1 = toPdfPoint(current.lat, current.lng);
+        const p2 = toPdfPoint(next.lat, next.lng);
+        page.drawLine({
+          start: p1,
+          end: p2,
+          thickness: 2,
+          color: rgb(0.96, 0.62, 0.04),
+        });
+      }
+    }
+
+    const moduleColor = rgb(0.12, 0.16, 0.23);
+    for (const mod of layout.modules) {
+      const corners = mod.corners.map((point) => toPdfPoint(point.lat, point.lng));
+      for (let i = 0; i < corners.length; i++) {
+        const p1 = corners[i];
+        const p2 = corners[(i + 1) % corners.length];
+        page.drawLine({
+          start: p1,
+          end: p2,
+          thickness: 0.8,
+          color: moduleColor,
+        });
+      }
+      if (corners.length >= 3) {
+        page.drawLine({
+          start: corners[0],
+          end: corners[2],
+          thickness: 0.4,
+          color: rgb(0.2, 0.25, 0.33),
+        });
+      }
+    }
+
+    const compassX = MARGIN + contentW - 36;
+    const compassY = mapY + mapH - 36;
+    page.drawCircle({
+      x: compassX,
+      y: compassY,
+      size: 14,
+      borderColor: rgbColor(COLORS.navy),
+      borderWidth: 0.75,
+      color: rgbColor(COLORS.white),
+    });
+    page.drawText("N", {
+      x: compassX - 4,
+      y: compassY + 4,
+      size: 8,
+      font: fontBold,
+      color: rgbColor(COLORS.navy),
+    });
+  } else {
+    page.drawText("위성 지도를 불러오지 못했습니다.", {
+      x: MARGIN + 12,
+      y: mapY + mapH / 2,
+      size: 9,
+      font,
+      color: rgbColor(COLORS.slate),
+    });
+  }
+
+  y = mapY - 16;
+  const statW = (contentW - 16) / 4;
+  const stats = [
+    { label: "예상 설치용량", value: data.capacity },
+    {
+      label: "배치 모듈 수",
+      value: `${layout.stats.placedModuleCount.toLocaleString("ko-KR")}장`,
+    },
+    {
+      label: "모듈 사양",
+      value: `${layout.stats.modulePowerW}W · ${layout.stats.tiers}단`,
+    },
+    {
+      label: "설치 유형",
+      value: formatInstallTypeDisplayLabel(layout.stats.installType as InstallTypeOption),
+    },
+  ];
+
+  for (let i = 0; i < stats.length; i++) {
+    drawMetricCard(
+      page,
+      font,
+      fontBold,
+      MARGIN + i * (statW + 5.3),
+      y,
+      statW,
+      58,
+      stats[i].label,
+      stats[i].value,
+    );
+  }
+
+  y -= 74;
+  const polygonLabel =
+    layout.polygonSource === "cadastral" ? "연속지적도 경계" : "추정 설치면적(참고)";
+  page.drawText(
+    sanitizePdfText(
+      `경계 출처: ${polygonLabel} · 열간격 ${layout.stats.rowSpacingM}m · 경사 ${layout.stats.tiltDeg}° · 목표 ${layout.stats.targetModuleCount.toLocaleString("ko-KR")}장`,
+    ),
+    {
+      x: MARGIN,
+      y,
+      size: 8,
+      font,
+      color: rgbColor(COLORS.slate),
+      maxWidth: contentW,
+    },
+  );
+
+  page.drawText(sanitizePdfText(`※ ${moduleLayoutConfig.disclaimer}`), {
+    x: MARGIN,
+    y: 56,
+    size: 7.5,
+    font,
+    color: rgbColor(COLORS.slate),
+    maxWidth: contentW,
+  });
 
   drawPageFooter(page, font, pageNum, totalPages);
 }
@@ -848,13 +1047,32 @@ export async function generateSiteReviewPdf(
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const [regularBytes, boldBytes, logoBytes, mapBytes, qrBytes] = await Promise.all([
+  const [regularBytes, boldBytes, logoBytes, mapBytes, qrBytes, moduleLayout] = await Promise.all([
     loadFontBytes(KR_FONT_REGULAR),
     loadFontBytes(KR_FONT_BOLD),
     loadBrandLogoBytes(),
     fetchKakaoStaticMap(data.lat, data.lng),
     fetchQrCodePng(siteLinks.mainSite, 120),
+    resolveModuleLayoutForSite({
+      pnu: data.pnu,
+      lat: data.lat,
+      lng: data.lng,
+      capacityKw: data.solarMetrics.capacityKw,
+      installType: data.solarMetrics.installType,
+      moduleCount: data.solarMetrics.moduleCount,
+    }),
   ]);
+
+  const moduleMapBytes = await fetchKakaoStaticMap(
+    moduleLayout.center.lat,
+    moduleLayout.center.lng,
+    {
+      size: `${MODULE_MAP_SIZE.width}x${MODULE_MAP_SIZE.height}`,
+      level: MODULE_MAP_LEVEL,
+      maptype: "hybrid",
+      marker: false,
+    },
+  );
 
   const font = await pdfDoc.embedFont(regularBytes);
   const fontBold = await pdfDoc.embedFont(boldBytes);
@@ -865,14 +1083,28 @@ export async function generateSiteReviewPdf(
 
   const logoImage = await embedPngImage(pdfDoc, logoBytes);
   const mapImage = await embedPngImage(pdfDoc, mapBytes);
+  const moduleMapImage = await embedPngImage(pdfDoc, moduleMapBytes);
   const qrImage = await embedPngImage(pdfDoc, qrBytes);
 
   const includeOrdinance = hasOrdinanceContent(options.ordinance);
-  const totalPages = includeOrdinance ? 6 : 5;
+  const totalPages = includeOrdinance ? 7 : 6;
   let pageNum = 1;
 
   const cover = pdfDoc.addPage([PAGE.width, PAGE.height]);
   drawCoverPage(cover, font, fontBold, data, mapImage, logoImage, pageNum++, totalPages);
+
+  const moduleLayoutPage = pdfDoc.addPage([PAGE.width, PAGE.height]);
+  drawModuleLayoutPage(
+    moduleLayoutPage,
+    font,
+    fontBold,
+    data,
+    moduleLayout,
+    moduleMapImage,
+    logoImage,
+    pageNum++,
+    totalPages,
+  );
 
   const summary = pdfDoc.addPage([PAGE.width, PAGE.height]);
   drawSiteSummaryPage(

@@ -6,6 +6,7 @@ import {
 import ResultHero from "@/components/result/ResultHero";
 import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import MapArea from "@/components/result/MapArea";
+import ModuleLayoutSection from "@/components/result/ModuleLayoutSection";
 import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import RegionDistrictSection from "@/components/result/RegionDistrictSection";
 import DetailInfoSection from "@/components/result/DetailInfoSection";
@@ -124,6 +125,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               </section>
 
               <ResultSiteOverview recommendation={data.recommendation} address={data.address} />
+
+              <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
 
               <MultiParcelSection />
 
