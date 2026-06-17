@@ -27,12 +27,8 @@ async function resolveCadastralRing(
     if (cadastral?.ring?.length) return cadastral.ring;
   }
 
-  if (!pnu) {
-    const fromCoords = await fetchCadastralPolygonAtCoordinates(lat, lng);
-    return fromCoords?.ring?.length ? fromCoords.ring : null;
-  }
-
-  return null;
+  const fromCoords = await fetchCadastralPolygonAtCoordinates(lat, lng);
+  return fromCoords?.ring?.length ? fromCoords.ring : null;
 }
 
 export async function resolveLayoutBoundary(input: {
