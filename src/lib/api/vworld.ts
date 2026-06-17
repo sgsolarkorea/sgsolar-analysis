@@ -710,8 +710,12 @@ export async function fetchBuildingPolygonByPnu(
   const apiKey = process.env.VWORLD_API_KEY?.trim();
   if (!apiKey || !pnu) return null;
 
-  for (const dataLayer of BUILDING_DATA_LAYERS) {
-    const result = await fetchBuildingPolygonFromDataLayer(pnu, lat, lng, dataLayer, apiKey);
+  const dataLayerResults = await Promise.all(
+    BUILDING_DATA_LAYERS.map((dataLayer) =>
+      fetchBuildingPolygonFromDataLayer(pnu, lat, lng, dataLayer, apiKey),
+    ),
+  );
+  for (const result of dataLayerResults) {
     if (result?.ring?.length) return result;
   }
 

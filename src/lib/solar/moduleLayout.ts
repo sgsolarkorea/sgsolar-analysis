@@ -155,6 +155,12 @@ function collectValidSlots(
   return slots;
 }
 
+function trimSlotsToTarget(slots: ModuleSlot[], targetCount: number): ModuleSlot[] {
+  if (slots.length <= targetCount) return slots;
+  const skip = Math.floor((slots.length - targetCount) / 2);
+  return slots.slice(skip, skip + targetCount);
+}
+
 function selectSpreadSlots(slots: ModuleSlot[], targetCount: number): ModuleSlot[] {
   if (slots.length <= targetCount) return slots;
 
@@ -165,6 +171,18 @@ function selectSpreadSlots(slots: ModuleSlot[], targetCount: number): ModuleSlot
     selected.push(slots[index]);
   }
   return selected;
+}
+
+function countSlotsAtScale(
+  oriented: OrientedPoly,
+  scale: number,
+  params: LayoutParams,
+): ModuleSlot[] {
+  const widthM = moduleLayoutConfig.moduleShortM * scale;
+  const heightM = moduleLayoutConfig.moduleLongM * scale;
+  const rowGapM =
+    params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
+  return collectValidSlots(oriented, widthM, heightM, rowGapM);
 }
 
 function findOptimalScale(
@@ -180,11 +198,7 @@ function findOptimalScale(
 
   for (let i = 0; i < 18; i++) {
     const mid = (lo + hi) / 2;
-    const widthM = moduleLayoutConfig.moduleShortM * mid;
-    const heightM = moduleLayoutConfig.moduleLongM * mid;
-    const rowGapM =
-      params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
-    const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
+    const slots = countSlotsAtScale(oriented, mid, params);
 
     if (slots.length >= targetCount) {
       best = mid;
@@ -194,7 +208,18 @@ function findOptimalScale(
     }
   }
 
-  return best;
+  let refined = best;
+  for (let step = 0; step < 12; step++) {
+    const next = refined * 1.015;
+    const slots = countSlotsAtScale(oriented, next, params);
+    if (slots.length >= targetCount) {
+      refined = next;
+    } else {
+      break;
+    }
+  }
+
+  return refined;
 }
 
 /**
@@ -217,7 +242,10 @@ function placeModulesInFootprint(
     params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
 
   const slots = collectValidSlots(oriented, widthM, heightM, rowGapM);
-  const selected = selectSpreadSlots(slots, targetCount);
+  const selected =
+    params.mode === "row"
+      ? selectSpreadSlots(slots, targetCount)
+      : trimSlotsToTarget(slots, targetCount);
 
   return selected.map((slot) =>
     makePortraitModuleRect(slot.x, slot.y, widthM, heightM, oriented.origin, oriented.angleRad),
