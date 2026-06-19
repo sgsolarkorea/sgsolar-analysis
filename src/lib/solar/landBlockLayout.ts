@@ -1,6 +1,7 @@
 import { getVisualRowSpacingM, moduleLayoutConfig } from "@/data/moduleLayoutConfig";
 import {
   computeOrientedBounds,
+  computePolygonOrientation,
   localToGeo,
   pointInPolygon,
   toLocal,
@@ -497,6 +498,44 @@ function collectTwoTierRowSets(
   return sets;
 }
 
+function trimWeakEdgeSets(sets: TwoTierRowSet[], targetCount: number): TwoTierRowSet[] {
+  let active = [...sets];
+  while (active.length > 2) {
+    const totalCapacity = active.reduce((sum, set) => sum + set.capacity, 0);
+    const maxCapacity = Math.max(...active.map((set) => set.capacity), 0);
+    const threshold = Math.max(8, maxCapacity * 0.28);
+    const first = active[0];
+    const last = active[active.length - 1];
+    const canDropFirst = first.capacity < threshold && totalCapacity - first.capacity >= targetCount;
+    const canDropLast = last.capacity < threshold && totalCapacity - last.capacity >= targetCount;
+
+    if (!canDropFirst && !canDropLast) break;
+    if (canDropFirst && (!canDropLast || first.capacity <= last.capacity)) {
+      active = active.slice(1);
+    } else {
+      active = active.slice(0, -1);
+    }
+  }
+  return active.map((set, setIndex) => ({ ...set, setIndex }));
+}
+
+function edgeRowPenalty(rowModuleCounts: number[]): number {
+  if (rowModuleCounts.length <= 4) return 0;
+  const firstPair = rowModuleCounts.slice(0, TIER_ROWS_PER_ARRAY);
+  const lastPair = rowModuleCounts.slice(-TIER_ROWS_PER_ARRAY);
+  const pairTotals: number[] = [];
+  for (let i = 0; i < rowModuleCounts.length; i += TIER_ROWS_PER_ARRAY) {
+    pairTotals.push((rowModuleCounts[i] ?? 0) + (rowModuleCounts[i + 1] ?? 0));
+  }
+  const threshold = Math.max(8, Math.max(...pairTotals, 1) * 0.78);
+  let penalty = 0;
+  const firstTotal = firstPair.reduce((sum, count) => sum + count, 0);
+  const lastTotal = lastPair.reduce((sum, count) => sum + count, 0);
+  if (firstTotal > 0 && firstTotal < threshold) penalty += threshold - firstTotal;
+  if (lastTotal > 0 && lastTotal < threshold) penalty += threshold - lastTotal;
+  return penalty;
+}
+
 function distributeTwoTierSetQuotas(sets: TwoTierRowSet[], targetCount: number): number[] {
   const capacities = sets.map((set) => set.capacity);
   const totalCap = capacities.reduce((sum, cap) => sum + cap, 0);
@@ -661,6 +700,8 @@ function scoreTwoTierRowSets(input: {
   score += Math.min(aisleVisibilityM, 3.5) * 450;
   score -= avgBalancePenalty * 2500;
   score -= oneSidedSetCount * 1200;
+  const narrowParcelEdgePenalty = computeRowDirectionAspect(oriented) < 0.8 ? 1800 : 300;
+  score -= edgeRowPenalty(rowModuleCounts) * narrowParcelEdgePenalty;
   score -= unusedAreaRatio * 250;
   if (twoTierSetCount <= 1) score -= 6000;
   if (maxSetShare > 0.35) score -= 2500;
@@ -850,6 +891,9 @@ function makePortraitModuleRect(
 }
 
 function azimuthPreferenceScore(azimuthDeg: number): number {
+  if (!LAND_CANDIDATE_AZIMUTHS_DEG.includes(azimuthDeg as (typeof LAND_CANDIDATE_AZIMUTHS_DEG)[number])) {
+    return 1400;
+  }
   if (azimuthDeg === 180) return 2500;
   if (azimuthDeg === 225) return 1600;
   if (azimuthDeg === 135) return 0;
@@ -869,7 +913,42 @@ function azimuthShapePreferenceScore(azimuthDeg: number, rowDirectionAspect: num
   if (azimuthDeg === 180) return 3000;
   if (azimuthDeg === 225) return 3000;
   if (azimuthDeg === 135) return 1200;
-  return 0;
+  return 3800;
+}
+
+function normalizeDegrees(deg: number): number {
+  return ((deg % 360) + 360) % 360;
+}
+
+function angularDistanceDeg(a: number, b: number): number {
+  const diff = Math.abs(normalizeDegrees(a) - normalizeDegrees(b));
+  return Math.min(diff, 360 - diff);
+}
+
+function polygonLongAxisAzimuth(polygon: LatLngPoint[]): number {
+  const longAxisFromEastDeg = normalizeDegrees((computePolygonOrientation(polygon) * 180) / Math.PI);
+  const candidateA = normalizeDegrees(180 - longAxisFromEastDeg);
+  const candidateB = normalizeDegrees(candidateA + 180);
+  return angularDistanceDeg(candidateA, 180) <= angularDistanceDeg(candidateB, 180)
+    ? candidateA
+    : candidateB;
+}
+
+function buildLandCandidateAzimuths(polygon: LatLngPoint[]): number[] {
+  const shapeAzimuth = polygonLongAxisAzimuth(polygon);
+  const southFacingShapeAzimuth =
+    shapeAzimuth >= 150 && shapeAzimuth <= 235
+      ? angularDistanceDeg(shapeAzimuth, 180) <= 12
+        ? 180
+        : angularDistanceDeg(shapeAzimuth, 225) <= 8
+          ? 225
+          : Math.round(shapeAzimuth)
+      : undefined;
+  return [180, southFacingShapeAzimuth, 225, 135].filter(
+    (azimuth): azimuth is number => typeof azimuth === "number",
+  ).filter(
+    (azimuth, index, arr) => arr.indexOf(azimuth) === index,
+  );
 }
 
 function buildSelectedReason(input: {
@@ -924,7 +1003,7 @@ function tryPlacementAtAzimuth(input: {
       : 0;
   const visualScaleCandidates =
     input.params.mode === "row"
-      ? [0.86, 0.82, 0.78, 0.74, moduleLayoutConfig.visualScale].filter(
+      ? [0.96, 0.92, 0.88, 0.86, 0.82, moduleLayoutConfig.visualScale].filter(
           (scale, i, arr) => scale > 0 && arr.indexOf(scale) === i,
         )
       : [moduleLayoutConfig.visualScale];
@@ -959,9 +1038,11 @@ function tryPlacementAtAzimuth(input: {
           );
           const validSlotCount = sets.reduce((sum, set) => sum + set.capacity, 0);
           if (validSlotCount === 0) continue;
+          const visualSets = trimWeakEdgeSets(sets, input.targetCount);
+          if (visualSets.length === 0) continue;
 
           const { selected, rowModuleCounts, twoTierSetModuleCounts } = selectTwoTierRowSets(
-            sets,
+            visualSets,
             input.targetCount,
           );
           if (selected.length === 0) continue;
@@ -1046,10 +1127,11 @@ export function placeLandBlockLayout(
   const candidateScores: Record<string, number> = {};
   const candidatePlacedCounts: Record<string, number> = {};
   let best: ReturnType<typeof tryPlacementAtAzimuth> = null;
-  let bestAzimuth: number = LAND_CANDIDATE_AZIMUTHS_DEG[0];
+  const candidateAzimuths = buildLandCandidateAzimuths(polygon);
+  let bestAzimuth: number = candidateAzimuths[0];
   let rejectReason: string | undefined;
 
-  for (const azimuthDeg of LAND_CANDIDATE_AZIMUTHS_DEG) {
+  for (const azimuthDeg of candidateAzimuths) {
     const attempt = tryPlacementAtAzimuth({
       polygon,
       targetCount,
@@ -1073,7 +1155,7 @@ export function placeLandBlockLayout(
 
   if (!best && requireMinArrays >= 2) {
     rejectReason = rejectReason ?? "double-array-failed-fallback-single";
-    for (const azimuthDeg of LAND_CANDIDATE_AZIMUTHS_DEG) {
+    for (const azimuthDeg of candidateAzimuths) {
       const attempt = tryPlacementAtAzimuth({
         polygon,
         targetCount,
@@ -1108,7 +1190,7 @@ export function placeLandBlockLayout(
         rowCount: 0,
         rowModuleCounts: [],
         selectedAzimuthDegrees: 180,
-        candidateAzimuths: [...LAND_CANDIDATE_AZIMUTHS_DEG],
+        candidateAzimuths,
         candidateScores,
         candidatePlacedCounts,
         selectedReason: rejectReason ?? "no-valid-two-tier-row-set",
@@ -1154,7 +1236,7 @@ export function placeLandBlockLayout(
       rowCount: best.rowModuleCounts.length,
       rowModuleCounts: best.rowModuleCounts,
       selectedAzimuthDegrees: bestAzimuth,
-      candidateAzimuths: [...LAND_CANDIDATE_AZIMUTHS_DEG],
+      candidateAzimuths,
       candidateScores,
       candidatePlacedCounts,
       selectedReason: buildSelectedReason({

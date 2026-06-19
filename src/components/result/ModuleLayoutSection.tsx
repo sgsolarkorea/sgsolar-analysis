@@ -116,9 +116,7 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
               ? "VWorld cadastral 원본(sourceBoundary)만 표시합니다. setback·모듈 미적용."
               : polygonDebugOverlay
                 ? "setback 적용 후 layout.boundary만 표시합니다. 모듈은 숨깁니다."
-                : installType === "토지형"
-                  ? "토지 Polygon 내부 usableArea 기준 1차 모듈 가배치입니다."
-                  : "건물/지붕 Polygon 내부 기준 1차 모듈 가배치입니다. 토지 cadastral은 참고용으로만 표시됩니다."
+                : "위성지도 기준 예상 배치도입니다. 실제 설계 시 현장 조건, 구조검토, 이격거리 및 인허가 기준에 따라 배치가 변경될 수 있습니다."
         }
       />
 

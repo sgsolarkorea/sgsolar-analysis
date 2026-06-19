@@ -161,27 +161,11 @@ function groupSlotsByRow(slots: ModuleSlot[], heightM: number): ModuleSlot[][] {
     .map(([, row]) => row.sort((a, b) => a.x - b.x));
 }
 
-function selectDistributedCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
+function selectContiguousCentered(slots: ModuleSlot[], count: number): ModuleSlot[] {
   if (count <= 0 || slots.length === 0) return [];
   if (slots.length <= count) return [...slots];
-  if (count === 1) return [slots[Math.floor(slots.length / 2)]];
-
-  const margin = Math.max(0, Math.floor((slots.length - count) / 4));
-  const start = margin;
-  const end = slots.length - 1 - margin;
-  const picked: ModuleSlot[] = [];
-  const used = new Set<number>();
-
-  for (let i = 0; i < count; i++) {
-    const t = count === 1 ? 0.5 : i / (count - 1);
-    let idx = Math.round(start + (end - start) * t);
-    while (used.has(idx) && idx < slots.length - 1) idx++;
-    while (used.has(idx) && idx > 0) idx--;
-    used.add(idx);
-    picked.push(slots[idx]);
-  }
-
-  return picked.sort((a, b) => a.x - b.x);
+  const start = Math.floor((slots.length - count) / 2);
+  return slots.slice(start, start + count);
 }
 
 function polygonLocalCentroid(localPoly: LocalPoint[]): LocalPoint {
@@ -194,19 +178,25 @@ function polygonLocalCentroid(localPoly: LocalPoint[]): LocalPoint {
   return { x: sx / localPoly.length, y: sy / localPoly.length };
 }
 
-function distributeRowQuotas(rowCaps: number[], target: number): number[] {
-  const total = rowCaps.reduce((a, b) => a + b, 0);
-  if (total === 0) return rowCaps.map(() => 0);
-  const effective = Math.min(target, total);
-  const quotas = rowCaps.map((cap) => Math.floor((cap / total) * effective));
-  let assigned = quotas.reduce((a, b) => a + b, 0);
-  const order = rowCaps.map((cap, i) => ({ i, cap })).sort((a, b) => b.cap - a.cap);
-  let qi = 0;
-  while (assigned < effective) {
-    quotas[order[qi % order.length].i]++;
-    assigned++;
-    qi++;
+function distributeRoofBandQuotas(rowCaps: number[], target: number): number[] {
+  const quotas = rowCaps.map(() => 0);
+  let remaining = Math.min(target, rowCaps.reduce((sum, cap) => sum + cap, 0));
+  const order = rowCaps
+    .map((cap, i) => ({ cap, i }))
+    .sort((a, b) => b.cap - a.cap || a.i - b.i);
+
+  while (remaining > 0) {
+    let progressed = false;
+    for (const { i } of order) {
+      if (remaining <= 0) break;
+      if (quotas[i] >= rowCaps[i]) continue;
+      quotas[i]++;
+      remaining--;
+      progressed = true;
+    }
+    if (!progressed) break;
   }
+
   return quotas;
 }
 
@@ -267,39 +257,75 @@ function selectSlotsRoofCentered(
     return { selected: [], rowModuleCounts: [], diagnostics: emptyDiag };
   }
 
-  const centroid = polygonLocalCentroid(localPoly);
   const rows = groupSlotsByRow(slots, heightM);
-  const rowsByCentrality = rows
-    .map((row) => ({
-      row,
-      distY: Math.abs((row[0]?.y ?? 0) + heightM / 2 - centroid.y),
-    }))
-    .sort((a, b) => a.distY - b.distY);
-
-  const rowCaps = rowsByCentrality.map((r) => r.row.length);
-  const quotas = distributeRowQuotas(rowCaps, targetCount);
-
-  const selected: ModuleSlot[] = [];
-  const rowModuleCounts: number[] = [];
-
-  for (let i = 0; i < rowsByCentrality.length; i++) {
-    const quota = quotas[i];
-    if (quota <= 0) continue;
-    const row = rowsByCentrality[i].row;
-    const sortedByX = [...row].sort((a, b) => a.x - b.x);
-    const pick = selectDistributedCentered(sortedByX, quota);
-    selected.push(...pick);
-    rowModuleCounts.push(pick.length);
-  }
-
   const polyBBox = {
     minX: Math.min(...localPoly.map((p) => p.x)),
     maxX: Math.max(...localPoly.map((p) => p.x)),
     minY: Math.min(...localPoly.map((p) => p.y)),
     maxY: Math.max(...localPoly.map((p) => p.y)),
   };
-  const selBBox = slotsBBox(selected, widthM, heightM);
   const polyCenter = bboxCenter(polyBBox);
+
+  let best:
+    | {
+        selected: ModuleSlot[];
+        rowModuleCounts: number[];
+        score: number;
+      }
+    | null = null;
+
+  for (let start = 0; start < rows.length; start++) {
+    for (let end = start; end < rows.length; end++) {
+      const band = rows.slice(start, end + 1);
+      const rowCaps = band.map((row) => row.length);
+      const capacity = rowCaps.reduce((sum, cap) => sum + cap, 0);
+      if (capacity < targetCount) continue;
+
+      const quotas = distributeRoofBandQuotas(rowCaps, targetCount);
+      const selected: ModuleSlot[] = [];
+      const rowModuleCounts: number[] = [];
+
+      for (let i = 0; i < band.length; i++) {
+        const quota = quotas[i];
+        if (quota <= 0) continue;
+        const sortedByX = [...band[i]].sort((a, b) => a.x - b.x);
+        const pick = selectContiguousCentered(sortedByX, quota);
+        selected.push(...pick);
+        rowModuleCounts.push(pick.length);
+      }
+
+      const selBBox = slotsBBox(selected, widthM, heightM);
+      const selCenter = bboxCenter(selBBox);
+      const selectedW = Math.max(selBBox.maxX - selBBox.minX, 0.01);
+      const selectedH = Math.max(selBBox.maxY - selBBox.minY, 0.01);
+      const polyW = Math.max(polyBBox.maxX - polyBBox.minX, 0.01);
+      const centerOffsetM = Math.hypot(selCenter.x - polyCenter.x, selCenter.y - polyCenter.y);
+      const rowCount = rowModuleCounts.length;
+      const avgPerRow = selected.length / Math.max(rowCount, 1);
+      const minRowFill = Math.min(
+        ...rowModuleCounts.map((count, i) => count / Math.max(rowCaps[i] ?? count, 1)),
+      );
+      const widthCoverage = selectedW / polyW;
+
+      let score = selected.length * 1000;
+      score -= centerOffsetM * 120;
+      score += avgPerRow * 520;
+      score += widthCoverage * 2500;
+      score += minRowFill * 1200;
+      score -= rowCount * 70;
+      score -= Math.abs(selectedW / Math.max(selectedH, 0.01) - 3.2) * 80;
+      if (rowCount > 6) score -= 2500;
+      if (avgPerRow < 8) score -= 3500;
+
+      if (!best || score > best.score) {
+        best = { selected, rowModuleCounts, score };
+      }
+    }
+  }
+
+  const selected = best?.selected ?? [];
+  const rowModuleCounts = best?.rowModuleCounts ?? [];
+  const selBBox = slotsBBox(selected, widthM, heightM);
   const selCenter = bboxCenter(selBBox);
   const centerOffsetM = Math.hypot(selCenter.x - polyCenter.x, selCenter.y - polyCenter.y);
 
@@ -359,11 +385,15 @@ function placeModulesInFootprint(
 
   const oriented = toOrientedPoly(polygon);
   const orientationCandidates = [oriented.angleRad, oriented.angleRad + Math.PI / 2];
-  const scale = moduleLayoutConfig.visualScale;
+  const scale = params.kind === "roof" ? 0.66 : moduleLayoutConfig.visualScale;
   const widthM = moduleLayoutConfig.moduleShortM * scale;
   const heightM = moduleLayoutConfig.moduleLongM * scale;
   const rowGapM =
-    params.mode === "row" ? getVisualRowSpacingM(params.kind, params.mode) : 0;
+    params.kind === "roof"
+      ? 0.25
+      : params.mode === "row"
+        ? getVisualRowSpacingM(params.kind, params.mode)
+        : 0;
 
   let best:
     | {
@@ -376,7 +406,8 @@ function placeModulesInFootprint(
       }
     | null = null;
 
-  for (const angleRad of orientationCandidates) {
+  for (let orientationIndex = 0; orientationIndex < orientationCandidates.length; orientationIndex++) {
+    const angleRad = orientationCandidates[orientationIndex];
     const candidate = toOrientedPolyAtAngle(polygon, angleRad);
     const slots = collectValidSlots(candidate, widthM, heightM, rowGapM);
     const { selected, rowModuleCounts, diagnostics } = selectSlotsRoofCentered(
@@ -400,6 +431,7 @@ function placeModulesInFootprint(
     score += avgPerRow * 260;
     score -= rowCount * 45;
     score -= aspect * 80;
+    if (params.kind === "roof" && orientationIndex === 1) score += 6000;
     if (rowCount <= 1 || rowCount > 12 || avgPerRow < 4 || maxRowShare > 0.65) score -= 2000;
 
     if (!best || score > best.score) {
