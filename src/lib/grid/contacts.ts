@@ -89,13 +89,15 @@ const BRANCH_RULES: BranchRule[] = [
   },
 ];
 
+const KEPCO_HOTLINE = "국번없이 123";
+
 const DEFAULT_CONTACTS: GridContactInfo = {
   kepcoBranch: "한국전력 관할 지사",
-  branchPhone: "—",
+  branchPhone: KEPCO_HOTLINE,
   supplyDepartment: SUPPLY_ROLE,
-  supplyPhone: "—",
+  supplyPhone: KEPCO_HOTLINE,
   operationsDepartment: OPERATIONS_ROLE,
-  operationsPhone: "—",
+  operationsPhone: KEPCO_HOTLINE,
 };
 
 function extractSigunguToken(haystack: string): string | null {
@@ -114,6 +116,14 @@ export function normalizeGridContacts(contacts: Partial<GridContactInfo>): GridC
     operationsDepartment: contacts.operationsDepartment?.trim() || OPERATIONS_ROLE,
     operationsPhone: contacts.operationsPhone?.trim() || branchPhone,
   };
+}
+
+export function mergeGridContacts(
+  base: GridContactInfo,
+  override?: Partial<GridContactInfo>,
+): GridContactInfo {
+  if (!override) return base;
+  return normalizeGridContacts({ ...base, ...override });
 }
 
 export function resolveGridContacts(address: string, jibunAddress: string): GridContactInfo {

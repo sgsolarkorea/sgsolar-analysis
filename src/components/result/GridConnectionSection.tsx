@@ -146,41 +146,34 @@ function SingleValueCard({
 
 function ContactCard({
   title,
-  primary,
-  secondary,
+  department,
+  phone,
+  fallbackNote,
 }: {
   title: string;
-  primary: string;
-  secondary?: string;
+  department: string;
+  phone: string;
+  fallbackNote?: string;
 }) {
+  const hasPhone = Boolean(phone && phone !== "—");
   return (
     <div className="flex h-full min-h-[120px] flex-col rounded-xl border border-slate-200 bg-slate-50/60 p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</p>
-      <p className="mt-3 flex-1 text-base font-bold leading-snug text-slate-900">{primary}</p>
-      {secondary && <p className="mt-2 text-sm text-slate-700">{secondary}</p>}
+      <p className="mt-3 flex-1 text-base font-bold leading-snug text-slate-900">{department}</p>
+      {hasPhone ? (
+        <p className="mt-2 text-sm font-semibold text-navy">{phone}</p>
+      ) : (
+        <p className="mt-2 text-sm text-slate-600">{fallbackNote ?? "한전 고객센터 국번없이 123"}</p>
+      )}
     </div>
   );
 }
 
-function resolveDirectContactLine(
-  directPhone: string,
-  branchPhone: string,
-  roleLabel: string,
-): { primary: string; secondary?: string } {
-  const direct = directPhone?.trim();
-  const branch = branchPhone?.trim();
-  const hasDirect =
-    direct &&
-    direct !== "—" &&
-    direct !== branch &&
-    direct !== "국번없이 123";
-  if (hasDirect) {
-    return { primary: roleLabel, secondary: direct };
-  }
-  return {
-    primary: roleLabel,
-    secondary: branch && branch !== "—" ? `관할 지사 문의 · ${branch}` : "관할 지사 문의",
-  };
+function formatContactPhone(phone: string): string {
+  const trimmed = phone?.trim();
+  if (!trimmed || trimmed === "—") return "";
+  if (trimmed === "국번없이 123") return "한전 고객센터 · 국번없이 123";
+  return trimmed;
 }
 
 export default function GridConnectionSection({
@@ -241,17 +234,10 @@ export default function GridConnectionSection({
     Math.round((metrics.capacityKw / 1000) * 1000) / 1000;
   const solarCapacityDisplay = formatSolarCapacityKw(metrics.capacityKw);
   const dlRemainingDisplay = formatGridCapacityMwOrKw(gridInfo.distributionLine.remainingMw);
-  const branchPhone = gridInfo.contacts.branchPhone;
-  const supplyContact = resolveDirectContactLine(
-    gridInfo.contacts.supplyPhone,
-    branchPhone,
-    "전력공급부 담당자",
-  );
-  const operationsContact = resolveDirectContactLine(
-    gridInfo.contacts.operationsPhone,
-    branchPhone,
-    "배전계통 담당자",
-  );
+  const branchPhone = formatContactPhone(gridInfo.contacts.branchPhone);
+  const supplyPhone = formatContactPhone(gridInfo.contacts.supplyPhone);
+  const operationsPhone = formatContactPhone(gridInfo.contacts.operationsPhone);
+  const hasBranchContacts = Boolean(branchPhone || supplyPhone || operationsPhone);
 
   return (
     <section id="grid" className="scroll-mt-24">
@@ -396,21 +382,37 @@ export default function GridConnectionSection({
 
         {/* 한전 연락처 */}
         <div className="border-t border-slate-100 px-5 py-6 sm:px-6 sm:py-7">
-          <div className="grid gap-4 sm:grid-cols-3">
+          <h3 className="text-sm font-bold text-slate-800">한전 연락처</h3>
+          <p className="mt-1 text-xs leading-relaxed text-slate-500">
+            {hasBranchContacts
+              ? "관할 지사·담당 부서 연락처입니다. 계통 접수 전 확인에 활용하세요."
+              : "관할 지사 확인이 필요합니다. 우선 한전 대표번호로 문의하세요."}
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <ContactCard
               title="관할 한전 지사"
-              primary={gridInfo.contacts.kepcoBranch}
-              secondary={gridInfo.contacts.branchPhone}
+              department={gridInfo.contacts.kepcoBranch}
+              phone={branchPhone}
             />
             <ContactCard
-              title="전력공급부 담당자"
-              primary={supplyContact.primary}
-              secondary={supplyContact.secondary}
+              title="전력공급부"
+              department={gridInfo.contacts.supplyDepartment}
+              phone={supplyPhone || branchPhone}
+              fallbackNote={
+                branchPhone
+                  ? `관할 지사 문의 · ${branchPhone}`
+                  : "한전 고객센터 · 국번없이 123"
+              }
             />
             <ContactCard
-              title="배전계통 담당자"
-              primary={operationsContact.primary}
-              secondary={operationsContact.secondary}
+              title="배전계통"
+              department={gridInfo.contacts.operationsDepartment}
+              phone={operationsPhone || branchPhone}
+              fallbackNote={
+                branchPhone
+                  ? `관할 지사 문의 · ${branchPhone}`
+                  : "한전 고객센터 · 국번없이 123"
+              }
             />
           </div>
           {hasDetails && (

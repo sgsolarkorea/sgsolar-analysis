@@ -188,5 +188,5 @@ export function matchGridAdminRecord(
     }
   }
 
-  return bestScore >= 2 ? best : null;
+  return bestScore >= 1 ? best : null;
 }

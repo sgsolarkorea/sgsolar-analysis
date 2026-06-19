@@ -88,7 +88,7 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                       : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-semibold text-slate-900">{step.label}</span>
                     <span
                       className={`shrink-0 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[step.statusKind]}`}
@@ -96,7 +96,6 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                       {step.statusLabel}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{step.description}</p>
                 </button>
               </li>
             );

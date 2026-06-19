@@ -32,7 +32,7 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   },
   {
     id: "grid",
-    label: "계통 연계",
+    label: "계통연계",
     statusLabel: "확인필요",
     statusKind: "caution",
     description: "한전 접수 전 별도 확인 필요",
@@ -46,7 +46,7 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   },
   {
     id: "consultation",
-    label: "상담 신청",
+    label: "상담신청",
     statusLabel: "가능",
     statusKind: "available",
     description: "전문가 컨설팅 가능",

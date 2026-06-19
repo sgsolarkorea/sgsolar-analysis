@@ -86,6 +86,12 @@ const DISTRICT_TEMPLATES: DistrictTemplate[] = [
   },
 ];
 
+function hasUsableValue(value?: string | null): boolean {
+  if (!value) return false;
+  const trimmed = value.trim();
+  return trimmed.length > 0 && trimmed !== "확인 필요" && trimmed !== "—";
+}
+
 function buildContextText(landInfo: InfoField[], landDetail?: LandInfoDetail): string {
   return [
     getFieldValue(landInfo, "용도지역"),
@@ -101,10 +107,32 @@ function buildContextText(landInfo: InfoField[], landDetail?: LandInfoDetail): s
     .join(" ");
 }
 
-function resolveRow(template: DistrictTemplate, context: string): RegionDistrictRow {
+function buildConfirmedDataRows(
+  landInfo: InfoField[],
+  landDetail?: LandInfoDetail,
+): RegionDistrictRow[] {
+  const fieldSources: Array<{ district: string; value?: string | null }> = [
+    { district: "지목", value: getFieldValue(landInfo, "지목") || landDetail?.landCategory },
+    { district: "면적", value: getFieldValue(landInfo, "면적") || landDetail?.area },
+    { district: "용도지역", value: getFieldValue(landInfo, "용도지역") || landDetail?.zoning },
+    { district: "용도지구", value: landDetail?.zoningSecondary },
+    { district: "지역·지구", value: getFieldValue(landInfo, "지역·지구") || landDetail?.regionDistrictSummary },
+    { district: "토지이용계획", value: getFieldValue(landInfo, "토지이용계획") || landDetail?.landUseSituation },
+  ];
+
+  return fieldSources
+    .filter((field) => hasUsableValue(field.value))
+    .map((field) => ({
+      district: field.district,
+      feasibility: "확인 완료" as RegionDistrictFeasibility,
+      condition: field.value!.trim(),
+    }));
+}
+
+function resolveRow(template: DistrictTemplate, context: string, hasLandData: boolean): RegionDistrictRow {
   const matched = template.keywords.some((keyword) => context.includes(keyword));
 
-  if (!context || context === "확인 필요") {
+  if (!hasLandData || !context || context === "확인 필요") {
     return {
       district: template.district,
       feasibility: "추가 확인 필요",
@@ -120,18 +148,10 @@ function resolveRow(template: DistrictTemplate, context: string): RegionDistrict
     };
   }
 
-  if (/주거|상업|공업|준/.test(context) && template.district.includes("지역")) {
-    return {
-      district: template.district,
-      feasibility: "추가 확인 필요",
-      condition: template.unknownCondition,
-    };
-  }
-
   return {
     district: template.district,
-    feasibility: "추가 확인 필요",
-    condition: template.unknownCondition,
+    feasibility: "기본 확인",
+    condition: "조회 기준 해당 없음 · 세부 규제는 상담 시 확인",
   };
 }
 
@@ -140,13 +160,19 @@ export function resolveRegionDistrictAnalysis(
   landDetail?: LandInfoDetail,
 ): RegionDistrictAnalysis {
   const context = buildContextText(landInfo, landDetail);
-  const rows = DISTRICT_TEMPLATES.map((template) => resolveRow(template, context));
+  const hasLandData = hasUsableValue(context);
+  const confirmedRows = buildConfirmedDataRows(landInfo, landDetail);
+  const regulationRows = DISTRICT_TEMPLATES.map((template) =>
+    resolveRow(template, context, hasLandData),
+  );
+
+  const rows = [...confirmedRows, ...regulationRows];
 
   return {
     rows,
     sourceNote:
       landDetail?.dataSource === "api"
-        ? "VWorld 토지특성·용도지역 기준 1차 매칭 (토지이용계획 API 연동 예정)"
+        ? "VWorld 토지특성·용도지역 기준 1차 확인 결과입니다. 조례·인허가 세부 기준은 상담 시 추가 검토합니다."
         : "토지정보 확인 후 지역·지구 분석이 정확해집니다.",
   };
 }

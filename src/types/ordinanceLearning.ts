@@ -88,6 +88,6 @@ export const ORDINANCE_STATUS_LABELS: Record<OrdinanceRecordStatus, string> = {
 export const ORDINANCE_DISPLAY_LABELS: Record<OrdinanceDisplayStatus, string> = {
   verified: "검증 완료",
   ai_draft: "AI 초안",
-  preparing: "준비 중",
+  preparing: "상세 검토 필요",
   default_template: "기본 템플릿",
 };

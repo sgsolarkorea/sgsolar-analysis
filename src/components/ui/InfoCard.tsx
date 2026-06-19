@@ -29,12 +29,12 @@ interface KpiCardProps {
 export function KpiCard({ label, value, unit, emphasis = false }: KpiCardProps) {
   return (
     <div
-      className={`flex flex-col items-center px-3 py-5 text-center sm:py-6 ${
+      className={`flex flex-col items-center px-2.5 py-4 text-center sm:px-3 sm:py-5 ${
         emphasis ? "bg-navy-light/40" : ""
       }`}
     >
       <p className="text-xs font-bold text-slate-500 sm:text-sm">{label}</p>
-      <p className={`mt-2 font-bold tracking-tight ${emphasis ? "text-2xl text-navy sm:text-3xl" : "text-lg text-slate-900 sm:text-xl"}`}>
+      <p className={`mt-1.5 font-bold tracking-tight ${emphasis ? "text-xl text-navy sm:text-2xl" : "text-lg text-slate-900 sm:text-xl"}`}>
         {value}
       </p>
       {unit && <p className="mt-0.5 text-xs text-slate-500">{unit}</p>}

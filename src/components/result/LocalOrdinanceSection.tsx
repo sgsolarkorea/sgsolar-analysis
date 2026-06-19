@@ -108,13 +108,15 @@ function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
         <DisplayStatusBadge meta={meta} />
         <span className="text-sm font-semibold text-slate-900">{meta.municipalityLabel}</span>
       </div>
-      <h3 className="mt-4 text-lg font-bold text-slate-900">조례 데이터 준비 중입니다.</h3>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">지자체 조례 기준 상세 검토가 필요합니다.</h3>
       <p className="mt-3 text-sm leading-relaxed text-slate-600">
-        해당 지역({meta.municipalityLabel}) 조례를 수집·검토 중이며, 관리자 승인 후 자동으로 표시됩니다.
-        현재는 이격거리 검토와 기본 법령 정보만 참고해 주세요.
+        해당 지역({meta.municipalityLabel}) 조례 세부 기준은 상담 시 확인합니다. 아래 이격거리
+        검토와 기본 법령 정보를 참고해 주세요.
       </p>
       <p className="mt-4 text-sm font-medium text-slate-500">
-        상태: {meta.status === "review" ? "관리자 검토 중" : "AI 생성 대기/진행 중"}
+        {meta.status === "review"
+          ? "관리자 검토 후 조례 요약이 업데이트됩니다."
+          : "상담 시 조례 세부 기준을 함께 검토합니다."}
       </p>
     </div>
   );

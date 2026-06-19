@@ -12,7 +12,12 @@ export interface LandInfoDetail {
   dataSource: "api" | "unavailable";
 }
 
-export type RegionDistrictFeasibility = "가능" | "제한" | "추가 확인 필요";
+export type RegionDistrictFeasibility =
+  | "가능"
+  | "제한"
+  | "추가 확인 필요"
+  | "확인 완료"
+  | "기본 확인";
 
 export interface RegionDistrictRow {
   district: string;

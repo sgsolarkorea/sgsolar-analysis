@@ -1,5 +1,5 @@
 import { getGridDataSourceLabel } from "@/lib/grid/dataSourceLabel";
-import { normalizeGridContacts, resolveGridContacts } from "@/lib/grid/contacts";
+import { mergeGridContacts, normalizeGridContacts, resolveGridContacts } from "@/lib/grid/contacts";
 import {
   buildReviewResult,
   evaluateGridConnectionStatus,
@@ -159,7 +159,13 @@ function selectPole(
 export type { GridConnectionInfo as GridInfo };
 
 export async function resolveGridConnection(input: ResolveGridInput): Promise<GridConnectionInfo> {
-  const contacts = resolveGridContacts(input.address, input.jibunAddress);
+  const baseContacts = resolveGridContacts(input.address, input.jibunAddress);
+  const adminRecords = await listGridAdminRecords();
+  const adminMatch = matchGridAdminRecord(adminRecords, input.address, input.jibunAddress);
+  const contacts = mergeGridContacts(
+    baseContacts,
+    adminMatch ? normalizeGridContacts(adminMatch.contacts) : undefined,
+  );
 
   const kepco = await fetchKepcoGridByLocation(input);
   if (kepco?.poles.length) {
@@ -179,18 +185,15 @@ export async function resolveGridConnection(input: ResolveGridInput): Promise<Gr
     };
   }
 
-  const adminRecords = await listGridAdminRecords();
-  const adminMatch = matchGridAdminRecord(adminRecords, input.address, input.jibunAddress);
-
   if (adminMatch?.poles.length) {
     const pole = selectPole(adminMatch.poles, input.poleId, input.jibunAddress)!;
     return {
-      ...buildFromPole(pole, input, adminMatch.dataAsOfDate, "admin", adminMatch.contacts),
+      ...buildFromPole(pole, input, adminMatch.dataAsOfDate, "admin", contacts),
       poles: adminMatch.poles.map((p) => ({
         ...p,
         label: p.label || buildPoleLabel(p.poleId, p.referenceLocation),
       })),
-      contacts: normalizeGridContacts(adminMatch.contacts),
+      contacts,
     };
   }
 

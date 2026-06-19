@@ -32,7 +32,11 @@ export interface MunicipalityOrdinanceData {
   articles: OrdinanceArticle[];
 }
 
-export type SetbackJudgment = "적합" | "검토 필요" | "추가 확인" | "미측정";
+export type SetbackJudgment =
+  | "적합"
+  | "검토 필요"
+  | "추가 확인"
+  | "조례 기준 확인 필요";
 
 export interface SetbackReviewRow {
   item: string;

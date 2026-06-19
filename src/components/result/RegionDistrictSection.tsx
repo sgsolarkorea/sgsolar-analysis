@@ -4,6 +4,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 const FEASIBILITY_STYLES: Record<RegionDistrictFeasibility, string> = {
   가능: "bg-emerald-50 text-emerald-800 border-emerald-200",
   제한: "bg-amber-50 text-amber-900 border-amber-200",
+  "확인 완료": "bg-blue-50 text-blue-800 border-blue-200",
+  "기본 확인": "bg-slate-50 text-slate-700 border-slate-200",
   "추가 확인 필요": "bg-slate-100 text-slate-700 border-slate-200",
 };
 
