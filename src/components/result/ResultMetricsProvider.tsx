@@ -130,6 +130,8 @@ export function ResultMetricsProvider({
               capacityBasis: g.capacityBasis,
               displayLandAreaSqm: g.landAreaSqm,
               displayBuildingFootprintAreaSqm: g.buildingFootprintAreaSqm,
+              buildingPolygonCount: g.buildingPolygonCount,
+              buildingFootprintAreaSumSqm: g.buildingFootprintAreaSumSqm,
               displayRoofUsableAreaSqm: g.roofUsableAreaSqm,
               displayUsableAreaSqm: g.landUsableAreaSqm ?? g.roofUsableAreaSqm,
             };

@@ -82,6 +82,17 @@ function pickField(item: BuildingTitleItem, ...keys: (keyof BuildingTitleItem)[]
   return "";
 }
 
+function parseNumericField(item: BuildingTitleItem, ...keys: (keyof BuildingTitleItem)[]): number {
+  const value = pickField(item, ...keys).replace(/,/g, "");
+  const num = Number(value);
+  return Number.isFinite(num) && num > 0 ? num : 0;
+}
+
+function sumNumericFields(items: BuildingTitleItem[], ...keys: (keyof BuildingTitleItem)[]): string {
+  const sum = items.reduce((total, item) => total + parseNumericField(item, ...keys), 0);
+  return sum > 0 ? String(Math.round(sum * 100) / 100) : "";
+}
+
 function formatArea(value: string): string {
   if (!value) return "확인 필요";
   const num = Number(value.replace(/,/g, ""));
@@ -197,11 +208,17 @@ function pickBestBuilding(
     if (matched) return matched;
   }
 
-  return items.reduce((best, current) => {
+  const representative = items.reduce((best, current) => {
     const bestArea = Number(pickField(best, "totArea", "tot_area").replace(/,/g, "") || "0");
     const currentArea = Number(pickField(current, "totArea", "tot_area").replace(/,/g, "") || "0");
     return currentArea > bestArea ? current : best;
   });
+
+  return {
+    ...representative,
+    archArea: sumNumericFields(items, "archArea", "arch_area"),
+    totArea: sumNumericFields(items, "totArea", "tot_area"),
+  };
 }
 
 function mapBuildingToFields(item: BuildingTitleItem): InfoField[] {

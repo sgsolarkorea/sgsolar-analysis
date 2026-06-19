@@ -38,13 +38,6 @@ export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
     description: "추천 유형·시공비 개요",
   },
   {
-    id: "module-layout",
-    label: "모듈 가배치도",
-    statusLabel: "참고",
-    statusKind: "reference",
-    description: "위성지도 기반 1차 모듈 배치",
-  },
-  {
     id: "multi-parcel",
     label: "다중 필지 검토",
     statusLabel: "가능",
@@ -285,7 +278,7 @@ export function formatInstallTypeDisplayLabel(installType: InstallTypeOption): s
   }
 }
 
-/** 가배치도·PDF·search-history 등 — 유형명만 */
+/** PDF·search-history 등 — 유형명만 */
 export function formatInstallTypeShortLabel(installType: InstallTypeOption | string): string {
   if (INSTALL_TYPE_OPTIONS.includes(installType as InstallTypeOption)) {
     return installType;

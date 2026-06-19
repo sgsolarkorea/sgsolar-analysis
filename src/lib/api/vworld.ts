@@ -617,6 +617,7 @@ const BUILDING_DATA_LAYERS = ["LT_C_SPBD", "LT_L_SPRD", "LT_C_ADBD"] as const;
 export interface BuildingPolygonResult {
   pnu: string;
   ring: LatLngPoint[];
+  rings: LatLngPoint[][];
 }
 
 function ringFromFeature(feature: VworldFeatureWithGeometry): LatLngPoint[] | null {
@@ -628,13 +629,17 @@ function ringFromFeature(feature: VworldFeatureWithGeometry): LatLngPoint[] | nu
   }));
 }
 
-function pickLargestBuildingRing(features: VworldFeatureWithGeometry[]): LatLngPoint[] | null {
+function collectBuildingRings(features: VworldFeatureWithGeometry[]): LatLngPoint[][] {
+  return features
+    .map((feature) => ringFromFeature(feature))
+    .filter((ring): ring is LatLngPoint[] => Boolean(ring?.length));
+}
+
+function pickLargestBuildingRing(rings: LatLngPoint[][]): LatLngPoint[] | null {
   let bestRing: LatLngPoint[] | null = null;
   let bestArea = 0;
 
-  for (const feature of features) {
-    const ring = ringFromFeature(feature);
-    if (!ring?.length) continue;
+  for (const ring of rings) {
     const area = polygonAreaSqm(ring);
     if (area > bestArea) {
       bestArea = area;
@@ -679,9 +684,10 @@ async function fetchBuildingPolygonFromDataLayer(
         const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
         return !featurePnu || featurePnu === pnu;
       });
-      const ring = pickLargestBuildingRing(matching);
+      const rings = collectBuildingRings(matching);
+      const ring = pickLargestBuildingRing(rings);
       if (ring?.length) {
-        return { pnu, ring };
+        return { pnu, ring, rings };
       }
     }
   }

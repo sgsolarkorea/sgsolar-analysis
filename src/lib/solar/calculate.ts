@@ -90,6 +90,8 @@ export interface CalculateSolarInput {
   /** 표시용 면적 (대장·Polygon) */
   displayLandAreaSqm?: number | null;
   displayBuildingFootprintAreaSqm?: number | null;
+  buildingPolygonCount?: number;
+  buildingFootprintAreaSumSqm?: number | null;
   displayRoofUsableAreaSqm?: number | null;
   displayUsableAreaSqm?: number | null;
 }
@@ -230,6 +232,8 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     landAreaSqm: input.displayLandAreaSqm ?? parsedLandArea,
     buildingFootprintAreaSqm:
       input.displayBuildingFootprintAreaSqm ?? buildingArea,
+    buildingPolygonCount: input.buildingPolygonCount,
+    buildingFootprintAreaSumSqm: input.buildingFootprintAreaSumSqm,
     roofUsableAreaSqm: input.displayRoofUsableAreaSqm ?? null,
     usableAreaSqm: input.displayUsableAreaSqm ?? null,
     areaPerKw,

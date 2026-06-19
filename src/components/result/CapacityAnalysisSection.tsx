@@ -78,20 +78,12 @@ export default function CapacityAnalysisSection({
             </span>
           </div>
         )}
-        {!isLand && metrics.roofUsableAreaSqm != null && metrics.roofUsableAreaSqm > 0 && (
-          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-slate-500">지붕 유효면적 (setback 후)</span>
-            <span className="text-sm font-semibold text-slate-900">
-              {metrics.roofUsableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
-            </span>
-          </div>
-        )}
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
           <p className="text-sm font-medium leading-relaxed text-amber-900">
             ⚠ {metrics.capacityDisclaimer}
           </p>
           <p className="mt-2 text-sm font-medium leading-relaxed text-amber-900">
-            ⚠ 실제 모듈 수량은 배치도, 음영, 지붕 형상, 구조검토 결과에 따라 달라질 수 있습니다.
+            ⚠ 실제 설치용량은 음영, 지붕 형상, 구조검토 결과에 따라 달라질 수 있습니다.
           </p>
         </div>
       </div>

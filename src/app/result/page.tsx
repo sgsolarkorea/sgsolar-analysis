@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getCachedAnalyzeSolarSite } from "@/lib/api/analysis";
 import {
   KakaoAddressNotFoundError,
@@ -7,7 +6,6 @@ import {
 import ResultHero from "@/components/result/ResultHero";
 import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import MapArea from "@/components/result/MapArea";
-import ModuleLayoutSection from "@/components/result/ModuleLayoutSection";
 import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import RegionDistrictSection from "@/components/result/RegionDistrictSection";
 import DetailInfoSection from "@/components/result/DetailInfoSection";
@@ -124,11 +122,6 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                   lat={data.lat}
                   lng={data.lng}
                 />
-                <div className="mt-8">
-                  <Suspense fallback={null}>
-                    <ModuleLayoutSection address={data.address} jibunAddress={data.jibunAddress} />
-                  </Suspense>
-                </div>
               </section>
 
               <ResultSiteOverview recommendation={data.recommendation} address={data.address} />

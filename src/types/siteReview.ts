@@ -11,10 +11,12 @@ export interface CompanyInfo {
   companyName: string;
   ceo: string;
   phone: string;
+  fax: string;
   email: string;
   website: string;
   address: string;
   businessNumber: string;
+  mailOrderNumber: string;
 }
 
 export interface InfoField {
@@ -66,6 +68,8 @@ export interface SolarMetrics {
   landAreaSqm?: number | null;
   /** 건물/지붕 footprint Polygon 면적 (㎡) */
   buildingFootprintAreaSqm?: number | null;
+  buildingPolygonCount?: number;
+  buildingFootprintAreaSumSqm?: number | null;
   /** 지붕 setback 후 유효면적 (㎡) — 건물형 */
   roofUsableAreaSqm?: number | null;
   /** setback 후 usableArea (㎡) — 토지형 */

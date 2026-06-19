@@ -10,8 +10,11 @@ export interface SiteGeometryBundle {
   buildingAreaSqm: number | null;
   cadastralPolygon: LatLngPoint[] | null;
   cadastralAreaSqm: number | null;
+  buildingPolygons?: LatLngPoint[][];
   buildingPolygon: LatLngPoint[] | null;
   buildingFootprintAreaSqm: number | null;
+  buildingPolygonCount?: number;
+  buildingFootprintAreaSumSqm?: number | null;
 }
 
 export interface SiteGeometryResult {
@@ -20,6 +23,8 @@ export interface SiteGeometryResult {
   layoutBoundarySource: LayoutBoundarySource;
   landAreaSqm: number | null;
   buildingFootprintAreaSqm: number | null;
+  buildingPolygonCount?: number;
+  buildingFootprintAreaSumSqm?: number | null;
   roofUsableAreaSqm: number | null;
   /** 토지형 setback 후 usableArea (㎡) */
   landUsableAreaSqm: number | null;

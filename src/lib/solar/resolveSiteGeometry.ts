@@ -47,6 +47,22 @@ function ringArea(ring: LatLngPoint[] | null | undefined): number | null {
   return Math.round(polygonAreaSqm(ring) * 100) / 100;
 }
 
+function ringsAreaSum(rings: LatLngPoint[][] | null | undefined): number | null {
+  if (!rings?.length) return null;
+  const sum = rings.reduce((total, ring) => total + (ringArea(ring) ?? 0), 0);
+  return sum > 0 ? Math.round(sum * 100) / 100 : null;
+}
+
+function setbackRingsAreaSum(rings: LatLngPoint[][] | null | undefined, setbackM: number): number | null {
+  if (!rings?.length) return null;
+  const sum = rings.reduce((total, ring) => {
+    if (ring.length < 3) return total;
+    const setback = closeRing(applySetback(closeRing(normalizeRing(ring)), setbackM));
+    return total + (ringArea(setback) ?? 0);
+  }, 0);
+  return sum > 0 ? Math.round(sum * 100) / 100 : null;
+}
+
 /** VWorld Polygon 원본 수집 — 설치유형 전환 시 재사용 */
 export async function fetchSiteGeometryBundle(input: {
   pnu?: string | null;
@@ -56,20 +72,44 @@ export async function fetchSiteGeometryBundle(input: {
   buildingAreaSqm?: number | null;
 }): Promise<SiteGeometryBundle> {
   const cadastralPolygon = await resolveCadastralRing(input.pnu, input.lat, input.lng);
+  const cadastralAreaSqm = ringArea(cadastralPolygon);
   let buildingPolygon: LatLngPoint[] | null = null;
+  let buildingPolygons: LatLngPoint[][] = [];
 
   if (input.pnu) {
     const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
     buildingPolygon = building?.ring?.length ? building.ring : null;
+    buildingPolygons = building?.rings?.length ? building.rings : buildingPolygon ? [buildingPolygon] : [];
   }
+
+  if (cadastralAreaSqm != null) {
+    buildingPolygons = buildingPolygons.filter((ring) => {
+      const area = ringArea(ring);
+      return area != null && area < cadastralAreaSqm * 0.85;
+    });
+    buildingPolygon =
+      buildingPolygons
+        .map((ring) => ({ ring, area: ringArea(ring) ?? 0 }))
+        .sort((a, b) => b.area - a.area)[0]?.ring ?? null;
+  }
+
+  const buildingFootprintAreaSumSqm = ringsAreaSum(buildingPolygons);
+  const registryBuildingAreaSqm = input.buildingAreaSqm ?? null;
+  const buildingFootprintAreaSqm =
+    registryBuildingAreaSqm != null && registryBuildingAreaSqm > (buildingFootprintAreaSumSqm ?? 0)
+      ? registryBuildingAreaSqm
+      : buildingFootprintAreaSumSqm ?? ringArea(buildingPolygon);
 
   return {
     landAreaSqm: input.landAreaSqm ?? null,
     buildingAreaSqm: input.buildingAreaSqm ?? null,
     cadastralPolygon,
-    cadastralAreaSqm: ringArea(cadastralPolygon),
+    cadastralAreaSqm,
+    buildingPolygons,
     buildingPolygon,
-    buildingFootprintAreaSqm: ringArea(buildingPolygon),
+    buildingFootprintAreaSqm,
+    buildingPolygonCount: buildingPolygons.length,
+    buildingFootprintAreaSumSqm: buildingFootprintAreaSqm,
   };
 }
 
@@ -197,8 +237,15 @@ export function resolveSiteGeometryFromBundle(
     moduleLayoutConfig.roofSetbackM,
   );
   const footprintArea =
-    bundle.buildingFootprintAreaSqm ?? ringArea(sourceBoundary) ?? bundle.buildingAreaSqm ?? 0;
-  const roofUsable = ringArea(boundary) ?? 0;
+    bundle.buildingFootprintAreaSumSqm ??
+    bundle.buildingFootprintAreaSqm ??
+    ringArea(sourceBoundary) ??
+    bundle.buildingAreaSqm ??
+    0;
+  const roofUsable =
+    setbackRingsAreaSum(bundle.buildingPolygons, moduleLayoutConfig.roofSetbackM) ??
+    ringArea(boundary) ??
+    0;
 
   return {
     installType: input.installType,
@@ -206,6 +253,8 @@ export function resolveSiteGeometryFromBundle(
     layoutBoundarySource: buildingSource.layoutBoundarySource,
     landAreaSqm: bundle.landAreaSqm,
     buildingFootprintAreaSqm: footprintArea,
+    buildingPolygonCount: bundle.buildingPolygonCount,
+    buildingFootprintAreaSumSqm: bundle.buildingFootprintAreaSumSqm,
     roofUsableAreaSqm: roofUsable,
     landUsableAreaSqm: null,
     capacityAreaSqm: footprintArea,

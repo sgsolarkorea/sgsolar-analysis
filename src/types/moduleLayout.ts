@@ -63,6 +63,8 @@ export interface ModuleLayoutDiagnostics {
   capacityBasis?: "land" | "buildingRoof";
   landAreaSqm?: number | null;
   buildingFootprintAreaSqm?: number | null;
+  buildingPolygonCount?: number;
+  buildingFootprintAreaSumSqm?: number | null;
   roofUsableAreaSqm?: number | null;
   layoutBoundarySource?: "cadastral" | "building" | "roof" | "virtual";
   layoutTier?: "single" | "double";

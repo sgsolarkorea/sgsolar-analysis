@@ -105,6 +105,8 @@ function buildDiagnostics(input: {
     capacityBasis: g.capacityBasis,
     landAreaSqm: g.landAreaSqm,
     buildingFootprintAreaSqm: g.buildingFootprintAreaSqm,
+    buildingPolygonCount: g.buildingPolygonCount,
+    buildingFootprintAreaSumSqm: g.buildingFootprintAreaSumSqm,
     roofUsableAreaSqm: g.roofUsableAreaSqm,
     layoutBoundarySource: g.layoutBoundarySource,
     layoutTier: land?.layoutTier,

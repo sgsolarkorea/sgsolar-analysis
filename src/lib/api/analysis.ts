@@ -82,6 +82,8 @@ export async function calculateSolarProfitability(
     capacityBasis?: "land" | "buildingRoof";
     displayLandAreaSqm?: number | null;
     displayBuildingFootprintAreaSqm?: number | null;
+    buildingPolygonCount?: number;
+    buildingFootprintAreaSumSqm?: number | null;
     displayRoofUsableAreaSqm?: number | null;
     displayUsableAreaSqm?: number | null;
   },
@@ -105,6 +107,8 @@ export async function calculateSolarProfitability(
     capacityBasis: input.capacityBasis,
     displayLandAreaSqm: input.displayLandAreaSqm,
     displayBuildingFootprintAreaSqm: input.displayBuildingFootprintAreaSqm,
+    buildingPolygonCount: input.buildingPolygonCount,
+    buildingFootprintAreaSumSqm: input.buildingFootprintAreaSumSqm,
     displayRoofUsableAreaSqm: input.displayRoofUsableAreaSqm,
     displayUsableAreaSqm: input.displayUsableAreaSqm,
   });
@@ -234,6 +238,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     capacityBasis: siteGeometry.capacityBasis,
     displayLandAreaSqm: siteGeometry.landAreaSqm,
     displayBuildingFootprintAreaSqm: siteGeometry.buildingFootprintAreaSqm,
+    buildingPolygonCount: siteGeometry.buildingPolygonCount,
+    buildingFootprintAreaSumSqm: siteGeometry.buildingFootprintAreaSumSqm,
     displayRoofUsableAreaSqm: siteGeometry.roofUsableAreaSqm,
     displayUsableAreaSqm: siteGeometry.landUsableAreaSqm ?? siteGeometry.roofUsableAreaSqm,
   });

@@ -89,7 +89,7 @@ export const monthlyGenerationWeights = [
 
 export const disclaimer = {
   capacity:
-    "실제 설치용량은 구조검토, 음영, 통로, 소방·안전거리, 모듈배치, 인허가 조건에 따라 달라질 수 있습니다.",
+    "실제 설치용량은 구조검토, 음영, 통로, 소방·안전거리, 인허가 조건에 따라 달라질 수 있습니다.",
   market:
     "시장단가는 매일 변동되며 실제 거래금액은 계약조건 및 가중치에 따라 달라질 수 있습니다.",
   construction:
