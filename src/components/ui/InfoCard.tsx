@@ -23,13 +23,20 @@ interface KpiCardProps {
   label: string;
   value: string;
   unit?: string;
+  emphasis?: boolean;
 }
 
-export function KpiCard({ label, value, unit }: KpiCardProps) {
+export function KpiCard({ label, value, unit, emphasis = false }: KpiCardProps) {
   return (
-    <div className="flex flex-col items-center px-3 py-5 text-center sm:py-6">
-      <p className="text-xs font-semibold text-slate-500 sm:text-sm">{label}</p>
-      <p className="mt-2 text-lg font-bold text-slate-900 sm:text-xl">{value}</p>
+    <div
+      className={`flex flex-col items-center px-3 py-5 text-center sm:py-6 ${
+        emphasis ? "bg-navy-light/40" : ""
+      }`}
+    >
+      <p className="text-xs font-bold text-slate-500 sm:text-sm">{label}</p>
+      <p className={`mt-2 font-bold tracking-tight ${emphasis ? "text-2xl text-navy sm:text-3xl" : "text-lg text-slate-900 sm:text-xl"}`}>
+        {value}
+      </p>
       {unit && <p className="mt-0.5 text-xs text-slate-500">{unit}</p>}
     </div>
   );

@@ -1,8 +1,11 @@
+"use client";
+
 import type { Profitability } from "@/types/siteReview";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { KpiCard } from "@/components/ui/InfoCard";
 import { REVENUE_WARNING } from "@/data/sampleData";
 import { MOUNTAIN_REC_WEIGHT_NOTE } from "@/lib/site/mountainLand";
+import { scrollToSection } from "@/components/layout/ScrollLink";
 
 interface RevenueAnalysisProps {
   profitability: Profitability;
@@ -26,6 +29,9 @@ export default function RevenueAnalysis({
         title="수익성 분석"
         description="SMP·REC 시장단가 및 REC 가중치 기준 1차 수익성 검토 결과입니다."
       />
+      <p className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium leading-relaxed text-blue-950">
+        예상 연매출과 시공비를 기준으로 초기 투자 회수 가능성을 검토한 결과입니다.
+      </p>
       <div className="card-premium overflow-hidden">
         <div className="grid grid-cols-2 divide-x divide-y divide-slate-200 sm:grid-cols-4 sm:divide-y-0">
           {cards.map((card) => (
@@ -44,6 +50,18 @@ export default function RevenueAnalysis({
             ⚠ {REVENUE_WARNING}
           </p>
         </div>
+      </div>
+      <div className="mt-5 rounded-2xl border border-navy/10 bg-navy-light/40 p-5 text-center">
+        <p className="text-sm font-medium text-slate-700">
+          현재 조건으로 설치 가능성과 견적을 더 구체적으로 확인해 보세요.
+        </p>
+        <button
+          type="button"
+          onClick={() => scrollToSection("consultation")}
+          className="btn-primary mt-3 h-11 px-6 text-sm font-bold"
+        >
+          이 조건으로 무료 상담 신청하기
+        </button>
       </div>
     </section>
   );

@@ -28,19 +28,22 @@ export default function GradeSection({
   const thirdValue = thirdKpiValue ?? annualRevenue;
 
   return (
-    <section className="-mt-3 sm:-mt-4">
-      <div className="card-premium overflow-hidden">
-        <div className="grid grid-cols-2 divide-x divide-y divide-slate-200 sm:grid-cols-3">
-          <KpiCard label="예상 설치용량" value={capacity} />
-          <KpiCard label="예상 발전량" value={annualGeneration} />
-          <KpiCard label={thirdLabel} value={thirdValue} />
-          <KpiCard label="예상 시공비" value={constructionCost} />
-          <KpiCard label="추천유형" value={recommendation} />
-          <KpiCard label="REC 가중치" value={recWeight} />
+    <section className="-mt-2 sm:-mt-3">
+      <div className="card-premium overflow-hidden ring-1 ring-navy/10">
+        <div className="grid grid-cols-2 divide-x divide-y divide-slate-200 sm:grid-cols-5">
+          <KpiCard label="예상 설치용량" value={capacity} emphasis />
+          <KpiCard label="예상 발전량" value={annualGeneration} emphasis />
+          <KpiCard label={thirdLabel} value={thirdValue} emphasis />
+          <KpiCard label="예상 시공비" value={constructionCost} emphasis />
+          <KpiCard label="REC 가중치" value={recWeight} emphasis />
+          <div className="col-span-2 flex flex-col items-center justify-center bg-white px-3 py-4 text-center sm:col-span-5 sm:flex-row sm:gap-2 sm:py-3">
+            <span className="text-xs font-bold text-slate-500 sm:text-sm">추천유형</span>
+            <span className="mt-1 text-sm font-bold text-slate-900 sm:mt-0 sm:text-base">{recommendation}</span>
+          </div>
         </div>
 
         {!isHousehold && (
-          <div className="border-t border-amber-200 bg-amber-50 px-5 py-3 sm:px-6">
+          <div className="border-t border-amber-200 bg-amber-50 px-4 py-2.5 sm:px-5">
             <p className="text-sm font-medium leading-relaxed text-amber-900">⚠ {REVENUE_WARNING}</p>
           </div>
         )}

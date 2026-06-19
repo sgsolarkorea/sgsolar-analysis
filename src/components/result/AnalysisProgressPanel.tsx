@@ -67,14 +67,14 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
   }, [steps]);
 
   return (
-    <aside className="hidden lg:block lg:w-64 lg:shrink-0 lg:self-stretch">
-      <div className="sticky top-24 z-30 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-base font-bold text-navy">원포인트 분석</h2>
+    <aside className="hidden lg:block lg:w-60 lg:shrink-0 lg:self-stretch">
+      <div className="sticky top-24 z-30 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
+        <h2 className="text-sm font-bold text-navy">검토 흐름</h2>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">
-          검토 단계별 진행 상태를 확인하고 해당 섹션으로 이동할 수 있습니다.
+          핵심 결과만 빠르게 확인하세요.
         </p>
 
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-3 space-y-2">
           {steps.map((step) => {
             const isActive = activeId === step.id;
             return (
@@ -82,7 +82,7 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                 <button
                   type="button"
                   onClick={() => scrollToSection(step.id)}
-                  className={`w-full rounded-lg border p-3 text-left transition-colors ${
+                  className={`w-full rounded-lg border px-3 py-2.5 text-left transition-colors ${
                     isActive
                       ? "border-navy bg-navy-light ring-1 ring-navy/20"
                       : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
@@ -96,7 +96,7 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                       {step.statusLabel}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{step.description}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{step.description}</p>
                 </button>
               </li>
             );
