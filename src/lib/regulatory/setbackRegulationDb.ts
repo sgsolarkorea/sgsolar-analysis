@@ -1,0 +1,115 @@
+import setbackData from "@/data/regulatory/setback-regulations.json";
+import { mergeParsedAddresses, parseKepcoAddress } from "@/lib/kepco/parseKepcoAddress";
+import type {
+  ResolvedSetbackRegulation,
+  SetbackDistanceKey,
+  SetbackDistances,
+  SetbackRegulationConfidence,
+} from "@/types/regulatoryReview";
+
+type RawEntry = {
+  municipalityLabel: string;
+  sido: string;
+  sigungu: string;
+  source: string;
+  lastUpdated: string;
+  confidence: SetbackRegulationConfidence;
+  distances: SetbackDistances;
+};
+
+const ENTRIES = setbackData.entries as Record<string, RawEntry>;
+const COMMON = setbackData.commonFallback;
+
+export const SETBACK_DISTANCE_KEYS: SetbackDistanceKey[] = [
+  "residential",
+  "road",
+  "river",
+  "school",
+  "cultural",
+];
+
+/** GIS 검토 항목 key → DB distances key */
+export const SETBACK_TARGET_DISTANCE_KEY: Record<string, SetbackDistanceKey> = {
+  building: "residential",
+  road: "road",
+  river: "river",
+  school: "school",
+  cultural: "cultural",
+};
+
+function regionLookupKey(sido: string | null, sigungu: string | null): string | null {
+  if (!sido || !sigungu) return null;
+  return `${sido}|${sigungu}`;
+}
+
+function toResolved(entry: RawEntry, isFallback: boolean): ResolvedSetbackRegulation {
+  return {
+    municipalityLabel: entry.municipalityLabel,
+    sido: entry.sido,
+    sigungu: entry.sigungu,
+    source: entry.source,
+    lastUpdated: entry.lastUpdated,
+    confidence: entry.confidence,
+    distances: { ...entry.distances },
+    isFallback,
+  };
+}
+
+function fallbackRegulation(municipalityLabel?: string): ResolvedSetbackRegulation {
+  return {
+    municipalityLabel: municipalityLabel ?? "해당 지자체",
+    sido: null,
+    sigungu: null,
+    source: COMMON.source,
+    lastUpdated: COMMON.lastUpdated,
+    confidence: COMMON.confidence as SetbackRegulationConfidence,
+    distances: { ...COMMON.distances },
+    isFallback: true,
+  };
+}
+
+export function lookupSetbackRegulation(
+  address: string,
+  jibunAddress = "",
+): ResolvedSetbackRegulation {
+  const parsed = mergeParsedAddresses(
+    parseKepcoAddress(address.trim()),
+    parseKepcoAddress(jibunAddress.trim()),
+  );
+
+  const key = regionLookupKey(parsed.sido, parsed.sigungu);
+  if (key && ENTRIES[key]) {
+    return toResolved(ENTRIES[key], false);
+  }
+
+  const label = parsed.sigungu ?? parsed.sido ?? undefined;
+  return fallbackRegulation(label);
+}
+
+export function formatSetbackStandardM(meters: number): string {
+  return `${meters}m`;
+}
+
+export function buildSetbackStandardNotice(regulation: ResolvedSetbackRegulation): string {
+  if (regulation.isFallback) {
+    return "공통 기준 적용 중 (지자체 조례 DB 미반영)";
+  }
+
+  if (regulation.confidence === "needs_verification") {
+    return `현재 적용 중인 기준: ${regulation.source} (조례 확인 권장)`;
+  }
+
+  return `현재 적용 중인 기준: ${regulation.source} 기준`;
+}
+
+export function buildSetbackStandardColumnLabel(regulation: ResolvedSetbackRegulation): string {
+  if (regulation.isFallback) {
+    return "공통 참고 기준";
+  }
+  return "적용 기준";
+}
+
+export const SETBACK_REGULATION_STATS = {
+  registeredMunicipalities: Object.keys(ENTRIES).length,
+  version: setbackData.meta.version,
+};

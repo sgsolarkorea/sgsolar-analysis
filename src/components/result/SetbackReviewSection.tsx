@@ -1,6 +1,6 @@
 import type { SetbackJudgment, SetbackReview } from "@/types/regulatoryReview";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { SETBACK_COMMON_STANDARD_NOTICE, SETBACK_SECTION_FOOTER, SETBACK_STANDARD_COLUMN_LABEL } from "@/lib/regulatory/setbackDisplay";
+import { SETBACK_SECTION_FOOTER } from "@/lib/regulatory/setbackDisplay";
 
 const JUDGMENT_STYLES: Record<SetbackJudgment, string> = {
   "기본 확인": "bg-blue-50 text-blue-800 border-blue-200",
@@ -20,6 +20,11 @@ interface SetbackReviewSectionProps {
 }
 
 export default function SetbackReviewSection({ review }: SetbackReviewSectionProps) {
+  const standardNotice =
+    review.appliedStandard?.notice ??
+    "공통 기준 적용 중 (지자체 조례 DB 미반영)";
+  const columnLabel = review.appliedStandard?.columnLabel ?? "공통 참고 기준";
+
   return (
     <section id="setback-review" className="scroll-mt-24">
       <SectionHeader
@@ -34,8 +39,14 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
         </div>
       )}
 
-      <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-snug text-slate-700 sm:text-sm">
-        {SETBACK_COMMON_STANDARD_NOTICE}
+      <div
+        className={`mb-3 rounded-lg border px-3 py-2 text-xs leading-snug sm:text-sm ${
+          review.appliedStandard?.isFallback
+            ? "border-amber-200 bg-amber-50 text-amber-900"
+            : "border-emerald-200 bg-emerald-50 text-emerald-900"
+        }`}
+      >
+        {standardNotice}
       </div>
 
       <div className="card-premium overflow-hidden rounded-lg">
@@ -44,7 +55,7 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
             <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-600">
               <tr>
                 <th className="w-[18%] px-3 py-2 font-semibold">검토 항목</th>
-                <th className="w-[14%] px-3 py-2 font-semibold">{SETBACK_STANDARD_COLUMN_LABEL}</th>
+                <th className="w-[14%] px-3 py-2 font-semibold">{columnLabel}</th>
                 <th className="w-[14%] px-3 py-2 font-semibold">예상 거리</th>
                 <th className="w-[16%] px-3 py-2 font-semibold">검토 상태</th>
                 <th className="w-[38%] px-3 py-2 font-semibold">안내</th>

@@ -405,14 +405,22 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
             : ""
         }`;
 
+  const setbackStandardNotice =
+    data.setbackReview?.appliedStandard?.notice ?? PDF_SETBACK_COMMON_NOTICE;
+  const setbackColumnLabel =
+    data.setbackReview?.appliedStandard?.columnLabel ?? PDF_SETBACK_STANDARD_COLUMN;
+  const setbackStandardClass = data.setbackReview?.appliedStandard?.isFallback
+    ? "notice compact amber"
+    : "notice compact green";
+
   const setbackTable = `
     ${data.setbackReview?.notice ? `<div class="notice blue">${htmlText(data.setbackReview.notice)}</div>` : ""}
-    <div class="notice compact">${htmlText(PDF_SETBACK_COMMON_NOTICE)}</div>
+    <div class="${setbackStandardClass}">${htmlText(setbackStandardNotice)}</div>
     <div class="card avoid-break">
       <table>
         <thead><tr>
           <th style="width:18%">검토 항목</th>
-          <th style="width:11%">${htmlText(PDF_SETBACK_STANDARD_COLUMN)}</th>
+          <th style="width:11%">${htmlText(setbackColumnLabel)}</th>
           <th style="width:12%">예상 거리</th>
           <th style="width:13%">검토 상태</th>
           <th style="width:46%">안내</th>

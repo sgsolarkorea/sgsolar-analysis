@@ -209,6 +209,7 @@ export function reportBaseStyles(): string {
     .notice.compact { padding: 8px 12px; font-size: 7.5pt; margin-bottom: 0; }
     .notice.blue { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
     .notice.amber { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .notice.green { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
 
     /* ── Tables ── */
     table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }

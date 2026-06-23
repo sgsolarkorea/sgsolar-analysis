@@ -46,7 +46,7 @@ export async function GET(request: Request) {
           ? buildLayerARegulatoryAnalysis(bundle.landUseAttributes, bundle.meta.collectedAt)
           : null;
         const setback = bundle?.parcel
-          ? await buildSetbackFromGis(bundle.parcel, undefined, undefined)
+          ? await buildSetbackFromGis(bundle.parcel, { address })
           : null;
 
         results.push({

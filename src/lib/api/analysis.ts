@@ -309,8 +309,12 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   );
 
   const setbackReview = siteIntel?.parcel
-    ? await buildSetbackFromGis(siteIntel.parcel, solarMetrics.installType)
-    : buildDefaultSetbackReview(solarMetrics.installType);
+    ? await buildSetbackFromGis(siteIntel.parcel, {
+        installType: solarMetrics.installType,
+        address: geo.address,
+        jibunAddress: geo.jibunAddress,
+      })
+    : buildDefaultSetbackReview(solarMetrics.installType, geo.address, geo.jibunAddress);
 
   return {
     address: geo.address,

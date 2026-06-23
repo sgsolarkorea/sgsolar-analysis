@@ -65,10 +65,42 @@ export interface SetbackReviewMeta {
   gisDistanceCount?: number;
 }
 
+export type SetbackRegulationConfidence =
+  | "verified"
+  | "ordinance_based"
+  | "needs_verification"
+  | "common_fallback";
+
+export type SetbackDistanceKey = "residential" | "road" | "river" | "school" | "cultural";
+
+export type SetbackDistances = Record<SetbackDistanceKey, number>;
+
+export interface ResolvedSetbackRegulation {
+  municipalityLabel: string;
+  sido: string | null;
+  sigungu: string | null;
+  source: string;
+  lastUpdated: string;
+  confidence: SetbackRegulationConfidence;
+  distances: SetbackDistances;
+  isFallback: boolean;
+}
+
+export interface SetbackAppliedStandard {
+  municipalityLabel: string;
+  source: string;
+  lastUpdated: string;
+  confidence: SetbackRegulationConfidence;
+  isFallback: boolean;
+  notice: string;
+  columnLabel: string;
+}
+
 export interface SetbackReview {
   notice?: string;
   rows: SetbackReviewRow[];
   meta?: SetbackReviewMeta;
+  appliedStandard?: SetbackAppliedStandard;
 }
 
 /** @deprecated MunicipalityOrdinanceData 사용 */

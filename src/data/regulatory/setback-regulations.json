@@ -1,0 +1,171 @@
+{
+  "meta": {
+    "version": "2026-06-23",
+    "description": "지자체별 태양광 이격거리 기준 DB (Step 6). 수동 적재 — 크롤링 없음.",
+    "fallbackKey": "_common"
+  },
+  "commonFallback": {
+    "source": "전국 공통 참고 기준",
+    "lastUpdated": "2026-06-23",
+    "confidence": "common_fallback",
+    "distances": {
+      "residential": 200,
+      "road": 100,
+      "river": 100,
+      "school": 100,
+      "cultural": 100
+    }
+  },
+  "entries": {
+    "충청남도|논산시": {
+      "municipalityLabel": "논산시",
+      "sido": "충청남도",
+      "sigungu": "논산시",
+      "source": "논산시 개발행위허가 운영지침",
+      "lastUpdated": "2026-06-23",
+      "confidence": "ordinance_based",
+      "distances": {
+        "residential": 500,
+        "road": 200,
+        "river": 100,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "충청남도|서산시": {
+      "municipalityLabel": "서산시",
+      "sido": "충청남도",
+      "sigungu": "서산시",
+      "source": "서산시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "ordinance_based",
+      "distances": {
+        "residential": 300,
+        "road": 100,
+        "river": 100,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "경기도|평택시": {
+      "municipalityLabel": "평택시",
+      "sido": "경기도",
+      "sigungu": "평택시",
+      "source": "평택시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "ordinance_based",
+      "distances": {
+        "residential": 200,
+        "road": 100,
+        "river": 100,
+        "school": 300,
+        "cultural": 100
+      }
+    },
+    "전라북도|군산시": {
+      "municipalityLabel": "군산시",
+      "sido": "전라북도",
+      "sigungu": "군산시",
+      "source": "군산시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "ordinance_based",
+      "distances": {
+        "residential": 200,
+        "road": 200,
+        "river": 200,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "전라북도|김제시": {
+      "municipalityLabel": "김제시",
+      "sido": "전라북도",
+      "sigungu": "김제시",
+      "source": "김제시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "needs_verification",
+      "distances": {
+        "residential": 200,
+        "road": 200,
+        "river": 100,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "전라북도|전주시": {
+      "municipalityLabel": "전주시",
+      "sido": "전라북도",
+      "sigungu": "전주시",
+      "source": "전주시 도시계획 조례 [별표 26] 태양광 발전시설 허가기준",
+      "lastUpdated": "2024-04-01",
+      "confidence": "verified",
+      "distances": {
+        "residential": 200,
+        "road": 200,
+        "river": 200,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "전라북도|부안군": {
+      "municipalityLabel": "부안군",
+      "sido": "전라북도",
+      "sigungu": "부안군",
+      "source": "부안군 군계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "needs_verification",
+      "distances": {
+        "residential": 200,
+        "road": 200,
+        "river": 200,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "전라남도|목포시": {
+      "municipalityLabel": "목포시",
+      "sido": "전라남도",
+      "sigungu": "목포시",
+      "source": "목포시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "needs_verification",
+      "distances": {
+        "residential": 200,
+        "road": 100,
+        "river": 200,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "경상남도|사천시": {
+      "municipalityLabel": "사천시",
+      "sido": "경상남도",
+      "sigungu": "사천시",
+      "source": "사천시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "needs_verification",
+      "distances": {
+        "residential": 200,
+        "road": 100,
+        "river": 100,
+        "school": 100,
+        "cultural": 100
+      }
+    },
+    "경상남도|통영시": {
+      "municipalityLabel": "통영시",
+      "sido": "경상남도",
+      "sigungu": "통영시",
+      "source": "통영시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "lastUpdated": "2026-06-23",
+      "confidence": "needs_verification",
+      "distances": {
+        "residential": 200,
+        "road": 100,
+        "river": 100,
+        "school": 100,
+        "cultural": 100
+      }
+    }
+  }
+}

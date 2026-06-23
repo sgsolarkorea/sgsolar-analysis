@@ -10,15 +10,28 @@ import {
   resolveSetbackJudgment,
   SETBACK_SECTION_NOTICE,
 } from "@/lib/regulatory/setbackDisplay";
+import {
+  formatSetbackStandardM,
+  lookupSetbackRegulation,
+  SETBACK_TARGET_DISTANCE_KEY,
+} from "@/lib/regulatory/setbackRegulationDb";
 import type { ParcelContext } from "@/types/siteIntel";
-import type { SetbackReview, SetbackReviewRow } from "@/types/regulatoryReview";
+import type {
+  ResolvedSetbackRegulation,
+  SetbackAppliedStandard,
+  SetbackReview,
+  SetbackReviewRow,
+} from "@/types/regulatoryReview";
+import {
+  buildSetbackStandardColumnLabel,
+  buildSetbackStandardNotice,
+} from "@/lib/regulatory/setbackRegulationDb";
 
-export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
+const SETBACK_GIS_TARGET_DEFS: Omit<SetbackTargetSpec, "standardM">[] = [
   {
     key: "building",
     label: "건물/주거지",
     detail: "인근 건물",
-    standardM: 200,
     layerIds: ["LT_C_SPBD"],
     searchRadiusM: 350,
     featureSize: 100,
@@ -27,7 +40,6 @@ export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
     key: "road",
     label: "도로",
     detail: "포장도로",
-    standardM: 100,
     layerIds: ["LT_C_UPISUQ151", "LT_L_SPRD"],
     searchRadiusM: 250,
     featureSize: 100,
@@ -35,7 +47,6 @@ export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
   {
     key: "river",
     label: "하천",
-    standardM: 100,
     layerIds: ["LT_C_WKMSTRM"],
     searchRadiusM: 350,
     featureSize: 100,
@@ -43,7 +54,6 @@ export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
   {
     key: "school",
     label: "학교",
-    standardM: 100,
     layerIds: ["LT_C_DHSCH", "LT_C_DMSCH", "LT_C_DESCH"],
     searchRadiusM: 350,
     featureSize: 50,
@@ -51,15 +61,30 @@ export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
   {
     key: "cultural",
     label: "문화재보호구역",
-    standardM: 100,
     layerIds: ["LT_C_UO301"],
     searchRadiusM: 350,
     featureSize: 50,
   },
 ];
 
-function formatStandardM(standardM: number): string {
-  return `${standardM}m`;
+function buildTargets(regulation: ResolvedSetbackRegulation): SetbackTargetSpec[] {
+  return SETBACK_GIS_TARGET_DEFS.map((def) => {
+    const distanceKey = SETBACK_TARGET_DISTANCE_KEY[def.key];
+    const standardM = regulation.distances[distanceKey];
+    return { ...def, standardM };
+  });
+}
+
+function buildAppliedStandard(regulation: ResolvedSetbackRegulation): SetbackAppliedStandard {
+  return {
+    municipalityLabel: regulation.municipalityLabel,
+    source: regulation.source,
+    lastUpdated: regulation.lastUpdated,
+    confidence: regulation.confidence,
+    isFallback: regulation.isFallback,
+    notice: buildSetbackStandardNotice(regulation),
+    columnLabel: buildSetbackStandardColumnLabel(regulation),
+  };
 }
 
 function measureToRow(target: SetbackTargetSpec, result: SetbackMeasureResult): SetbackReviewRow {
@@ -67,7 +92,7 @@ function measureToRow(target: SetbackTargetSpec, result: SetbackMeasureResult): 
   return {
     item: target.label,
     detail: target.detail,
-    standard: formatStandardM(target.standardM),
+    standard: formatSetbackStandardM(target.standardM),
     estimatedDistanceM: result.distanceM,
     measured: formatSetbackDistanceDisplay(result.distanceM),
     judgment,
@@ -86,13 +111,20 @@ export interface BuildSetbackFromGisResult extends SetbackReview {
 
 export async function buildSetbackFromGis(
   parcel: ParcelContext,
-  _installType?: string,
-  counter?: VworldFetchCounter,
+  options?: {
+    installType?: string;
+    address?: string;
+    jibunAddress?: string;
+    regulation?: ResolvedSetbackRegulation;
+    counter?: VworldFetchCounter;
+  },
 ): Promise<BuildSetbackFromGisResult> {
-  const results = await measureAllSetbackTargets(parcel, SETBACK_GIS_TARGETS, counter);
-  const rows = SETBACK_GIS_TARGETS.map((target, index) =>
-    measureToRow(target, results[index]),
-  );
+  const regulation =
+    options?.regulation ??
+    lookupSetbackRegulation(options?.address ?? "", options?.jibunAddress ?? "");
+  const targets = buildTargets(regulation);
+  const results = await measureAllSetbackTargets(parcel, targets, options?.counter);
+  const rows = targets.map((target, index) => measureToRow(target, results[index]));
 
   const layerErrors = results
     .filter((result) => result.distanceM == null && result.error)
@@ -110,9 +142,10 @@ export async function buildSetbackFromGis(
 
   return {
     notice: SETBACK_SECTION_NOTICE,
+    appliedStandard: buildAppliedStandard(regulation),
     rows,
     meta: {
-      partial: layerErrors.length > 0 || withDistance < SETBACK_GIS_TARGETS.length,
+      partial: layerErrors.length > 0 || withDistance < targets.length,
       errors: layerErrors.map((entry) => `${entry.key}: ${entry.error}`),
       debug: layerErrors,
       collectedAt: new Date().toISOString(),
@@ -121,3 +154,5 @@ export async function buildSetbackFromGis(
     layerErrors,
   };
 }
+
+export { SETBACK_GIS_TARGET_DEFS as SETBACK_GIS_TARGETS };
