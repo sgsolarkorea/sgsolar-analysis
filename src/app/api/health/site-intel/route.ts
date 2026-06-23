@@ -1,0 +1,90 @@
+import { NextResponse } from "next/server";
+import { searchAddressByKakao } from "@/lib/api/kakao";
+import { getLandInfoByVworld } from "@/lib/api/vworld";
+import { resolveSiteIntel, summarizeSiteIntel } from "@/lib/gis/siteIntel";
+
+const GOLDEN_ADDRESSES = [
+  "충남 논산시 부적면 충곡리 18-4",
+  "충남 서산시 대산읍 기은리 698-6",
+  "경기도 평택시 청북읍 토진리 314-14",
+] as const;
+
+async function resolveAddressForSiteIntel(address: string) {
+  const geo = await searchAddressByKakao(address);
+  const land = await getLandInfoByVworld(geo.lat, geo.lng);
+  const pnu = land.pnu;
+  if (!pnu) {
+    throw new Error(`PNU not resolved for address: ${address}`);
+  }
+  return { pnu, lat: geo.lat, lng: geo.lng };
+}
+
+/** GIS Step 1 진단 — SiteIntelBundle (ParcelContext + getLandUseAttr) */
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const mode = searchParams.get("mode");
+  const skipCache = searchParams.get("skipCache") === "1";
+
+  if (mode === "golden") {
+    const results = [];
+    for (const address of GOLDEN_ADDRESSES) {
+      try {
+        const { pnu, lat, lng } = await resolveAddressForSiteIntel(address);
+        const bundle = await resolveSiteIntel({
+          pnu,
+          lat,
+          lng,
+          skipCache,
+        });
+        results.push({
+          address,
+          ok: Boolean(bundle),
+          summary: bundle ? summarizeSiteIntel(bundle) : { errors: ["resolveSiteIntel returned null"] },
+        });
+      } catch (error) {
+        results.push({
+          address,
+          ok: false,
+          summary: { errors: [error instanceof Error ? error.message : String(error)] },
+        });
+      }
+    }
+    return NextResponse.json({ mode: "golden", skipCache, results });
+  }
+
+  const address = searchParams.get("address")?.trim();
+  if (!address) {
+    return NextResponse.json(
+      { error: "address query required, or use mode=golden" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { pnu, lat, lng } = await resolveAddressForSiteIntel(address);
+    const bundle = await resolveSiteIntel({
+      pnu,
+      lat,
+      lng,
+      skipCache,
+    });
+
+    if (!bundle) {
+      return NextResponse.json(
+        { address, pnu, ok: false, errors: ["resolveSiteIntel returned null"] },
+        { status: 502 },
+      );
+    }
+
+    return NextResponse.json({
+      address,
+      ok: true,
+      summary: summarizeSiteIntel(bundle),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : String(error) },
+      { status: 500 },
+    );
+  }
+}
