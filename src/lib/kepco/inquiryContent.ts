@@ -16,9 +16,15 @@ export const KEPCO_PREP_ITEMS = [
 
 export const KEPCO_DEPARTMENT_HINT = "배전운영부 / 신재생 계통연계 담당";
 
-export const KEPCO_REPRESENTATIVE_PHONE = "123";
+export const KEPCO_FALLBACK_PHONE = "123";
+
+/** @deprecated use KEPCO_FALLBACK_PHONE */
+export const KEPCO_REPRESENTATIVE_PHONE = KEPCO_FALLBACK_PHONE;
 
 export const KEPCO_OFFICE_SOURCE = "한국전력공사 사업소 안내 기준";
+
+export const KEPCO_INQUIRY_CALL_GUIDE =
+  "전화 연결 시 태양광 계통연계 가능용량 확인 및 배전운영부 연결을 요청하세요.";
 
 export const KEPCO_SUPPLEMENTARY_GUIDE =
   "우선 관할 사업소 확인 후 배전운영부 또는 신재생 계통 담당 부서 연결을 권장합니다.";

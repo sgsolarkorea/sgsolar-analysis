@@ -329,7 +329,13 @@ export function reportBaseStyles(): string {
     .kepco-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
     .kepco-list { margin: 4px 0 0; padding-left: 12px; font-size: 7.5pt; color: #475569; line-height: 1.45; }
     .kepco-list li { margin-bottom: 2px; }
-    .kepco-supplement { font-size: 7pt; color: #64748b; line-height: 1.45; border-top: 1px solid #d8e1ea; padding-top: 8px; }
+    .kepco-contact-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;
+    }
+    .kepco-call-guide {
+      font-size: 7pt; color: #334155; line-height: 1.45; border-top: 1px solid #d8e1ea; padding-top: 8px;
+      background: #fff; border-radius: 6px; padding: 6px 8px; margin-top: 4px;
+    }
 
     /* ── Consultation page ── */
     .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }

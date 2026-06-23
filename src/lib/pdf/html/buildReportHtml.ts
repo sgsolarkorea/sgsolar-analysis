@@ -30,9 +30,9 @@ import {
 import { htmlText } from "@/lib/pdf/html/escape";
 import { reportBaseStyles } from "@/lib/pdf/html/reportStyles";
 import {
+  KEPCO_INQUIRY_CALL_GUIDE,
   KEPCO_INQUIRY_TOPICS,
   KEPCO_PREP_ITEMS,
-  KEPCO_SUPPLEMENTARY_GUIDE,
 } from "@/lib/kepco/inquiryContent";
 import { resolveKepcoOffice } from "@/lib/kepco/resolveKepcoOffice";
 
@@ -133,9 +133,19 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
         </div>
         <span class="kepco-status badge ${office.statusLabel === "확인 필요" ? "badge-slate" : office.statusLabel === "관할 확인 권장" ? "badge-amber" : "badge-blue"}">${htmlText(office.statusLabel)}</span>
       </div>
-      <div class="kepco-match-row">
-        <div class="kepco-field-label">매칭 기준</div>
-        <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
+      <div class="kepco-contact-grid">
+        <div>
+          <div class="kepco-field-label">지사 대표번호</div>
+          <div class="kepco-field-val">${htmlText(office.officePhoneDisplay)}</div>
+        </div>
+        <div>
+          <div class="kepco-field-label">보조 연락수단</div>
+          <div class="kepco-field-val">한전 ${htmlText(office.fallbackPhone)}</div>
+        </div>
+        <div>
+          <div class="kepco-field-label">매칭 기준</div>
+          <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
+        </div>
       </div>
       <div class="kepco-match-row meta">
         <div class="kepco-field-label">기준 행정구역</div>
@@ -148,10 +158,6 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
           <div class="kepco-field-label">문의 부서</div>
           <div class="kepco-field-val">${htmlText(office.departmentHint)}</div>
         </div>
-        <div>
-          <div class="kepco-field-label">보조 연락</div>
-          <div class="kepco-field-val">한전 대표번호 ${htmlText(office.representativePhone)}</div>
-        </div>
       </div>
       <div class="kepco-lists">
         <div>
@@ -163,7 +169,7 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
           <ul class="kepco-list">${prep}</ul>
         </div>
       </div>
-      <p class="kepco-supplement">${htmlText(KEPCO_SUPPLEMENTARY_GUIDE)}</p>
+      <p class="kepco-call-guide">${htmlText(KEPCO_INQUIRY_CALL_GUIDE)}</p>
     </div>`;
 }
 

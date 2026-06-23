@@ -2,12 +2,10 @@ import type { KepcoOfficeRegistryEntry } from "@/types/kepco";
 import {
   KEPCO_DEPARTMENT_HINT,
   KEPCO_OFFICE_SOURCE,
-  KEPCO_REPRESENTATIVE_PHONE,
 } from "@/lib/kepco/inquiryContent";
 
 const DEFAULT_ENTRY = {
   departmentHint: KEPCO_DEPARTMENT_HINT,
-  representativePhone: KEPCO_REPRESENTATIVE_PHONE,
   source: KEPCO_OFFICE_SOURCE,
 } as const;
 

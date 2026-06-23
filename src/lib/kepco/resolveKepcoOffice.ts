@@ -5,6 +5,10 @@ import {
   MATCH_LEVEL_SCORE,
 } from "@/lib/kepco/formatMatchBasis";
 import {
+  formatOfficePhoneDisplay,
+  lookupKepcoOfficePhone,
+} from "@/lib/kepco/kepcoOfficePhoneDb";
+import {
   formatParsedAddressMeta,
   mergeParsedAddresses,
   parseKepcoAddress,
@@ -13,11 +17,12 @@ import {
   KEPCO_DEPARTMENT_HINT,
   KEPCO_FALLBACK_INQUIRY_GUIDE,
   KEPCO_FALLBACK_OFFICE_NAME,
+  KEPCO_FALLBACK_PHONE,
   KEPCO_OFFICE_SOURCE,
-  KEPCO_REPRESENTATIVE_PHONE,
 } from "@/lib/kepco/inquiryContent";
 import type {
   KepcoOfficeConfidence,
+  KepcoOfficePhoneStatus,
   KepcoOfficeRegistryEntry,
   ParsedKepcoAddress,
   ResolvedKepcoOffice,
@@ -52,12 +57,36 @@ function pickBestMatch(
   })[0];
 }
 
-function buildFallback(parsed: ParsedKepcoAddress): ResolvedKepcoOffice {
+function attachPhoneFields(
+  base: Omit<
+    ResolvedKepcoOffice,
+    | "officePhone"
+    | "officePhoneDisplay"
+    | "fallbackPhone"
+    | "phoneStatus"
+    | "phoneSource"
+    | "phoneLastCheckedAt"
+  >,
+): ResolvedKepcoOffice {
+  const phoneEntry = lookupKepcoOfficePhone(base.officeName);
+  const officePhone = phoneEntry?.officePhone ?? null;
+
   return {
+    ...base,
+    officePhone,
+    officePhoneDisplay: formatOfficePhoneDisplay(officePhone),
+    fallbackPhone: phoneEntry?.fallbackPhone ?? KEPCO_FALLBACK_PHONE,
+    phoneStatus: phoneEntry?.phoneStatus ?? ("unknown" satisfies KepcoOfficePhoneStatus),
+    phoneSource: phoneEntry?.source ?? KEPCO_OFFICE_SOURCE,
+    phoneLastCheckedAt: phoneEntry?.lastCheckedAt ?? null,
+  };
+}
+
+function buildFallback(parsed: ParsedKepcoAddress): ResolvedKepcoOffice {
+  return attachPhoneFields({
     parsedAddress: parsed,
     officeName: KEPCO_FALLBACK_OFFICE_NAME,
     departmentHint: KEPCO_DEPARTMENT_HINT,
-    representativePhone: KEPCO_REPRESENTATIVE_PHONE,
     source: KEPCO_OFFICE_SOURCE,
     matchLevel: "unknown",
     confidence: "unknown",
@@ -66,17 +95,16 @@ function buildFallback(parsed: ParsedKepcoAddress): ResolvedKepcoOffice {
     parsedMeta: formatParsedAddressMeta(parsed),
     inquiryGuide: KEPCO_FALLBACK_INQUIRY_GUIDE,
     verificationNote: null,
-  };
+  });
 }
 
 function buildResolved(entry: KepcoOfficeRegistryEntry, parsed: ParsedKepcoAddress): ResolvedKepcoOffice {
   const isFallbackOffice = entry.officeName === KEPCO_FALLBACK_OFFICE_NAME;
 
-  return {
+  return attachPhoneFields({
     parsedAddress: parsed,
     officeName: entry.officeName,
     departmentHint: entry.departmentHint,
-    representativePhone: entry.representativePhone,
     source: entry.source,
     matchLevel: entry.matchLevel,
     confidence: entry.confidence,
@@ -85,7 +113,7 @@ function buildResolved(entry: KepcoOfficeRegistryEntry, parsed: ParsedKepcoAddre
     parsedMeta: formatParsedAddressMeta(parsed),
     inquiryGuide: isFallbackOffice ? KEPCO_FALLBACK_INQUIRY_GUIDE : null,
     verificationNote: entry.verificationNote ?? null,
-  };
+  });
 }
 
 export function resolveKepcoOffice(address: string, jibunAddress = ""): ResolvedKepcoOffice {

@@ -333,7 +333,7 @@ export default function GridConnectionSection({
 
         {/* 계통 검토 요약 + 한전 사업소 문의 */}
         <div className="border-t border-slate-100 px-5 py-6 sm:px-6 sm:py-7">
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] xl:items-start">
+          <div className="space-y-5">
             <div className="min-w-0">
               {hasDetails ? (
                 <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
