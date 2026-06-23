@@ -1,8 +1,12 @@
-import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-core";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const MAP_WIDTH = 720;
 const MAP_HEIGHT = 320;
+
+/** Vercel 번들에 bin이 누락될 때 사용 — @sparticuz/chromium 버전과 맞춤 */
+const CHROMIUM_PACK_URL =
+  "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar";
 
 export async function renderHtmlToPdf(html: string): Promise<Uint8Array> {
   const browser = await launchBrowser();
@@ -25,18 +29,39 @@ export async function renderHtmlToPdf(html: string): Promise<Uint8Array> {
   }
 }
 
+async function resolveChromiumExecutable(chromium: {
+  executablePath: (input?: string) => Promise<string>;
+  setGraphicsMode: boolean;
+}): Promise<string> {
+  const localBin = join(process.cwd(), "node_modules", "@sparticuz", "chromium", "bin");
+
+  if (existsSync(localBin)) {
+    return chromium.executablePath(localBin);
+  }
+
+  return chromium.executablePath(CHROMIUM_PACK_URL);
+}
+
 async function launchBrowser() {
   const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
   if (isServerless) {
-    return puppeteer.launch({
+    const puppeteer = await import("puppeteer-core");
+    const chromiumModule = await import("@sparticuz/chromium");
+    const chromium = chromiumModule.default;
+
+    chromium.setGraphicsMode = false;
+    const executablePath = await resolveChromiumExecutable(chromium);
+
+    return puppeteer.default.launch({
       args: [...chromium.args, "--hide-scrollbars", "--disable-web-security", "--font-render-hinting=none"],
       defaultViewport: { width: 794, height: 1123, deviceScaleFactor: 2 },
-      executablePath: await chromium.executablePath(),
+      executablePath,
       headless: true,
     });
   }
 
+  const puppeteer = await import("puppeteer-core");
   const localChrome =
     process.env.CHROME_PATH ||
     (process.platform === "win32"
@@ -46,15 +71,20 @@ async function launchBrowser() {
         : "/usr/bin/google-chrome");
 
   try {
-    return await puppeteer.launch({
+    return await puppeteer.default.launch({
       executablePath: localChrome,
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--font-render-hinting=none"],
     });
   } catch {
-    return puppeteer.launch({
+    const chromiumModule = await import("@sparticuz/chromium");
+    const chromium = chromiumModule.default;
+    chromium.setGraphicsMode = false;
+    const executablePath = await resolveChromiumExecutable(chromium);
+
+    return puppeteer.default.launch({
       args: [...chromium.args, "--no-sandbox"],
-      executablePath: await chromium.executablePath(),
+      executablePath,
       headless: true,
     });
   }

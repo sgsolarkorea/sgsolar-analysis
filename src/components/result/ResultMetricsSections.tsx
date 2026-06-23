@@ -12,7 +12,6 @@ import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
 import { isHouseholdInstallType } from "@/lib/solar/householdSavings";
-import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { formatHouseholdMonthlySavings } from "@/lib/solar/householdSavings";
 
 interface ResultSiteOverviewProps {
@@ -45,7 +44,7 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
         annualRevenue={annualRevenue}
         constructionCost={constructionCost}
         recommendation={recommendation}
-        recWeight={formatRecWeightDisplay(metrics.recWeight)}
+        recWeight="별도 검토"
         isHousehold={isHousehold}
         thirdKpiLabel={isHousehold ? "월 예상 절감액" : undefined}
         thirdKpiValue={isHousehold ? formatHouseholdMonthlySavings(metrics.capacityKw) : undefined}
@@ -97,7 +96,7 @@ export function ResultRevenueSection({ showMountainRecNote = false }: { showMoun
   }
 
   return (
-    <RevenueAnalysis profitability={profitability} showMountainRecNote={showMountainRecNote} />
+    <RevenueAnalysis profitability={profitability} />
   );
 }
 

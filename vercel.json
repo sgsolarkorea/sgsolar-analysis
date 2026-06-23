@@ -3,5 +3,12 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "regions": ["icn1"]
+  "regions": ["icn1"],
+  "functions": {
+    "src/app/api/report/pdf/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "node_modules/@sparticuz/chromium/**"
+    }
+  }
 }

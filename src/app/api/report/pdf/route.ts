@@ -13,6 +13,8 @@ import {
 } from "@/lib/solar/calculate";
 import type { ParcelSnapshot } from "@/types/parcelReview";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 interface PdfPostBody {
