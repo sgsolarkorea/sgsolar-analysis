@@ -306,6 +306,10 @@ export const result: Omit<
     ],
     sourceNote: "샘플 데이터 기준 참고",
   },
+  layerARegulatoryAnalysis: {
+    rows: [],
+    sourceNote: "샘플 데이터 기준 참고",
+  },
   buildingInfo: [
     { label: "건물 용도", value: "업무시설 (근린생활시설)", status: "상담 시 확인" },
     { label: "구조", value: "철근콘크리트", status: "상담 시 확인" },

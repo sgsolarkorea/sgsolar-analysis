@@ -1,4 +1,4 @@
-import type { LandInfoDetail, RegionDistrictAnalysis } from "@/types/landInfo";
+import type { LandInfoDetail, LayerARegulatoryAnalysis, RegionDistrictAnalysis } from "@/types/landInfo";
 import type { GridConnectionInfo } from "@/types/gridConnection";
 
 export type Grade = "A" | "B" | "C" | "D";
@@ -174,6 +174,7 @@ export interface SiteReviewResult {
   landInfo: InfoField[];
   landInfoDetail: LandInfoDetail;
   regionDistrictAnalysis: RegionDistrictAnalysis;
+  layerARegulatoryAnalysis: LayerARegulatoryAnalysis;
   buildingInfo: InfoField[];
   gridInfo: GridInfo;
   ordinanceInfo: OrdinanceItem[];

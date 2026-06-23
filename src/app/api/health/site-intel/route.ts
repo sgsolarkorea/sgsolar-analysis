@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { searchAddressByKakao } from "@/lib/api/kakao";
 import { getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveSiteIntel, summarizeSiteIntel } from "@/lib/gis/siteIntel";
+import { buildRegionDistrictFromGis } from "@/lib/regulatory/buildRegionDistrictFromGis";
+import { buildLayerARegulatoryAnalysis } from "@/lib/regulatory/buildLayerARegulatory";
 
 const GOLDEN_ADDRESSES = [
   "충남 논산시 부적면 충곡리 18-4",
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
   const mode = searchParams.get("mode");
   const skipCache = searchParams.get("skipCache") === "1";
 
-  if (mode === "golden") {
+  if (mode === "golden" || mode === "step2") {
     const results = [];
     for (const address of GOLDEN_ADDRESSES) {
       try {
@@ -36,10 +38,26 @@ export async function GET(request: Request) {
           lng,
           skipCache,
         });
+        const regionDistrict = bundle
+          ? buildRegionDistrictFromGis(bundle.landUseAttributes, bundle.meta.collectedAt)
+          : null;
+        const regulatory = bundle
+          ? buildLayerARegulatoryAnalysis(bundle.landUseAttributes, bundle.meta.collectedAt)
+          : null;
+
         results.push({
           address,
           ok: Boolean(bundle),
           summary: bundle ? summarizeSiteIntel(bundle) : { errors: ["resolveSiteIntel returned null"] },
+          regionDistrictRows: regionDistrict?.rows.map((r) => ({
+            district: r.district,
+            feasibility: r.feasibility,
+          })),
+          regulatoryRows: regulatory?.rows.map((r) => ({
+            item: r.item,
+            matchedZone: r.matchedZone,
+            level: r.level,
+          })),
         });
       } catch (error) {
         results.push({
@@ -49,7 +67,7 @@ export async function GET(request: Request) {
         });
       }
     }
-    return NextResponse.json({ mode: "golden", skipCache, results });
+    return NextResponse.json({ mode, skipCache, results });
   }
 
   const address = searchParams.get("address")?.trim();

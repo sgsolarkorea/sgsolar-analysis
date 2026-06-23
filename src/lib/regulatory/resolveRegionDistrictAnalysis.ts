@@ -1,6 +1,8 @@
 import type { LandInfoDetail, RegionDistrictAnalysis, RegionDistrictFeasibility, RegionDistrictRow } from "@/types/landInfo";
 import { getFieldValue } from "@/lib/solar/calculate";
 import type { InfoField } from "@/types/siteReview";
+import type { LandUseAttrItem } from "@/types/siteIntel";
+import { buildRegionDistrictFromGis } from "@/lib/regulatory/buildRegionDistrictFromGis";
 
 interface DistrictTemplate {
   district: string;
@@ -155,7 +157,7 @@ function resolveRow(template: DistrictTemplate, context: string, hasLandData: bo
   };
 }
 
-export function resolveRegionDistrictAnalysis(
+function resolveLegacyRegionDistrictAnalysis(
   landInfo: InfoField[],
   landDetail?: LandInfoDetail,
 ): RegionDistrictAnalysis {
@@ -175,4 +177,17 @@ export function resolveRegionDistrictAnalysis(
         ? "VWorld 토지특성·용도지역 기준 1차 확인 결과입니다. 조례·인허가 세부 기준은 상담 시 추가 검토합니다."
         : "토지정보 확인 후 지역·지구 분석이 정확해집니다.",
   };
+}
+
+export function resolveRegionDistrictAnalysis(
+  landInfo: InfoField[],
+  landDetail?: LandInfoDetail,
+  landUseAttributes?: LandUseAttrItem[],
+  collectedAt?: string,
+): RegionDistrictAnalysis {
+  if (landUseAttributes && landUseAttributes.length > 0) {
+    return buildRegionDistrictFromGis(landUseAttributes, collectedAt);
+  }
+
+  return resolveLegacyRegionDistrictAnalysis(landInfo, landDetail);
 }

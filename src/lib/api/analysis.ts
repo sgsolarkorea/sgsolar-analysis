@@ -18,6 +18,8 @@ import { buildPnu } from "@/lib/api/pnu";
 import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/recommendCases";
 import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveRegionDistrictAnalysis } from "@/lib/regulatory/resolveRegionDistrictAnalysis";
+import { buildLayerARegulatoryAnalysis } from "@/lib/regulatory/buildLayerARegulatory";
+import { resolveSiteIntel } from "@/lib/gis/siteIntel";
 import type { LandInfoDetail } from "@/types/landInfo";
 import {
   fetchSiteGeometryBundle,
@@ -287,7 +289,22 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     capacityKw: solarMetrics.capacityKw,
     pnu: effectivePnu ?? undefined,
   });
-  const regionDistrictAnalysis = resolveRegionDistrictAnalysis(landInfo, landInfoDetail);
+
+  const siteIntel =
+    effectivePnu != null && effectivePnu !== ""
+      ? await resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng })
+      : null;
+
+  const regionDistrictAnalysis = resolveRegionDistrictAnalysis(
+    landInfo,
+    landInfoDetail,
+    siteIntel?.landUseAttributes,
+    siteIntel?.meta.collectedAt,
+  );
+  const layerARegulatoryAnalysis = buildLayerARegulatoryAnalysis(
+    siteIntel?.landUseAttributes ?? [],
+    siteIntel?.meta.collectedAt,
+  );
 
   return {
     address: geo.address,
@@ -302,6 +319,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     landInfo,
     landInfoDetail,
     regionDistrictAnalysis,
+    layerARegulatoryAnalysis,
     buildingInfo,
     gridInfo,
     profitability,

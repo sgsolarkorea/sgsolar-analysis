@@ -14,14 +14,33 @@ interface RegionDistrictSectionProps {
 }
 
 export default function RegionDistrictSection({ analysis }: RegionDistrictSectionProps) {
+  const confirmedAt = analysis.collectedAt
+    ? new Intl.DateTimeFormat("ko-KR", {
+        timeZone: "Asia/Seoul",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+        .format(new Date(analysis.collectedAt))
+        .replace(/\./g, "-")
+        .replace(/\s/g, "")
+        .replace(/-$/, "")
+    : null;
+
   return (
     <section id="region-district" className="scroll-mt-24">
       <SectionHeader
         title="지역/지구 분석"
-        description="토지이용계획·용도지역 기준 지역·지구별 설치 검토 가능성입니다."
+        description="VWorld 토지이용계획 기준 용도지역·지구·구역 1차 확인 결과입니다."
       />
 
       <div className="card-premium overflow-hidden">
+        {(analysis.dataSource || confirmedAt) && (
+          <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 text-xs text-slate-600">
+            {analysis.dataSource ?? "VWorld 토지이용계획"}
+            {confirmedAt ? ` · 확인일 ${confirmedAt}` : ""}
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-600">

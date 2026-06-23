@@ -8,6 +8,7 @@ import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import MapArea from "@/components/result/MapArea";
 import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import RegionDistrictSection from "@/components/result/RegionDistrictSection";
+import RegulatoryAnalysisSection from "@/components/result/RegulatoryAnalysisSection";
 import DetailInfoSection from "@/components/result/DetailInfoSection";
 import GridConnectionSection from "@/components/result/GridConnectionSection";
 import SetbackReviewSection from "@/components/result/SetbackReviewSection";
@@ -130,6 +131,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
               <LandInfoCardSection detail={data.landInfoDetail} />
               <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
+              <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
 
               <DetailInfoSection
                 id="building-info"

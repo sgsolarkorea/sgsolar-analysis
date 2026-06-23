@@ -108,15 +108,17 @@ function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
         <DisplayStatusBadge meta={meta} />
         <span className="text-sm font-semibold text-slate-900">{meta.municipalityLabel}</span>
       </div>
-      <h3 className="mt-4 text-lg font-bold text-slate-900">지자체 조례 기준 상세 검토가 필요합니다.</h3>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">
+        해당 지자체 조례 세부 기준은 상담 시 확인합니다.
+      </h3>
       <p className="mt-3 text-sm leading-relaxed text-slate-600">
-        해당 지역({meta.municipalityLabel}) 조례 세부 기준은 상담 시 확인합니다. 아래 이격거리
-        검토와 기본 법령 정보를 참고해 주세요.
+        위 법·규제 분석은 공공 GIS 기준 1차 검토입니다. {meta.municipalityLabel} 조례·인허가
+        세부 기준은 상담 시 함께 검토합니다.
       </p>
       <p className="mt-4 text-sm font-medium text-slate-500">
         {meta.status === "review"
           ? "관리자 검토 후 조례 요약이 업데이트됩니다."
-          : "상담 시 조례 세부 기준을 함께 검토합니다."}
+          : "조례 원문·세부 거리 기준은 상담 시 안내합니다."}
       </p>
     </div>
   );
@@ -127,7 +129,7 @@ export default function LocalOrdinanceSection({ review, meta }: LocalOrdinanceSe
     return (
       <section id="local-ordinance" className="scroll-mt-24">
         <SectionHeader
-          title="법·조례 검토"
+          title="지자체 조례 검토"
           description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
         />
         <OrdinancePreparingPanel meta={meta} />
@@ -138,7 +140,7 @@ export default function LocalOrdinanceSection({ review, meta }: LocalOrdinanceSe
   return (
     <section id="local-ordinance" className="scroll-mt-24">
       <SectionHeader
-        title="법·조례 검토"
+        title="지자체 조례 검토"
         description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약했습니다."
       />
 
