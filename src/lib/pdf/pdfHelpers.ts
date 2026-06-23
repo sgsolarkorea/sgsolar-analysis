@@ -586,6 +586,34 @@ export function drawInfoCard(
   }
 }
 
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
+
+function isPngBytes(bytes: Uint8Array): boolean {
+  return (
+    bytes.length >= 4 &&
+    bytes[0] === PNG_MAGIC[0] &&
+    bytes[1] === PNG_MAGIC[1] &&
+    bytes[2] === PNG_MAGIC[2] &&
+    bytes[3] === PNG_MAGIC[3]
+  );
+}
+
+function logStaticMapFailure(
+  label: string,
+  url: string,
+  response: Response,
+  bodyHead: string,
+): void {
+  console.warn(
+    `[PDF map] ${label} failed: status=${response.status} content-type=${response.headers.get("content-type") ?? "unknown"} url=${url} body=${bodyHead.slice(0, 200)}`,
+  );
+}
+
+/**
+ * Kakao는 서버용 Static Map REST API를 공식 제공하지 않아 404가 반환됩니다.
+ * PDF 지도는 Puppeteer + Kakao JS SDK(StaticMap)로 렌더링합니다.
+ * 이 함수는 보조 시도·진단용이며 PNG가 아닌 응답은 null을 반환합니다.
+ */
 export async function fetchKakaoStaticMap(
   lat: number,
   lng: number,
@@ -597,26 +625,57 @@ export async function fetchKakaoStaticMap(
   },
 ): Promise<Uint8Array | null> {
   const apiKey = process.env.KAKAO_REST_API_KEY?.trim();
-  if (!apiKey) return null;
-
-  const size = options?.size ?? "480x160";
-  const level = options?.level ?? 4;
-  const maptype = options?.maptype ?? "roadmap";
-  const marker = options?.marker !== false ? `&marker=${lng},${lat}` : "";
-  const url =
-    `https://apis.map.kakao.com/maps/v3/staticmap?center=${lng},${lat}` +
-    `&level=${level}&size=${size}&maptype=${maptype}${marker}`;
-
-  try {
-    const response = await fetch(url, {
-      headers: { Authorization: `KakaoAK ${apiKey}` },
-      cache: "no-store",
-    });
-    if (!response.ok) return null;
-    return new Uint8Array(await response.arrayBuffer());
-  } catch {
+  if (!apiKey) {
+    console.warn("[PDF map] KAKAO_REST_API_KEY not configured — use Kakao JS SDK in PDF HTML");
     return null;
   }
+
+  const [width, height] = (options?.size ?? "720x320").split("x").map((v) => parseInt(v, 10));
+  const level = options?.level ?? 4;
+  const maptype = options?.maptype ?? "roadmap";
+  const marker =
+    options?.marker !== false ? `&markers=${lng},${lat}` : "";
+
+  const attempts: { label: string; url: string }[] = [
+    {
+      label: maptype,
+      url:
+        `https://apis.map.kakao.com/maps/v3/staticmap?center=${lng},${lat}` +
+        `&level=${level}&w=${width}&h=${height}&maptype=${maptype}${marker}`,
+    },
+  ];
+
+  if (maptype === "hybrid") {
+    attempts.push({
+      label: "roadmap-retry",
+      url:
+        `https://apis.map.kakao.com/maps/v3/staticmap?center=${lng},${lat}` +
+        `&level=${level}&w=${width}&h=${height}&maptype=roadmap${marker}`,
+    });
+  }
+
+  for (const { label, url } of attempts) {
+    try {
+      const response = await fetch(url, {
+        headers: { Authorization: `KakaoAK ${apiKey}` },
+        cache: "no-store",
+      });
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      const head = Buffer.from(bytes.slice(0, 120)).toString("utf8");
+
+      if (!response.ok || !isPngBytes(bytes)) {
+        logStaticMapFailure(label, url, response, head);
+        continue;
+      }
+
+      console.info(`[PDF map] REST ${label} succeeded (${bytes.length} bytes)`);
+      return bytes;
+    } catch (error) {
+      console.warn(`[PDF map] ${label} fetch error:`, error);
+    }
+  }
+
+  return null;
 }
 
 const M_PER_DEG_LAT = 110_540;

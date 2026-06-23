@@ -14,7 +14,10 @@ export async function renderHtmlToPdf(html: string): Promise<Uint8Array> {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
-    await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    await page.setContent(html, {
+      waitUntil: "domcontentloaded",
+      timeout: 45_000,
+    });
     await waitForDocumentImages(page);
 
     const pdf = await page.pdf({
@@ -62,8 +65,9 @@ async function resolveChromiumExecutable(chromium: {
   return chromium.executablePath(CHROMIUM_PACK_URL);
 }
 
-async function launchBrowser() {
+export async function launchBrowser() {
   const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  const securityArgs = ["--disable-web-security", "--disable-features=IsolateOrigins,site-per-process"];
 
   if (isServerless) {
     const puppeteer = await import("puppeteer-core");
@@ -74,7 +78,7 @@ async function launchBrowser() {
     const executablePath = await resolveChromiumExecutable(chromium);
 
     return puppeteer.default.launch({
-      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security", "--font-render-hinting=none"],
+      args: [...chromium.args, "--hide-scrollbars", ...securityArgs, "--font-render-hinting=none"],
       defaultViewport: { width: 794, height: 1123, deviceScaleFactor: 2 },
       executablePath,
       headless: true,
@@ -94,7 +98,7 @@ async function launchBrowser() {
     return await puppeteer.default.launch({
       executablePath: localChrome,
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--font-render-hinting=none"],
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--font-render-hinting=none", ...securityArgs],
     });
   } catch {
     const chromiumModule = await import("@sparticuz/chromium");
@@ -103,11 +107,11 @@ async function launchBrowser() {
     const executablePath = await resolveChromiumExecutable(chromium);
 
     return puppeteer.default.launch({
-      args: [...chromium.args, "--no-sandbox"],
+      args: [...chromium.args, "--no-sandbox", ...securityArgs],
       executablePath,
       headless: true,
     });
   }
 }
 
-export { MAP_WIDTH, MAP_HEIGHT };
+export { MAP_WIDTH, MAP_HEIGHT, waitForDocumentImages };

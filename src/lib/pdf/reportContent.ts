@@ -15,7 +15,7 @@ export const PDF_SETBACK_FOOTER =
 export const PDF_SETBACK_COMMON_NOTICE =
   "현재 기준거리는 지자체별 조례 DB 적용 전의 공통 참고 기준입니다. 실제 기준은 지자체 조례에 따라 달라질 수 있습니다.";
 
-export const PDF_SETBACK_STANDARD_COLUMN = "공통 참고 기준";
+export const PDF_SETBACK_STANDARD_COLUMN = "공통 기준";
 
 export const PDF_GRID_GUIDANCE = [
   "계통연계 가능 여부는 관할 한전 사업소의 접속 가능 용량 확인이 필요합니다.",
@@ -33,7 +33,18 @@ export const PDF_CONSULTATION_CHECKLIST = [
 ];
 
 export const PDF_CTA =
-  "보다 정확한 설치 가능 여부와 예상 수익성은 현장 확인 및 전문 상담을 통해 안내드립니다.";
+  "SG SOLAR가 현장 조건, 계통 가능성, 인허가 리스크를 함께 검토해드립니다.";
+
+export const PDF_CTA_BUTTON = "전문 상담 요청";
+
+export const PDF_REPORT_SUBTITLE = "공공데이터 기반 태양광 입지·용량·계통 사전 검토";
+
+export const PDF_PROCESS_STEPS = [
+  { step: 1, title: "주소 검토", desc: "입지 주소 및 토지·건물 공공데이터 확인" },
+  { step: 2, title: "현장 확인", desc: "실측 및 설치 조건·장애물 검토" },
+  { step: 3, title: "계통·인허가 검토", desc: "한전 접속·지자체 인허가 가능성 검토" },
+  { step: 4, title: "견적 및 상담", desc: "설비 규모·수익성·공사 견적 상담" },
+] as const;
 
 export type PdfStatusTone = "blue" | "orange" | "amber" | "gray";
 
@@ -78,4 +89,12 @@ export function deriveOverallReviewStatus(data: ResolvedSiteReview): string {
 
 export function formatInstallTypeForPdf(installType: string): string {
   return formatInstallTypeDisplayLabel(installType as InstallTypeOption);
+}
+
+export function deriveExecutiveSummary(data: ResolvedSiteReview): string {
+  const installType = formatInstallTypeForPdf(data.solarMetrics.installType);
+  return (
+    `본 부지는 공공데이터 기준으로 약 ${data.capacity} 규모의 ${installType} 태양광 설치 검토가 가능한 후보지입니다. ` +
+    "다만 지자체 조례, 이격거리, 계통 접속 가능 여부는 현장 확인 및 관할기관 확인이 필요합니다."
+  );
 }

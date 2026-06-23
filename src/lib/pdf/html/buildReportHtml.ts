@@ -12,11 +12,15 @@ import {
 import {
   PDF_CONSULTATION_CHECKLIST,
   PDF_CTA,
+  PDF_CTA_BUTTON,
   PDF_LEGAL_DISCLAIMER,
+  PDF_PROCESS_STEPS,
+  PDF_REPORT_SUBTITLE,
   PDF_REPORT_TITLE,
   PDF_SETBACK_COMMON_NOTICE,
   PDF_SETBACK_FOOTER,
   PDF_SETBACK_STANDARD_COLUMN,
+  deriveExecutiveSummary,
   deriveOverallReviewStatus,
   formatInstallTypeForPdf,
 } from "@/lib/pdf/reportContent";
@@ -31,6 +35,7 @@ export interface HtmlReportAssets {
   mapWidth: number;
   mapHeight: number;
   mapAvailable: boolean;
+  mapFailureReason?: string | null;
 }
 
 const REGULATORY_BADGE: Record<LayerARegulatoryLevel, string> = {
@@ -83,16 +88,38 @@ function barClass(remaining: number | null, expectedMw: number): string {
   return "rem";
 }
 
+function renderLocationFallback(data: ResolvedSiteReview, reason: string): string {
+  const reasonNote =
+    reason === "no-js-key"
+      ? "지도 API 설정이 필요합니다."
+      : "지도 이미지를 불러오지 못했습니다. 현장 상담 시 위치를 함께 재확인합니다.";
+
+  return `
+    <div class="location-card">
+      <div class="loc-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>
+        </svg>
+      </div>
+      <div class="loc-body">
+        <div class="loc-title">위치 확인 정보</div>
+        <div class="loc-row"><span class="loc-label">주소</span><span class="loc-val">${htmlText(data.address)}</span></div>
+        <div class="loc-row"><span class="loc-label">좌표</span><span class="loc-val">${htmlText(data.lat.toFixed(5))}, ${htmlText(data.lng.toFixed(5))}</span></div>
+        <div class="loc-note">${htmlText(reasonNote)}</div>
+      </div>
+    </div>`;
+}
+
 function renderMapBlock(data: ResolvedSiteReview, assets: HtmlReportAssets): string {
-  const mapBody = assets.mapAvailable && assets.mapDataUrl
-    ? `<div class="map-wrap">
-        <img src="${assets.mapDataUrl}" alt="입지 위치 지도" width="${assets.mapWidth}" height="${assets.mapHeight}" />
-        ${assets.mapOverlaySvg ? `<svg viewBox="0 0 ${assets.mapWidth} ${assets.mapHeight}" preserveAspectRatio="none">${assets.mapOverlaySvg}</svg>` : ""}
-      </div>`
-    : `<div class="map-fallback">
-        <div class="fb-title">지도 정보를 불러오지 못했습니다</div>
-        <div class="fb-desc">좌표: ${htmlText(data.lat.toFixed(5))}, ${htmlText(data.lng.toFixed(5))}<br/>상담 시 현장 위치를 함께 확인합니다.</div>
-      </div>`;
+  const mapBody =
+    assets.mapAvailable && assets.mapDataUrl
+      ? `<div class="map-stage">
+          <div class="map-wrap">
+            <img src="${assets.mapDataUrl}" alt="입지 위치 지도" width="${assets.mapWidth}" height="${assets.mapHeight}" />
+          </div>
+          ${assets.mapOverlaySvg ? `<svg class="map-overlay" viewBox="0 0 ${assets.mapWidth} ${assets.mapHeight}" preserveAspectRatio="none">${assets.mapOverlaySvg}</svg>` : ""}
+        </div>`
+      : renderLocationFallback(data, assets.mapFailureReason ?? "no-key");
 
   return `
     <div class="map-card avoid-break">
@@ -102,42 +129,6 @@ function renderMapBlock(data: ResolvedSiteReview, assets: HtmlReportAssets): str
       </div>
       ${mapBody}
       <div class="map-caption">${htmlText(data.address)}</div>
-    </div>`;
-}
-
-function renderHighlightGrid(data: ResolvedSiteReview, overallStatus: string): string {
-  const regRows = data.layerARegulatoryAnalysis?.rows ?? [];
-  const setRows = data.setbackReview?.rows ?? [];
-
-  const regItems = regRows.slice(0, 3).map((row) =>
-    `<div class="hl-item"><strong>${htmlText(row.item)}</strong> · ${badge(row.level, REGULATORY_BADGE)}</div>`,
-  );
-  if (regItems.length === 0) {
-    regItems.push(`<div class="hl-item">규제 1차 검토 데이터 확인 필요</div>`);
-  }
-
-  const setItems = setRows.slice(0, 3).map((row) =>
-    `<div class="hl-item"><strong>${htmlText(row.item)}</strong> · ${htmlText(row.measured)} · ${badge(row.judgment, SETBACK_BADGE)}</div>`,
-  );
-  if (setItems.length === 0) {
-    setItems.push(`<div class="hl-item">이격거리 검토 데이터 확인 필요</div>`);
-  }
-
-  return `
-    <div class="highlight-grid avoid-break">
-      <div class="highlight-card">
-        <div class="hl-label">종합 검토</div>
-        <div class="hl-item"><strong>${htmlText(overallStatus)}</strong></div>
-        <div class="hl-item">설비 ${htmlText(data.capacity)} · ${htmlText(formatInstallTypeForPdf(data.solarMetrics.installType))}</div>
-      </div>
-      <div class="highlight-card">
-        <div class="hl-label">법·규제 요약</div>
-        ${regItems.join("")}
-      </div>
-      <div class="highlight-card">
-        <div class="hl-label">이격거리 요약</div>
-        ${setItems.join("")}
-      </div>
     </div>`;
 }
 
@@ -157,10 +148,21 @@ function renderChecklistSection(): string {
     </div>`;
 }
 
-function renderGridBars(
-  data: ResolvedSiteReview,
-  expectedMw: number,
-): string {
+function renderProcessSteps(): string {
+  return `
+    <div class="process-grid avoid-break">
+      ${PDF_PROCESS_STEPS.map(
+        (step) => `
+        <div class="process-card">
+          <div class="step-num">${step.step}</div>
+          <div class="step-title">${htmlText(step.title)}</div>
+          <div class="step-desc">${htmlText(step.desc)}</div>
+        </div>`,
+      ).join("")}
+    </div>`;
+}
+
+function renderGridBars(data: ResolvedSiteReview, expectedMw: number): string {
   const grid = data.gridInfo;
   if (!hasDetailedGridData(grid)) {
     return `
@@ -181,13 +183,11 @@ function renderGridBars(
       const cum = level.cumulativeMw;
       const pct = barPct(rem, cum);
       const cls = barClass(rem, expectedMw);
-      const remText = formatGridCapacityMwOrKw(rem);
-      const cumText = formatGridCapacityMwOrKw(cum);
       return `
         <div class="bar-row">
           <div class="bar-meta">
             <span class="bar-label">${htmlText(key)}</span>
-            <span class="bar-val">잔여 ${htmlText(remText)} · 누적 ${htmlText(cumText)}</span>
+            <span class="bar-val">잔여 ${htmlText(formatGridCapacityMwOrKw(rem))} · 누적 ${htmlText(formatGridCapacityMwOrKw(cum))}</span>
           </div>
           <div class="bar-track">
             <div class="bar-fill cum" style="width:100%"></div>
@@ -197,15 +197,19 @@ function renderGridBars(
     })
     .join("");
 
+  const reviewNote = grid.reviewResult
+    ? htmlText(grid.reviewResult)
+    : "계통 연계 가능 여부는 한전 접속 가능 용량 확인이 필요합니다.";
+
   return `
     <div class="bar-section avoid-break">
-      <h3>잔여용량 시각화 (공공데이터 1차 참고)</h3>
+      <h3>잔여용량 (공공데이터 1차 참고)</h3>
       ${bars}
       <div class="bar-legend">
-        <span class="legend-cum">누적연계용량 기준</span>
-        <span class="legend-rem">잔여용량 비율</span>
+        <span class="legend-cum">누적연계용량</span>
+        <span class="legend-rem">잔여용량</span>
       </div>
-      <p style="margin-top:10px;font-size:8pt;color:#64748b;line-height:1.5">${htmlText(grid.reviewResult || "계통 연계 가능 여부는 한전 접속 가능 용량 확인이 필요합니다.")}</p>
+      <p style="margin-top:10px;font-size:7.5pt;color:#64748b;line-height:1.5">${reviewNote}</p>
     </div>`;
 }
 
@@ -213,6 +217,7 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
   const m = data.solarMetrics;
   const installType = formatInstallTypeForPdf(m.installType);
   const overallStatus = deriveOverallReviewStatus(data);
+  const executiveSummary = deriveExecutiveSummary(data);
   const expectedMw = Math.round((m.capacityKw / 1000) * 1000) / 1000;
   const grid = data.gridInfo;
   const hasGrid = hasDetailedGridData(grid);
@@ -226,15 +231,12 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
       : "확인 필요";
 
   const landCategory = getFieldValue(data.landInfo, "지목");
-  const zoning = getFieldValue(data.landInfo, "용도지역");
+  const zoningField = getFieldValue(data.landInfo, "용도지역");
   const areaField = getFieldValue(data.landInfo, "면적");
   const buildingArea = getFieldValue(data.buildingInfo, "건축면적");
 
   const regulatoryRows = data.layerARegulatoryAnalysis?.rows ?? [];
   const setbackRows = data.setbackReview?.rows ?? [];
-
-  const mapBlock = renderMapBlock(data, assets);
-  const highlightBlock = renderHighlightGrid(data, overallStatus);
 
   const logoHtml = assets.logoDataUrl
     ? `<img src="${assets.logoDataUrl}" alt="SG SOLAR" />`
@@ -269,21 +271,21 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         </div>
         ${
           data.layerARegulatoryAnalysis?.sourceNote
-            ? `<p class="notice" style="margin-top:8px">${htmlText(data.layerARegulatoryAnalysis.sourceNote)}</p>`
+            ? `<p class="notice compact" style="margin-top:8px">${htmlText(data.layerARegulatoryAnalysis.sourceNote)}</p>`
             : ""
         }`;
 
   const setbackTable = `
     ${data.setbackReview?.notice ? `<div class="notice blue">${htmlText(data.setbackReview.notice)}</div>` : ""}
-    <div class="notice">${htmlText(PDF_SETBACK_COMMON_NOTICE)}</div>
+    <div class="notice compact">${htmlText(PDF_SETBACK_COMMON_NOTICE)}</div>
     <div class="card avoid-break">
       <table>
         <thead><tr>
           <th style="width:18%">검토 항목</th>
-          <th style="width:12%">${htmlText(PDF_SETBACK_STANDARD_COLUMN)}</th>
+          <th style="width:11%">${htmlText(PDF_SETBACK_STANDARD_COLUMN)}</th>
           <th style="width:12%">예상 거리</th>
-          <th style="width:14%">검토 상태</th>
-          <th style="width:44%">안내</th>
+          <th style="width:13%">검토 상태</th>
+          <th style="width:46%">안내</th>
         </tr></thead>
         <tbody>
           ${setbackRows
@@ -292,9 +294,9 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
             <tr>
               <td>
                 <strong>${htmlText(row.item)}</strong>
-                ${row.detail ? `<div style="font-size:7.5pt;color:#64748b;margin-top:2px">${htmlText(row.detail)}</div>` : ""}
+                ${row.detail ? `<div style="font-size:7.5pt;color:#64748b;margin-top:3px;line-height:1.45">${htmlText(row.detail)}</div>` : ""}
               </td>
-              <td>${htmlText(row.standard)}</td>
+              <td style="white-space:nowrap">${htmlText(row.standard)}</td>
               <td><strong>${htmlText(row.measured)}</strong></td>
               <td>${badge(row.judgment, SETBACK_BADGE)}</td>
               <td>${htmlText(row.remark ?? "-")}</td>
@@ -304,7 +306,7 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         </tbody>
       </table>
     </div>
-    <p class="notice" style="margin-top:8px">${htmlText(PDF_SETBACK_FOOTER)}</p>`;
+    <p class="notice compact" style="margin-top:8px">${htmlText(PDF_SETBACK_FOOTER)}</p>`;
 
   const gridEquipment = hasGrid
     ? `
@@ -326,6 +328,15 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
       ${renderGridBars(data, expectedMw)}`
     : "";
 
+  const gridBadgeClass =
+    grid.status === "high"
+      ? "badge-blue"
+      : grid.status === "difficult"
+        ? "badge-amber"
+        : grid.status === "review"
+          ? "badge-orange"
+          : "badge-slate";
+
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -338,30 +349,34 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 </head>
 <body>
   <div class="report">
-    <header class="brand-bar">
-      <div>
-        ${logoHtml}
-        <div class="brand-sub">Solar Site Pre-Review Report</div>
-      </div>
-      <div style="text-align:right;font-size:8pt;opacity:0.9">
-        <div>분석일 ${htmlText(data.analyzedAt)}</div>
-      </div>
-    </header>
-
-    <div class="title-block">
-      <h1>${htmlText(PDF_REPORT_TITLE)}</h1>
-      <p class="subtitle">${htmlText(data.address)}</p>
-    </div>
-
     <section class="page-one">
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="label">설치 유형</div>
-          <div class="value">${htmlText(installType)}</div>
+      <header class="hero avoid-break">
+        <div class="hero-inner">
+          <div class="hero-top">
+            <div class="hero-brand">
+              ${logoHtml}
+              <div class="brand-tag">Solar Site Pre-Review Report</div>
+            </div>
+            <div class="hero-date">분석일 ${htmlText(data.analyzedAt)}</div>
+          </div>
+          <h1>${htmlText(PDF_REPORT_TITLE)}</h1>
+          <p class="hero-sub">${htmlText(PDF_REPORT_SUBTITLE)}</p>
+          <div class="hero-address">${htmlText(data.address)}</div>
         </div>
+      </header>
+
+      <div class="kpi-address avoid-break">
+        <div class="label">분석 주소</div>
+        <div class="value">${htmlText(data.address)}</div>
+      </div>
+      <div class="kpi-grid avoid-break">
         <div class="kpi-card">
           <div class="label">예상 설비용량</div>
           <div class="value">${htmlText(data.capacity)}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">설치 유형</div>
+          <div class="value">${htmlText(installType)}</div>
         </div>
         <div class="kpi-card">
           <div class="label">종합 검토 상태</div>
@@ -373,8 +388,12 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         </div>
       </div>
 
-      ${mapBlock}
-      ${highlightBlock}
+      ${renderMapBlock(data, assets)}
+
+      <div class="exec-summary avoid-break">
+        <div class="exec-label">종합 검토 요약</div>
+        <p>${htmlText(executiveSummary)}</p>
+      </div>
 
       <div class="notice compact">${htmlText(PDF_LEGAL_DISCLAIMER)}</div>
     </section>
@@ -417,12 +436,12 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 
       <div class="card capacity-rows avoid-break" style="margin-bottom:14px">
         <div class="row highlight"><span class="label">지목</span><span class="val">${htmlText(landCategory)}</span></div>
-        <div class="row"><span class="label">용도지역</span><span class="val">${htmlText(zoning)}</span></div>
+        <div class="row"><span class="label">용도지역</span><span class="val">${htmlText(zoningField)}</span></div>
         <div class="row"><span class="label">토지/건물 면적</span><span class="val">${htmlText(areaField !== "—" ? areaField : buildingArea)}</span></div>
         <div class="row"><span class="label">분석 기준</span><span class="val">${htmlText(m.capacityDisclaimer)}</span></div>
       </div>
 
-      <div class="section-head" style="margin-top:6px">
+      <div class="section-head" style="margin-top:4px">
         <div class="accent"></div>
         <div>
           <h2>계통 검토</h2>
@@ -434,9 +453,9 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         <div class="grid-summary">
           <div style="display:flex;align-items:center;gap:8px">
             <span class="grid-status-dot ${GRID_DOT[grid.status]}"></span>
-            <span class="badge ${grid.status === "high" ? "badge-blue" : grid.status === "difficult" ? "badge-amber" : grid.status === "review" ? "badge-orange" : "badge-slate"}">${htmlText(cleanGridLabel(grid.statusLabel))}</span>
+            <span class="badge ${gridBadgeClass}">${htmlText(cleanGridLabel(grid.statusLabel))}</span>
           </div>
-          <div style="text-align:right;font-size:8pt;color:#64748b">
+          <div style="text-align:right;font-size:8pt;color:#64748b;line-height:1.45">
             <div>태양광 설치용량 ${htmlText(formatSolarCapacityKw(m.capacityKw))}</div>
             ${grid.queryBasisLabel ? `<div>조회 기준: ${htmlText(grid.queryBasisLabel)}</div>` : ""}
           </div>
@@ -476,9 +495,20 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 
       ${renderChecklistSection()}
 
+      <div class="section-head" style="margin-top:4px">
+        <div class="accent"></div>
+        <div>
+          <h2>진행 절차</h2>
+          <p>사전 검토부터 전문 상담까지</p>
+        </div>
+      </div>
+
+      ${renderProcessSteps()}
+
       <div class="cta-box avoid-break">
         <h3>SG SOLAR 상담 안내</h3>
         <p>${htmlText(PDF_CTA)}</p>
+        <span class="cta-button">${htmlText(PDF_CTA_BUTTON)}</span>
       </div>
 
       <div class="notice amber" style="margin-top:14px">${htmlText(PDF_LEGAL_DISCLAIMER)}</div>
