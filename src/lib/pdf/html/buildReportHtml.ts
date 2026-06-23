@@ -29,6 +29,12 @@ import {
 } from "@/lib/pdf/reportContent";
 import { htmlText } from "@/lib/pdf/html/escape";
 import { reportBaseStyles } from "@/lib/pdf/html/reportStyles";
+import {
+  KEPCO_INQUIRY_TOPICS,
+  KEPCO_PREP_ITEMS,
+  KEPCO_SUPPLEMENTARY_GUIDE,
+} from "@/lib/kepco/inquiryContent";
+import { resolveKepcoOffice } from "@/lib/kepco/resolveKepcoOffice";
 
 export interface HtmlReportAssets {
   fontFacesCss: string;
@@ -110,6 +116,46 @@ function renderLocationFallback(data: ResolvedSiteReview, reason: string): strin
         <div class="loc-row"><span class="loc-label">좌표</span><span class="loc-val">${htmlText(data.lat.toFixed(5))}, ${htmlText(data.lng.toFixed(5))}</span></div>
         <div class="loc-note">${htmlText(reasonNote)}</div>
       </div>
+    </div>`;
+}
+
+function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
+  const office = resolveKepcoOffice(data.address);
+  const topics = KEPCO_INQUIRY_TOPICS.map((item) => `<li>${htmlText(item)}</li>`).join("");
+  const prep = KEPCO_PREP_ITEMS.map((item) => `<li>${htmlText(item)}</li>`).join("");
+
+  return `
+    <div class="kepco-office-card avoid-break">
+      <div class="kepco-office-head">
+        <div>
+          <div class="kepco-office-label">관할 한전 사업소 문의</div>
+          <div class="kepco-office-name">${htmlText(office.officeName)}</div>
+        </div>
+        <span class="kepco-status badge ${office.statusLabel === "확인 필요" ? "badge-slate" : office.statusLabel === "세부 관할 확인 권장" ? "badge-amber" : "badge-blue"}">${htmlText(office.statusLabel)}</span>
+      </div>
+      ${office.verificationNote ? `<p class="kepco-note">${htmlText(office.verificationNote)}</p>` : ""}
+      ${office.inquiryGuide ? `<p class="kepco-note warn">${htmlText(office.inquiryGuide)}</p>` : ""}
+      <div class="kepco-office-grid">
+        <div>
+          <div class="kepco-field-label">문의 부서</div>
+          <div class="kepco-field-val">${htmlText(office.departmentHint)}</div>
+        </div>
+        <div>
+          <div class="kepco-field-label">보조 연락</div>
+          <div class="kepco-field-val">한전 대표번호 ${htmlText(office.representativePhone)}</div>
+        </div>
+      </div>
+      <div class="kepco-lists">
+        <div>
+          <div class="kepco-field-label">문의 항목</div>
+          <ul class="kepco-list">${topics}</ul>
+        </div>
+        <div>
+          <div class="kepco-field-label">문의 전 준비</div>
+          <ul class="kepco-list">${prep}</ul>
+        </div>
+      </div>
+      <p class="kepco-supplement">${htmlText(KEPCO_SUPPLEMENTARY_GUIDE)}</p>
     </div>`;
 }
 
@@ -512,6 +558,7 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         </div>
         ${gridEquipment}
       </div>
+      ${renderKepcoOfficeCard(data)}
     </section>
 
     <section class="section page-break">

@@ -303,6 +303,32 @@ export function reportBaseStyles(): string {
     .legend-cum::before { background: #cbd5e1; }
     .legend-rem::before { background: #0b1736; }
 
+    /* ── KEPCO office (PDF) ── */
+    .kepco-office-card {
+      margin-top: 10px; border: 1px solid #d8e1ea; border-radius: 12px; padding: 12px 14px;
+      background: linear-gradient(180deg, #fff 0%, #eef3f8 100%);
+      box-shadow: 0 2px 8px rgba(11, 23, 54, 0.05);
+    }
+    .kepco-office-head {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .kepco-office-label {
+      font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b;
+    }
+    .kepco-office-name { font-size: 11pt; font-weight: 700; color: #0b1736; margin-top: 3px; }
+    .kepco-status { font-size: 6.5pt !important; }
+    .kepco-note { font-size: 7.5pt; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+    .kepco-note.warn { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 8px; }
+    .kepco-office-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;
+    }
+    .kepco-field-label { font-size: 6.5pt; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .kepco-field-val { font-size: 8pt; font-weight: 700; color: #334155; margin-top: 3px; line-height: 1.4; }
+    .kepco-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .kepco-list { margin: 4px 0 0; padding-left: 12px; font-size: 7.5pt; color: #475569; line-height: 1.45; }
+    .kepco-list li { margin-bottom: 2px; }
+    .kepco-supplement { font-size: 7pt; color: #64748b; line-height: 1.45; border-top: 1px solid #d8e1ea; padding-top: 8px; }
+
     /* ── Consultation page ── */
     .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .check-card {

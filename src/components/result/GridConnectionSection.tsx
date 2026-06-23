@@ -14,6 +14,7 @@ import {
   formatSolarCapacityKw,
 } from "@/lib/grid/evaluate";
 import { getGridDataSourceNotice } from "@/lib/grid/dataSourceLabel";
+import KepcoOfficeInquiryCard from "@/components/result/KepcoOfficeInquiryCard";
 import type { GridConnectionInfo, GridConnectionStatus } from "@/types/gridConnection";
 
 const KEPCO_LINE_CAPACITY_URL = "https://online.kepco.co.kr/EWM092D00";
@@ -144,38 +145,6 @@ function SingleValueCard({
   );
 }
 
-function ContactCard({
-  title,
-  department,
-  phone,
-  fallbackNote,
-}: {
-  title: string;
-  department: string;
-  phone: string;
-  fallbackNote?: string;
-}) {
-  const hasPhone = Boolean(phone && phone !== "—");
-  return (
-    <div className="flex h-full min-h-[120px] flex-col rounded-xl border border-slate-200 bg-slate-50/60 p-5">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</p>
-      <p className="mt-3 flex-1 text-base font-bold leading-snug text-slate-900">{department}</p>
-      {hasPhone ? (
-        <p className="mt-2 text-sm font-semibold text-navy">{phone}</p>
-      ) : (
-        <p className="mt-2 text-sm text-slate-600">{fallbackNote ?? "한전 고객센터 국번없이 123"}</p>
-      )}
-    </div>
-  );
-}
-
-function formatContactPhone(phone: string): string {
-  const trimmed = phone?.trim();
-  if (!trimmed || trimmed === "—") return "";
-  if (trimmed === "국번없이 123") return "한전 고객센터 · 국번없이 123";
-  return trimmed;
-}
-
 export default function GridConnectionSection({
   initialGridInfo,
   address,
@@ -234,10 +203,6 @@ export default function GridConnectionSection({
     Math.round((metrics.capacityKw / 1000) * 1000) / 1000;
   const solarCapacityDisplay = formatSolarCapacityKw(metrics.capacityKw);
   const dlRemainingDisplay = formatGridCapacityMwOrKw(gridInfo.distributionLine.remainingMw);
-  const branchPhone = formatContactPhone(gridInfo.contacts.branchPhone);
-  const supplyPhone = formatContactPhone(gridInfo.contacts.supplyPhone);
-  const operationsPhone = formatContactPhone(gridInfo.contacts.operationsPhone);
-  const hasBranchContacts = Boolean(branchPhone || supplyPhone || operationsPhone);
 
   return (
     <section id="grid" className="scroll-mt-24">
@@ -351,14 +316,9 @@ export default function GridConnectionSection({
               <SingleValueCard title="태양광 설치용량" value={solarCapacityDisplay} />
               <SingleValueCard title="D/L 잔여용량" value={dlRemainingDisplay} />
             </div>
-
-            <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
-              {gridInfo.reviewResult}
-            </p>
           </div>
         )}
 
-        {/* 데이터 없음 */}
         {!hasDetails && (
           <div className="border-b border-slate-100 px-5 py-8 sm:px-6 sm:py-10">
             <p className="text-base leading-relaxed text-slate-700">
@@ -366,68 +326,38 @@ export default function GridConnectionSection({
             </p>
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               아래 <strong className="font-semibold text-slate-800">선로용량 확인하기</strong>{" "}
-              버튼을 통해 한전 공개 시스템에서 확인 가능합니다.
+              버튼 또는 관할 한전 사업소 문의를 통해 접속 가능용량 확인이 필요합니다.
             </p>
-            <div className="mt-6">
-              <a
-                href={KEPCO_LINE_CAPACITY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 items-center rounded-lg bg-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-navy/90"
-              >
-                선로용량 확인하기
-              </a>
-            </div>
           </div>
         )}
 
-        {/* 한전 연락처 */}
+        {/* 계통 검토 요약 + 한전 사업소 문의 */}
         <div className="border-t border-slate-100 px-5 py-6 sm:px-6 sm:py-7">
-          <h3 className="text-sm font-bold text-slate-800">한전 연락처</h3>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            {hasBranchContacts
-              ? "관할 지사·담당 부서 연락처입니다. 계통 접수 전 확인에 활용하세요."
-              : "관할 지사 확인이 필요합니다. 우선 한전 대표번호로 문의하세요."}
-          </p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            <ContactCard
-              title="관할 한전 지사"
-              department={gridInfo.contacts.kepcoBranch}
-              phone={branchPhone}
-            />
-            <ContactCard
-              title="전력공급부"
-              department={gridInfo.contacts.supplyDepartment}
-              phone={supplyPhone || branchPhone}
-              fallbackNote={
-                branchPhone
-                  ? `관할 지사 문의 · ${branchPhone}`
-                  : "한전 고객센터 · 국번없이 123"
-              }
-            />
-            <ContactCard
-              title="배전계통"
-              department={gridInfo.contacts.operationsDepartment}
-              phone={operationsPhone || branchPhone}
-              fallbackNote={
-                branchPhone
-                  ? `관할 지사 문의 · ${branchPhone}`
-                  : "한전 고객센터 · 국번없이 123"
-              }
-            />
-          </div>
-          {hasDetails && (
-            <div className="mt-6">
-              <a
-                href={KEPCO_LINE_CAPACITY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-11 items-center rounded-lg bg-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-navy/90"
-              >
-                선로용량 확인하기
-              </a>
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] xl:items-start">
+            <div className="min-w-0">
+              {hasDetails ? (
+                <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
+                  {gridInfo.reviewResult}
+                </p>
+              ) : (
+                <p className="text-sm leading-relaxed text-slate-600">
+                  공개 계통 데이터가 제한적인 경우에도 관할 한전 사업소에 접속 가능용량 확인을
+                  요청할 수 있습니다.
+                </p>
+              )}
+              <div className="mt-5">
+                <a
+                  href={KEPCO_LINE_CAPACITY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-11 items-center rounded-lg bg-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-navy/90"
+                >
+                  선로용량 확인하기
+                </a>
+              </div>
             </div>
-          )}
+            <KepcoOfficeInquiryCard address={address} jibunAddress={jibunAddress} />
+          </div>
         </div>
 
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3">
