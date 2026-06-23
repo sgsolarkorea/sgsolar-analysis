@@ -93,7 +93,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="lg:flex lg:gap-8 lg:py-6">
+        <div className="lg:flex lg:gap-6 lg:py-4">
           <AnalysisProgressPanel steps={progressSteps} />
 
           <ResultMetricsProvider
@@ -109,7 +109,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             consultationBase={consultationBase}
             siteGeometryBundle={data.siteGeometryBundle}
           >
-            <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
+            <div className="min-w-0 flex-1 space-y-7 sm:space-y-8">
               {showMountainWarning && <MountainLandWarningBanner />}
 
               <section id="site-location" className="scroll-mt-24 mt-8 sm:mt-0">

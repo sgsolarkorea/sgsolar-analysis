@@ -67,14 +67,14 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
   }, [steps]);
 
   return (
-    <aside className="hidden lg:block lg:w-60 lg:shrink-0 lg:self-stretch">
-      <div className="sticky top-24 z-30 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-        <h2 className="text-sm font-bold text-navy">분석 진행 단계</h2>
-        <p className="mt-1 text-xs leading-relaxed text-slate-500">
+    <aside className="hidden lg:block lg:w-56 lg:shrink-0 lg:self-stretch">
+      <div className="sticky top-[4.75rem] z-30 max-h-[calc(100vh-5.25rem)] overflow-y-auto rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+        <h2 className="text-[13px] font-bold text-navy">분석 진행 단계</h2>
+        <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
           분석 항목을 순서대로 확인하세요.
         </p>
 
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-2 space-y-1.5">
           {steps.map((step) => {
             const isActive = activeId === step.id;
             return (
@@ -82,21 +82,23 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                 <button
                   type="button"
                   onClick={() => scrollToSection(step.id)}
-                  className={`w-full rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                  className={`w-full rounded-md border px-2.5 py-2 text-left transition-colors ${
                     isActive
                       ? "border-navy bg-navy-light ring-1 ring-navy/20"
                       : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-slate-900">{step.label}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 pt-px text-[13px] font-semibold leading-tight text-slate-900">
+                      {step.label}
+                    </span>
                     <span
-                      className={`shrink-0 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[step.statusKind]}`}
+                      className={`mt-px shrink-0 rounded border px-1.5 py-px text-[10px] font-semibold leading-none ${STATUS_STYLES[step.statusKind]}`}
                     >
                       {step.statusLabel}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs leading-snug text-slate-500">{step.description}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-slate-500">{step.description}</p>
                 </button>
               </li>
             );
@@ -106,7 +108,7 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
         <button
           type="button"
           onClick={() => scrollToSection("consultation")}
-          className="btn-primary mt-4 h-11 w-full text-sm font-bold"
+          className="btn-primary mt-3 h-9 w-full px-3 text-xs font-bold"
         >
           무료 컨설팅 상담 신청하기
         </button>

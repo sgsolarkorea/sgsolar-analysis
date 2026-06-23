@@ -244,8 +244,9 @@ export default function GridConnectionSection({
       <SectionHeader
         title="한전 계통 연계 검토"
         description="한전 계통 연계 가능 여부를 확인합니다."
+        compact
       />
-      <p className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium leading-relaxed text-blue-950">
+      <p className="mb-3 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium leading-snug text-blue-950 sm:text-sm">
         변전소·배전선로·잔여용량 기준 1차 계통 검토 결과입니다. 실제 접속 가능 여부는 한전
         접수 및 현장 검토 후 확정됩니다.
       </p>

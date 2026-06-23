@@ -36,17 +36,19 @@ export default function GradeSection({
           <KpiCard label={thirdLabel} value={thirdValue} emphasis />
           <KpiCard label="예상 시공비" value={constructionCost} emphasis />
           <KpiCard label="REC 가중치" value={recWeight} emphasis />
-          <div className="col-span-2 flex flex-col items-center justify-center bg-white px-3 py-3 text-center sm:col-span-5 sm:flex-row sm:gap-2 sm:py-2.5">
-            <span className="text-[11px] font-semibold text-slate-500 sm:text-xs">추천유형</span>
-            <span className="mt-0.5 text-xs font-semibold leading-snug text-slate-900 sm:mt-0 sm:text-sm">
+          <div className="col-span-2 flex flex-col items-center justify-center bg-white px-2.5 py-2 text-center sm:col-span-5 sm:flex-row sm:gap-2 sm:py-2">
+            <span className="text-[10px] font-semibold text-slate-500 sm:text-[11px]">추천유형</span>
+            <span className="mt-px text-[11px] font-semibold leading-snug text-slate-900 sm:mt-0 sm:text-xs">
               {recommendation}
             </span>
           </div>
         </div>
 
         {!isHousehold && (
-          <div className="border-t border-amber-200 bg-amber-50 px-3 py-2 sm:px-4">
-            <p className="text-xs font-medium leading-relaxed text-amber-900">⚠ {REVENUE_WARNING}</p>
+          <div className="border-t border-amber-200 bg-amber-50 px-2.5 py-1.5 sm:px-3">
+            <p className="text-[11px] font-medium leading-snug text-amber-900 sm:text-xs">
+              ⚠ {REVENUE_WARNING}
+            </p>
           </div>
         )}
       </div>

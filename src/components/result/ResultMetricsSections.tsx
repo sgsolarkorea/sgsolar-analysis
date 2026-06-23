@@ -31,7 +31,7 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
 
   return (
     <section id="site-overview" className="scroll-mt-24">
-      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+      <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
         <PdfDownloadButton address={address} />
       </div>
       <SectionHeader
@@ -50,10 +50,14 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
         thirdKpiLabel={isHousehold ? "월 예상 절감액" : undefined}
         thirdKpiValue={isHousehold ? formatHouseholdMonthlySavings(metrics.capacityKw) : undefined}
       />
-      <p className="mt-2.5 text-xs font-medium leading-relaxed text-slate-500">
-        ⚠ {solarDisclaimer.construction}
-      </p>
-      <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">※ {constructionExtra}</p>
+      <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2">
+        <p className="text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+          ⚠ {solarDisclaimer.construction}
+        </p>
+        <p className="mt-1 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+          ※ {constructionExtra}
+        </p>
+      </div>
     </section>
   );
 }

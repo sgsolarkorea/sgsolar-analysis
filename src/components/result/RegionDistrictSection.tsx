@@ -31,39 +31,40 @@ export default function RegionDistrictSection({ analysis }: RegionDistrictSectio
     <section id="region-district" className="scroll-mt-24">
       <SectionHeader
         title="지역/지구 분석"
-        description="VWorld 토지이용계획 기준 용도지역·지구·구역 1차 확인 결과입니다."
+        description="토지이용계획 기준 용도지역·지구·구역 1차 확인 결과입니다."
+        compact
       />
 
-      <div className="card-premium overflow-hidden">
+      <div className="card-premium overflow-hidden rounded-lg">
         {(analysis.dataSource || confirmedAt) && (
-          <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 text-xs text-slate-600">
-            {analysis.dataSource ?? "VWorld 토지이용계획"}
+          <div className="border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-[11px] text-slate-600">
+            {analysis.dataSource ?? "토지이용계획"}
             {confirmedAt ? ` · 확인일 ${confirmedAt}` : ""}
           </div>
         )}
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+          <table className="w-full min-w-[32rem] table-fixed text-left text-xs sm:text-sm">
+            <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-600">
               <tr>
-                <th className="px-4 py-3 font-semibold">지역/지구</th>
-                <th className="px-4 py-3 font-semibold">가능여부</th>
-                <th className="px-4 py-3 font-semibold">조건/제한사항</th>
+                <th className="w-[32%] px-3 py-2 font-semibold">지역/지구</th>
+                <th className="w-[18%] px-3 py-2 font-semibold">가능여부</th>
+                <th className="w-[50%] px-3 py-2 font-semibold">조건/제한사항</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {analysis.rows.map((row) => (
                 <tr key={row.district} className="hover:bg-slate-50/60">
-                  <td className="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-900">
-                    {row.district}
-                  </td>
-                  <td className="px-4 py-3.5">
+                  <td className="px-3 py-2 align-top font-semibold text-slate-900">{row.district}</td>
+                  <td className="px-3 py-2 align-top">
                     <span
-                      className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-semibold ${FEASIBILITY_STYLES[row.feasibility]}`}
+                      className={`inline-flex max-w-full whitespace-normal rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight sm:text-[11px] ${FEASIBILITY_STYLES[row.feasibility]}`}
                     >
                       {row.feasibility}
                     </span>
                   </td>
-                  <td className="px-4 py-3.5 text-slate-700">{row.condition}</td>
+                  <td className="px-3 py-2 align-top text-xs leading-snug break-words text-slate-700 sm:text-sm">
+                    {row.condition}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -72,7 +73,9 @@ export default function RegionDistrictSection({ analysis }: RegionDistrictSectio
       </div>
 
       {analysis.sourceNote && (
-        <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">{analysis.sourceNote}</p>
+        <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+          {analysis.sourceNote}
+        </p>
       )}
     </section>
   );

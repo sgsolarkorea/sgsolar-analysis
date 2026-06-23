@@ -37,50 +37,51 @@ export default function RegulatoryAnalysisSection({ analysis }: RegulatoryAnalys
     <section id="regulatory-analysis" className="scroll-mt-24">
       <SectionHeader
         title="법·규제 분석"
-        description="공공 GIS(VWorld 토지이용계획) 기반 Layer A 1차 규제 검토입니다."
+        description="공공 GIS 토지이용계획 기반 Layer A 1차 규제 검토입니다."
+        compact
       />
 
       {analysis.rows.length === 0 ? (
-        <div className="card-premium p-6 sm:p-8">
-          <p className="text-sm leading-relaxed text-slate-600">
+        <div className="card-premium rounded-lg p-4 sm:p-5">
+          <p className="text-xs leading-snug text-slate-600 sm:text-sm">
             토지이용계획 GIS 데이터를 조회하지 못해 규제 1차 검토 결과가 없습니다. 상담 시 추가
             확인합니다.
           </p>
         </div>
       ) : (
-        <div className="card-premium overflow-hidden">
+        <div className="card-premium overflow-hidden rounded-lg">
           {confirmedAt && (
-            <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 text-xs text-slate-600">
-              VWorld 토지이용계획 확인 · {confirmedAt}
+            <div className="border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-[11px] text-slate-600">
+              토지이용계획 확인 · {confirmedAt}
             </div>
           )}
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+            <table className="w-full min-w-[36rem] table-fixed text-left text-xs sm:text-sm">
+              <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-600">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">규제 항목</th>
-                  <th className="px-4 py-3 font-semibold">해당 구역</th>
-                  <th className="px-4 py-3 font-semibold">1차 판단</th>
-                  <th className="px-4 py-3 font-semibold">요약</th>
+                  <th className="w-[18%] px-3 py-2 font-semibold">규제 항목</th>
+                  <th className="w-[18%] px-3 py-2 font-semibold">해당 구역</th>
+                  <th className="w-[14%] px-3 py-2 font-semibold">1차 판단</th>
+                  <th className="w-[50%] px-3 py-2 font-semibold">요약</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {analysis.rows.map((row) => (
                   <tr key={`${row.item}-${row.matchedZone ?? ""}`} className="hover:bg-slate-50/60">
-                    <td className="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-900">
+                    <td className="px-3 py-2 align-top font-semibold text-slate-900">
                       {row.item}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3.5 text-slate-700">
-                      {row.matchedZone ?? "—"}
-                    </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-3 py-2 align-top text-slate-700">{row.matchedZone ?? "—"}</td>
+                    <td className="px-3 py-2 align-top">
                       <span
-                        className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-semibold ${LEVEL_STYLES[row.level]}`}
+                        className={`inline-flex max-w-full whitespace-normal rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight sm:text-[11px] ${LEVEL_STYLES[row.level]}`}
                       >
                         {row.level}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-700">{row.summary}</td>
+                    <td className="px-3 py-2 align-top text-xs leading-snug break-words text-slate-700 sm:text-sm">
+                      {row.summary}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -90,7 +91,9 @@ export default function RegulatoryAnalysisSection({ analysis }: RegulatoryAnalys
       )}
 
       {analysis.sourceNote && (
-        <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">{analysis.sourceNote}</p>
+        <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+          {analysis.sourceNote}
+        </p>
       )}
     </section>
   );
