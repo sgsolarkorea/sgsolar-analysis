@@ -1,28 +1,48 @@
+/** registry 항목이 적용되는 행정 단위 */
+export type KepcoOfficeMatchLevel = "sido" | "sigungu" | "gu" | "eupmyeon" | "dong" | "unknown";
+
 /** 주소 registry 매칭 신뢰도 */
-export type KepcoOfficeConfidence = "region_match" | "needs_verification" | "unknown";
+export type KepcoOfficeConfidence = "verified" | "region_match" | "needs_verification" | "unknown";
 
 export interface KepcoOfficeRegistryEntry {
   sido: string;
   sigungu: string;
+  gu?: string;
+  eupmyeon?: string;
+  dong?: string;
+  ri?: string;
   officeName: string;
   departmentHint: string;
   representativePhone: string;
   source: string;
+  matchLevel: KepcoOfficeMatchLevel;
   confidence: KepcoOfficeConfidence;
-  /** 관할 분기가 불확실할 때 UI·PDF 보조 문구 */
   verificationNote?: string;
 }
 
-export interface ResolvedKepcoOffice {
+export interface ParsedKepcoAddress {
   sido: string | null;
   sigungu: string | null;
+  gu: string | null;
+  eupmyeon: string | null;
+  dong: string | null;
+  ri: string | null;
+  roadOrDong: string | null;
+  raw: string;
+}
+
+export interface ResolvedKepcoOffice {
+  parsedAddress: ParsedKepcoAddress;
   officeName: string;
   departmentHint: string;
   representativePhone: string;
   source: string;
+  matchLevel: KepcoOfficeMatchLevel;
   confidence: KepcoOfficeConfidence;
   statusLabel: string;
-  /** registry 미매칭 시 안내 */
+  matchBasisLabel: string;
+  /** 파싱·매칭 debug/meta 요약 */
+  parsedMeta: string;
   inquiryGuide: string | null;
   verificationNote: string | null;
 }

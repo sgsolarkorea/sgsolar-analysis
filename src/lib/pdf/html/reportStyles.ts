@@ -316,6 +316,8 @@ export function reportBaseStyles(): string {
       font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b;
     }
     .kepco-office-name { font-size: 11pt; font-weight: 700; color: #0b1736; margin-top: 3px; }
+    .kepco-match-row { margin-bottom: 6px; }
+    .kepco-match-row.meta .kepco-field-val { font-weight: 500; color: #64748b; font-size: 7pt; }
     .kepco-status { font-size: 6.5pt !important; }
     .kepco-note { font-size: 7.5pt; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
     .kepco-note.warn { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 8px; }

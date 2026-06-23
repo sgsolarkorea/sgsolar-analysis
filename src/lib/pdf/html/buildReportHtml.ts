@@ -131,7 +131,15 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
           <div class="kepco-office-label">관할 한전 사업소 문의</div>
           <div class="kepco-office-name">${htmlText(office.officeName)}</div>
         </div>
-        <span class="kepco-status badge ${office.statusLabel === "확인 필요" ? "badge-slate" : office.statusLabel === "세부 관할 확인 권장" ? "badge-amber" : "badge-blue"}">${htmlText(office.statusLabel)}</span>
+        <span class="kepco-status badge ${office.statusLabel === "확인 필요" ? "badge-slate" : office.statusLabel === "관할 확인 권장" ? "badge-amber" : "badge-blue"}">${htmlText(office.statusLabel)}</span>
+      </div>
+      <div class="kepco-match-row">
+        <div class="kepco-field-label">매칭 기준</div>
+        <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
+      </div>
+      <div class="kepco-match-row meta">
+        <div class="kepco-field-label">주소 파싱</div>
+        <div class="kepco-field-val">${htmlText(office.parsedMeta)}</div>
       </div>
       ${office.verificationNote ? `<p class="kepco-note">${htmlText(office.verificationNote)}</p>` : ""}
       ${office.inquiryGuide ? `<p class="kepco-note warn">${htmlText(office.inquiryGuide)}</p>` : ""}

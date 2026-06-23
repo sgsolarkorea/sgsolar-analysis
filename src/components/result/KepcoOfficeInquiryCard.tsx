@@ -13,8 +13,8 @@ interface KepcoOfficeInquiryCardProps {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  "1차 매칭": "bg-emerald-50 text-emerald-800 border-emerald-200",
-  "세부 관할 확인 권장": "bg-amber-50 text-amber-900 border-amber-200",
+  "주소 1차 매칭": "bg-emerald-50 text-emerald-800 border-emerald-200",
+  "관할 확인 권장": "bg-amber-50 text-amber-900 border-amber-200",
   "확인 필요": "bg-slate-100 text-slate-700 border-slate-200",
 };
 
@@ -60,6 +60,12 @@ export default function KepcoOfficeInquiryCard({
         <div>
           <p className="text-xs font-semibold text-slate-500">관할 한전 사업소</p>
           <p className="mt-1 text-lg font-bold text-navy">{office.officeName}</p>
+          <p className="mt-1.5 text-xs font-medium text-slate-600">
+            매칭 기준: {office.matchBasisLabel}
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+            주소 파싱: {office.parsedMeta}
+          </p>
           {office.verificationNote && (
             <p className="mt-1 text-xs leading-relaxed text-amber-800">{office.verificationNote}</p>
           )}
