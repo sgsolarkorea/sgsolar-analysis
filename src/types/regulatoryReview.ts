@@ -91,6 +91,7 @@ export type RegulationSourceType =
 export type RegulationSourceStatus =
   | "not_started"
   | "source_found"
+  | "needs_verification"
   | "parsing"
   | "parsed"
   | "verified"
@@ -102,6 +103,9 @@ export interface RegulationSourceEntry {
   appendix?: string;
   sourceUrl: string;
   status: RegulationSourceStatus;
+  sourceOrigin?: "elis.go.kr" | "law.go.kr" | "municipal" | "unknown";
+  notes?: string;
+  collectedAt?: string;
 }
 
 export interface SetbackRegulationEntry {

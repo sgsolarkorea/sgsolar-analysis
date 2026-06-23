@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-23T08:37:06.255Z",
+  "regionsProcessed": 229,
+  "ordinanceSourceFound": 194,
+  "ordinanceNeedsVerification": 0,
+  "ordinanceNotStarted": 35,
+  "guidelineSourceFound": 0,
+  "totalSourceFound": 194,
+  "totalNeedsVerification": 0,
+  "totalNotStarted": 111,
+  "sourceFoundRatePct": 63.6,
+  "byType": {
+    "ordinance": 229
+  },
+  "byOrigin": {
+    "elis.go.kr": 169,
+    "law.go.kr": 25
+  },
+  "priorityRegions": {
+    "total": 64,
+    "found": 50
+  },
+  "dryRun": false
+}

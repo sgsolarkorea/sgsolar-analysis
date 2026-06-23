@@ -32,6 +32,7 @@ export const SOURCE_TYPES = [
 export const SOURCE_STATUSES = [
   "not_started",
   "source_found",
+  "needs_verification",
   "parsing",
   "parsed",
   "verified",

@@ -12,6 +12,8 @@
     "build:kepco-registry": "node scripts/build-kepco-office-registry.mjs",
     "build:korea-regions": "node scripts/build-korea-region-registry.mjs",
     "build:regulatory-db": "node scripts/build-korea-region-registry.mjs && node scripts/build-regulatory-db.mjs",
+    "collect:regulation-sources": "node scripts/collect-regulation-sources.mjs --all",
+    "collect:regulation-sources:priority": "node scripts/collect-regulation-sources.mjs --priority",
     "validate:regulatory-db": "node scripts/validate-regulatory-db.mjs",
     "start": "next start",
     "lint": "eslint"

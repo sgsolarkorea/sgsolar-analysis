@@ -1,10 +1,15 @@
 {
   "meta": {
-    "version": "2026-06-23",
+    "version": "2026-06-23-step6.6",
     "generatedAt": "2026-06-23",
     "description": "전국 지자체 태양광 조례·지침 source registry skeleton",
     "regionCount": 229,
-    "entryCount": 229
+    "entryCount": 229,
+    "collectedAt": "2026-06-23",
+    "sourceFoundCount": 194,
+    "sourceNeedsVerificationCount": 0,
+    "sourceNotStartedCount": 111,
+    "collectionMethod": "law.go.kr 자치법규 slug + ordinInfoP (elis gubun=ELIS when present)"
   },
   "entries": {
     "강원특별자치도|강릉시": {
@@ -16,8 +21,11 @@
           "type": "ordinance",
           "name": "강릉시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2102673&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -36,8 +44,11 @@
           "type": "ordinance",
           "name": "고성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121233&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -50,8 +61,11 @@
           "type": "ordinance",
           "name": "동해시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2091767&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -70,8 +84,11 @@
           "type": "ordinance",
           "name": "삼척시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2063433&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -90,8 +107,11 @@
           "type": "ordinance",
           "name": "속초시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121085&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -111,7 +131,10 @@
           "name": "양구군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -124,8 +147,11 @@
           "type": "ordinance",
           "name": "양양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2102945&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -138,8 +164,11 @@
           "type": "ordinance",
           "name": "영월군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2109147&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -152,8 +181,11 @@
           "type": "ordinance",
           "name": "원주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106795&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -172,8 +204,11 @@
           "type": "ordinance",
           "name": "인제군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2099217&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -186,8 +221,11 @@
           "type": "ordinance",
           "name": "정선군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2029433&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -201,7 +239,10 @@
           "name": "철원군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -214,8 +255,11 @@
           "type": "ordinance",
           "name": "춘천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2112587&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -234,8 +278,11 @@
           "type": "ordinance",
           "name": "태백시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110049&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -254,8 +301,11 @@
           "type": "ordinance",
           "name": "평창군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1979117&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -268,8 +318,11 @@
           "type": "ordinance",
           "name": "홍천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121139&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -282,8 +335,11 @@
           "type": "ordinance",
           "name": "화천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2117227&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -296,8 +352,11 @@
           "type": "ordinance",
           "name": "횡성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2125215&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -310,8 +369,11 @@
           "type": "ordinance",
           "name": "가평군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2124585&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -324,8 +386,11 @@
           "type": "ordinance",
           "name": "고양시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2086131&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -344,8 +409,11 @@
           "type": "ordinance",
           "name": "과천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2078539&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -364,14 +432,20 @@
           "type": "ordinance",
           "name": "광명시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095423&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "광명시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -384,8 +458,11 @@
           "type": "ordinance",
           "name": "광주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2123363&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -404,8 +481,11 @@
           "type": "ordinance",
           "name": "구리시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2089953&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -424,14 +504,20 @@
           "type": "ordinance",
           "name": "군포시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2077621&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "군포시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -444,14 +530,20 @@
           "type": "ordinance",
           "name": "김포시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2036273&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "김포시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -464,8 +556,11 @@
           "type": "ordinance",
           "name": "남양주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2099095&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -484,8 +579,11 @@
           "type": "ordinance",
           "name": "동두천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2127631&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -504,14 +602,20 @@
           "type": "ordinance",
           "name": "부천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2109243&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "부천시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -524,14 +628,20 @@
           "type": "ordinance",
           "name": "성남시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2111431&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "성남시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -544,14 +654,20 @@
           "type": "ordinance",
           "name": "수원시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2102141&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "수원시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -564,14 +680,20 @@
           "type": "ordinance",
           "name": "시흥시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2118597&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "시흥시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -584,8 +706,11 @@
           "type": "ordinance",
           "name": "안산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2067975&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -604,14 +729,20 @@
           "type": "ordinance",
           "name": "안성시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121099&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "안성시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -624,14 +755,20 @@
           "type": "ordinance",
           "name": "안양시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2117933&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "안양시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -644,8 +781,11 @@
           "type": "ordinance",
           "name": "양주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2088967&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -665,7 +805,10 @@
           "name": "양평군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -678,14 +821,20 @@
           "type": "ordinance",
           "name": "여주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095885&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "여주시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -698,8 +847,11 @@
           "type": "ordinance",
           "name": "연천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2123687&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -712,14 +864,20 @@
           "type": "ordinance",
           "name": "오산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2127873&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "오산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -732,14 +890,20 @@
           "type": "ordinance",
           "name": "용인시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2102461&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "용인시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -752,14 +916,20 @@
           "type": "ordinance",
           "name": "의왕시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2002325&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "의왕시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -772,8 +942,11 @@
           "type": "ordinance",
           "name": "의정부시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2072835&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -792,14 +965,20 @@
           "type": "ordinance",
           "name": "이천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2113131&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "이천시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -812,8 +991,11 @@
           "type": "ordinance",
           "name": "파주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2022815&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -832,14 +1014,20 @@
           "type": "ordinance",
           "name": "평택시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122835&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "평택시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -852,8 +1040,11 @@
           "type": "ordinance",
           "name": "포천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121989&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -872,14 +1063,20 @@
           "type": "ordinance",
           "name": "하남시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2064475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "하남시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -892,14 +1089,20 @@
           "type": "ordinance",
           "name": "화성시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2115001&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "화성시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -912,14 +1115,20 @@
           "type": "ordinance",
           "name": "거제시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120831&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "거제시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -933,7 +1142,10 @@
           "name": "거창군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -946,8 +1158,11 @@
           "type": "ordinance",
           "name": "고성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121233&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -960,14 +1175,20 @@
           "type": "ordinance",
           "name": "김해시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2118405&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "김해시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -981,7 +1202,10 @@
           "name": "남해군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -994,14 +1218,20 @@
           "type": "ordinance",
           "name": "밀양시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2035513&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "밀양시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1014,14 +1244,20 @@
           "type": "ordinance",
           "name": "사천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2112751&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "사천시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1034,8 +1270,11 @@
           "type": "ordinance",
           "name": "산청군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2089703&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1048,14 +1287,20 @@
           "type": "ordinance",
           "name": "양산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2091561&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "양산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1069,7 +1314,10 @@
           "name": "의령군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1082,14 +1330,20 @@
           "type": "ordinance",
           "name": "진주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2127421&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "진주시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1103,7 +1357,10 @@
           "name": "창녕군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1116,14 +1373,20 @@
           "type": "ordinance",
           "name": "창원시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110201&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "창원시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1136,14 +1399,20 @@
           "type": "ordinance",
           "name": "통영시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2105587&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "통영시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1157,7 +1426,10 @@
           "name": "하동군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1171,7 +1443,10 @@
           "name": "함안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1184,8 +1459,11 @@
           "type": "ordinance",
           "name": "함양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2051639&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1198,8 +1476,11 @@
           "type": "ordinance",
           "name": "합천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2123757&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1212,8 +1493,11 @@
           "type": "ordinance",
           "name": "경산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106343&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1232,8 +1516,11 @@
           "type": "ordinance",
           "name": "경주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2057435&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1252,8 +1539,11 @@
           "type": "ordinance",
           "name": "고령군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122635&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1266,8 +1556,11 @@
           "type": "ordinance",
           "name": "구미시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1970211&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1286,8 +1579,11 @@
           "type": "ordinance",
           "name": "김천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2112719&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1306,8 +1602,11 @@
           "type": "ordinance",
           "name": "문경시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2100779&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1326,8 +1625,11 @@
           "type": "ordinance",
           "name": "봉화군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2093765&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1340,8 +1642,11 @@
           "type": "ordinance",
           "name": "상주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116275&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1361,7 +1666,10 @@
           "name": "성주군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1374,8 +1682,11 @@
           "type": "ordinance",
           "name": "안동시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2103263&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1394,8 +1705,11 @@
           "type": "ordinance",
           "name": "영덕군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095663&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1408,8 +1722,11 @@
           "type": "ordinance",
           "name": "영양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2094775&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1422,8 +1739,11 @@
           "type": "ordinance",
           "name": "영주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2099533&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1442,8 +1762,11 @@
           "type": "ordinance",
           "name": "영천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2000711&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1462,8 +1785,11 @@
           "type": "ordinance",
           "name": "예천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2096259&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1476,8 +1802,11 @@
           "type": "ordinance",
           "name": "울릉군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2125271&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1490,8 +1819,11 @@
           "type": "ordinance",
           "name": "울진군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1807053&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1505,7 +1837,10 @@
           "name": "의성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1519,7 +1854,10 @@
           "name": "청도군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1533,7 +1871,10 @@
           "name": "청송군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1547,7 +1888,10 @@
           "name": "칠곡군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1560,8 +1904,11 @@
           "type": "ordinance",
           "name": "포항시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106311&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -1578,10 +1925,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "광산구 도시계획 조례",
+          "name": "광주광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2084475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1592,10 +1942,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "남구 도시계획 조례",
+          "name": "광주광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2084475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1606,10 +1959,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "광주광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2084475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1620,10 +1976,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "북구 도시계획 조례",
+          "name": "광주광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2084475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1634,10 +1993,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서구 도시계획 조례",
+          "name": "광주광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2084475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1648,10 +2010,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "군위군 군계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1662,10 +2027,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "남구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1676,10 +2044,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "달서구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1690,10 +2061,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "달성군 군계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1704,10 +2078,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1718,10 +2095,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "북구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1732,10 +2112,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1746,10 +2129,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "수성구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1760,10 +2146,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "대구광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128915&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1774,10 +2163,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "대덕구 도시계획 조례",
+          "name": "대전광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110261&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1788,10 +2180,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "대전광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110261&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1802,10 +2197,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서구 도시계획 조례",
+          "name": "대전광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110261&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1816,10 +2214,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "유성구 도시계획 조례",
+          "name": "대전광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110261&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1830,10 +2231,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "대전광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2110261&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1844,10 +2248,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강서구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1858,10 +2265,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "금정구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1872,10 +2282,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "기장군 군계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1886,10 +2299,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "남구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1900,10 +2316,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1914,10 +2333,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동래구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1928,10 +2350,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "부산진구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1942,10 +2367,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "북구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1956,10 +2384,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "사상구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1970,10 +2401,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "사하구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1984,10 +2418,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -1998,10 +2435,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "수영구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2012,10 +2452,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "연제구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2026,10 +2469,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "영도구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2040,10 +2486,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2054,10 +2503,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "해운대구 도시계획 조례",
+          "name": "부산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120465&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2068,10 +2520,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강남구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2082,10 +2537,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강동구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2096,10 +2554,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강북구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2110,10 +2571,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강서구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2124,10 +2588,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "관악구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2138,10 +2605,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "광진구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2152,10 +2622,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "구로구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2166,10 +2639,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "금천구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2180,10 +2656,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "노원구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2194,10 +2673,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "도봉구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2208,10 +2690,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동대문구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2222,10 +2707,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동작구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2236,10 +2724,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "마포구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2250,10 +2741,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서대문구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2264,10 +2758,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서초구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2278,10 +2775,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "성동구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2292,10 +2792,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "성북구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2306,10 +2809,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "송파구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2320,10 +2826,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "양천구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2334,10 +2843,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "영등포구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2348,10 +2860,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "용산구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2362,10 +2877,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "은평구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2376,10 +2894,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "종로구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2390,10 +2911,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2404,10 +2928,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중랑구 도시계획 조례",
+          "name": "서울특별시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+          "status": "source_found",
+          "sourceOrigin": "law.go.kr",
+          "notes": "",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2420,8 +2947,11 @@
           "type": "ordinance",
           "name": "세종특별자치시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2113473&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2432,10 +2962,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "남구 도시계획 조례",
+          "name": "울산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120867&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2446,10 +2979,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "울산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120867&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2460,10 +2996,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "북구 도시계획 조례",
+          "name": "울산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120867&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2474,10 +3013,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "울주군 군계획 조례",
+          "name": "울산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120867&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2488,10 +3030,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "울산광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2120867&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2502,10 +3047,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "강화군 군계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2516,10 +3064,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "계양구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2530,10 +3081,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "남동구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2544,10 +3098,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "동구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2558,10 +3115,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "미추홀구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2572,10 +3132,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "부평구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2586,10 +3149,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2600,10 +3166,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "연수구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2614,10 +3183,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "옹진군 군계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2628,10 +3200,13 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "중구 도시계획 조례",
+          "name": "인천광역시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2644,8 +3219,11 @@
           "type": "ordinance",
           "name": "강진군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2080951&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2658,8 +3236,11 @@
           "type": "ordinance",
           "name": "고흥군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2099347&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2672,8 +3253,11 @@
           "type": "ordinance",
           "name": "곡성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2100715&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2686,8 +3270,11 @@
           "type": "ordinance",
           "name": "광양시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2105463&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -2707,7 +3294,10 @@
           "name": "구례군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2720,8 +3310,11 @@
           "type": "ordinance",
           "name": "나주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2103137&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -2741,7 +3334,10 @@
           "name": "담양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2754,8 +3350,11 @@
           "type": "ordinance",
           "name": "목포시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2099295&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -2775,7 +3374,10 @@
           "name": "무안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2788,8 +3390,11 @@
           "type": "ordinance",
           "name": "보성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2123169&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2802,8 +3407,11 @@
           "type": "ordinance",
           "name": "순천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2113913&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -2823,7 +3431,10 @@
           "name": "신안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2836,8 +3447,11 @@
           "type": "ordinance",
           "name": "여수시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2090475&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -2857,7 +3471,10 @@
           "name": "영광군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2871,7 +3488,10 @@
           "name": "영암군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2885,7 +3505,10 @@
           "name": "완도군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2899,7 +3522,10 @@
           "name": "장성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2913,7 +3539,10 @@
           "name": "장흥군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2927,7 +3556,10 @@
           "name": "진도군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2940,8 +3572,11 @@
           "type": "ordinance",
           "name": "함평군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2087531&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2954,8 +3589,11 @@
           "type": "ordinance",
           "name": "해남군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092395&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2969,7 +3607,10 @@
           "name": "화순군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2983,7 +3624,10 @@
           "name": "고창군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -2996,14 +3640,20 @@
           "type": "ordinance",
           "name": "군산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2030847&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "군산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3016,14 +3666,20 @@
           "type": "ordinance",
           "name": "김제시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092743&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "김제시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3036,14 +3692,20 @@
           "type": "ordinance",
           "name": "남원시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2093179&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "남원시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3056,8 +3718,11 @@
           "type": "ordinance",
           "name": "무주군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2090963&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3070,8 +3735,11 @@
           "type": "ordinance",
           "name": "부안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2059843&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3085,7 +3753,10 @@
           "name": "순창군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3099,7 +3770,10 @@
           "name": "완주군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3112,14 +3786,20 @@
           "type": "ordinance",
           "name": "익산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2103039&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "익산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3133,7 +3813,10 @@
           "name": "임실군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3146,8 +3829,11 @@
           "type": "ordinance",
           "name": "장수군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2118571&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3157,11 +3843,14 @@
       "sigungu": "전주시",
       "sources": [
         {
-          "sourceUrl": "",
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122435&gubun=ELIS",
           "status": "source_found",
           "type": "ordinance",
           "name": "전주시 도시계획 조례",
-          "appendix": "[별표 26] 태양광 발전시설 허가기준"
+          "appendix": "[별표 26] 태양광 발전시설 허가기준",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ],
       "linkedSetbackReviewStatus": "source_found"
@@ -3175,14 +3864,20 @@
           "type": "ordinance",
           "name": "정읍시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121657&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "정읍시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3196,7 +3891,10 @@
           "name": "진안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3210,7 +3908,10 @@
           "name": "서귀포시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -3230,7 +3931,10 @@
           "name": "제주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -3249,14 +3953,20 @@
           "type": "ordinance",
           "name": "계룡시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2088919&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "계룡시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3269,14 +3979,20 @@
           "type": "ordinance",
           "name": "공주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092049&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "공주시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3290,7 +4006,10 @@
           "name": "금산군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3300,16 +4019,22 @@
       "sigungu": "논산시",
       "sources": [
         {
-          "sourceUrl": "",
-          "status": "not_started",
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095519&gubun=ELIS",
+          "status": "source_found",
           "type": "ordinance",
-          "name": "논산시 도시계획 조례"
+          "name": "논산시 도시계획 조례",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "sourceUrl": "",
           "status": "not_started",
           "type": "guideline",
-          "name": "논산시 개발행위허가 운영지침"
+          "name": "논산시 개발행위허가 운영지침",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ],
       "linkedSetbackReviewStatus": "not_started"
@@ -3323,14 +4048,20 @@
           "type": "ordinance",
           "name": "당진시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092539&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "당진시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3343,14 +4074,20 @@
           "type": "ordinance",
           "name": "보령시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2083897&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "보령시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3363,8 +4100,11 @@
           "type": "ordinance",
           "name": "부여군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2093561&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3377,14 +4117,20 @@
           "type": "ordinance",
           "name": "서산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2090923&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "서산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3398,7 +4144,10 @@
           "name": "서천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3411,14 +4160,20 @@
           "type": "ordinance",
           "name": "아산시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2111831&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "아산시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3431,8 +4186,11 @@
           "type": "ordinance",
           "name": "예산군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2088757&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3445,14 +4203,20 @@
           "type": "ordinance",
           "name": "천안시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1932763&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
           "name": "천안시 개발행위허가 운영지침",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3465,8 +4229,11 @@
           "type": "ordinance",
           "name": "청양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092161&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3480,7 +4247,10 @@
           "name": "태안군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "",
-          "status": "not_started"
+          "status": "not_started",
+          "sourceOrigin": "unknown",
+          "notes": "TypeError: fetch failed",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3493,8 +4263,11 @@
           "type": "ordinance",
           "name": "홍성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2113307&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3507,8 +4280,11 @@
           "type": "ordinance",
           "name": "괴산군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2109185&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3521,8 +4297,11 @@
           "type": "ordinance",
           "name": "단양군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1974929&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3535,8 +4314,11 @@
           "type": "ordinance",
           "name": "보은군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2082909&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3549,8 +4331,11 @@
           "type": "ordinance",
           "name": "영동군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2005799&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3563,8 +4348,11 @@
           "type": "ordinance",
           "name": "옥천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2054307&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3577,8 +4365,11 @@
           "type": "ordinance",
           "name": "음성군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106201&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3591,8 +4382,11 @@
           "type": "ordinance",
           "name": "제천시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2128449&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -3611,8 +4405,11 @@
           "type": "ordinance",
           "name": "증평군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2087667&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3625,8 +4422,11 @@
           "type": "ordinance",
           "name": "진천군 군계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2109249&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         }
       ]
     },
@@ -3639,8 +4439,11 @@
           "type": "ordinance",
           "name": "청주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122093&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",
@@ -3659,8 +4462,11 @@
           "type": "ordinance",
           "name": "충주시 도시계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
-          "sourceUrl": "",
-          "status": "not_started"
+          "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2126707&gubun=ELIS",
+          "status": "source_found",
+          "sourceOrigin": "elis.go.kr",
+          "notes": "law.go.kr ELIS 연계 ordinSeq",
+          "collectedAt": "2026-06-23"
         },
         {
           "type": "guideline",

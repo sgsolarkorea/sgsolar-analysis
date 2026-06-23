@@ -80,6 +80,9 @@ function main() {
     for (const source of entry.sources) {
       if (!SOURCE_TYPES.includes(source.type)) errors.push(`invalid source type at ${key}: ${source.type}`);
       if (!SOURCE_STATUSES.includes(source.status)) errors.push(`invalid source status at ${key}: ${source.status}`);
+      if (source.sourceUrl && !/^https:\/\/(www\.)?(law\.go\.kr|elis\.go\.kr)/.test(source.sourceUrl)) {
+        warnings.push(`${key}/${source.type}: non-official domain URL ${source.sourceUrl}`);
+      }
     }
   }
 
