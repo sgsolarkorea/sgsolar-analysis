@@ -19,6 +19,8 @@ export const COLORS = {
   amber: { r: 0.92, g: 0.72, b: 0.2 },
   border: { r: 0.88, g: 0.9, b: 0.92 },
   blueSoft: { r: 0.93, g: 0.96, b: 0.99 },
+  tableHeader: { r: 0.9, g: 0.93, b: 0.96 },
+  accent: { r: 0.95, g: 0.55, b: 0.15 },
   blueText: { r: 0.12, g: 0.35, b: 0.72 },
   orangeSoft: { r: 1, g: 0.97, b: 0.93 },
   orangeText: { r: 0.72, g: 0.35, b: 0.08 },
@@ -33,15 +35,15 @@ export function rgbColor(c: (typeof COLORS)[keyof typeof COLORS]) {
 }
 
 export const KR_FONT_FILES = {
-  regular: "NotoSansKR-Regular.ttf",
-  medium: "NotoSansKR-Medium.ttf",
-  bold: "NotoSansKR-Bold.ttf",
+  regular: "GmarketSansLight.woff",
+  medium: "GmarketSansMedium.woff",
+  bold: "GmarketSansBold.woff",
 } as const;
 
 export const KR_FONT_CDN = {
-  regular: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-400-normal.ttf",
-  medium: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-500-normal.ttf",
-  bold: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-700-normal.ttf",
+  regular: "https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff",
+  medium: "https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff",
+  bold: "https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff",
 } as const;
 
 const fontCache = new Map<string, ArrayBuffer>();
@@ -143,7 +145,7 @@ export function drawFlexibleTableRow(
   });
   const maxLines = Math.max(1, ...cellTexts.map((lines) => lines.length));
   const rowH = maxLines * lineHeight + 10;
-  const bg = header ? COLORS.navyLight : COLORS.white;
+  const bg = header ? COLORS.tableHeader : COLORS.white;
 
   page.drawRectangle({
     x: MARGIN,
@@ -166,7 +168,6 @@ export function drawFlexibleTableRow(
         size: fontSize,
         font: f,
         color: rgbColor(COLORS.text),
-        maxWidth: colWidths[i] - 12,
       });
       lineY -= lineHeight;
     }
@@ -204,7 +205,6 @@ export function drawDisclaimerBox(
       size: 8.5,
       font,
       color: rgbColor(COLORS.slate),
-      maxWidth: contentW - 20,
     });
     lineY -= 12;
   }
@@ -213,13 +213,64 @@ export function drawDisclaimerBox(
 }
 
 
-/** PDF 출력용 — 이모지·제로폭 문자 등 깨짐 유발 문자 정리 */
+/** PDF 출력용 — 이모지·제로폭·미지원 기호 등 깨짐 유발 문자 정리 */
 export function sanitizePdfText(text: string): string {
   return text
     .replace(/\u00A0/g, " ")
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/㎡/g, "m2")
+    .replace(/㎥/g, "m3")
+    .replace(/☐|☑|✓|✔|●|■|□|▪|▫|•|·/g, "-")
     .replace(/⚠\uFE0F?/g, "※")
+    .replace(/—/g, "-")
     .trim();
+}
+
+function tokenizeForWrap(text: string): string[] {
+  const tokens: string[] = [];
+  let i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+
+    if (/\s/.test(ch)) {
+      let ws = ch;
+      i += 1;
+      while (i < text.length && /\s/.test(text[i])) {
+        ws += text[i];
+        i += 1;
+      }
+      tokens.push(ws);
+      continue;
+    }
+
+    if (/[a-zA-Z0-9]/.test(ch)) {
+      let word = ch;
+      i += 1;
+      while (i < text.length && /[a-zA-Z0-9./,%]/.test(text[i])) {
+        word += text[i];
+        i += 1;
+      }
+      tokens.push(word);
+      continue;
+    }
+
+    if (/[\uAC00-\uD7A3]/.test(ch)) {
+      let chunk = ch;
+      i += 1;
+      while (i < text.length && /[\uAC00-\uD7A3]/.test(text[i])) {
+        chunk += text[i];
+        i += 1;
+      }
+      tokens.push(chunk);
+      continue;
+    }
+
+    tokens.push(ch);
+    i += 1;
+  }
+
+  return tokens;
 }
 
 export function wrapTextByWidth(
@@ -232,20 +283,34 @@ export function wrapTextByWidth(
   if (!sanitized) return [""];
 
   const lines: string[] = [];
-  let current = "";
 
-  for (const char of sanitized) {
-    const test = current + char;
-    const width = font.widthOfTextAtSize(test, fontSize);
-    if (width > maxWidth && current.length > 0) {
-      lines.push(current);
-      current = char;
-    } else {
-      current = test;
+  for (const paragraph of sanitized.split("\n")) {
+    if (!paragraph.trim()) {
+      lines.push("");
+      continue;
+    }
+
+    const tokens = tokenizeForWrap(paragraph);
+    let current = "";
+
+    for (const token of tokens) {
+      const test = current ? `${current}${token}` : token;
+      const width = font.widthOfTextAtSize(test, fontSize);
+
+      if (width > maxWidth && current.trim()) {
+        lines.push(current.trimEnd());
+        current = token.trimStart();
+      } else {
+        current = test;
+      }
+    }
+
+    if (current.trim()) {
+      lines.push(current.trimEnd());
     }
   }
-  if (current) lines.push(current);
-  return lines;
+
+  return lines.length > 0 ? lines : [""];
 }
 
 /** @deprecated wrapTextByWidth 사용 */
@@ -456,7 +521,7 @@ export function drawTableRow(
   header = false,
 ): number {
   const rowH = header ? 22 : 20;
-  const bg = header ? COLORS.navyLight : COLORS.white;
+  const bg = header ? COLORS.tableHeader : COLORS.white;
 
   page.drawRectangle({
     x: MARGIN,
@@ -477,7 +542,6 @@ export function drawTableRow(
       size: fontSize,
       font: f,
       color: rgbColor(COLORS.text),
-      maxWidth: col.w - 10,
     });
   }
 

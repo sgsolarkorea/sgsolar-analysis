@@ -15,7 +15,6 @@ export const PDF_SETBACK_FOOTER =
 export const PDF_GRID_GUIDANCE = [
   "계통연계 가능 여부는 관할 한전 사업소의 접속 가능 용량 확인이 필요합니다.",
   "상담 전 설치 주소, 예상 설비용량, 설치 유형 정보를 준비하면 검토가 빠릅니다.",
-  "관할 사업소 및 담당부서 정보는 다음 단계에서 자동 매칭 예정입니다.",
 ];
 
 export const PDF_CONSULTATION_CHECKLIST = [
@@ -74,14 +73,4 @@ export function deriveOverallReviewStatus(data: ResolvedSiteReview): string {
 
 export function formatInstallTypeForPdf(installType: string): string {
   return formatInstallTypeDisplayLabel(installType as InstallTypeOption);
-}
-
-export function estimatePdfPageCount(data: ResolvedSiteReview, includeOrdinance: boolean): number {
-  const regRows = data.layerARegulatoryAnalysis?.rows.length ?? 0;
-  const setRows = data.setbackReview?.rows.length ?? 0;
-  let pages = 6;
-  if (regRows > 8) pages += 1;
-  if (setRows > 5) pages += 1;
-  if (includeOrdinance) pages += 1;
-  return pages;
 }
