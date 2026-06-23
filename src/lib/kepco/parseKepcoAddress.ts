@@ -11,6 +11,7 @@ export const SIDO_ALIASES: Record<string, string> = {
   전라남도: "전라남도",
   전북: "전라북도",
   전라북도: "전라북도",
+  전북특별자치도: "전라북도",
   충남: "충청남도",
   충청남도: "충청남도",
   충북: "충청북도",
@@ -150,9 +151,40 @@ export function formatParsedAddressMeta(parsed: ParsedKepcoAddress): string {
     parsed.sigungu,
     parsed.gu,
     parsed.eupmyeon,
-    parsed.dong,
-    parsed.ri,
-    parsed.roadOrDong,
+    parsed.ri ?? parsed.dong,
   ].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : parsed.raw || "—";
+  return parts.length > 0 ? parts.join(" ") : parsed.raw || "—";
+}
+
+function specificityScore(parsed: ParsedKepcoAddress): number {
+  return (
+    (parsed.ri ? 32 : 0) +
+    (parsed.dong ? 16 : 0) +
+    (parsed.eupmyeon ? 8 : 0) +
+    (parsed.gu ? 4 : 0) +
+    (parsed.sigungu ? 2 : 0) +
+    (parsed.sido ? 1 : 0) +
+    (parsed.roadOrDong ? 1 : 0)
+  );
+}
+
+export function mergeParsedAddresses(...sources: ParsedKepcoAddress[]): ParsedKepcoAddress {
+  const valid = sources.filter((source) => source.raw.trim());
+  if (valid.length === 0) return emptyParsed("");
+
+  const sorted = [...valid].sort((a, b) => specificityScore(b) - specificityScore(a));
+  const merged: ParsedKepcoAddress = { ...sorted[0] };
+
+  for (const other of sorted.slice(1)) {
+    merged.sido ??= other.sido;
+    merged.sigungu ??= other.sigungu;
+    merged.gu ??= other.gu;
+    merged.eupmyeon ??= other.eupmyeon;
+    merged.dong ??= other.dong;
+    merged.ri ??= other.ri;
+    merged.roadOrDong ??= other.roadOrDong;
+  }
+
+  merged.raw = valid.map((source) => source.raw).join(" | ");
+  return merged;
 }

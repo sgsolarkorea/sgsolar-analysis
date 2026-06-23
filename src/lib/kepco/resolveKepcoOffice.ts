@@ -6,6 +6,7 @@ import {
 } from "@/lib/kepco/formatMatchBasis";
 import {
   formatParsedAddressMeta,
+  mergeParsedAddresses,
   parseKepcoAddress,
 } from "@/lib/kepco/parseKepcoAddress";
 import {
@@ -88,8 +89,10 @@ function buildResolved(entry: KepcoOfficeRegistryEntry, parsed: ParsedKepcoAddre
 }
 
 export function resolveKepcoOffice(address: string, jibunAddress = ""): ResolvedKepcoOffice {
-  const haystack = `${address} ${jibunAddress}`.trim();
-  const parsed = parseKepcoAddress(haystack);
+  const parsed = mergeParsedAddresses(
+    parseKepcoAddress(address.trim()),
+    parseKepcoAddress(jibunAddress.trim()),
+  );
 
   const candidates = KEPCO_OFFICE_REGISTRY.filter((entry) => entryMatches(entry, parsed));
   const best = pickBestMatch(candidates);

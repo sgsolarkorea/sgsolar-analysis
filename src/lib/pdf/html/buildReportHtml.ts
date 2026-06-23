@@ -120,7 +120,7 @@ function renderLocationFallback(data: ResolvedSiteReview, reason: string): strin
 }
 
 function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
-  const office = resolveKepcoOffice(data.address);
+  const office = resolveKepcoOffice(data.address, data.jibunAddress);
   const topics = KEPCO_INQUIRY_TOPICS.map((item) => `<li>${htmlText(item)}</li>`).join("");
   const prep = KEPCO_PREP_ITEMS.map((item) => `<li>${htmlText(item)}</li>`).join("");
 
@@ -138,7 +138,7 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
         <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
       </div>
       <div class="kepco-match-row meta">
-        <div class="kepco-field-label">주소 파싱</div>
+        <div class="kepco-field-label">기준 행정구역</div>
         <div class="kepco-field-val">${htmlText(office.parsedMeta)}</div>
       </div>
       ${office.verificationNote ? `<p class="kepco-note">${htmlText(office.verificationNote)}</p>` : ""}

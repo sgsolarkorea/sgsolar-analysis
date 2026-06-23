@@ -64,7 +64,7 @@ export default function KepcoOfficeInquiryCard({
             매칭 기준: {office.matchBasisLabel}
           </p>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-            주소 파싱: {office.parsedMeta}
+            기준 행정구역: {office.parsedMeta}
           </p>
           {office.verificationNote && (
             <p className="mt-1 text-xs leading-relaxed text-amber-800">{office.verificationNote}</p>
