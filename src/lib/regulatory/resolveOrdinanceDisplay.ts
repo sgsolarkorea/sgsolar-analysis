@@ -10,6 +10,8 @@ import {
   isMetroUrbanSido,
   resolveUrbanPolicy,
 } from "@/lib/regulatory/ordinanceDisplayPolicy";
+import { lookupManualOverride } from "@/lib/regulatory/setbackManualOverrideDb";
+import { buildManualOverrideOrdinanceDisplay } from "@/lib/regulatory/resolveManualOverrideDisplay";
 import { mergeParsedAddresses, parseKepcoAddress } from "@/lib/kepco/parseKepcoAddress";
 import type { MunicipalityOrdinanceData } from "@/types/regulatoryReview";
 import type { OrdinanceDisplayResult } from "@/types/regulatoryReview";
@@ -52,6 +54,11 @@ export function resolveOrdinanceDisplay(
     parseKepcoAddress(jibunAddress.trim()),
   );
   const sido = parsed.sido;
+
+  const manualOverride = lookupManualOverride(address, jibunAddress);
+  if (manualOverride) {
+    return buildManualOverrideOrdinanceDisplay(manualOverride, municipalityLabel);
+  }
 
   const rawCandidate = lookupParsedCandidate(address, jibunAddress);
   const candidate = rawCandidate ? enrichCandidateForDisplay(rawCandidate) : null;

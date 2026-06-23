@@ -20,6 +20,7 @@
     "parse:regulation-appendices": "node scripts/parse-regulation-appendices.mjs --all",
     "parse:regulation-appendices:priority": "node scripts/parse-regulation-appendices.mjs --priority",
     "validate:regulatory-db": "node scripts/validate-regulatory-db.mjs",
+    "validate:setback-manual-overrides": "node scripts/validate-setback-manual-overrides.mjs",
     "start": "next start",
     "lint": "eslint"
   },

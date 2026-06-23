@@ -190,6 +190,43 @@ export interface ParsedOrdinanceCandidate {
   parsedAt?: string;
 }
 
+/** Step 6.9 — 수동 검토·승인 override (production parser 후보보다 우선) */
+export type ManualOverrideReviewStatus = "manual_verified" | "manual_pending";
+
+export interface ManualOverrideDistances {
+  residential: number | null;
+  building: number | null;
+  road: number | null;
+  river: number | null;
+  school: number | null;
+  cultural: number | null;
+}
+
+export interface ManualOverrideConditions {
+  slope?: string;
+  buffer?: string;
+  roofException?: string;
+  [key: string]: string | undefined;
+}
+
+export interface SetbackManualOverrideEntry {
+  municipalityLabel: string;
+  sido: string;
+  sigungu: string;
+  reviewStatus: ManualOverrideReviewStatus;
+  confidence: SetbackRegulationConfidence;
+  source: string;
+  sourceUrl: string;
+  verifiedBy: string | null;
+  verifiedAt: string | null;
+  articleTitle: string;
+  articleNumber: string;
+  appendixNumber: string;
+  distances: ManualOverrideDistances;
+  conditions?: ManualOverrideConditions;
+  notes?: string;
+}
+
 export interface SetbackRegulationEntry {
   municipalityLabel: string;
   sido: string;
@@ -217,6 +254,11 @@ export interface ResolvedSetbackRegulation {
   confidence: SetbackRegulationConfidence;
   distances: SetbackDistances;
   isFallback: boolean;
+  /** Step 6.9 — setback-manual-overrides.json 적용 여부 */
+  isManualOverride?: boolean;
+  manualReviewStatus?: ManualOverrideReviewStatus;
+  sourceUrl?: string | null;
+  manualOverrideNotes?: string;
 }
 
 export interface SetbackAppliedStandard {
@@ -240,6 +282,8 @@ export interface SetbackReview {
 export type OrdinanceDisplayStatus =
   | "urban_review_required"
   | "manual_review"
+  | "manual_verified"
+  | "manual_pending"
   | "candidate"
   | "preparing"
   | "verified";
@@ -259,6 +303,9 @@ export interface OrdinanceDisplayPolicy {
   displayStatus: OrdinanceDisplayStatus;
   urbanNotice?: UrbanOrdinanceNotice;
   reviewReason?: string;
+  /** Step 6.9 — manual_verified 카드 하단 안내 문구 */
+  manualOverrideNoticeLines?: readonly string[];
+  manualReviewStatus?: ManualOverrideReviewStatus;
 }
 
 export interface OrdinanceDisplayCard {
@@ -278,7 +325,9 @@ export interface OrdinanceDisplayResult {
   policy: OrdinanceDisplayPolicy;
   cards: OrdinanceDisplayCard[];
   hasParsedCandidate: boolean;
+  hasManualOverride?: boolean;
   parsedAt?: string;
+  manualVerifiedAt?: string | null;
 }
 
 /** @deprecated MunicipalityOrdinanceData 사용 */

@@ -32,6 +32,8 @@ function resolveBadgeStatus(
   meta: OrdinanceLoadMeta,
 ): keyof typeof ORDINANCE_DISPLAY_LABELS {
   if (policy.displayStatus === "urban_review_required") return "urban_review_required";
+  if (policy.displayStatus === "manual_verified") return "manual_verified";
+  if (policy.displayStatus === "manual_pending") return "manual_pending";
   if (policy.displayStatus === "manual_review") return "manual_review";
   if (policy.displayStatus === "candidate") return "candidate";
   if (!meta.isPreparing && meta.displayStatus === "verified") return "verified";
@@ -45,6 +47,8 @@ const BADGE_STYLES: Record<string, string> = {
   default_template: "bg-slate-100 text-slate-700 border-slate-200",
   urban_review_required: "bg-indigo-50 text-indigo-800 border-indigo-200",
   manual_review: "bg-amber-50 text-amber-900 border-amber-200",
+  manual_verified: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  manual_pending: "bg-amber-50 text-amber-900 border-amber-200",
   candidate: "bg-sky-50 text-sky-800 border-sky-200",
 };
 
@@ -95,7 +99,15 @@ function OrdinancePreparingPanel({
 }
 
 export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceSectionProps) {
-  const { policy, cards, municipalityLabel, parsedAt, hasParsedCandidate } = display;
+  const {
+    policy,
+    cards,
+    municipalityLabel,
+    parsedAt,
+    hasParsedCandidate,
+    hasManualOverride,
+    manualVerifiedAt,
+  } = display;
   const showUrbanNotice = policy.isUrbanMetro && policy.urbanNotice;
   const showPreparing = !showUrbanNotice && cards.length === 0 && meta.isPreparing;
 
@@ -106,9 +118,11 @@ export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceS
         description={
           showUrbanNotice
             ? "수도권·도시지역은 개발행위허가 및 설치 가능 여부 검토가 우선입니다."
-            : hasParsedCandidate
-              ? "parser QA 후보 기준으로 조례 정보를 요약했습니다. (production 미반영)"
-              : "해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
+            : hasManualOverride
+              ? "수동 검토 DB 기준으로 조례 정보를 표시합니다. (parser 후보·production DB보다 우선)"
+              : hasParsedCandidate
+                ? "parser QA 후보 기준으로 조례 정보를 요약했습니다. (production 미반영)"
+                : "해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
         }
       />
 
@@ -116,10 +130,13 @@ export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceS
         <DisplayStatusBadge policy={policy} meta={meta} />
         <div className="text-sm text-slate-700">
           <span className="font-semibold text-slate-900">{municipalityLabel}</span>
+          {manualVerifiedAt && (
+            <span className="ml-2 text-slate-600">수동 검토 · {formatReviewDate(manualVerifiedAt)}</span>
+          )}
           {parsedAt && (
             <span className="ml-2 text-slate-600">parser QA · {parsedAt}</span>
           )}
-          {meta.reviewedAt && !parsedAt && (
+          {meta.reviewedAt && !parsedAt && !manualVerifiedAt && (
             <span className="ml-2 text-slate-600">
               최종 검토일 {formatReviewDate(meta.reviewedAt)}
               {meta.version ? ` · v${meta.version}` : ""}
@@ -141,7 +158,17 @@ export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceS
           {cards.map((card) => (
             <OrdinanceInfoCard key={card.id} card={card} />
           ))}
-          {policy.displayStatus === "manual_review" && policy.reviewReason && (
+          {policy.manualOverrideNoticeLines && policy.manualOverrideNoticeLines.length > 0 && (
+            <ul className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm leading-relaxed text-emerald-900">
+              {policy.manualOverrideNoticeLines.map((line) => (
+                <li key={line} className="list-inside list-disc">
+                  {line}
+                </li>
+              ))}
+            </ul>
+          )}
+          {(policy.displayStatus === "manual_review" || policy.displayStatus === "manual_pending") &&
+            policy.reviewReason && (
             <p className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
               {policy.reviewReason}
             </p>

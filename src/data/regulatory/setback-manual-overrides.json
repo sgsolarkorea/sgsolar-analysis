@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "version": "2026-06-24-step6.9",
+    "description": "Step 6.9 — 수동 검토·승인된 조례 이격거리 override. production setback-regulations.json보다 우선. parser 후보는 자동 반영하지 않음.",
+    "lookupPriority": ["setback-manual-overrides.json", "setback-regulations.json", "commonFallback"]
+  },
+  "entries": {
+    "전라북도|전주시": {
+      "municipalityLabel": "전주시",
+      "sido": "전라북도",
+      "sigungu": "전주시",
+      "reviewStatus": "manual_pending",
+      "confidence": "needs_verification",
+      "source": "전주시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122435&gubun=ELIS",
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "articleTitle": "개발행위허가의 기준",
+      "articleNumber": "",
+      "appendixNumber": "",
+      "distances": {
+        "residential": null,
+        "building": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "conditions": {},
+      "notes": "전주시 담당부서 확인 예정. ELIS 별표26(태양광 발전시설 허가기준) XML/HWP 미수신 — 확인 후 manual_verified로 승격"
+    }
+  }
+}

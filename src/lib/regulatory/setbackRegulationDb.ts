@@ -1,9 +1,13 @@
 import setbackData from "@/data/regulatory/setback-regulations.json";
 import { mergeParsedAddresses, parseKepcoAddress } from "@/lib/kepco/parseKepcoAddress";
+import {
+  lookupManualOverrideByKey,
+  resolveDistancesFromManualOverride,
+} from "@/lib/regulatory/setbackManualOverrideDb";
 import type {
   ResolvedSetbackRegulation,
   SetbackDistanceKey,
-  SetbackDistances,
+  SetbackManualOverrideEntry,
   SetbackRegulationConfidence,
   SetbackRegulationEntry,
 } from "@/types/regulatoryReview";
@@ -48,6 +52,24 @@ function toResolved(entry: RawEntry, isFallback: boolean): ResolvedSetbackRegula
   };
 }
 
+function toResolvedFromManual(entry: SetbackManualOverrideEntry): ResolvedSetbackRegulation {
+  const isPending = entry.reviewStatus === "manual_pending";
+  return {
+    municipalityLabel: entry.municipalityLabel,
+    sido: entry.sido,
+    sigungu: entry.sigungu,
+    source: isPending ? `${entry.source} (담당부서 확인 예정)` : entry.source,
+    lastUpdated: entry.verifiedAt ?? COMMON.lastUpdated,
+    confidence: entry.confidence,
+    distances: resolveDistancesFromManualOverride(entry),
+    isFallback: isPending,
+    isManualOverride: true,
+    manualReviewStatus: entry.reviewStatus,
+    sourceUrl: entry.sourceUrl,
+    manualOverrideNotes: entry.notes,
+  };
+}
+
 function fallbackRegulation(municipalityLabel?: string): ResolvedSetbackRegulation {
   return {
     municipalityLabel: municipalityLabel ?? "해당 지자체",
@@ -71,8 +93,14 @@ export function lookupSetbackRegulation(
   );
 
   const key = regionLookupKey(parsed.sido, parsed.sigungu);
-  if (key && ENTRIES[key]) {
-    return toResolved(ENTRIES[key], false);
+  if (key) {
+    const manual = lookupManualOverrideByKey(key);
+    if (manual) {
+      return toResolvedFromManual(manual);
+    }
+    if (ENTRIES[key]) {
+      return toResolved(ENTRIES[key], false);
+    }
   }
 
   const label = parsed.sigungu ?? parsed.sido ?? undefined;
@@ -84,6 +112,13 @@ export function formatSetbackStandardM(meters: number): string {
 }
 
 export function buildSetbackStandardNotice(regulation: ResolvedSetbackRegulation): string {
+  if (regulation.isManualOverride) {
+    if (regulation.manualReviewStatus === "manual_verified") {
+      return `${regulation.municipalityLabel} · 지자체 담당부서 확인 기준 · 조례 기준 참고 · 최종 인허가는 관할 지자체 검토 필요`;
+    }
+    return `${regulation.municipalityLabel} · 지자체 담당부서 확인 예정 · 조례 수동 검토 대기 (공통 참고 기준 적용 중)`;
+  }
+
   if (regulation.isFallback) {
     return "공통 기준 적용 중 (지자체 조례 DB 미반영)";
   }
@@ -100,6 +135,9 @@ export function buildSetbackStandardNotice(regulation: ResolvedSetbackRegulation
 }
 
 export function buildSetbackStandardColumnLabel(regulation: ResolvedSetbackRegulation): string {
+  if (regulation.isManualOverride && regulation.manualReviewStatus === "manual_verified") {
+    return "수동 검토 기준";
+  }
   if (regulation.isFallback || regulation.confidence === "needs_verification") {
     return "공통 참고 기준";
   }
