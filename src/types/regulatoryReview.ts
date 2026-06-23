@@ -34,6 +34,9 @@ export interface MunicipalityOrdinanceData {
 
 export type SetbackJudgment =
   | "기본 확인"
+  | "거리 검토 필요"
+  | "공공데이터 확인 필요"
+  /** @deprecated 이전 Step 3 내부값 */
   | "추가 검토 필요"
   | "조례 확인 필요"
   | "데이터 확인 필요"
@@ -57,6 +60,7 @@ export interface SetbackReviewRow {
 export interface SetbackReviewMeta {
   partial?: boolean;
   errors?: string[];
+  debug?: Array<{ key: string; error: string; layerId?: string }>;
   collectedAt?: string;
   gisDistanceCount?: number;
 }

@@ -1,31 +1,23 @@
 import type { SetbackReview } from "@/types/regulatoryReview";
 import type { ParcelContext } from "@/types/siteIntel";
 import { buildSetbackFromGis } from "@/lib/regulatory/buildSetbackFromGis";
+import { SETBACK_SECTION_NOTICE } from "@/lib/regulatory/setbackDisplay";
 
 export { extractMunicipalityLabel, loadMunicipalityOrdinance } from "@/lib/regulatory/loadOrdinance";
 
-export function buildDefaultSetbackReview(installType?: string): SetbackReview {
-  const isRoof =
-    installType?.includes("지붕") ||
-    installType?.includes("옥상") ||
-    installType?.includes("축사") ||
-    installType?.includes("공장") ||
-    installType?.includes("상가");
-
+export function buildDefaultSetbackReview(_installType?: string): SetbackReview {
   const fallbackRow = (item: string, standard: string, detail?: string) => ({
     item,
     detail,
     standard,
     estimatedDistanceM: null,
-    measured: "데이터 확인 필요",
-    judgment: "데이터 확인 필요" as const,
-    remark: "필지 GIS 정보 확인 후 추정 거리를 산출합니다.",
+    measured: "확인 필요",
+    judgment: "공공데이터 확인 필요" as const,
+    remark: "해당 항목은 공공데이터에서 확인되지 않았습니다.",
   });
 
   return {
-    notice: isRoof
-      ? "지붕형 태양광은 이격거리 조례에 무관하게 설치를 검토할 수 있습니다."
-      : "아래 거리는 공공 GIS 기준 추정값이며, 최종 이격거리는 지자체 조례·현장 확인이 필요합니다.",
+    notice: SETBACK_SECTION_NOTICE,
     rows: [
       fallbackRow("건물/주거지", "200m", "인근 건물"),
       fallbackRow("도로", "100m", "포장도로"),

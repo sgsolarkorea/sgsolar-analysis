@@ -4,8 +4,14 @@ import {
   type SetbackTargetSpec,
 } from "@/lib/gis/distanceEngine";
 import type { VworldFetchCounter } from "@/lib/gis/vworldClient";
+import {
+  buildSetbackGuidance,
+  formatSetbackDistanceDisplay,
+  resolveSetbackJudgment,
+  SETBACK_SECTION_NOTICE,
+} from "@/lib/regulatory/setbackDisplay";
 import type { ParcelContext } from "@/types/siteIntel";
-import type { SetbackJudgment, SetbackReview, SetbackReviewRow } from "@/types/regulatoryReview";
+import type { SetbackReview, SetbackReviewRow } from "@/types/regulatoryReview";
 
 export const SETBACK_GIS_TARGETS: SetbackTargetSpec[] = [
   {
@@ -56,57 +62,33 @@ function formatStandardM(standardM: number): string {
   return `${standardM}m`;
 }
 
-function formatEstimatedDistanceM(distanceM: number | null): string {
-  if (distanceM == null) return "데이터 확인 필요";
-  return `${distanceM}m`;
-}
-
-function resolveJudgment(standardM: number, distanceM: number | null): SetbackJudgment {
-  if (distanceM == null) return "데이터 확인 필요";
-  if (distanceM >= standardM) return "기본 확인";
-  if (distanceM >= standardM * 0.5) return "조례 확인 필요";
-  return "추가 검토 필요";
-}
-
-function buildRemark(result: SetbackMeasureResult, judgment: SetbackJudgment): string {
-  if (judgment === "데이터 확인 필요") {
-    return result.error ? `GIS 레이어 조회 실패 (${result.error})` : "GIS 레이어 데이터 확인 필요";
-  }
-  const parts: string[] = ["공공 GIS 기준 추정"];
-  if (result.featureLabel) parts.push(result.featureLabel);
-  if (result.layerId) parts.push(`레이어 ${result.layerId}`);
-  return parts.join(" · ");
-}
-
 function measureToRow(target: SetbackTargetSpec, result: SetbackMeasureResult): SetbackReviewRow {
-  const judgment = resolveJudgment(target.standardM, result.distanceM);
+  const judgment = resolveSetbackJudgment(target.standardM, result.distanceM);
   return {
     item: target.label,
     detail: target.detail,
     standard: formatStandardM(target.standardM),
     estimatedDistanceM: result.distanceM,
-    measured: formatEstimatedDistanceM(result.distanceM),
+    measured: formatSetbackDistanceDisplay(result.distanceM),
     judgment,
-    remark: buildRemark(result, judgment),
+    remark: buildSetbackGuidance({
+      targetKey: target.key,
+      standardM: target.standardM,
+      distanceM: result.distanceM,
+      judgment,
+    }),
   };
 }
 
 export interface BuildSetbackFromGisResult extends SetbackReview {
-  layerErrors: Array<{ key: string; error: string }>;
+  layerErrors: Array<{ key: string; error: string; layerId?: string }>;
 }
 
 export async function buildSetbackFromGis(
   parcel: ParcelContext,
-  installType?: string,
+  _installType?: string,
   counter?: VworldFetchCounter,
 ): Promise<BuildSetbackFromGisResult> {
-  const isRoof =
-    installType?.includes("지붕") ||
-    installType?.includes("옥상") ||
-    installType?.includes("축사") ||
-    installType?.includes("공장") ||
-    installType?.includes("상가");
-
   const results = await measureAllSetbackTargets(parcel, SETBACK_GIS_TARGETS, counter);
   const rows = SETBACK_GIS_TARGETS.map((target, index) =>
     measureToRow(target, results[index]),
@@ -114,18 +96,25 @@ export async function buildSetbackFromGis(
 
   const layerErrors = results
     .filter((result) => result.distanceM == null && result.error)
-    .map((result) => ({ key: result.key, error: result.error! }));
+    .map((result) => ({
+      key: result.key,
+      error: result.error!,
+      layerId: result.layerId,
+    }));
+
+  if (layerErrors.length > 0) {
+    console.debug("[SetbackReview] layer lookup details", layerErrors);
+  }
 
   const withDistance = results.filter((result) => result.distanceM != null).length;
 
   return {
-    notice: isRoof
-      ? "지붕형 태양광은 이격거리 조례에 무관하게 설치를 검토할 수 있습니다. 아래는 참고용 GIS 추정 거리입니다."
-      : "아래 거리는 공공 GIS 기준 추정값이며, 최종 이격거리는 지자체 조례·현장 확인이 필요합니다.",
+    notice: SETBACK_SECTION_NOTICE,
     rows,
     meta: {
       partial: layerErrors.length > 0 || withDistance < SETBACK_GIS_TARGETS.length,
       errors: layerErrors.map((entry) => `${entry.key}: ${entry.error}`),
+      debug: layerErrors,
       collectedAt: new Date().toISOString(),
       gisDistanceCount: withDistance,
     },

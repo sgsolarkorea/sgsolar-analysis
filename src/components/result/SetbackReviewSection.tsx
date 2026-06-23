@@ -1,13 +1,16 @@
 import type { SetbackJudgment, SetbackReview } from "@/types/regulatoryReview";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { SETBACK_SECTION_FOOTER } from "@/lib/regulatory/setbackDisplay";
 
 const JUDGMENT_STYLES: Record<SetbackJudgment, string> = {
-  "기본 확인": "bg-emerald-50 text-emerald-800 border-emerald-200",
+  "기본 확인": "bg-blue-50 text-blue-800 border-blue-200",
+  "거리 검토 필요": "bg-orange-50/80 text-orange-800 border-orange-100",
+  "공공데이터 확인 필요": "bg-slate-100 text-slate-600 border-slate-200",
   "추가 검토 필요": "bg-orange-50/80 text-orange-800 border-orange-100",
-  "조례 확인 필요": "bg-amber-50 text-amber-900 border-amber-200",
+  "조례 확인 필요": "bg-orange-50/80 text-orange-800 border-orange-100",
   "데이터 확인 필요": "bg-slate-100 text-slate-600 border-slate-200",
-  적합: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  "검토 필요": "bg-amber-50 text-amber-900 border-amber-200",
+  적합: "bg-blue-50 text-blue-800 border-blue-200",
+  "검토 필요": "bg-orange-50/80 text-orange-800 border-orange-100",
   "추가 확인": "bg-slate-100 text-slate-700 border-slate-200",
   "조례 기준 확인 필요": "bg-slate-100 text-slate-600 border-slate-200",
 };
@@ -21,7 +24,7 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
     <section id="setback-review" className="scroll-mt-24">
       <SectionHeader
         title="이격거리 검토"
-        description="주요 시설물·경계와의 GIS 추정 이격거리입니다."
+        description="주요 시설물·경계까지의 예상 거리입니다."
         compact
       />
 
@@ -36,11 +39,11 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
           <table className="w-full min-w-[36rem] table-fixed text-left text-xs sm:text-sm">
             <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-600">
               <tr>
-                <th className="w-[18%] px-3 py-2 font-semibold">항목</th>
-                <th className="w-[14%] px-3 py-2 font-semibold">기준 이격거리</th>
-                <th className="w-[14%] px-3 py-2 font-semibold">GIS 추정 거리</th>
-                <th className="w-[16%] px-3 py-2 font-semibold">검토 결과</th>
-                <th className="w-[38%] px-3 py-2 font-semibold">비고</th>
+                <th className="w-[18%] px-3 py-2 font-semibold">검토 항목</th>
+                <th className="w-[14%] px-3 py-2 font-semibold">참고 기준</th>
+                <th className="w-[14%] px-3 py-2 font-semibold">예상 거리</th>
+                <th className="w-[16%] px-3 py-2 font-semibold">검토 상태</th>
+                <th className="w-[38%] px-3 py-2 font-semibold">안내</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -72,8 +75,7 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
       </div>
 
       <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
-        GIS 추정 거리는 공공데이터 기준 1차 참고값입니다. 최종 이격거리는 지자체 조례·현장 확인 후
-        판단합니다.
+        {SETBACK_SECTION_FOOTER}
       </p>
     </section>
   );

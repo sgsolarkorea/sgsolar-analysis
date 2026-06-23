@@ -37,7 +37,7 @@ export default function RegulatoryAnalysisSection({ analysis }: RegulatoryAnalys
     <section id="regulatory-analysis" className="scroll-mt-24">
       <SectionHeader
         title="법·규제 분석"
-        description="공공 GIS 토지이용계획 기반 Layer A 1차 규제 검토입니다."
+        description="공공 토지이용계획 기반 1차 규제 검토입니다."
         compact
       />
 
