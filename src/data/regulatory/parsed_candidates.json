@@ -1057,7 +1057,8 @@
           "matchConfidence": "medium"
         }
       ],
-      "requiresManualReview": false,
+      "requiresManualReview": true,
+      "reviewReason": "태양광 발전시설 전용 조문·별표(별표26) 미확인 — 개발행위허가 일반기준 원문 검토 필요",
       "isUrbanMetro": false,
       "appendixRefs": [
         {
@@ -1088,7 +1089,7 @@
         "appendixCount": 2,
         "manualReviewCount": 1
       },
-      "notes": "소각·고형연료 1000m는 excludedSections 유지. 확인된 sub-1000m 거리(주거·문화재)는 display 표시"
+      "notes": "소각·고형연료 1000m excludedSections 유지. ELIS 등록 별표26(태양광 발전시설 허가기준)은 XML 피드 미수신 — display는 manual_review·qualitative 요약"
     },
     {
       "regionKey": "충청남도|논산시",

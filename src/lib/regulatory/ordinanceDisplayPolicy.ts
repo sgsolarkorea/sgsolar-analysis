@@ -115,9 +115,23 @@ function hasDisplayableDistances(candidate: ParsedOrdinanceCandidate): boolean {
   return Object.values(filterDistancesForDisplay(candidate)).some((v) => v != null);
 }
 
-/** 1000m+ 소각/고형연료 등만 manual review인 경우 — 확인된 sub-1000m 거리는 표시 허용 */
+/** 태양광/신재생에너지 전용 조문·별표가 확인된 경우 */
+export function candidateHasSolarOrdinanceEvidence(candidate: ParsedOrdinanceCandidate): boolean {
+  const hasSolarSection = (candidate.matchedSections ?? []).some(
+    (s) =>
+      s.type === "article" &&
+      /태양(?:광)?|태양\s*에너지|신재생(?:에?)너지|태양.*발전|발전시설.*허가/i.test(s.title),
+  );
+  const hasSolarAppendix = (candidate.appendixRefs ?? []).some((a) =>
+    /태양(?:광)?|태양\s*에너지|신재생(?:에?)너지|발전시설|이격거리/i.test(a.title),
+  );
+  return hasSolarSection || hasSolarAppendix;
+}
+
+/** 1000m+ 소각/고형연료 등만 manual review이고 태양광 전용 근거가 있는 경우 — sub-1000m 표시 허용 */
 export function isPartialManualReviewOnly(candidate: ParsedOrdinanceCandidate): boolean {
   if (!candidate.requiresManualReview) return false;
+  if (!candidateHasSolarOrdinanceEvidence(candidate)) return false;
   if (!hasDisplayableDistances(candidate)) return false;
 
   const manualCandidates = candidate.manualReviewCandidates ?? [];
@@ -159,6 +173,23 @@ export function resolveUrbanPolicy(input: {
       includeSchoolSetback,
       displayStatus: "manual_review",
       reviewReason: input.candidate.reviewReason,
+    };
+  }
+
+  if (
+    input.candidate &&
+    !candidateHasSolarOrdinanceEvidence(input.candidate) &&
+    !input.candidate.appendixParseSuccess
+  ) {
+    return {
+      isUrbanMetro: false,
+      hideSetbackDistances: false,
+      hideOrdinanceDistances: true,
+      includeSchoolSetback,
+      displayStatus: "manual_review",
+      reviewReason:
+        input.candidate.reviewReason ??
+        "태양광 발전시설 전용 조문·별표 확인 필요 — 개발행위허가 일반기준 원문 검토 후 반영",
     };
   }
 
@@ -346,7 +377,12 @@ function buildSummaryBullets(
   candidate: ParsedOrdinanceCandidate,
   policy: OrdinanceDisplayPolicy,
 ): string[] {
-  if (policy.hideOrdinanceDistances) return [];
+  if (policy.hideOrdinanceDistances) {
+    if (policy.displayStatus === "manual_review") {
+      return buildQualitativeBullets(candidate);
+    }
+    return [];
+  }
 
   const verified = buildVerifiedNumericBullets(candidate);
   if (verified.length > 0) {

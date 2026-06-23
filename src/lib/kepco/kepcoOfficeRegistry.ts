@@ -242,6 +242,17 @@ export const MANUAL_KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = [
     confidence: "region_match",
     ...DEFAULT_ENTRY,
   },
+
+  // ── 충청북도 (Step 5.6b — 생극면은 한전ON 자동 registry가 진천지사로 매칭되나 실무상 음성지사 관할) ──
+  {
+    sido: "충청북도",
+    sigungu: "음성군",
+    eupmyeon: "생극면",
+    officeName: "음성지사",
+    matchLevel: "eupmyeon",
+    confidence: "region_match",
+    ...DEFAULT_ENTRY,
+  },
 ];
 
 type AutoRegistryEntry = Omit<KepcoOfficeRegistryEntry, "departmentHint"> & {
