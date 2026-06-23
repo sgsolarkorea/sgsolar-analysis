@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { rgb, type PDFImage, type PDFFont, type PDFPage } from "pdf-lib";
+import type { PdfStatusTone } from "@/lib/pdf/reportContent";
 
 export const PAGE = { width: 595, height: 842 } as const;
 export const MARGIN = 48;
@@ -17,11 +18,200 @@ export const COLORS = {
   white: { r: 1, g: 1, b: 1 },
   amber: { r: 0.92, g: 0.72, b: 0.2 },
   border: { r: 0.88, g: 0.9, b: 0.92 },
+  blueSoft: { r: 0.93, g: 0.96, b: 0.99 },
+  blueText: { r: 0.12, g: 0.35, b: 0.72 },
+  orangeSoft: { r: 1, g: 0.97, b: 0.93 },
+  orangeText: { r: 0.72, g: 0.35, b: 0.08 },
+  amberSoft: { r: 1, g: 0.96, b: 0.9 },
+  amberText: { r: 0.55, g: 0.32, b: 0.02 },
+  graySoft: { r: 0.96, g: 0.97, b: 0.98 },
+  grayText: { r: 0.4, g: 0.42, b: 0.46 },
 } as const;
 
 export function rgbColor(c: (typeof COLORS)[keyof typeof COLORS]) {
   return rgb(c.r, c.g, c.b);
 }
+
+export const KR_FONT_FILES = {
+  regular: "NotoSansKR-Regular.ttf",
+  medium: "NotoSansKR-Medium.ttf",
+  bold: "NotoSansKR-Bold.ttf",
+} as const;
+
+export const KR_FONT_CDN = {
+  regular: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-400-normal.ttf",
+  medium: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-500-normal.ttf",
+  bold: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-kr@5.2.5/korean-700-normal.ttf",
+} as const;
+
+const fontCache = new Map<string, ArrayBuffer>();
+
+export async function loadKrFontBytes(weight: keyof typeof KR_FONT_FILES): Promise<ArrayBuffer> {
+  const cacheKey = `kr-${weight}`;
+  const cached = fontCache.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const local = await readFile(join(process.cwd(), "public", "fonts", KR_FONT_FILES[weight]));
+    const bytes = new Uint8Array(local).buffer;
+    fontCache.set(cacheKey, bytes);
+    return bytes;
+  } catch {
+    const response = await fetch(KR_FONT_CDN[weight], { cache: "force-cache" });
+    if (!response.ok) {
+      throw new Error(`PDF font load failed (${weight}): HTTP ${response.status}`);
+    }
+    const bytes = await response.arrayBuffer();
+    fontCache.set(cacheKey, bytes);
+    return bytes;
+  }
+}
+
+export function statusToneColors(tone: PdfStatusTone): {
+  bg: (typeof COLORS)[keyof typeof COLORS];
+  text: (typeof COLORS)[keyof typeof COLORS];
+} {
+  switch (tone) {
+    case "blue":
+      return { bg: COLORS.blueSoft, text: COLORS.blueText };
+    case "orange":
+      return { bg: COLORS.orangeSoft, text: COLORS.orangeText };
+    case "amber":
+      return { bg: COLORS.amberSoft, text: COLORS.amberText };
+    default:
+      return { bg: COLORS.graySoft, text: COLORS.grayText };
+  }
+}
+
+export function drawStatusBadge(
+  page: PDFPage,
+  font: PDFFont,
+  x: number,
+  y: number,
+  label: string,
+  tone: PdfStatusTone,
+): number {
+  const { bg, text } = statusToneColors(tone);
+  const fontSize = 7.5;
+  const padX = 5;
+  const padY = 3;
+  const textWidth = font.widthOfTextAtSize(sanitizePdfText(label), fontSize);
+  const w = textWidth + padX * 2;
+  const h = fontSize + padY * 2;
+
+  page.drawRectangle({
+    x,
+    y: y - h,
+    width: w,
+    height: h,
+    color: rgbColor(bg),
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.4,
+  });
+  page.drawText(sanitizePdfText(label), {
+    x: x + padX,
+    y: y - h + padY + 1,
+    size: fontSize,
+    font,
+    color: rgbColor(text),
+  });
+  return w;
+}
+
+function cellLines(text: string, font: PDFFont, fontSize: number, maxWidth: number): string[] {
+  return wrapTextByWidth(text, font, fontSize, maxWidth);
+}
+
+export function drawFlexibleTableRow(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  fontMedium: PDFFont,
+  y: number,
+  cols: { w: number; text: string; bold?: boolean; medium?: boolean }[],
+  options?: { header?: boolean; fontSize?: number },
+): number {
+  const header = options?.header ?? false;
+  const fontSize = options?.fontSize ?? (header ? 9 : 8.5);
+  const contentW = PAGE.width - MARGIN * 2;
+  const colWidths = cols.map((col) => (col.w / 100) * contentW);
+  const lineHeight = fontSize + 4;
+
+  const cellTexts = cols.map((col, index) => {
+    const f = header || col.bold ? fontBold : col.medium ? fontMedium : font;
+    return cellLines(col.text, f, fontSize, colWidths[index] - 12);
+  });
+  const maxLines = Math.max(1, ...cellTexts.map((lines) => lines.length));
+  const rowH = maxLines * lineHeight + 10;
+  const bg = header ? COLORS.navyLight : COLORS.white;
+
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - rowH,
+    width: contentW,
+    height: rowH,
+    color: rgbColor(bg),
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.5,
+  });
+
+  let x = MARGIN;
+  for (let i = 0; i < cols.length; i++) {
+    const f = header || cols[i].bold ? fontBold : cols[i].medium ? fontMedium : font;
+    let lineY = y - 14;
+    for (const line of cellTexts[i]) {
+      page.drawText(sanitizePdfText(line), {
+        x: x + 6,
+        y: lineY,
+        size: fontSize,
+        font: f,
+        color: rgbColor(COLORS.text),
+        maxWidth: colWidths[i] - 12,
+      });
+      lineY -= lineHeight;
+    }
+    x += colWidths[i];
+  }
+
+  return y - rowH;
+}
+
+export function drawDisclaimerBox(
+  page: PDFPage,
+  font: PDFFont,
+  y: number,
+  text: string,
+): number {
+  const contentW = PAGE.width - MARGIN * 2;
+  const lines = wrapTextByWidth(text, font, 8.5, contentW - 20);
+  const boxH = lines.length * 12 + 16;
+
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - boxH,
+    width: contentW,
+    height: boxH,
+    color: rgbColor(COLORS.navyLight),
+    borderColor: rgbColor(COLORS.border),
+    borderWidth: 0.75,
+  });
+
+  let lineY = y - 14;
+  for (const line of lines) {
+    page.drawText(line, {
+      x: MARGIN + 10,
+      y: lineY,
+      size: 8.5,
+      font,
+      color: rgbColor(COLORS.slate),
+      maxWidth: contentW - 20,
+    });
+    lineY -= 12;
+  }
+
+  return y - boxH - 8;
+}
+
 
 /** PDF 출력용 — 이모지·제로폭 문자 등 깨짐 유발 문자 정리 */
 export function sanitizePdfText(text: string): string {
@@ -170,9 +360,10 @@ export function drawPageFooter(
   font: PDFFont,
   pageNum: number,
   total: number,
+  footerLabel = "태양광 입지분석 사전 검토 보고서",
 ) {
   page.drawText(
-    sanitizePdfText(`SG SOLAR 태양광 입지검토 제안서  ·  ${pageNum} / ${total}`),
+    sanitizePdfText(`SG SOLAR ${footerLabel}  ·  ${pageNum} / ${total}`),
     {
       x: MARGIN,
       y: 28,
