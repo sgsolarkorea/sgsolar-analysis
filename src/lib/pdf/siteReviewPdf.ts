@@ -1,25 +1,13 @@
-import fontkit from "@pdf-lib/fontkit";
-import { PDFDocument, type PDFFont } from "pdf-lib";
+import type { LatLngPoint } from "@/types/moduleLayout";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import type { ParcelSnapshot } from "@/types/parcelReview";
 import type { MunicipalityOrdinanceData } from "@/types/regulatoryReview";
 import { MARKETING_NAME } from "@/data/sampleData";
-import { embedPngImage, loadBrandLogoBytes, loadKrFontBytes } from "@/lib/pdf/pdfHelpers";
-import { PdfFlowLayout } from "@/lib/pdf/pdfFlowLayout";
-import {
-  PDF_REPORT_TITLE,
-  deriveOverallReviewStatus,
-  formatInstallTypeForPdf,
-} from "@/lib/pdf/reportContent";
-import {
-  drawChecklistAndCtaSection,
-  drawGridGuidanceSection,
-  drawOrdinanceAppendix,
-  drawRegulatoryAnalysisSection,
-  drawSetbackReviewSection,
-  drawSiteOverviewSection,
-  drawSummaryBlock,
-} from "@/lib/pdf/reportSections";
+import { fetchKakaoStaticMap, latLngToStaticMapPixel } from "@/lib/pdf/pdfHelpers";
+import { loadGmarketFontFacesCss, loadLogoDataUrl, pngToDataUrl } from "@/lib/pdf/html/assets";
+import { buildReportHtml } from "@/lib/pdf/html/buildReportHtml";
+import { MAP_HEIGHT, MAP_WIDTH, renderHtmlToPdf } from "@/lib/pdf/renderHtmlPdf";
+import { PDF_REPORT_TITLE } from "@/lib/pdf/reportContent";
 
 export interface SiteReviewPdfOptions {
   parcels?: ParcelSnapshot[];
@@ -30,65 +18,68 @@ function todayFileDate(): string {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());
 }
 
-function hasOrdinanceContent(ordinance?: MunicipalityOrdinanceData | null): boolean {
-  if (!ordinance) return false;
-  return Boolean(
-    ordinance.ordinanceTitle?.trim() ||
-      ordinance.distanceRules?.length ||
-      ordinance.ordinanceUrl,
-  );
+function buildPolygonOverlaySvg(
+  polygon: LatLngPoint[],
+  centerLat: number,
+  centerLng: number,
+  level: number,
+  width: number,
+  height: number,
+): string {
+  if (polygon.length < 3) return "";
+
+  const points = polygon
+    .map((p) => {
+      const { x, y } = latLngToStaticMapPixel(p.lat, p.lng, centerLat, centerLng, level, width, height);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  return `<polygon points="${points}" fill="rgba(249,115,22,0.22)" stroke="#ea580c" stroke-width="2.5"/>`;
 }
 
 export async function generateSiteReviewPdf(
   data: ResolvedSiteReview,
-  options: SiteReviewPdfOptions = {},
+  _options: SiteReviewPdfOptions = {},
 ): Promise<Uint8Array> {
-  const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-
-  const [regularBytes, mediumBytes, boldBytes, logoBytes] = await Promise.all([
-    loadKrFontBytes("regular"),
-    loadKrFontBytes("medium"),
-    loadKrFontBytes("bold"),
-    loadBrandLogoBytes(),
+  const mapLevel = 3;
+  const [fontFacesCss, logoDataUrl, mapBytes] = await Promise.all([
+    loadGmarketFontFacesCss(),
+    loadLogoDataUrl(),
+    fetchKakaoStaticMap(data.lat, data.lng, {
+      size: `${MAP_WIDTH}x${MAP_HEIGHT}`,
+      level: mapLevel,
+      maptype: "hybrid",
+      marker: true,
+    }),
   ]);
 
-  const font: PDFFont = await pdfDoc.embedFont(regularBytes);
-  const fontMedium: PDFFont = await pdfDoc.embedFont(mediumBytes);
-  const fontBold: PDFFont = await pdfDoc.embedFont(boldBytes);
-  const logoImage = await embedPngImage(pdfDoc, logoBytes);
+  const polygon =
+    data.siteGeometryBundle?.cadastralPolygon ??
+    data.siteGeometryBundle?.buildingPolygon ??
+    null;
 
-  pdfDoc.setTitle(PDF_REPORT_TITLE);
-  pdfDoc.setSubject(`${data.address} 사전 검토 결과`);
-  pdfDoc.setCreator(MARKETING_NAME);
+  const mapOverlaySvg = polygon
+    ? buildPolygonOverlaySvg(polygon, data.lat, data.lng, mapLevel, MAP_WIDTH, MAP_HEIGHT)
+    : null;
 
-  const overallStatus = deriveOverallReviewStatus(data);
-  const installType = formatInstallTypeForPdf(data.solarMetrics.installType);
+  const html = buildReportHtml(data, {
+    fontFacesCss,
+    logoDataUrl,
+    mapDataUrl: pngToDataUrl(mapBytes),
+    mapOverlaySvg,
+    mapWidth: MAP_WIDTH,
+    mapHeight: MAP_HEIGHT,
+  });
 
-  const flow = new PdfFlowLayout(pdfDoc, font, fontMedium, fontBold, logoImage);
+  const pdfBytes = await renderHtmlToPdf(html);
 
-  flow.drawReportTitle(PDF_REPORT_TITLE, "Solar Site Pre-Review Report");
-
-  const summaryData = {
-    ...data,
-    solarMetrics: { ...data.solarMetrics, installType },
-  };
-  drawSummaryBlock(flow, summaryData, overallStatus);
-  drawSiteOverviewSection(flow, data, options.parcels);
-  drawRegulatoryAnalysisSection(flow, data);
-  drawSetbackReviewSection(flow, data);
-  drawGridGuidanceSection(flow, data);
-  drawChecklistAndCtaSection(flow);
-
-  if (hasOrdinanceContent(options.ordinance) && options.ordinance) {
-    drawOrdinanceAppendix(flow, options.ordinance);
-  }
-
-  flow.finalizeFooters();
-
-  return pdfDoc.save();
+  return pdfBytes;
 }
 
 export function siteReviewPdfFilename(): string {
   return `sgsolar-pre-review-${todayFileDate().replace(/-/g, "")}.pdf`;
 }
+
+export const PDF_DOCUMENT_TITLE = PDF_REPORT_TITLE;
+export const PDF_DOCUMENT_CREATOR = MARKETING_NAME;
