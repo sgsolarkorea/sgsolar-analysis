@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "version": "2026-06-23-step6.7c",
+    "generatedAt": "2026-06-23T12:49:16.081Z",
+    "scope": "metro_urban_qa",
+    "testRegions": [
+      "경기도|평택시",
+      "경기도|화성시",
+      "경기도|안성시",
+      "서울특별시|강남구",
+      "인천광역시|남동구",
+      "경기도|고양시"
+    ],
+    "withAppendices": true
+  },
+  "results": [
+    {
+      "regionKey": "경기도|평택시",
+      "sigungu": "평택시",
+      "parserConfidence": "low",
+      "requiresManualReview": true,
+      "distanceExtractionMethod": "xml_manual_review",
+      "distanceCount": 0,
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "manualReviewCount": 2,
+      "excludedLongDistance": 2,
+      "highBlocked": true
+    },
+    {
+      "regionKey": "경기도|화성시",
+      "sigungu": "화성시",
+      "parserConfidence": "none",
+      "requiresManualReview": false,
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 0,
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "manualReviewCount": 0,
+      "excludedLongDistance": 0,
+      "highBlocked": true
+    },
+    {
+      "regionKey": "경기도|안성시",
+      "sigungu": "안성시",
+      "parserConfidence": "high",
+      "requiresManualReview": false,
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 3,
+      "extractedDistances": {
+        "building": 50,
+        "residential": 500,
+        "road": 200,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "manualReviewCount": 0,
+      "excludedLongDistance": 0,
+      "highBlocked": false
+    },
+    {
+      "regionKey": "서울특별시|강남구",
+      "sigungu": "강남구",
+      "parserConfidence": "high",
+      "requiresManualReview": false,
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 4,
+      "extractedDistances": {
+        "building": 200,
+        "residential": 50,
+        "road": 20,
+        "river": null,
+        "school": null,
+        "cultural": 12
+      },
+      "manualReviewCount": 0,
+      "excludedLongDistance": 0,
+      "highBlocked": false
+    },
+    {
+      "regionKey": "인천광역시|남동구",
+      "sigungu": "남동구",
+      "parserConfidence": "none",
+      "requiresManualReview": false,
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 0,
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "manualReviewCount": 0,
+      "excludedLongDistance": 0,
+      "highBlocked": true
+    },
+    {
+      "regionKey": "경기도|고양시",
+      "sigungu": "고양시",
+      "parserConfidence": "none",
+      "requiresManualReview": false,
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 0,
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "manualReviewCount": 0,
+      "excludedLongDistance": 0,
+      "highBlocked": true
+    }
+  ],
+  "summary": {
+    "processed": 6,
+    "manualReviewCount": 1,
+    "highConfidenceCount": 2,
+    "longDistanceExcluded": 2,
+    "withConfirmedDistances": 2
+  }
+}

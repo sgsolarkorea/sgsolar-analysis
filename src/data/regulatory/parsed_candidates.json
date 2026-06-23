@@ -1,0 +1,1229 @@
+{
+  "meta": {
+    "version": "2026-06-23-step6.7c",
+    "generatedAt": "2026-06-23T12:49:20.221Z",
+    "parserVersion": "1.2.0",
+    "description": "Step 6.7c parsed candidates with 1000m+ review policy — NOT applied to setback-regulations.json",
+    "scope": "priority_sg_solar",
+    "regionsProcessed": 9,
+    "confidenceCounts": {
+      "high": 2,
+      "medium": 3,
+      "low": 4,
+      "none": 0
+    },
+    "withDistances": 5,
+    "metroQaSummary": {
+      "processed": 6,
+      "manualReviewCount": 1,
+      "highConfidenceCount": 2,
+      "longDistanceExcluded": 2,
+      "withConfirmedDistances": 2,
+      "urbanMetroCount": 6
+    }
+  },
+  "candidates": [
+    {
+      "regionKey": "경기도|고양시",
+      "municipalityLabel": "고양시",
+      "sido": "경기도",
+      "sigungu": "고양시",
+      "ordinanceName": "고양시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2086131&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "matchedSections": [],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": true,
+      "appendixRefs": [],
+      "parserConfidence": "none",
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 0,
+        "distanceCount": 0,
+        "appendixCount": 0,
+        "manualReviewCount": 0
+      },
+      "notes": "",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "경기도|안성시",
+      "municipalityLabel": "안성시",
+      "sido": "경기도",
+      "sigungu": "안성시",
+      "ordinanceName": "안성시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2121099&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": 50,
+        "residential": 500,
+        "road": 200,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "<신설 2018.12.31.> <개정 2019.12.24., 2021.05.21., 2021.12.17.> 가. 「도로법」이 적용되는 도로의 경계 및 관내 주요관광지, 공공체육시설로부터 200미터 안에 입지하지 아니할 것 <개정 2021.05.21.> 나. 「농어촌도로 정비법」 및 법에 따라 개설된 도로의 경계로부터 100미터 안에 입지하지 않을 것 <개정 2021.05.21., 2021.12.17.> 다",
+        "「전기사업법」에 따른 태양광발전설비 부지 경계로부터 다음 각 세호에서 정하는 인접 주택의 최소 이격거리 이내에 입지하지 아니할 것 <개정 2019.12.24.> 1) 5호 미만: 부지 경계로부터 직선거리 200미터 이내 <개정 2021.05.21.> 2) 5호 이상 10호 미만: 부지 경계로부터 직선거리 300미터 이내 <개정 2021.05.21.> 3) 10호 이상: 부지 경계로부터 직선거리 500미터 이내 <개정 2021.",
+        "④ 「건축법 시행령」 별표 1 제4호너목의 제조업소 및 제17호의 공장을 건축(건축물의 용도변경 포함)하기 위한 개발행위허가는 신청하는 건축물 외벽으로부터 50미터 안에 가구 7호 이상이 입지하지 아니하여야 한다",
+        "1. 5호 이상 주택[주택호수 산정기준은 주택(「건축법 시행령」 별표 1 제1호 및 제2호의 주택에 한한다)의 건축벽면에서 직선거리 50미터 이내의 가구수의 합을 말한다]으로부터 직선거리 100미터 안에 입지하지 아니할 것",
+        "2. 「도로법」 제10조, 「국토의 계획 및 이용에 관한 법률」 제43조에 따른 도로 중 왕복 2차선 이상의 포장도로 및 「하천법」 에 의한 하천(국가하천, 지방하천을 포함한다)의 경계로부터 직선거리 200미터 안에 입지하지 아니할 것"
+      ],
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "개발행위허가의 기준",
+          "articleNumber": "002000",
+          "matchCount": 5
+        }
+      ],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": true,
+      "appendixRefs": [
+        {
+          "title": "별표 23 (삭제 2014.10.13 조례 제1066호)",
+          "number": "0024",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394209&flNm=%EB%B3%84%ED%91%9C+23+%28%EC%82%AD%EC%A0%9C+2014.10.13+%EC%A1%B0%EB%A1%80+%EC%A0%9C1066%ED%98%B8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "별표 25",
+          "number": "0025",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394211&flNm=%EB%B3%84%ED%91%9C+25",
+          "hasInlineContent": false
+        },
+        {
+          "title": "［별표 26］",
+          "number": "0026",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394213&flNm=%EF%BC%BB%EB%B3%84%ED%91%9C+26%EF%BC%BD",
+          "hasInlineContent": false
+        },
+        {
+          "title": "［별표 28］이격거리",
+          "number": "0028",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394217&flNm=%EF%BC%BB%EB%B3%84%ED%91%9C+28%EF%BC%BD%EC%9D%B4%EA%B2%A9%EA%B1%B0%EB%A6%AC",
+          "hasInlineContent": false
+        },
+        {
+          "title": "[별표 1] 제1종전용주거지역안에서 건축할 수 있는 건축물",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394163&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%A0%9C1%EC%A2%85%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 기준",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표 16] 자연녹지지역안에서 건축할 수 있는 건축물",
+          "number": "0016",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163394193&flNm=%5B%EB%B3%84%ED%91%9C+16%5D+%EC%9E%90%EC%97%B0%EB%85%B9%EC%A7%80%EC%A7%80%EC%97%AD%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 기준",
+          "referencedAppendixNumber": "16"
+        }
+      ],
+      "parserConfidence": "high",
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 3,
+        "appendixCount": 6,
+        "manualReviewCount": 0
+      },
+      "notes": "",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "경기도|평택시",
+      "municipalityLabel": "평택시",
+      "sido": "경기도",
+      "sigungu": "평택시",
+      "ordinanceName": "평택시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122835&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "1. 5호 이상의 주거 밀집지역[취락지구 등을 말하며, 주택호수 산정기준은 주택(「건축법 시행령」 별표 1에 따른 용도별 건축물의 종류에 따른 주택에 한한다)의 건축벽면에서 직선거리 50미터 이내의 가구수의 합을 말한다],「관광진흥법」에 의한 관광지, 정온시설(공공시설, 학교, 병원 등을 말한다)의 부지 경계로부터 직선거리 1,000미터 안에 입지하지 아니할 것 2.「하천법」에 의한 하천(국가하천, 지방하천을 포함한다)의 경계",
+        "3. 왕복2차로 이상의 모든 도로와「국토의 계획 및 이용에 관한 법률」제2조제7호에 따른 도시계획 도로에서 직선거리 1,000미터 이내에 입지하지 아니할 것 ⑤ 영 제55조제1항 및 이 조례 제19조에 따라 부지면적 4,500제곱미터를 초과하는 「물류시설의 개발 및 운영에 관한 법률」 제2조에 따른 물류시설 및 「건축법 시행령」 별표 1 제18호의 창고시설(농업·어업·임업용 창고시설은 제외한다)은 「평택시 규모초과 시설 및 창"
+      ],
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "개발행위허가의 기준",
+          "articleNumber": "002000",
+          "matchCount": 2
+        }
+      ],
+      "excludedSections": [
+        {
+          "type": "distance_match",
+          "title": "건축물",
+          "articleNumber": null,
+          "reason": "long_distance_without_solar_keyword",
+          "matchCount": 1,
+          "distanceM": 1000,
+          "sentence": "1. 5호 이상의 주거 밀집지역[취락지구 등을 말하며, 주택호수 산정기준은 주택(「건축법 시행령」 별표 1에 따른 용도별 건축물의 종류에 따른 주택에 한한다)의 건축벽면에서 직선거리 50미터 이내의 가구수의 합을 말한다],「관광진흥법」에 의한 관광지, 정온시설(공공시설, 학교, 병원 등을 말한다)의 부지 경계로부터 직선거리 1,000미터 안에 입지하지 아니할 것 2.「하천법」에 의한 하천(국가하천, 지방하천을 포함한다)의 경계"
+        },
+        {
+          "type": "distance_match",
+          "title": "도로",
+          "articleNumber": null,
+          "reason": "non_solar_facility_permit_rule",
+          "matchCount": 1,
+          "distanceM": 1000,
+          "sentence": "3. 왕복2차로 이상의 모든 도로와「국토의 계획 및 이용에 관한 법률」제2조제7호에 따른 도시계획 도로에서 직선거리 1,000미터 이내에 입지하지 아니할 것 ⑤ 영 제55조제1항 및 이 조례 제19조에 따라 부지면적 4,500제곱미터를 초과하는 「물류시설의 개발 및 운영에 관한 법률」 제2조에 따른 물류시설 및 「건축법 시행령」 별표 1 제18호의 창고시설(농업·어업·임업용 창고시설은 제외한다)은 「평택시 규모초과 시설 및 창"
+        }
+      ],
+      "manualReviewCandidates": [
+        {
+          "category": "building",
+          "label": "건축물",
+          "distanceM": 1000,
+          "sentence": "1. 5호 이상의 주거 밀집지역[취락지구 등을 말하며, 주택호수 산정기준은 주택(「건축법 시행령」 별표 1에 따른 용도별 건축물의 종류에 따른 주택에 한한다)의 건축벽면에서 직선거리 50미터 이내의 가구수의 합을 말한다],「관광진흥법」에 의한 관광지, 정온시설(공공시설, 학교, 병원 등을 말한다)의 부지 경계로부터 직선거리 1,000미터 안에 입지하지 아니할 것 2.「하천법」에 의한 하천(국가하천, 지방하천을 포함한다)의 경계",
+          "reason": "long_distance_without_solar_keyword",
+          "suspectDistanceReason": "1000m 이상이나 태양광/신재생에너지 직접 언급 없음",
+          "matchConfidence": "medium"
+        },
+        {
+          "category": "road",
+          "label": "도로",
+          "distanceM": 1000,
+          "sentence": "3. 왕복2차로 이상의 모든 도로와「국토의 계획 및 이용에 관한 법률」제2조제7호에 따른 도시계획 도로에서 직선거리 1,000미터 이내에 입지하지 아니할 것 ⑤ 영 제55조제1항 및 이 조례 제19조에 따라 부지면적 4,500제곱미터를 초과하는 「물류시설의 개발 및 운영에 관한 법률」 제2조에 따른 물류시설 및 「건축법 시행령」 별표 1 제18호의 창고시설(농업·어업·임업용 창고시설은 제외한다)은 「평택시 규모초과 시설 및 창",
+          "reason": "non_solar_facility_permit_rule",
+          "suspectDistanceReason": "물류·창고·폐기물·위험시설 등 태양광 외 시설 허가기준",
+          "matchConfidence": "medium"
+        }
+      ],
+      "requiresManualReview": true,
+      "reviewReason": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요",
+      "suspectDistanceReason": "1000m 이상이나 태양광/신재생에너지 직접 언급 없음",
+      "urbanRegionNotice": "해당 지역은 도시지역 특성상 이격거리보다 개발행위허가, 건축물 설치 가능 여부, 계통 접속 검토가 중요합니다. 조례 원문 검토 후 반영됩니다.",
+      "isUrbanMetro": true,
+      "appendixRefs": [
+        {
+          "title": "[별표 1] 제1종 전용주거지역 안에서 건축할 수 있는 건축물",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163519013&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%A0%9C1%EC%A2%85+%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 기준",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표 16] 자연녹지지역 안에서 건축할 수 있는 건축물",
+          "number": "0016",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163519083&flNm=%5B%EB%B3%84%ED%91%9C+16%5D+%EC%9E%90%EC%97%B0%EB%85%B9%EC%A7%80%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 기준",
+          "referencedAppendixNumber": "16"
+        }
+      ],
+      "parserConfidence": "low",
+      "distanceExtractionMethod": "xml_manual_review",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 0,
+        "appendixCount": 2,
+        "manualReviewCount": 2
+      },
+      "notes": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요 — 해당 지역은 도시지역 특성상 이격거리보다 개발행위허가, 건축물 설치 가능 여부, 계통 접속 검토가 중요합니다. 조례 원문 검토 후 반영됩니다.",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "경기도|화성시",
+      "municipalityLabel": "화성시",
+      "sido": "경기도",
+      "sigungu": "화성시",
+      "ordinanceName": "화성시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2115001&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "matchedSections": [],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": true,
+      "appendixRefs": [],
+      "parserConfidence": "none",
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 0,
+        "distanceCount": 0,
+        "appendixCount": 0,
+        "manualReviewCount": 0
+      },
+      "notes": "",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "경상남도|사천시",
+      "municipalityLabel": "사천시",
+      "sido": "경상남도",
+      "sigungu": "사천시",
+      "ordinanceName": "사천시 도시계획조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2112751&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": 500,
+        "road": 300,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "1. 도로 부지 경계를 기준으로 「도로법」에 따른 고속국도, 일반국도, 지방도, 시(군)도의 300미터 이내에 입지하지 아니할 것(다만, 시도 중 도시계획도로 소로는 제외한다.)",
+        "2. 주거밀집 지역(주택과 주택 간의 거리가 100미터 이내이면서 5호 이상의 주택이 모여 있는 지역을 말한다) 부지 경계로부터 500미터 이내에 입지하지 아니할 것"
+      ],
+      "parserConfidence": "medium",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "태양광 발전시설에 대한 개발행위허가의 기준",
+          "articleNumber": "001202",
+          "matchCount": 2
+        }
+      ],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "자원순환시설에 대한 개발행위허가의 기준",
+          "articleNumber": "001203",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 4
+        },
+        {
+          "type": "article",
+          "title": "제1종일반주거지역안에서 건축할 수 있는 건축물",
+          "articleNumber": "002300",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 1
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표 1] 계획관리지역에서 휴게음식점 등을 설치할 수 없는지역(제39조관련)",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=161976241&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EA%B3%84%ED%9A%8D%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD%EC%97%90%EC%84%9C+%ED%9C%B4%EA%B2%8C%EC%9D%8C%EC%8B%9D%EC%A0%90+%EB%93%B1%EC%9D%84+%EC%84%A4%EC%B9%98%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94%EC%A7%80%EC%97%AD%28%EC%A0%9C39%EC%A1%B0%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false,
+          "referencedByArticle": "태양광 발전시설에 대한 개발행위허가의 기준",
+          "referencedAppendixNumber": "1"
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 2,
+        "distanceCount": 2,
+        "appendixCount": 1,
+        "manualReviewCount": 0
+      },
+      "notes": "제16조의4 등 발전시설 등 일반 허가기준(1000m)은 태양광 전용 이격 아님 — HWP 별표 또는 manual_review 필요"
+    },
+    {
+      "regionKey": "경상남도|통영시",
+      "municipalityLabel": "통영시",
+      "sido": "경상남도",
+      "sigungu": "통영시",
+      "ordinanceName": "통영시 도시계획조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2105587&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": 200,
+        "road": 200,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "1. 도로(왕복 2차선 이상의 도로 또는 「도로법」제10조에 따른 도로로 개설이 완료되었거나 사업시행계획이 수립된 도로를 말한다)의 경계로부터 직선거리 200미터 이내에 입지하지 아니할 것",
+        "2. 5호 이상인 주거밀집지역(주택 대지경계선으로부터 100미터 이내로 연결되는 호 수를 합산한 것을 말한다) 경계로부터 200미터 이내 및 주거밀집지역이 아닌 기존 가옥으로부터 50미터 이내에 입지하지 아니할 것"
+      ],
+      "parserConfidence": "medium",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "태양에너지 설비에 대한 개발행위허가 기준",
+          "articleNumber": "001502",
+          "matchCount": 2
+        }
+      ],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "제1종 일반주거지역 안에서 건축할 수 있는 건축물",
+          "articleNumber": "002500",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 1
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "별표 1(집단화 유도구역 세부기준)",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=160477101&flNm=%EB%B3%84%ED%91%9C+1%28%EC%A7%91%EB%8B%A8%ED%99%94+%EC%9C%A0%EB%8F%84%EA%B5%AC%EC%97%AD+%EC%84%B8%EB%B6%80%EA%B8%B0%EC%A4%80%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "별표 2(평균경사도 산정방식)",
+          "number": "0002",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=160477103&flNm=%EB%B3%84%ED%91%9C+2%28%ED%8F%89%EA%B7%A0%EA%B2%BD%EC%82%AC%EB%8F%84+%EC%82%B0%EC%A0%95%EB%B0%A9%EC%8B%9D%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "별표 3(계획관리지역에서 휴게음식점 등을 설치할 수 없는 지역)",
+          "number": "0003",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=160477105&flNm=%EB%B3%84%ED%91%9C+3%28%EA%B3%84%ED%9A%8D%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD%EC%97%90%EC%84%9C+%ED%9C%B4%EA%B2%8C%EC%9D%8C%EC%8B%9D%EC%A0%90+%EB%93%B1%EC%9D%84+%EC%84%A4%EC%B9%98%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EC%A7%80%EC%97%AD%29",
+          "hasInlineContent": false
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 2,
+        "appendixCount": 3,
+        "manualReviewCount": 0
+      },
+      "notes": "제16조의4 등 발전시설 등 일반 허가기준(1000m)은 태양광 전용 이격 아님 — HWP 별표 또는 manual_review 필요"
+    },
+    {
+      "regionKey": "서울특별시|강남구",
+      "municipalityLabel": "강남구",
+      "sido": "서울특별시",
+      "sigungu": "강남구",
+      "ordinanceName": "서울특별시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2116657",
+      "sourceType": "ordinance",
+      "sourceOrigin": "law.go.kr",
+      "extractedDistances": {
+        "building": 200,
+        "residential": 50,
+        "road": 20,
+        "river": null,
+        "school": null,
+        "cultural": 12
+      },
+      "matchedText": [
+        "│ │ │ ㈎ ha당 입목축적이 산림기본통계(산림청장이 가장 최근 고시한 산림기본통계를 말한다) │ │ │상 서울특별시 ha당 평균입목축적의 30퍼센트(녹지지역에서는 20퍼센트) 미만인 토 │ │ │지 │ │ │ ㈏ 평균경사도 18도(녹지지역에서는 12도) 미만인 토지. 다만, 일필지 내에 격자(10m×1 │ │ │0m)가 1개 이상일 경우(기존 건축물이 있는 대지에 건축허가?신고를 받거나 공작물을 │ │ │설치하기 위한 경우",
+        "9. 「건축법 시행령」 별표 1 제20호의 자동차 관련시설 중 주차장(너비 12미터 이상인 도로에 접한 대 지에 건축하는 것에 한정한다)",
+        "6. 「건축법 시행령」 별표 1 제20호의 자동차 관련시설 중 주차장(너비 12미터 이상인 도로에 접한 대 지에 건축하는 것에 한정한다)",
+        "2. 「건축법 시행령」 별표 1 제5호의 문화 및 집회시설 중 전시장 및 동·식물원(너비 12미터 이상인 도 로에 12미터 이상 접한 대지에 건축하는 것에 한정한다",
+        "6. 「건축법 시행령」 별표 1 제12호의 수련시설 중 유스호스텔(너비 15미터 이상인 도로에 20미터 이 상 접한 대지에 건축하는 것에 한정한다)",
+        "7. 「건축법 시행령」 별표 1 제13호의 운동시설(옥외 철탑이 설치된 골프연습장을 제외하며, 너비 12미 터 이상인 도로에 12미터 이상 접한 대지에 건축하는 것에 한정한다)",
+        "가. 「건축법 시행령」 별표 1 제4호의 제2종근린생활시설 중 다음의 어느 하나에 해당하는 건축에 해당 하는 건축물 1) 공연장(너비 12미터 이상인 도로에 접한 대지에 건축하는 것에 한정한다) 2) 종교집회장 3) 자동차영업소(너비 20미터 이상인 도로에 접한 대지에 건축하는 것에 한정한다) 4) 서점 5) 총포판매소(너비 20미터 이상인 도로에 접한 대지에 건축하는 것에 한정한다) 6) 사진관, 표구점 7) 청소년게임제공업",
+        "「건축법 시행령」 별표 1 제7호의 판매시설 중 다음 요건의 어느 하나에 해당하는 것 1) 소매시장 및 상점(일반게임제공업의 시설은 제외한다)으로서 해당 용도에 쓰이는 바닥면적의 합계 가 2천제곱미터 미만인 것(너비 20미터 이상인 도로에 접한 대지에 건축하는 것에 한정한다) 2) 기존의 도매시장 또는 소매시장을 재건축하는 경우로서 종전의 해당 용도에 쓰이는 바닥면적의 합계 의 3배 이하 또는 대지면적의 2배 이하인 것 라. ",
+        "1. 「건축법 시행령」 별표 1 제4호의 제2종근린생활시설(단란주점 및 안마시술소는 제외하며, 자동차영 업소는 1천제곱미터 미만, 총포판매소는 2천제곱미터 미만으로서 너비 20미터 이상인 도로에 접한 대지 에 건축하는 것에 한정한다)",
+        "다만, 예식장을 제외한 용도의 건축물은 시장과의 협의 및 구도시계획위원회 심의를 거쳐 주거환경 및 주변의 교통 등에 미치는 영향이 없다고 인정 하여 지정ㆍ공고한 구역이거나, 너비 20미터 이상인 도로에 접한 대지에 건축하는 경우에는 그러하지 아니하다.) 나. 전시장 및 동·식물원(너비 12미터 미만인 도로에 접한 대지에 건축하는 경우에는 해당 용도에 쓰 이는 바닥면적의 합계가 3천제곱미터 미만인 것에 한정한다)",
+        "3. 「건축법 시행령」 별표 1 제7호의 판매시설 중 다음 각 목의 건축물 가. 소매시장 및 상점(일반게임제공업의 시설은 제외한다)으로서 해당 용도에 쓰이는 바닥면적의 합계 가 2천제곱미터 미만인 것(너비 20미터 이상인 도로에 접한 대지에 건축하는 것에 한정한다) 나. 기존의 도매시장 또는 소매시장을 재건축하는 경우로서 해당 용도에 쓰이는 바닥면적의 합계의 4 배 이하 또는 대지면적의 2배 이하인 것",
+        "6. 「건축법 시행령」 별표 1 제12호의 수련시설(야영장 시설은 제외하며, 유스호스텔의 경우 너비 15미 터 이상인 도로에 20미터 이상 접한 대지에 건축하는 것에 한정한다)"
+      ],
+      "matchedSections": [
+        {
+          "type": "appendix",
+          "title": "개발행위허가 기준(제30조 관련)",
+          "number": "0001",
+          "matchCount": 1
+        },
+        {
+          "type": "appendix",
+          "title": "제1종전용주거지역 안에서 건축할 수 있는 건축물(제33조제1호 관련)",
+          "number": "0002",
+          "matchCount": 1
+        },
+        {
+          "type": "appendix",
+          "title": "제2종전용주거지역 안에서 건축할 수 있는 건축물(제33조제2호 관련)",
+          "number": "0003",
+          "matchCount": 1
+        },
+        {
+          "type": "appendix",
+          "title": "제1종일반주거지역 안에서 건축할 수 있는 건축물(제33조제3호 관련)",
+          "number": "0004",
+          "matchCount": 3
+        },
+        {
+          "type": "appendix",
+          "title": "제2종일반주거지역 안에서 건축할 수 있는 건축물(제33조제4호 관련)",
+          "number": "0005",
+          "matchCount": 2
+        },
+        {
+          "type": "appendix",
+          "title": "제3종일반주거지역 안에서 건축할 수 있는 건축물(제33조제5호 관련)",
+          "number": "0006",
+          "matchCount": 6
+        },
+        {
+          "type": "appendix",
+          "title": "중심상업지역 안에서 건축할 수 없는 건축물(제33조제7호 관련)",
+          "number": "0008",
+          "matchCount": 2
+        },
+        {
+          "type": "appendix",
+          "title": "권한위임 사무(제67조 관련)",
+          "number": "0019",
+          "matchCount": 1
+        }
+      ],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "자연경관지구 안에서의 건축제한",
+          "articleNumber": "003400",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 3
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": true,
+      "appendixRefs": [
+        {
+          "title": "제1종일반주거지역 안에서 건축할 수 있는 건축물(제33조제3호 관련)",
+          "number": "0004",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895345&flNm=%EC%A0%9C1%EC%A2%85%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C3%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "제2종일반주거지역 안에서 건축할 수 있는 건축물(제33조제4호 관련)",
+          "number": "0005",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895349&flNm=%EC%A0%9C2%EC%A2%85%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C4%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "제3종일반주거지역 안에서 건축할 수 있는 건축물(제33조제5호 관련)",
+          "number": "0006",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895357&flNm=%EC%A0%9C3%EC%A2%85%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C5%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "준주거지역 안에서 건축할 수 없는 건축물 (제33조제6호 관련)",
+          "number": "0007",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895363&flNm=%EC%A4%80%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C6%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "근린상업지역 안에서 건축할 수 없는 건축물(제33조제9호 관련)",
+          "number": "0010",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895375&flNm=%EA%B7%BC%EB%A6%B0%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C9%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "유통상업지역 안에서 건축할 수 없는 건축물(제33조제10호 관련)",
+          "number": "0011",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895379&flNm=%EC%9C%A0%ED%86%B5%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C10%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "상업지역 안에서 주거복합건물의 용도 비율 및 용적률(별표 8 제1호가목, 별표 9 제1호나목, 별표 10 제1호가목, 제50조제1호 관련)",
+          "number": "0016",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895399&flNm=%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EC%A3%BC%EA%B1%B0%EB%B3%B5%ED%95%A9%EA%B1%B4%EB%AC%BC%EC%9D%98+%EC%9A%A9%EB%8F%84+%EB%B9%84%EC%9C%A8+%EB%B0%8F+%EC%9A%A9%EC%A0%81%EB%A5%A0%28%EB%B3%84%ED%91%9C+8+%EC%A0%9C1%ED%98%B8%EA%B0%80%EB%AA%A9%2C+%EB%B3%84%ED%91%9C+9+%EC%A0%9C1%ED%98%B8%EB%82%98%EB%AA%A9%2C+%EB%B3%84%ED%91%9C+10+%EC%A0%9C1%ED%98%B8%EA%B0%80%EB%AA%A9%2C+%EC%A0%9C50%EC%A1%B0%EC%A0%9C1%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "준공업지역 내 공동주택 등 허용기준(제33조제11호, 제50조제2호, 별표 12 관련)",
+          "number": "0017",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895403&flNm=%EC%A4%80%EA%B3%B5%EC%97%85%EC%A7%80%EC%97%AD+%EB%82%B4+%EA%B3%B5%EB%8F%99%EC%A3%BC%ED%83%9D+%EB%93%B1+%ED%97%88%EC%9A%A9%EA%B8%B0%EC%A4%80%28%EC%A0%9C33%EC%A1%B0%EC%A0%9C11%ED%98%B8%2C+%EC%A0%9C50%EC%A1%B0%EC%A0%9C2%ED%98%B8%2C+%EB%B3%84%ED%91%9C+12+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true
+        },
+        {
+          "title": "개발행위허가 기준(제30조 관련)",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?flSeq=162895323&flNm=%EA%B0%9C%EB%B0%9C%ED%96%89%EC%9C%84%ED%97%88%EA%B0%80+%EA%B8%B0%EC%A4%80%28%EC%A0%9C30%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": true,
+          "referencedByArticle": "중요시설물보호지구 안에서의 건축물",
+          "referencedAppendixNumber": "1"
+        }
+      ],
+      "parserConfidence": "high",
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 4,
+        "appendixCount": 9,
+        "manualReviewCount": 0
+      },
+      "notes": "",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "인천광역시|남동구",
+      "municipalityLabel": "남동구",
+      "sido": "인천광역시",
+      "sigungu": "남동구",
+      "ordinanceName": "인천광역시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2104535&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "matchedSections": [],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "제2종일반주거지역안에서 건축할 수 있는 건축물",
+          "articleNumber": "003400",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 1
+        },
+        {
+          "type": "article",
+          "title": "제3종일반주거지역안에서 건축할 수 있는 건축물",
+          "articleNumber": "003500",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 2
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": true,
+      "appendixRefs": [],
+      "parserConfidence": "none",
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 0,
+        "distanceCount": 0,
+        "appendixCount": 0,
+        "manualReviewCount": 0
+      },
+      "notes": "",
+      "parsedAt": "2026-06-23"
+    },
+    {
+      "regionKey": "전라북도|군산시",
+      "municipalityLabel": "군산시",
+      "sido": "전라북도",
+      "sigungu": "군산시",
+      "ordinanceName": "군산시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2030847&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "parserConfidence": "low",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "시가지경관지구에서의 용도제한",
+          "articleNumber": "004100",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 1
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표1]제1종전용주거지역안에서 건축할 수 있는 건축물",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=151184425&flNm=%5B%EB%B3%84%ED%91%9C1%5D%EC%A0%9C1%EC%A2%85%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표 25] 특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "number": "0025",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=151184553&flNm=%5B%EB%B3%84%ED%91%9C+25%5D+%ED%8A%B9%EC%A0%95+%EA%B1%B4%EC%B6%95%EB%AC%BC+%EB%98%90%EB%8A%94+%EA%B3%B5%EC%9E%91%EB%AC%BC%EC%97%90+%EB%8C%80%ED%95%9C+%EA%B0%9C%EB%B0%9C%ED%96%89%EC%9C%84%ED%97%88%EA%B0%80%EA%B8%B0%EC%A4%80",
+          "hasInlineContent": false,
+          "referencedByArticle": "특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "referencedAppendixNumber": "25"
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 0,
+        "appendixCount": 2,
+        "manualReviewCount": 0
+      },
+      "notes": "제16조의4 등 발전시설 등 일반 허가기준(1000m)은 태양광 전용 이격 아님 — HWP 별표 또는 manual_review 필요"
+    },
+    {
+      "regionKey": "전라북도|김제시",
+      "municipalityLabel": "김제시",
+      "sido": "전라북도",
+      "sigungu": "김제시",
+      "ordinanceName": "김제시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2092743&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": 500,
+        "residential": 300,
+        "road": 300,
+        "river": null,
+        "school": 200,
+        "cultural": null
+      },
+      "matchedText": [
+        "다만, 공업지역 내 입지하는 경우, 지구단위계획구역 또는 도시계획시설 부지에 입지하는 경우, 기존 농장내(농장내 설치할 부지가 없을 경우 농장부지와 접한부지로서 최소한의 범위내) 가축사육시설이 아닌 악취저감을 목적으로 설치하는 부대시설(밀폐형 퇴비사, 밀폐형 고액분리실, 액비순환시스템, 정화방류시설, 악취제거장비 등) 신축에 대하여는 예외로 한다.<개정 2019.7.17., 2021.05.17., 2024.12.10.> 1.「",
+        "3. 10호 이상 주민이 거주하는 주거밀집지역(”주거밀집지역”이란 주택과 주택의 부지 경계 직선거리가 50미터 이내인 경우이며, 주거밀집지역으로부터 직선거리 100미터 이내에 위치한 독립가옥까지)부지 경계선으로부터 200미터(자원순환관련시설 중 하수 등 처리시설은 500미터) 이내에 입지하지 아니할 것(단, 해당 지역의 실제 거주하는 전 세대 동의시 허용)<개정 2019.7.17.> 4.「학교보건법」및「유아교육법」에 따른 학교",
+        "1. 「도로법」,「농어촌도로 정비법」에 따른 도로(포장이 완료된 6미터이상 또는 왕복 2차선이상) 부지 경계선에서 100미터 이내에 입지하지 아니할 것.(다만, 개발행위자가 한 사람 또는 여러 사람인 경우라도 시설물이 연계 또는 인접(부지경계선으로부터 30미터 이내)되는 사업부지 면적이 5천제곱미터 이상일 경우에는 200미터 이내에 입지하지 아니할 것)<개정 2019.7.17., 2023.4.7., 2023.11.13.>",
+        "2. 주민이 거주하는 다음 각 목의 어느 하나에 해당하는 경우 입지하지 아니할 것(다만, 해당 지역의 실제 거주하는 전 세대의 동의시 허용)<일부개정 2023.4.7.> 가. 10호 미만의 주거지 부지 경계선으로부터 100미터 이내 나. 10호 이상의 주거밀집지역(“주거밀집지역”이란 주택과 주택의 부지 경계 직선거리가 50미터 이내인 경우이며, 주거밀집지역으로부터 직선거리 100미터 이내에 위치한 독립가옥까지) 부지 경계선으로",
+        "3. 「학교보건법」또는 「유아교육법」에 따른 학교, 「영유아보육법」에 따른 어린이집,「의료법」에 따른 의료기관 부지 경계선에서 100미터 이내에 입지하지 아니하고, 「관광진흥법」에 따른 관광지 및 「국가유산기본법」에 따른 국가유산(국가 및 도지정 국가유산) 부지 경계선에서 200미터 이내에 입지하지 아니할 것<개정 2019.7.17., 2024.5.8.>"
+      ],
+      "parserConfidence": "high",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "개발행위허가의 기준",
+          "articleNumber": "002000",
+          "matchCount": 5
+        }
+      ],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "【별표 1】 제1종 전용주거지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520469&flNm=%E3%80%90%EB%B3%84%ED%91%9C+1%E3%80%91+%EC%A0%9C1%EC%A2%85+%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 2】 제2종 전용주거지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0002",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520471&flNm=%E3%80%90%EB%B3%84%ED%91%9C+2%E3%80%91+%EC%A0%9C2%EC%A2%85+%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 3】 제1종 일반주거지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0003",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520473&flNm=%E3%80%90%EB%B3%84%ED%91%9C+3%E3%80%91+%EC%A0%9C1%EC%A2%85+%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 4】 제2종 일반주거지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0004",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520475&flNm=%E3%80%90%EB%B3%84%ED%91%9C+4%E3%80%91+%EC%A0%9C2%EC%A2%85+%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 5】 제3종 일반주거지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0005",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520477&flNm=%E3%80%90%EB%B3%84%ED%91%9C+5%E3%80%91+%EC%A0%9C3%EC%A2%85+%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 6】 준주거지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0006",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520479&flNm=%E3%80%90%EB%B3%84%ED%91%9C+6%E3%80%91+%EC%A4%80%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 7】 중심상업지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0007",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520481&flNm=%E3%80%90%EB%B3%84%ED%91%9C+7%E3%80%91+%EC%A4%91%EC%8B%AC%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 8】 일반상업지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0008",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520483&flNm=%E3%80%90%EB%B3%84%ED%91%9C+8%E3%80%91+%EC%9D%BC%EB%B0%98%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 9】 근린상업지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0009",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520485&flNm=%E3%80%90%EB%B3%84%ED%91%9C+9%E3%80%91+%EA%B7%BC%EB%A6%B0%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 10】 유통상업지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0010",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520487&flNm=%E3%80%90%EB%B3%84%ED%91%9C+10%E3%80%91+%EC%9C%A0%ED%86%B5%EC%83%81%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 11】 전용공업지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0011",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520489&flNm=%E3%80%90%EB%B3%84%ED%91%9C+11%E3%80%91+%EC%A0%84%EC%9A%A9%EA%B3%B5%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 12】 일반공업지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0012",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520491&flNm=%E3%80%90%EB%B3%84%ED%91%9C+12%E3%80%91+%EC%9D%BC%EB%B0%98%EA%B3%B5%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 13】 준공업지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0013",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520493&flNm=%E3%80%90%EB%B3%84%ED%91%9C+13%E3%80%91+%EC%A4%80%EA%B3%B5%EC%97%85%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 14】 보전녹지지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0014",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520495&flNm=%E3%80%90%EB%B3%84%ED%91%9C+14%E3%80%91+%EB%B3%B4%EC%A0%84%EB%85%B9%EC%A7%80%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 15】 생산녹지지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0015",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520497&flNm=%E3%80%90%EB%B3%84%ED%91%9C+15%E3%80%91+%EC%83%9D%EC%82%B0%EB%85%B9%EC%A7%80%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 16】 자연녹지지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0016",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520499&flNm=%E3%80%90%EB%B3%84%ED%91%9C+16%E3%80%91+%EC%9E%90%EC%97%B0%EB%85%B9%EC%A7%80%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 17】 보전관리지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0017",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520501&flNm=%E3%80%90%EB%B3%84%ED%91%9C+17%E3%80%91+%EB%B3%B4%EC%A0%84%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 18】 생산관리지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0018",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520503&flNm=%E3%80%90%EB%B3%84%ED%91%9C+18%E3%80%91+%EC%83%9D%EC%82%B0%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 19】 계획관리지역 안에서 건축할 수 없는 건축물 (제31조 관련)",
+          "number": "0019",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520505&flNm=%E3%80%90%EB%B3%84%ED%91%9C+19%E3%80%91+%EA%B3%84%ED%9A%8D%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 20】 농림지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0020",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520507&flNm=%E3%80%90%EB%B3%84%ED%91%9C+20%E3%80%91+%EB%86%8D%EB%A6%BC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 21】 자연환경보전지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0021",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520509&flNm=%E3%80%90%EB%B3%84%ED%91%9C+21%E3%80%91+%EC%9E%90%EC%97%B0%ED%99%98%EA%B2%BD%EB%B3%B4%EC%A0%84%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 22】 자연취락지구 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0022",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520511&flNm=%E3%80%90%EB%B3%84%ED%91%9C+22%E3%80%91+%EC%9E%90%EC%97%B0%EC%B7%A8%EB%9D%BD%EC%A7%80%EA%B5%AC+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 23】 관리지역 안에서 건축할 수 있는 건축물 (제31조 관련)",
+          "number": "0023",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520513&flNm=%E3%80%90%EB%B3%84%ED%91%9C+23%E3%80%91+%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 24】 종전의 일반주거지역 안에서 건축할 수 있는 건축물 (부칙 제4조 관련)",
+          "number": "0024",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520515&flNm=%E3%80%90%EB%B3%84%ED%91%9C+24%E3%80%91+%EC%A2%85%EC%A0%84%EC%9D%98+%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EB%B6%80%EC%B9%99+%EC%A0%9C4%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        },
+        {
+          "title": "【별표 25】 계획관리지역 및 관리지역 안에서 휴게음식점 등을 설치할 수 없는 지역 (제56조 관련)",
+          "number": "0025",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520517&flNm=%E3%80%90%EB%B3%84%ED%91%9C+25%E3%80%91+%EA%B3%84%ED%9A%8D%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EB%B0%8F+%EA%B4%80%EB%A6%AC%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%ED%9C%B4%EA%B2%8C%EC%9D%8C%EC%8B%9D%EC%A0%90+%EB%93%B1%EC%9D%84+%EC%84%A4%EC%B9%98%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EC%A7%80%EC%97%AD+%28%EC%A0%9C56%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 4,
+        "appendixCount": 25,
+        "manualReviewCount": 0
+      },
+      "notes": ""
+    },
+    {
+      "regionKey": "전라북도|부안군",
+      "municipalityLabel": "부안군",
+      "sido": "전라북도",
+      "sigungu": "부안군",
+      "ordinanceName": "부안군 군계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2059843&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": 20,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "높이 : 태양광 기둥 구조물(모듈 포함)의 높이가 옥상 및 지붕 바닥면에서 높이 쪽이 3미터 미만일 것 라. 안전 : 건축물의 구조안전 확인을 위해 「국가기술자격법」상 건축구조기술사가 작성한 「건축법」에 따른 구조안전확인서 제출 및 건축물 높이에 발전시설의 높이를 합쳐서 20미터 이상인 경우 피뢰침 설치 또는 피뢰설비 기능을 확보할 것［본조 신설"
+      ],
+      "parserConfidence": "high",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "articleNumber": "002002",
+          "matchCount": 1
+        }
+      ],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표 1] 제1종 전용주거지역 안에서 건축할 수 있는 건축물(제30조제1호 관련)",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=154693313&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%A0%9C1%EC%A2%85+%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC%28%EC%A0%9C30%EC%A1%B0%EC%A0%9C1%ED%98%B8+%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false,
+          "referencedByArticle": "특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표 26] 특정 건축물 또는 공작물에 대한 개발행위허가기준(제20조의2제1항관련)",
+          "number": "0026",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=154693403&flNm=%5B%EB%B3%84%ED%91%9C+26%5D+%ED%8A%B9%EC%A0%95+%EA%B1%B4%EC%B6%95%EB%AC%BC+%EB%98%90%EB%8A%94+%EA%B3%B5%EC%9E%91%EB%AC%BC%EC%97%90+%EB%8C%80%ED%95%9C+%EA%B0%9C%EB%B0%9C%ED%96%89%EC%9C%84%ED%97%88%EA%B0%80%EA%B8%B0%EC%A4%80%28%EC%A0%9C20%EC%A1%B0%EC%9D%982%EC%A0%9C1%ED%95%AD%EA%B4%80%EB%A0%A8%29",
+          "hasInlineContent": false,
+          "referencedByArticle": "특정 건축물 또는 공작물에 대한 개발행위허가기준",
+          "referencedAppendixNumber": "26"
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 2,
+        "distanceCount": 1,
+        "appendixCount": 2,
+        "manualReviewCount": 0
+      },
+      "notes": ""
+    },
+    {
+      "regionKey": "전라북도|전주시",
+      "municipalityLabel": "전주시",
+      "sido": "전라북도",
+      "sigungu": "전주시",
+      "ordinanceName": "전주시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122435&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": 100,
+        "residential": 200,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [
+        "1. 표고 100미터 미만(다만, 기준이상인 경우에도 주거지역 중 지목이 “대”이거나 도시계획위원회의 심의를 거친 경우는 개발행위허가 할 수 있다)<개정 2019.4.19., 2022.11.4., 2024.4.15.>",
+        "1. 「건축법 시행령」 “별표1” 제22호 자원순환 관련 시설(하수 등 처리시설 및 제3호에 따른 시설 제외)ㆍ제26호 묘지 관련 시설 제한지역. 가. 사업대상지 경계로부터 반경 200미터 이내에 가구수 또는 세대수가 10호 이상인 지역 (가구수와 세대수는 「주민등록법」에 따라 세대별 주민등록표에 등재된 사람으로 구성된 세대수 또는 「건축법」에 따른 단독주택, 공동주택의 수로 산정하되, 다가구주택 및 공동주택의 수는 독립된 주",
+        "이하 같다) 나. 사업대상지가 농업생산기반이 정비되어 있는 우량농지 또는 자연취락지구이거나 자연취락지구 경계로부터 200미터 이내인 지역(자연취락지구 경계로부터 50미터 안에 주택이 있는 경우에는 가장 외측에 있는 주택의 대지 경계선을 자연취락지구 경계로 본다",
+        "한옥마을(전통문화구역), 공원, 국가유산 등 역사적ㆍ문화적 가치가 있어 보전의 필요성이 있는 시설이나 공공건축물(학교, 도서관) 부지 경계로부터 100미터 이내"
+      ],
+      "parserConfidence": "medium",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [
+        {
+          "type": "article",
+          "title": "개발행위허가의 일반적 기준",
+          "articleNumber": "001700",
+          "matchCount": 6
+        }
+      ],
+      "excludedSections": [
+        {
+          "type": "distance_match",
+          "title": "학교",
+          "articleNumber": null,
+          "reason": "non_solar_facility_permit_rule",
+          "matchCount": 1,
+          "distanceM": 1000,
+          "sentence": "3. 「폐기물관리법 시행령」 “별표3” 제1호 가목 소각시설ㆍ제3호 자목 소각열회수시설(이하 “소각시설”이라 한다) 및 「자원의 절약과 재활용촉진에 관한 법률 시행규칙」 “별표1” 제10호의 고형연료제품을 사용하는 시설(이하 “고형연료제품 사용시설”이라 한다) 제한지역 가. 사업대상지 경계로부터 반경 1,000미터 이내에 가구수 또는 세대수가 10호 이상인 지역 나. 사업대상지가 농업생산기반이 정비되어 있는 우량농지 또는 자연"
+        }
+      ],
+      "manualReviewCandidates": [
+        {
+          "category": "school",
+          "label": "학교",
+          "distanceM": 1000,
+          "sentence": "3. 「폐기물관리법 시행령」 “별표3” 제1호 가목 소각시설ㆍ제3호 자목 소각열회수시설(이하 “소각시설”이라 한다) 및 「자원의 절약과 재활용촉진에 관한 법률 시행규칙」 “별표1” 제10호의 고형연료제품을 사용하는 시설(이하 “고형연료제품 사용시설”이라 한다) 제한지역 가. 사업대상지 경계로부터 반경 1,000미터 이내에 가구수 또는 세대수가 10호 이상인 지역 나. 사업대상지가 농업생산기반이 정비되어 있는 우량농지 또는 자연",
+          "reason": "non_solar_facility_permit_rule",
+          "suspectDistanceReason": "물류·창고·폐기물·위험시설 등 태양광 외 시설 허가기준",
+          "matchConfidence": "medium"
+        }
+      ],
+      "requiresManualReview": true,
+      "reviewReason": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요",
+      "suspectDistanceReason": "물류·창고·폐기물·위험시설 등 태양광 외 시설 허가기준",
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표1] 제1종전용주거지역안에서 건축할 수 있는 건축물",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163568177&flNm=%5B%EB%B3%84%ED%91%9C1%5D+%EC%A0%9C1%EC%A2%85%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 일반적 기준",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표3] 제1종일반주거지역안에서 건축할 수 있는 건축물",
+          "number": "0003",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163568181&flNm=%5B%EB%B3%84%ED%91%9C3%5D+%EC%A0%9C1%EC%A2%85%EC%9D%BC%EB%B0%98%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 일반적 기준",
+          "referencedAppendixNumber": "3"
+        }
+      ],
+      "distanceExtractionMethod": "xml_manual_review",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 2,
+        "appendixCount": 2,
+        "manualReviewCount": 1
+      },
+      "notes": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요"
+    },
+    {
+      "regionKey": "충청남도|논산시",
+      "municipalityLabel": "논산시",
+      "sido": "충청남도",
+      "sigungu": "논산시",
+      "ordinanceName": "논산시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095519&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "parserConfidence": "low",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [],
+      "excludedSections": [],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표 1] ~ [별표 24]",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159661921&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%7E+%5B%EB%B3%84%ED%91%9C+24%5D",
+          "hasInlineContent": false,
+          "referencedByArticle": "개발행위허가의 기준",
+          "referencedAppendixNumber": "1"
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 1,
+        "distanceCount": 0,
+        "appendixCount": 1,
+        "manualReviewCount": 0
+      },
+      "notes": "태양광 관련 조문/별표 참조는 확인됐으나 별표 본문이 HWP 첨부만 제공되어 거리값 자동 추출 불가"
+    },
+    {
+      "regionKey": "충청남도|서산시",
+      "municipalityLabel": "서산시",
+      "sido": "충청남도",
+      "sigungu": "서산시",
+      "ordinanceName": "서산시 도시계획 조례",
+      "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2090923&gubun=ELIS",
+      "sourceType": "ordinance",
+      "sourceOrigin": "elis.go.kr",
+      "extractedDistances": {
+        "building": null,
+        "residential": null,
+        "road": null,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "matchedText": [],
+      "parserConfidence": "low",
+      "parsedAt": "2026-06-23",
+      "matchedSections": [],
+      "excludedSections": [
+        {
+          "type": "article",
+          "title": "발전시설 등 허가기준",
+          "articleNumber": "001604",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 4
+        },
+        {
+          "type": "article",
+          "title": "자원순환관련시설 허가기준",
+          "articleNumber": "001605",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 4
+        },
+        {
+          "type": "article",
+          "title": "건설폐기물중간처리업의 허가기준",
+          "articleNumber": "001606",
+          "reason": "generic_power_facility_permit_rule_not_solar_specific",
+          "matchCount": 4
+        }
+      ],
+      "manualReviewCandidates": [],
+      "requiresManualReview": false,
+      "isUrbanMetro": false,
+      "appendixRefs": [
+        {
+          "title": "[별표 1] 제1종전용주거지역 안에서 건축할 수 있는 건축물",
+          "number": "0001",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159030409&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%A0%9C1%EC%A2%85%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+          "hasInlineContent": false,
+          "referencedByArticle": "태양광 등 발전시설에 대한 도시계획위원회심의 등",
+          "referencedAppendixNumber": "1"
+        },
+        {
+          "title": "[별표 24] 태양광 등 발전시설에 대한 이격거리 등의 기준",
+          "number": "0025",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159030457&flNm=%5B%EB%B3%84%ED%91%9C+24%5D+%ED%83%9C%EC%96%91%EA%B4%91+%EB%93%B1+%EB%B0%9C%EC%A0%84%EC%8B%9C%EC%84%A4%EC%97%90+%EB%8C%80%ED%95%9C+%EC%9D%B4%EA%B2%A9%EA%B1%B0%EB%A6%AC+%EB%93%B1%EC%9D%98+%EA%B8%B0%EC%A4%80",
+          "hasInlineContent": false,
+          "referencedByArticle": "태양광 등 발전시설에 대한 도시계획위원회심의 등",
+          "referencedAppendixNumber": "24"
+        },
+        {
+          "title": "[별표 25] 폐차장, 도축장, 고물상에 대한 이격거리 등의 기준",
+          "number": "0026",
+          "hwpUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159030459&flNm=%5B%EB%B3%84%ED%91%9C+25%5D+%ED%8F%90%EC%B0%A8%EC%9E%A5%2C+%EB%8F%84%EC%B6%95%EC%9E%A5%2C+%EA%B3%A0%EB%AC%BC%EC%83%81%EC%97%90+%EB%8C%80%ED%95%9C+%EC%9D%B4%EA%B2%A9%EA%B1%B0%EB%A6%AC+%EB%93%B1%EC%9D%98+%EA%B8%B0%EC%A4%80",
+          "hasInlineContent": false,
+          "referencedByArticle": "solar_appendix_discovery"
+        }
+      ],
+      "distanceExtractionMethod": "xml",
+      "appendixSourceUrl": null,
+      "appendixFileType": null,
+      "appendixParseSuccess": false,
+      "appendixMatchedText": [],
+      "parseStats": {
+        "solarArticleCount": 2,
+        "distanceCount": 0,
+        "appendixCount": 3,
+        "manualReviewCount": 0
+      },
+      "notes": "제16조의4 등 발전시설 등 일반 허가기준(1000m)은 태양광 전용 이격 아님 — HWP 별표 또는 manual_review 필요"
+    }
+  ]
+}

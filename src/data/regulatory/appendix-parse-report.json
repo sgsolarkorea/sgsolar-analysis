@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "version": "2026-06-23-step6.7b",
+    "generatedAt": "2026-06-23T09:13:10.485Z",
+    "scope": "step6.7b_priority_targets",
+    "dryRun": false
+  },
+  "summary": {
+    "candidatesTotal": 9,
+    "candidatesSelected": 6,
+    "appendixParseAttempted": 6,
+    "appendixParseSuccess": 5,
+    "distanceExtracted": 6,
+    "confidenceBefore": {
+      "high": 1,
+      "medium": 5,
+      "low": 0,
+      "none": 0
+    },
+    "confidenceAfter": {
+      "high": 1,
+      "medium": 8,
+      "low": 0,
+      "none": 0
+    },
+    "hwpParseSuccessRate": "83%",
+    "distanceExtractionSuccessRate": "100%"
+  },
+  "results": [
+    {
+      "regionKey": "경기도|평택시",
+      "sigungu": "평택시",
+      "confidenceBefore": "medium",
+      "confidenceAfter": "medium",
+      "appendixParseSuccess": true,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 2,
+      "extractedDistances": {
+        "building": 1000,
+        "residential": null,
+        "road": 1000,
+        "river": null,
+        "school": null,
+        "cultural": null
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=163519013&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%EC%A0%9C1%EC%A2%85+%EC%A0%84%EC%9A%A9%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%9E%88%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC",
+      "notes": "HWP/PDF 별표에서 1개 카테고리 거리 추출"
+    },
+    {
+      "regionKey": "전라북도|군산시",
+      "sigungu": "군산시",
+      "confidenceBefore": "medium",
+      "confidenceAfter": "medium",
+      "appendixParseSuccess": true,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "hwp",
+      "distanceCount": 5,
+      "extractedDistances": {
+        "building": 100,
+        "residential": 300,
+        "road": 200,
+        "river": 300,
+        "school": 500,
+        "cultural": null
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=151184553&flNm=%5B%EB%B3%84%ED%91%9C+25%5D+%ED%8A%B9%EC%A0%95+%EA%B1%B4%EC%B6%95%EB%AC%BC+%EB%98%90%EB%8A%94+%EA%B3%B5%EC%9E%91%EB%AC%BC%EC%97%90+%EB%8C%80%ED%95%9C+%EA%B0%9C%EB%B0%9C%ED%96%89%EC%9C%84%ED%97%88%EA%B0%80%EA%B8%B0%EC%A4%80",
+      "notes": "HWP/PDF 별표에서 5개 카테고리 거리 추출"
+    },
+    {
+      "regionKey": "전라북도|김제시",
+      "sigungu": "김제시",
+      "confidenceBefore": "high",
+      "confidenceAfter": "high",
+      "appendixParseSuccess": false,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "xml",
+      "distanceCount": 4,
+      "extractedDistances": {
+        "building": 500,
+        "residential": 300,
+        "road": 300,
+        "river": null,
+        "school": 200,
+        "cultural": null
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159520479&flNm=%E3%80%90%EB%B3%84%ED%91%9C+6%E3%80%91+%EC%A4%80%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%97%AD+%EC%95%88%EC%97%90%EC%84%9C+%EA%B1%B4%EC%B6%95%ED%95%A0+%EC%88%98+%EC%97%86%EB%8A%94+%EA%B1%B4%EC%B6%95%EB%AC%BC+%28%EC%A0%9C31%EC%A1%B0+%EA%B4%80%EB%A0%A8%29",
+      "notes": ""
+    },
+    {
+      "regionKey": "전라북도|부안군",
+      "sigungu": "부안군",
+      "confidenceBefore": "medium",
+      "confidenceAfter": "medium",
+      "appendixParseSuccess": true,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "hwp",
+      "distanceCount": 5,
+      "extractedDistances": {
+        "building": 20,
+        "residential": 300,
+        "road": 150,
+        "river": 100,
+        "school": 200,
+        "cultural": null
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=154693403&flNm=%5B%EB%B3%84%ED%91%9C+26%5D+%ED%8A%B9%EC%A0%95+%EA%B1%B4%EC%B6%95%EB%AC%BC+%EB%98%90%EB%8A%94+%EA%B3%B5%EC%9E%91%EB%AC%BC%EC%97%90+%EB%8C%80%ED%95%9C+%EA%B0%9C%EB%B0%9C%ED%96%89%EC%9C%84%ED%97%88%EA%B0%80%EA%B8%B0%EC%A4%80%28%EC%A0%9C20%EC%A1%B0%EC%9D%982%EC%A0%9C1%ED%95%AD%EA%B4%80%EB%A0%A8%29",
+      "notes": "HWP/PDF 별표에서 4개 카테고리 거리 추출"
+    },
+    {
+      "regionKey": "충청남도|논산시",
+      "sigungu": "논산시",
+      "confidenceBefore": "medium",
+      "confidenceAfter": "medium",
+      "appendixParseSuccess": true,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "hwp",
+      "distanceCount": 4,
+      "extractedDistances": {
+        "building": null,
+        "residential": 500,
+        "road": 200,
+        "river": null,
+        "school": 300,
+        "cultural": 300
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159661921&flNm=%5B%EB%B3%84%ED%91%9C+1%5D+%7E+%5B%EB%B3%84%ED%91%9C+24%5D",
+      "notes": "HWP/PDF 별표에서 4개 카테고리 거리 추출"
+    },
+    {
+      "regionKey": "충청남도|서산시",
+      "sigungu": "서산시",
+      "confidenceBefore": "medium",
+      "confidenceAfter": "medium",
+      "appendixParseSuccess": true,
+      "appendixFileType": "hwp",
+      "distanceExtractionMethod": "hwp",
+      "distanceCount": 5,
+      "extractedDistances": {
+        "building": 300,
+        "residential": 300,
+        "road": 100,
+        "river": 100,
+        "school": 500,
+        "cultural": null
+      },
+      "appendixSourceUrl": "http://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=159030457&flNm=%5B%EB%B3%84%ED%91%9C+24%5D+%ED%83%9C%EC%96%91%EA%B4%91+%EB%93%B1+%EB%B0%9C%EC%A0%84%EC%8B%9C%EC%84%A4%EC%97%90+%EB%8C%80%ED%95%9C+%EC%9D%B4%EA%B2%A9%EA%B1%B0%EB%A6%AC+%EB%93%B1%EC%9D%98+%EA%B8%B0%EC%A4%80",
+      "notes": "서산 별표24(HWP) 태양광 이격기준 적용 — 제16조의4 1000m(고형연료 등)는 excludedSections 참조"
+    }
+  ]
+}

@@ -14,6 +14,11 @@
     "build:regulatory-db": "node scripts/build-korea-region-registry.mjs && node scripts/build-regulatory-db.mjs",
     "collect:regulation-sources": "node scripts/collect-regulation-sources.mjs --all",
     "collect:regulation-sources:priority": "node scripts/collect-regulation-sources.mjs --priority",
+    "parse:regulation-ordinances": "node scripts/parse-regulation-ordinances.mjs --all",
+    "parse:regulation-ordinances:priority": "node scripts/parse-regulation-ordinances.mjs --priority",
+    "parse:regulation-ordinances:metro": "node scripts/parse-regulation-ordinances-metro.mjs --with-appendices",
+    "parse:regulation-appendices": "node scripts/parse-regulation-appendices.mjs --all",
+    "parse:regulation-appendices:priority": "node scripts/parse-regulation-appendices.mjs --priority",
     "validate:regulatory-db": "node scripts/validate-regulatory-db.mjs",
     "start": "next start",
     "lint": "eslint"
@@ -31,6 +36,7 @@
     "resend": "^6.12.4"
   },
   "devDependencies": {
+    "@ohah/hwpjs": "^0.1.0-rc.10",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.1",
@@ -38,6 +44,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "kordoc": "^3.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -108,6 +108,88 @@ export interface RegulationSourceEntry {
   collectedAt?: string;
 }
 
+/** Step 6.7 — parser output candidate (not yet merged into setback DB) */
+export type ParserConfidence = "high" | "medium" | "low" | "none";
+
+export interface ParsedDistanceSet {
+  building: number | null;
+  residential: number | null;
+  road: number | null;
+  river: number | null;
+  school: number | null;
+  cultural: number | null;
+}
+
+export type DistanceExtractionMethod =
+  | "xml"
+  | "hwp"
+  | "pdf"
+  | "manual_review"
+  | "xml_manual_review";
+
+export interface ManualReviewCandidate {
+  category: string;
+  label?: string;
+  distanceM: number;
+  sentence: string;
+  reason: string;
+  suspectDistanceReason?: string;
+  matchConfidence?: ParserConfidence;
+}
+
+export interface ParsedOrdinanceCandidate {
+  regionKey: string;
+  municipalityLabel: string;
+  sido?: string;
+  sigungu?: string;
+  ordinanceName: string;
+  sourceUrl: string;
+  sourceType: RegulationSourceType;
+  sourceOrigin?: string;
+  extractedDistances: ParsedDistanceSet;
+  matchedText: string[];
+  matchedSections?: Array<{ type: string; title: string; matchCount?: number }>;
+  excludedSections?: Array<{
+    type: string;
+    title: string;
+    reason?: string;
+    matchCount?: number;
+    distanceM?: number;
+    sentence?: string;
+  }>;
+  manualReviewCandidates?: ManualReviewCandidate[];
+  requiresManualReview?: boolean;
+  reviewReason?: string;
+  suspectDistanceReason?: string;
+  urbanRegionNotice?: string;
+  isUrbanMetro?: boolean;
+  appendixRefs?: Array<{
+    title: string;
+    hwpUrl: string | null;
+    hasInlineContent: boolean;
+    number?: string;
+    referencedByArticle?: string;
+    referencedAppendixNumber?: string;
+  }>;
+  parserConfidence: ParserConfidence;
+  parserConfidenceBefore?: ParserConfidence;
+  distanceExtractionMethod?: DistanceExtractionMethod;
+  appendixSourceUrl?: string | null;
+  appendixFileType?: "hwp" | "pdf" | null;
+  appendixParseSuccess?: boolean;
+  appendixMatchedText?: string[];
+  appendixParseAttempted?: boolean;
+  appendixParseStats?: {
+    textLength?: number;
+    relevanceScore?: number;
+    distanceCount?: number;
+    error?: string | null;
+  };
+  parseStats?: { solarArticleCount: number; distanceCount: number; appendixCount: number };
+  notes?: string;
+  parsedAt?: string;
+}
+
 export interface SetbackRegulationEntry {
   municipalityLabel: string;
   sido: string;
