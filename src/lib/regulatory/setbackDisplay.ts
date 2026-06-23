@@ -42,3 +42,9 @@ export const SETBACK_SECTION_NOTICE =
 
 export const SETBACK_SECTION_FOOTER =
   "예상 거리는 공공데이터 기반의 1차 참고값입니다. 최종 이격거리 판단은 지자체 조례 및 현장 확인 후 결정됩니다.";
+
+/** 지자체 조례 DB 적용 전 공통 기준 안내 */
+export const SETBACK_COMMON_STANDARD_NOTICE =
+  "현재 기준거리는 지자체별 조례 DB 적용 전의 공통 참고 기준입니다. 실제 기준은 지자체 조례에 따라 달라질 수 있습니다.";
+
+export const SETBACK_STANDARD_COLUMN_LABEL = "공통 참고 기준";

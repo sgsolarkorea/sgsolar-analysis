@@ -40,26 +40,63 @@ export function reportBaseStyles(): string {
       overflow: hidden;
     }
     .kpi-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;
     }
     .kpi-card {
-      background: #eef2f8; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px;
+      background: #eef2f8; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px;
     }
-    .kpi-card .label { font-size: 8.5pt; color: #64748b; margin-bottom: 4px; }
-    .kpi-card .value { font-size: 12pt; font-weight: 700; color: #0b1d3a; word-break: keep-all; }
+    .kpi-card .label { font-size: 7.5pt; color: #64748b; margin-bottom: 3px; }
+    .kpi-card .value { font-size: 10pt; font-weight: 700; color: #0b1d3a; word-break: keep-all; line-height: 1.3; }
     .kpi-card.wide { grid-column: span 2; }
-    .map-card { margin-bottom: 14px; break-inside: avoid; page-break-inside: avoid; }
-    .map-wrap {
-      position: relative; border-radius: 10px; overflow: hidden;
-      border: 1px solid #e2e8f0; background: #eef2f8;
+    .page-one { margin-bottom: 0; }
+    .map-card {
+      margin-bottom: 12px; break-inside: avoid; page-break-inside: avoid;
+      border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(11,29,58,0.04), 0 2px 6px rgba(11,29,58,0.04);
     }
-    .map-wrap img { display: block; width: 100%; height: auto; }
+    .map-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+    }
+    .map-head h3 { font-size: 10pt; margin: 0; }
+    .map-head span { font-size: 7.5pt; color: #64748b; }
+    .map-wrap {
+      position: relative; background: #eef2f8; height: 200px; overflow: hidden;
+    }
+    .map-wrap img {
+      display: block; width: 100%; height: 200px; object-fit: cover;
+    }
     .map-wrap svg {
       position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
     }
+    .map-fallback {
+      height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #eef2f8 0%, #f8fafc 100%); padding: 16px; text-align: center;
+    }
+    .map-fallback .fb-title { font-size: 10pt; font-weight: 700; color: #0b1d3a; margin-bottom: 6px; }
+    .map-fallback .fb-desc { font-size: 8.5pt; color: #64748b; line-height: 1.5; }
     .map-caption {
-      padding: 8px 12px; font-size: 8.5pt; color: #64748b;
-      border-top: 1px solid #e2e8f0; background: #f8fafc;
+      padding: 8px 14px; font-size: 8pt; color: #64748b; background: #fff;
+      border-top: 1px solid #e2e8f0;
+    }
+    .highlight-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;
+    }
+    .highlight-card {
+      border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px;
+      background: #fff; min-height: 88px;
+      box-shadow: 0 1px 2px rgba(11,29,58,0.04);
+    }
+    .highlight-card .hl-label {
+      font-size: 7.5pt; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+    .highlight-card .hl-item {
+      font-size: 8pt; color: #334155; line-height: 1.45; margin-bottom: 4px;
+    }
+    .highlight-card .hl-item strong { color: #0b1d3a; }
+    .notice.compact {
+      padding: 8px 12px; font-size: 7.5pt; margin-bottom: 0;
     }
     .notice {
       background: #eef2f8; border: 1px solid #e2e8f0; border-radius: 8px;
@@ -150,16 +187,27 @@ export function reportBaseStyles(): string {
     .legend-cum::before { background: #94a3b8; opacity: 0.7; }
     .legend-rem::before { background: #0b1d3a; }
     .check-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
     }
-    .check-item {
-      display: flex; align-items: flex-start; gap: 8px;
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+    .check-card {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 12px 14px; min-height: 52px;
+      box-shadow: 0 1px 2px rgba(11,29,58,0.04), 0 2px 4px rgba(11,29,58,0.03);
     }
     .check-box {
-      width: 12px; height: 12px; border: 1.5px solid #94a3b8; border-radius: 2px; flex-shrink: 0; margin-top: 2px;
+      width: 14px; height: 14px; border: 2px solid #0b1d3a; border-radius: 3px;
+      flex-shrink: 0; margin-top: 1px; background: #fff;
     }
-    .check-item span { font-size: 9pt; color: #334155; }
+    .check-card .check-text { font-size: 9.5pt; font-weight: 600; color: #0b1d3a; line-height: 1.4; }
+    .check-section-wrap {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 14px; margin-bottom: 14px;
+    }
+    .check-section-wrap .check-intro {
+      font-size: 8.5pt; color: #64748b; margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
     .cta-box {
       background: linear-gradient(135deg, #eff6ff 0%, #eef2f8 100%);
       border: 1px solid #bfdbfe; border-radius: 10px; padding: 16px 18px; text-align: center;

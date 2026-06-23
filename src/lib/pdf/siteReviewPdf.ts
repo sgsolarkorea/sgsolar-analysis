@@ -43,16 +43,25 @@ export async function generateSiteReviewPdf(
   _options: SiteReviewPdfOptions = {},
 ): Promise<Uint8Array> {
   const mapLevel = 3;
-  const [fontFacesCss, logoDataUrl, mapBytes] = await Promise.all([
+  const [fontFacesCss, logoDataUrl] = await Promise.all([
     loadGmarketFontFacesCss(),
     loadLogoDataUrl(),
-    fetchKakaoStaticMap(data.lat, data.lng, {
+  ]);
+
+  let mapBytes = await fetchKakaoStaticMap(data.lat, data.lng, {
+    size: `${MAP_WIDTH}x${MAP_HEIGHT}`,
+    level: mapLevel,
+    maptype: "hybrid",
+    marker: true,
+  });
+  if (!mapBytes) {
+    mapBytes = await fetchKakaoStaticMap(data.lat, data.lng, {
       size: `${MAP_WIDTH}x${MAP_HEIGHT}`,
       level: mapLevel,
-      maptype: "hybrid",
+      maptype: "roadmap",
       marker: true,
-    }),
-  ]);
+    });
+  }
 
   const polygon =
     data.siteGeometryBundle?.cadastralPolygon ??
@@ -70,6 +79,7 @@ export async function generateSiteReviewPdf(
     mapOverlaySvg,
     mapWidth: MAP_WIDTH,
     mapHeight: MAP_HEIGHT,
+    mapAvailable: Boolean(mapBytes?.length),
   });
 
   const pdfBytes = await renderHtmlToPdf(html);

@@ -12,6 +12,11 @@ export const PDF_LEGAL_DISCLAIMER =
 export const PDF_SETBACK_FOOTER =
   "예상 거리는 공공데이터 기반의 1차 참고값입니다. 최종 이격거리 판단은 지자체 조례 및 현장 확인 후 결정됩니다.";
 
+export const PDF_SETBACK_COMMON_NOTICE =
+  "현재 기준거리는 지자체별 조례 DB 적용 전의 공통 참고 기준입니다. 실제 기준은 지자체 조례에 따라 달라질 수 있습니다.";
+
+export const PDF_SETBACK_STANDARD_COLUMN = "공통 참고 기준";
+
 export const PDF_GRID_GUIDANCE = [
   "계통연계 가능 여부는 관할 한전 사업소의 접속 가능 용량 확인이 필요합니다.",
   "상담 전 설치 주소, 예상 설비용량, 설치 유형 정보를 준비하면 검토가 빠릅니다.",

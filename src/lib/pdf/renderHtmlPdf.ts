@@ -14,7 +14,8 @@ export async function renderHtmlToPdf(html: string): Promise<Uint8Array> {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
-    await page.setContent(html, { waitUntil: "load", timeout: 30_000 });
+    await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    await waitForDocumentImages(page);
 
     const pdf = await page.pdf({
       format: "A4",
@@ -27,6 +28,25 @@ export async function renderHtmlToPdf(html: string): Promise<Uint8Array> {
   } finally {
     await browser.close();
   }
+}
+
+async function waitForDocumentImages(page: import("puppeteer-core").Page) {
+  await page.evaluate(async () => {
+    const images = Array.from(document.images);
+    await Promise.all(
+      images.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              resolve();
+              return;
+            }
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+          }),
+      ),
+    );
+  });
 }
 
 async function resolveChromiumExecutable(chromium: {

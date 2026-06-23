@@ -1,6 +1,6 @@
 import type { SetbackJudgment, SetbackReview } from "@/types/regulatoryReview";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { SETBACK_SECTION_FOOTER } from "@/lib/regulatory/setbackDisplay";
+import { SETBACK_COMMON_STANDARD_NOTICE, SETBACK_SECTION_FOOTER, SETBACK_STANDARD_COLUMN_LABEL } from "@/lib/regulatory/setbackDisplay";
 
 const JUDGMENT_STYLES: Record<SetbackJudgment, string> = {
   "기본 확인": "bg-blue-50 text-blue-800 border-blue-200",
@@ -34,13 +34,17 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
         </div>
       )}
 
+      <div className="mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-snug text-slate-700 sm:text-sm">
+        {SETBACK_COMMON_STANDARD_NOTICE}
+      </div>
+
       <div className="card-premium overflow-hidden rounded-lg">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[36rem] table-fixed text-left text-xs sm:text-sm">
             <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-600">
               <tr>
                 <th className="w-[18%] px-3 py-2 font-semibold">검토 항목</th>
-                <th className="w-[14%] px-3 py-2 font-semibold">참고 기준</th>
+                <th className="w-[14%] px-3 py-2 font-semibold">{SETBACK_STANDARD_COLUMN_LABEL}</th>
                 <th className="w-[14%] px-3 py-2 font-semibold">예상 거리</th>
                 <th className="w-[16%] px-3 py-2 font-semibold">검토 상태</th>
                 <th className="w-[38%] px-3 py-2 font-semibold">안내</th>
