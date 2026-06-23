@@ -3,7 +3,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 const LEVEL_STYLES: Record<LayerARegulatoryLevel, string> = {
   "제한 가능성 높음": "bg-amber-50 text-amber-900 border-amber-200",
-  "추가 검토 필요": "bg-orange-50 text-orange-900 border-orange-200",
+  "추가 검토 필요": "bg-orange-50/80 text-orange-800 border-orange-100",
   "기본 확인": "bg-blue-50 text-blue-800 border-blue-200",
   "해당 없음": "bg-slate-50 text-slate-600 border-slate-200",
 };

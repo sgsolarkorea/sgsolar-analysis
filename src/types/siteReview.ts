@@ -1,3 +1,4 @@
+import type { SetbackReview } from "@/types/regulatoryReview";
 import type { LandInfoDetail, LayerARegulatoryAnalysis, RegionDistrictAnalysis } from "@/types/landInfo";
 import type { GridConnectionInfo } from "@/types/gridConnection";
 
@@ -175,6 +176,7 @@ export interface SiteReviewResult {
   landInfoDetail: LandInfoDetail;
   regionDistrictAnalysis: RegionDistrictAnalysis;
   layerARegulatoryAnalysis: LayerARegulatoryAnalysis;
+  setbackReview: SetbackReview;
   buildingInfo: InfoField[];
   gridInfo: GridInfo;
   ordinanceInfo: OrdinanceItem[];

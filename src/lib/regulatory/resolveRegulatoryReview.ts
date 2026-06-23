@@ -1,9 +1,8 @@
 import type { SetbackReview } from "@/types/regulatoryReview";
+import type { ParcelContext } from "@/types/siteIntel";
+import { buildSetbackFromGis } from "@/lib/regulatory/buildSetbackFromGis";
 
 export { extractMunicipalityLabel, loadMunicipalityOrdinance } from "@/lib/regulatory/loadOrdinance";
-
-const ORDINANCE_CHECK = "조례 기준 확인 필요";
-const DETAILED_CHECK = "현장 및 지자체 조례 기준으로 상세 확인 필요";
 
 export function buildDefaultSetbackReview(installType?: string): SetbackReview {
   const isRoof =
@@ -13,62 +12,40 @@ export function buildDefaultSetbackReview(installType?: string): SetbackReview {
     installType?.includes("공장") ||
     installType?.includes("상가");
 
+  const fallbackRow = (item: string, standard: string, detail?: string) => ({
+    item,
+    detail,
+    standard,
+    estimatedDistanceM: null,
+    measured: "데이터 확인 필요",
+    judgment: "데이터 확인 필요" as const,
+    remark: "필지 GIS 정보 확인 후 추정 거리를 산출합니다.",
+  });
+
   return {
     notice: isRoof
       ? "지붕형 태양광은 이격거리 조례에 무관하게 설치를 검토할 수 있습니다."
-      : "이격거리는 자동 실측 연동 전 단계로, 아래는 조례·법령 기준 참고용입니다. 현장·GIS 측정 후 최종 판단합니다.",
+      : "아래 거리는 공공 GIS 기준 추정값이며, 최종 이격거리는 지자체 조례·현장 확인이 필요합니다.",
     rows: [
-      {
-        item: "도로",
-        detail: "포장도로",
-        standard: "확인 필요",
-        measured: ORDINANCE_CHECK,
-        judgment: "조례 기준 확인 필요",
-      },
-      {
-        item: "주거지역 건물",
-        standard: "200m",
-        measured: DETAILED_CHECK,
-        judgment: "검토 필요",
-      },
-      {
-        item: "하천",
-        standard: "200m",
-        measured: DETAILED_CHECK,
-        judgment: "추가 확인",
-      },
-      {
-        item: "산림경계",
-        standard: "200m",
-        measured: ORDINANCE_CHECK,
-        judgment: "조례 기준 확인 필요",
-      },
-      {
-        item: "농업시설",
-        standard: "200m",
-        measured: ORDINANCE_CHECK,
-        judgment: "조례 기준 확인 필요",
-      },
-      {
-        item: "문화재",
-        standard: "확인 필요",
-        measured: ORDINANCE_CHECK,
-        judgment: "조례 기준 확인 필요",
-      },
-      {
-        item: "관광지",
-        standard: "확인 필요",
-        measured: ORDINANCE_CHECK,
-        judgment: "조례 기준 확인 필요",
-      },
+      fallbackRow("건물/주거지", "200m", "인근 건물"),
+      fallbackRow("도로", "100m", "포장도로"),
+      fallbackRow("하천", "100m"),
+      fallbackRow("학교", "100m"),
+      fallbackRow("문화재보호구역", "100m"),
     ],
+    meta: { partial: true, errors: ["parcel context unavailable"] },
   };
 }
 
-export function resolveRegulatoryReview(input: {
-  address: string;
+export async function resolveRegulatoryReview(input: {
   installType?: string;
-}) {
+  parcel?: ParcelContext | null;
+}): Promise<{ setbackReview: SetbackReview }> {
+  if (input.parcel) {
+    const review = await buildSetbackFromGis(input.parcel, input.installType);
+    return { setbackReview: review };
+  }
+
   return {
     setbackReview: buildDefaultSetbackReview(input.installType),
   };

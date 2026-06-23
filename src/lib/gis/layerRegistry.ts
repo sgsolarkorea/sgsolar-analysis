@@ -34,9 +34,12 @@ export const GIS_LAYER_REGISTRY: GisLayerDefinition[] = [
   { id: "LT_C_UB001", name: "군사시설보호", group: "restriction", enabled: true, phase: "step2", forIntersect: true, forSetback: false, regulatoryCategory: "군사" },
   // 이격거리 MVP (Step 3)
   { id: "LT_C_UPISUQ151", name: "도시계획(도로)", group: "road", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
-  { id: "LT_L_CHRN", name: "하천", group: "river", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
+  { id: "LT_L_SPRD", name: "도로명주소도로", group: "road", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
+  { id: "LT_C_WKMSTRM", name: "하천망", group: "river", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
   { id: "LT_C_SPBD", name: "건물", group: "building", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
-  { id: "LT_C_AISBG", name: "GIS건물통합", group: "building", enabled: false, phase: "step3", forIntersect: false, forSetback: true },
+  { id: "LT_C_DHSCH", name: "고등학교학교군", group: "other", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
+  { id: "LT_C_DMSCH", name: "중학교학교군", group: "other", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
+  { id: "LT_C_DESCH", name: "초등학교학교군", group: "other", enabled: true, phase: "step3", forIntersect: false, forSetback: true },
 ];
 
 export function getEnabledLayers(filter?: {

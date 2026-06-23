@@ -32,6 +32,10 @@ function expandBbox(bbox: ParcelBbox, bufferM: number, refLat: number): ParcelBb
   };
 }
 
+export function expandParcelBbox(bbox: ParcelBbox, bufferM: number, refLat: number): ParcelBbox {
+  return expandBbox(bbox, bufferM, refLat);
+}
+
 export function bboxToGeomFilter(bbox: ParcelBbox): string {
   return `BOX(${bbox.minLng},${bbox.minLat},${bbox.maxLng},${bbox.maxLat})`;
 }

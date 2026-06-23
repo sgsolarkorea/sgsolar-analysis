@@ -19,6 +19,8 @@ import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/r
 import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveRegionDistrictAnalysis } from "@/lib/regulatory/resolveRegionDistrictAnalysis";
 import { buildLayerARegulatoryAnalysis } from "@/lib/regulatory/buildLayerARegulatory";
+import { buildSetbackFromGis } from "@/lib/regulatory/buildSetbackFromGis";
+import { buildDefaultSetbackReview } from "@/lib/regulatory/resolveRegulatoryReview";
 import { resolveSiteIntel } from "@/lib/gis/siteIntel";
 import type { LandInfoDetail } from "@/types/landInfo";
 import {
@@ -306,6 +308,10 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     siteIntel?.meta.collectedAt,
   );
 
+  const setbackReview = siteIntel?.parcel
+    ? await buildSetbackFromGis(siteIntel.parcel, solarMetrics.installType)
+    : buildDefaultSetbackReview(solarMetrics.installType);
+
   return {
     address: geo.address,
     jibunAddress: geo.jibunAddress,
@@ -320,6 +326,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     landInfoDetail,
     regionDistrictAnalysis,
     layerARegulatoryAnalysis,
+    setbackReview,
     buildingInfo,
     gridInfo,
     profitability,

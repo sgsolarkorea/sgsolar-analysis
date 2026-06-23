@@ -4,6 +4,7 @@ import { getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveSiteIntel, summarizeSiteIntel } from "@/lib/gis/siteIntel";
 import { buildRegionDistrictFromGis } from "@/lib/regulatory/buildRegionDistrictFromGis";
 import { buildLayerARegulatoryAnalysis } from "@/lib/regulatory/buildLayerARegulatory";
+import { buildSetbackFromGis } from "@/lib/regulatory/buildSetbackFromGis";
 
 const GOLDEN_ADDRESSES = [
   "충남 논산시 부적면 충곡리 18-4",
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
   const mode = searchParams.get("mode");
   const skipCache = searchParams.get("skipCache") === "1";
 
-  if (mode === "golden" || mode === "step2") {
+  if (mode === "golden" || mode === "step2" || mode === "step3") {
     const results = [];
     for (const address of GOLDEN_ADDRESSES) {
       try {
@@ -44,6 +45,9 @@ export async function GET(request: Request) {
         const regulatory = bundle
           ? buildLayerARegulatoryAnalysis(bundle.landUseAttributes, bundle.meta.collectedAt)
           : null;
+        const setback = bundle?.parcel
+          ? await buildSetbackFromGis(bundle.parcel, undefined, undefined)
+          : null;
 
         results.push({
           address,
@@ -58,6 +62,15 @@ export async function GET(request: Request) {
             matchedZone: r.matchedZone,
             level: r.level,
           })),
+          setbackRows: setback?.rows.map((r) => ({
+            item: r.item,
+            standard: r.standard,
+            measured: r.measured,
+            judgment: r.judgment,
+            remark: r.remark,
+          })),
+          setbackMeta: setback?.meta,
+          setbackLayerErrors: setback?.layerErrors,
         });
       } catch (error) {
         results.push({
