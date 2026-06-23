@@ -66,7 +66,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
   };
 
-  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo, data.gridInfo);
+  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
   const regulatory = resolveRegulatoryReview({
     address: data.address,
     installType: data.solarMetrics.installType,

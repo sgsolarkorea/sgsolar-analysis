@@ -1,4 +1,3 @@
-import type { GridConnectionInfo } from "@/types/gridConnection";
 import type { ProgressStatusKind } from "@/components/result/AnalysisProgressPanel";
 import { hasBuildingRecord, hasLandRecord } from "@/lib/api/infoFallbacks";
 import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
@@ -18,76 +17,44 @@ export interface ProgressStepConfig {
 export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   {
     id: "site-location",
-    label: "입지 정보",
+    label: "입지 분석",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "주소·토지·건축물 정보 확인",
+    description: "토지 특성 및 규제 검토",
   },
   {
     id: "site-overview",
-    label: "용량·수익성",
-    statusLabel: "검토완료",
-    statusKind: "reviewed",
-    description: "설치용량·발전량·연매출 요약",
+    label: "용량 산정",
+    statusLabel: "완료",
+    statusKind: "complete",
+    description: "설치 가능 용량 및 예상 발전량 산정",
   },
   {
     id: "grid",
-    label: "계통연계",
-    statusLabel: "확인필요",
-    statusKind: "caution",
-    description: "한전 접수 전 별도 확인 필요",
+    label: "계통 검토",
+    statusLabel: "가능",
+    statusKind: "available",
+    description: "한전 계통 연계 가능 여부 확인",
   },
   {
     id: "cases",
-    label: "시공사례",
-    statusLabel: "완료",
-    statusKind: "complete",
-    description: "유사 현장 사례 확인",
+    label: "시공 사례",
+    statusLabel: "확인",
+    statusKind: "reference",
+    description: "유사 시공 사례 확인",
   },
   {
     id: "consultation",
-    label: "상담신청",
+    label: "상담 신청",
     statusLabel: "가능",
     statusKind: "available",
-    description: "전문가 컨설팅 가능",
+    description: "전문가 상담 및 설치 문의",
   },
 ];
-
-export function resolveGridProgressStep(
-  gridInfo: GridConnectionInfo,
-): Pick<ProgressStepConfig, "statusLabel" | "statusKind" | "description"> {
-  switch (gridInfo.status) {
-    case "high":
-      return {
-        statusLabel: "여유",
-        statusKind: "available",
-        description: gridInfo.reviewResult.slice(0, 48),
-      };
-    case "review":
-      return {
-        statusLabel: "추가확인",
-        statusKind: "caution",
-        description: gridInfo.reviewResult.slice(0, 48),
-      };
-    case "difficult":
-      return {
-        statusLabel: "여유부족",
-        statusKind: "caution",
-        description: gridInfo.reviewResult.slice(0, 48),
-      };
-    default:
-      return {
-        statusLabel: "확인필요",
-        statusKind: "caution",
-        description: "한전 선로용량 확인 필요",
-      };
-  }
-}
 
 export function resolveProgressSteps(
   landInfo: InfoField[],
   buildingInfo: InfoField[],
-  gridInfo?: GridConnectionInfo,
 ): ProgressStepConfig[] {
   return ANALYSIS_PROGRESS_STEPS.map((step) => {
     if (step.id === "land-info") {
@@ -136,11 +103,6 @@ export function resolveProgressSteps(
             statusKind: "caution" as ProgressStatusKind,
             description: "건축물 정보 추가 확인 필요",
           };
-    }
-
-    if (step.id === "grid" && gridInfo) {
-      const gridStep = resolveGridProgressStep(gridInfo);
-      return { ...step, ...gridStep };
     }
 
     return step;

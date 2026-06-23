@@ -37,6 +37,7 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
       <SectionHeader
         title="입지 분석 개요"
         description="추천 유형·설치용량·시공비 등 1차 입지검토 요약입니다."
+        compact
       />
       <GradeSection
         capacity={capacity}
@@ -49,10 +50,10 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
         thirdKpiLabel={isHousehold ? "월 예상 절감액" : undefined}
         thirdKpiValue={isHousehold ? formatHouseholdMonthlySavings(metrics.capacityKw) : undefined}
       />
-      <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
+      <p className="mt-2.5 text-xs font-medium leading-relaxed text-slate-500">
         ⚠ {solarDisclaimer.construction}
       </p>
-      <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500">※ {constructionExtra}</p>
+      <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">※ {constructionExtra}</p>
     </section>
   );
 }

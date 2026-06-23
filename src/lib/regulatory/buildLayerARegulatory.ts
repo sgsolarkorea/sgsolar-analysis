@@ -128,7 +128,7 @@ function buildDefaultRow(item: LandUseAttrItem): LayerARegulatoryRow {
     item: item.name,
     matchedZone: item.name,
     level: "기본 확인",
-    summary: `${item.category}으로 VWorld 토지이용계획에 등재되어 있습니다. 세부 규제는 상담 시 확인합니다.`,
+    summary: `토지이용계획상 ${item.category}으로 확인됩니다. 세부 규제 및 인허가 사항은 상담 시 안내드립니다.`,
   };
 }
 

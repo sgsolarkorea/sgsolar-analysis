@@ -69,9 +69,9 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
   return (
     <aside className="hidden lg:block lg:w-60 lg:shrink-0 lg:self-stretch">
       <div className="sticky top-24 z-30 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm">
-        <h2 className="text-sm font-bold text-navy">검토 흐름</h2>
+        <h2 className="text-sm font-bold text-navy">분석 진행 단계</h2>
         <p className="mt-1 text-xs leading-relaxed text-slate-500">
-          핵심 결과만 빠르게 확인하세요.
+          분석 항목을 순서대로 확인하세요.
         </p>
 
         <ul className="mt-3 space-y-2">
@@ -96,6 +96,7 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
                       {step.statusLabel}
                     </span>
                   </div>
+                  <p className="mt-1 text-xs leading-snug text-slate-500">{step.description}</p>
                 </button>
               </li>
             );
