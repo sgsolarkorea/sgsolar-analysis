@@ -71,6 +71,53 @@ export type SetbackRegulationConfidence =
   | "needs_verification"
   | "common_fallback";
 
+/** Step 6.5 — 조례 DB 검수·확장 워크플로 상태 */
+export type SetbackReviewStatus =
+  | "not_started"
+  | "source_found"
+  | "parsing"
+  | "parsed"
+  | "verified"
+  | "rejected";
+
+export type RegulationSourceType =
+  | "ordinance"
+  | "guideline"
+  | "permit_rule"
+  | "solar_policy"
+  | "notice"
+  | "unknown";
+
+export type RegulationSourceStatus =
+  | "not_started"
+  | "source_found"
+  | "parsing"
+  | "parsed"
+  | "verified"
+  | "rejected";
+
+export interface RegulationSourceEntry {
+  type: RegulationSourceType;
+  name: string;
+  appendix?: string;
+  sourceUrl: string;
+  status: RegulationSourceStatus;
+}
+
+export interface SetbackRegulationEntry {
+  municipalityLabel: string;
+  sido: string;
+  sigungu: string;
+  source: string;
+  sourceUrl?: string;
+  lastUpdated: string | null;
+  verifiedAt?: string | null;
+  reviewStatus?: SetbackReviewStatus;
+  confidence: SetbackRegulationConfidence;
+  distances: SetbackDistances;
+  notes?: string;
+}
+
 export type SetbackDistanceKey = "residential" | "road" | "river" | "school" | "cultural";
 
 export type SetbackDistances = Record<SetbackDistanceKey, number>;

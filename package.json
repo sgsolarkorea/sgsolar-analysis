@@ -10,6 +10,9 @@
     "build": "next build",
     "build:kepco-contacts": "node scripts/build-kepco-office-contacts.mjs",
     "build:kepco-registry": "node scripts/build-kepco-office-registry.mjs",
+    "build:korea-regions": "node scripts/build-korea-region-registry.mjs",
+    "build:regulatory-db": "node scripts/build-korea-region-registry.mjs && node scripts/build-regulatory-db.mjs",
+    "validate:regulatory-db": "node scripts/validate-regulatory-db.mjs",
     "start": "next start",
     "lint": "eslint"
   },

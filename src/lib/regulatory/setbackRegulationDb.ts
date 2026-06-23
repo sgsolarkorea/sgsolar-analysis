@@ -5,17 +5,10 @@ import type {
   SetbackDistanceKey,
   SetbackDistances,
   SetbackRegulationConfidence,
+  SetbackRegulationEntry,
 } from "@/types/regulatoryReview";
 
-type RawEntry = {
-  municipalityLabel: string;
-  sido: string;
-  sigungu: string;
-  source: string;
-  lastUpdated: string;
-  confidence: SetbackRegulationConfidence;
-  distances: SetbackDistances;
-};
+type RawEntry = SetbackRegulationEntry;
 
 const ENTRIES = setbackData.entries as Record<string, RawEntry>;
 const COMMON = setbackData.commonFallback;
@@ -48,7 +41,7 @@ function toResolved(entry: RawEntry, isFallback: boolean): ResolvedSetbackRegula
     sido: entry.sido,
     sigungu: entry.sigungu,
     source: entry.source,
-    lastUpdated: entry.lastUpdated,
+    lastUpdated: entry.lastUpdated ?? COMMON.lastUpdated,
     confidence: entry.confidence,
     distances: { ...entry.distances },
     isFallback,
