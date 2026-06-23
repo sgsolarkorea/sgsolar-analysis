@@ -27,6 +27,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
 import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
+import { resolveOrdinanceDisplay } from "@/lib/regulatory/resolveOrdinanceDisplay";
 import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { primaryParcelFromReview } from "@/lib/api/parcelLookup";
@@ -67,6 +68,11 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
   const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
   const ordinanceResult = await resolveOrdinanceForAddress(data.address);
+  const ordinanceDisplay = resolveOrdinanceDisplay(
+    data.address,
+    data.jibunAddress,
+    ordinanceResult.data,
+  );
 
   const primaryParcel = primaryParcelFromReview(data);
   const multiParcelEnabled = data.solarMetrics.installType === "토지형";
@@ -134,8 +140,11 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                 fields={data.buildingInfo}
               />
 
-              <SetbackReviewSection review={data.setbackReview} />
-              <LocalOrdinanceSection review={ordinanceResult.data} meta={ordinanceResult.meta} />
+              <SetbackReviewSection
+                review={data.setbackReview}
+                displayPolicy={ordinanceDisplay.policy}
+              />
+              <LocalOrdinanceSection display={ordinanceDisplay} meta={ordinanceResult.meta} />
 
               <ResultCapacitySection recommendation={data.recommendation} />
               <ResultGenerationSection />

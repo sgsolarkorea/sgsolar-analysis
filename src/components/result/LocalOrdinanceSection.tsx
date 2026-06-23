@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import type { MunicipalityOrdinanceData, OrdinanceArticle } from "@/types/regulatoryReview";
+import type { OrdinanceDisplayPolicy, OrdinanceDisplayResult } from "@/types/regulatoryReview";
 import type { OrdinanceLoadMeta } from "@/types/ordinanceLearning";
 import { ORDINANCE_DISPLAY_LABELS } from "@/types/ordinanceLearning";
 import SectionHeader from "@/components/ui/SectionHeader";
+import OrdinanceInfoCard from "@/components/result/OrdinanceInfoCard";
+import UrbanOrdinanceNoticePanel from "@/components/result/UrbanOrdinanceNoticePanel";
 
 interface LocalOrdinanceSectionProps {
-  review: MunicipalityOrdinanceData | null;
+  display: OrdinanceDisplayResult;
   meta: OrdinanceLoadMeta;
 }
 
@@ -26,86 +27,55 @@ function formatReviewDate(iso?: string): string {
     .replace(/-$/, "");
 }
 
-function DisplayStatusBadge({ meta }: { meta: OrdinanceLoadMeta }) {
-  const styles = {
-    verified: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    ai_draft: "bg-violet-50 text-violet-800 border-violet-200",
-    preparing: "bg-amber-50 text-amber-900 border-amber-200",
-    default_template: "bg-slate-100 text-slate-700 border-slate-200",
-  };
+function resolveBadgeStatus(
+  policy: OrdinanceDisplayPolicy,
+  meta: OrdinanceLoadMeta,
+): keyof typeof ORDINANCE_DISPLAY_LABELS {
+  if (policy.displayStatus === "urban_review_required") return "urban_review_required";
+  if (policy.displayStatus === "manual_review") return "manual_review";
+  if (policy.displayStatus === "candidate") return "candidate";
+  if (!meta.isPreparing && meta.displayStatus === "verified") return "verified";
+  return meta.displayStatus;
+}
 
+const BADGE_STYLES: Record<string, string> = {
+  verified: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  ai_draft: "bg-violet-50 text-violet-800 border-violet-200",
+  preparing: "bg-amber-50 text-amber-900 border-amber-200",
+  default_template: "bg-slate-100 text-slate-700 border-slate-200",
+  urban_review_required: "bg-indigo-50 text-indigo-800 border-indigo-200",
+  manual_review: "bg-amber-50 text-amber-900 border-amber-200",
+  candidate: "bg-sky-50 text-sky-800 border-sky-200",
+};
+
+function DisplayStatusBadge({
+  policy,
+  meta,
+}: {
+  policy: OrdinanceDisplayPolicy;
+  meta: OrdinanceLoadMeta;
+}) {
+  const status = resolveBadgeStatus(policy, meta);
   return (
     <span
-      className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-semibold ${styles[meta.displayStatus]}`}
+      className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-semibold ${BADGE_STYLES[status] ?? BADGE_STYLES.preparing}`}
     >
-      {ORDINANCE_DISPLAY_LABELS[meta.displayStatus]}
+      {ORDINANCE_DISPLAY_LABELS[status]}
     </span>
   );
 }
 
-function OrdinanceArticleCard({ article }: { article: OrdinanceArticle }) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-      <div>
-        <p className="text-xs font-semibold text-navy">조례명</p>
-        <h4 className="mt-1 text-base font-bold text-slate-900">{article.title}</h4>
-        {article.summary && (
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">{article.summary}</p>
-        )}
-      </div>
-
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs text-slate-600">
-            <tr>
-              <th className="px-3 py-2.5 font-semibold">항목</th>
-              <th className="px-3 py-2.5 font-semibold">기준</th>
-              <th className="px-3 py-2.5 font-semibold">요약</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {article.items.map((item) => (
-              <tr key={item.label}>
-                <td className="whitespace-nowrap px-3 py-3 font-medium text-slate-900">
-                  {item.label}
-                </td>
-                <td className="whitespace-nowrap px-3 py-3 text-slate-700">
-                  {item.distance ?? "—"}
-                </td>
-                <td className="px-3 py-3 text-slate-700">{item.summary}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {article.originalText && (
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => setExpanded((prev) => !prev)}
-            className="text-sm font-semibold text-navy hover:underline"
-          >
-            {expanded ? "조례 원문 접기" : "조례 원문 펼치기"}
-          </button>
-          {expanded && (
-            <pre className="mt-3 whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">
-              {article.originalText}
-            </pre>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
+function OrdinancePreparingPanel({
+  meta,
+  policy,
+}: {
+  meta: OrdinanceLoadMeta;
+  policy: OrdinanceDisplayPolicy;
+}) {
   return (
     <div className="card-premium p-6 sm:p-8">
       <div className="flex flex-wrap items-center gap-2">
-        <DisplayStatusBadge meta={meta} />
+        <DisplayStatusBadge policy={policy} meta={meta} />
         <span className="text-sm font-semibold text-slate-900">{meta.municipalityLabel}</span>
       </div>
       <h3 className="mt-4 text-lg font-bold text-slate-900">
@@ -115,40 +85,41 @@ function OrdinancePreparingPanel({ meta }: { meta: OrdinanceLoadMeta }) {
         위 법·규제 분석은 공공 GIS 기준 1차 검토입니다. {meta.municipalityLabel} 조례·인허가
         세부 기준은 상담 시 함께 검토합니다.
       </p>
-      <p className="mt-4 text-sm font-medium text-slate-500">
-        {meta.status === "review"
-          ? "관리자 검토 후 조례 요약이 업데이트됩니다."
-          : "조례 원문·세부 거리 기준은 상담 시 안내합니다."}
-      </p>
+      {policy.reviewReason && (
+        <p className="mt-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          {policy.reviewReason}
+        </p>
+      )}
     </div>
   );
 }
 
-export default function LocalOrdinanceSection({ review, meta }: LocalOrdinanceSectionProps) {
-  if (meta.isPreparing || !review) {
-    return (
-      <section id="local-ordinance" className="scroll-mt-24">
-        <SectionHeader
-          title="지자체 조례 검토"
-          description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
-        />
-        <OrdinancePreparingPanel meta={meta} />
-      </section>
-    );
-  }
+export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceSectionProps) {
+  const { policy, cards, municipalityLabel, parsedAt, hasParsedCandidate } = display;
+  const showUrbanNotice = policy.isUrbanMetro && policy.urbanNotice;
+  const showPreparing = !showUrbanNotice && cards.length === 0 && meta.isPreparing;
 
   return (
     <section id="local-ordinance" className="scroll-mt-24">
       <SectionHeader
         title="지자체 조례 검토"
-        description="해당 지자체 조례 및 태양광 발전시설 허가기준을 요약했습니다."
+        description={
+          showUrbanNotice
+            ? "수도권·도시지역은 개발행위허가 및 설치 가능 여부 검토가 우선입니다."
+            : hasParsedCandidate
+              ? "parser QA 후보 기준으로 조례 정보를 요약했습니다. (production 미반영)"
+              : "해당 지자체 조례 및 태양광 발전시설 허가기준을 요약합니다."
+        }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-        <DisplayStatusBadge meta={meta} />
+        <DisplayStatusBadge policy={policy} meta={meta} />
         <div className="text-sm text-slate-700">
-          <span className="font-semibold text-slate-900">{review.municipalityLabel}</span>
-          {meta.reviewedAt && (
+          <span className="font-semibold text-slate-900">{municipalityLabel}</span>
+          {parsedAt && (
+            <span className="ml-2 text-slate-600">parser QA · {parsedAt}</span>
+          )}
+          {meta.reviewedAt && !parsedAt && (
             <span className="ml-2 text-slate-600">
               최종 검토일 {formatReviewDate(meta.reviewedAt)}
               {meta.version ? ` · v${meta.version}` : ""}
@@ -157,63 +128,26 @@ export default function LocalOrdinanceSection({ review, meta }: LocalOrdinanceSe
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="card-premium p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">출처</p>
-          <h3 className="mt-1 text-lg font-bold text-slate-900">{review.ordinanceTitle}</h3>
-          {review.appendixTitle && (
-            <p className="mt-2 text-sm text-slate-700">{review.appendixTitle}</p>
-          )}
-
-          <ul className="mt-5 divide-y divide-slate-100 rounded-xl border border-slate-100">
-            {review.distanceRules.map((rule) => (
-              <li key={rule.label} className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm text-slate-600">{rule.label}</span>
-                <span className="text-sm font-semibold text-slate-900">{rule.distance}</span>
-              </li>
-            ))}
-          </ul>
+      {showUrbanNotice && policy.urbanNotice && (
+        <div className="mb-4">
+          <UrbanOrdinanceNoticePanel notice={policy.urbanNotice} />
         </div>
+      )}
 
-        <div className="card-premium flex flex-col p-5 sm:p-6">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold text-slate-500">관련 법령</p>
-            <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-900">
-              {review.relatedLaw}
+      {showPreparing ? (
+        <OrdinancePreparingPanel meta={meta} policy={policy} />
+      ) : (
+        <div className="space-y-4">
+          {cards.map((card) => (
+            <OrdinanceInfoCard key={card.id} card={card} />
+          ))}
+          {policy.displayStatus === "manual_review" && policy.reviewReason && (
+            <p className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
+              {policy.reviewReason}
             </p>
-            {(review.promulgatedDate || review.enforcedDate) && (
-              <p className="mt-3 text-xs text-slate-600">
-                {review.promulgatedDate && `공포: ${review.promulgatedDate}`}
-                {review.promulgatedDate && review.enforcedDate && " · "}
-                {review.enforcedDate && `시행: ${review.enforcedDate}`}
-              </p>
-            )}
-          </div>
-
-          {review.statusNote && (
-            <p className="mt-4 text-sm leading-relaxed text-slate-600">{review.statusNote}</p>
-          )}
-
-          {review.ordinanceUrl ? (
-            <a
-              href={review.ordinanceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto pt-4 text-sm font-semibold text-navy hover:underline"
-            >
-              조례 원문 확인 →
-            </a>
-          ) : (
-            <p className="mt-auto pt-4 text-sm font-medium text-slate-600">조례 확인 필요</p>
           )}
         </div>
-      </div>
-
-      <div className="mt-4 space-y-4">
-        {review.articles.map((article) => (
-          <OrdinanceArticleCard key={article.id} article={article} />
-        ))}
-      </div>
+      )}
     </section>
   );
 }

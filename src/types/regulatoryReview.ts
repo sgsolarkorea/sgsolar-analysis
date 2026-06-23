@@ -236,5 +236,48 @@ export interface SetbackReview {
   appliedStandard?: SetbackAppliedStandard;
 }
 
+/** Step 6.8 — runtime ordinance display (parsed_candidates 기반, production DB 미반영) */
+export type OrdinanceDisplayStatus =
+  | "urban_review_required"
+  | "manual_review"
+  | "candidate"
+  | "preparing"
+  | "verified";
+
+export interface UrbanOrdinanceNotice {
+  status: "urban_review_required";
+  title: string;
+  paragraphs: string[];
+}
+
+export interface OrdinanceDisplayPolicy {
+  isUrbanMetro: boolean;
+  hideSetbackDistances: boolean;
+  hideOrdinanceDistances: boolean;
+  displayStatus: OrdinanceDisplayStatus;
+  urbanNotice?: UrbanOrdinanceNotice;
+  reviewReason?: string;
+}
+
+export interface OrdinanceDisplayCard {
+  id: string;
+  ordinanceName: string;
+  articleTitle: string;
+  appendixTitle?: string;
+  summaryBullets: string[];
+  sourceUrl: string;
+  sourceOriginLabel: string;
+  parserConfidence?: ParserConfidence;
+  showDistances: boolean;
+}
+
+export interface OrdinanceDisplayResult {
+  municipalityLabel: string;
+  policy: OrdinanceDisplayPolicy;
+  cards: OrdinanceDisplayCard[];
+  hasParsedCandidate: boolean;
+  parsedAt?: string;
+}
+
 /** @deprecated MunicipalityOrdinanceData 사용 */
 export type LocalOrdinanceReview = MunicipalityOrdinanceData;

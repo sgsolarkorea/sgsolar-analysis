@@ -1,5 +1,6 @@
-import type { SetbackJudgment, SetbackReview } from "@/types/regulatoryReview";
+import type { OrdinanceDisplayPolicy, SetbackJudgment, SetbackReview } from "@/types/regulatoryReview";
 import SectionHeader from "@/components/ui/SectionHeader";
+import UrbanOrdinanceNoticePanel from "@/components/result/UrbanOrdinanceNoticePanel";
 import { SETBACK_SECTION_FOOTER } from "@/lib/regulatory/setbackDisplay";
 
 const JUDGMENT_STYLES: Record<SetbackJudgment, string> = {
@@ -17,12 +18,31 @@ const JUDGMENT_STYLES: Record<SetbackJudgment, string> = {
 
 interface SetbackReviewSectionProps {
   review: SetbackReview;
+  displayPolicy?: OrdinanceDisplayPolicy;
 }
 
-export default function SetbackReviewSection({ review }: SetbackReviewSectionProps) {
+export default function SetbackReviewSection({
+  review,
+  displayPolicy,
+}: SetbackReviewSectionProps) {
+  if (displayPolicy?.hideSetbackDistances && displayPolicy.urbanNotice) {
+    return (
+      <section id="setback-review" className="scroll-mt-24">
+        <SectionHeader
+          title="이격거리 검토"
+          description="수도권·도시지역은 이격거리 수치보다 인허가·설치 가능 여부 검토가 우선입니다."
+          compact
+        />
+        <UrbanOrdinanceNoticePanel notice={displayPolicy.urbanNotice} />
+        <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+          GIS 기반 거리 산정은 상담 시 현장 조건과 함께 검토합니다.
+        </p>
+      </section>
+    );
+  }
+
   const standardNotice =
-    review.appliedStandard?.notice ??
-    "공통 기준 적용 중 (지자체 조례 DB 미반영)";
+    review.appliedStandard?.notice ?? "공통 기준 적용 중 (지자체 조례 DB 미반영)";
   const columnLabel = review.appliedStandard?.columnLabel ?? "공통 참고 기준";
 
   return (
@@ -41,7 +61,8 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
 
       <div
         className={`mb-3 rounded-lg border px-3 py-2 text-xs leading-snug sm:text-sm ${
-          review.appliedStandard?.isFallback || review.appliedStandard?.confidence === "needs_verification"
+          review.appliedStandard?.isFallback ||
+          review.appliedStandard?.confidence === "needs_verification"
             ? "border-amber-200 bg-amber-50 text-amber-900"
             : review.appliedStandard?.confidence === "ordinance_based"
               ? "border-blue-200 bg-blue-50 text-blue-900"
@@ -68,9 +89,13 @@ export default function SetbackReviewSection({ review }: SetbackReviewSectionPro
                 <tr key={row.item} className="hover:bg-slate-50/60">
                   <td className="px-3 py-2 align-top text-slate-900">
                     <div className="font-semibold">{row.item}</div>
-                    {row.detail && <div className="mt-px text-[11px] text-slate-500">{row.detail}</div>}
+                    {row.detail && (
+                      <div className="mt-px text-[11px] text-slate-500">{row.detail}</div>
+                    )}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">{row.standard}</td>
+                  <td className="whitespace-nowrap px-3 py-2 align-top text-slate-700">
+                    {row.standard}
+                  </td>
                   <td className="whitespace-nowrap px-3 py-2 align-top font-medium text-slate-900">
                     {row.measured}
                   </td>

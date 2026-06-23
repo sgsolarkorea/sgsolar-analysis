@@ -15,7 +15,10 @@ export type OrdinanceDisplayStatus =
   | "verified"
   | "ai_draft"
   | "preparing"
-  | "default_template";
+  | "default_template"
+  | "urban_review_required"
+  | "manual_review"
+  | "candidate";
 
 export interface OrdinanceVersion {
   version: number;
@@ -90,4 +93,7 @@ export const ORDINANCE_DISPLAY_LABELS: Record<OrdinanceDisplayStatus, string> = 
   ai_draft: "AI 초안",
   preparing: "상세 검토 필요",
   default_template: "기본 템플릿",
+  urban_review_required: "수도권 도시지역 검토",
+  manual_review: "조례 수동 검토",
+  candidate: "조례 후보 요약",
 };
