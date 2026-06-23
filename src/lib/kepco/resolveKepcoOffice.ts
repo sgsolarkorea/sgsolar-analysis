@@ -6,6 +6,7 @@ import {
 } from "@/lib/kepco/formatMatchBasis";
 import {
   formatOfficePhoneDisplay,
+  formatPhoneSourceDetail,
   lookupKepcoOfficePhone,
 } from "@/lib/kepco/kepcoOfficePhoneDb";
 import {
@@ -19,6 +20,7 @@ import {
   KEPCO_FALLBACK_OFFICE_NAME,
   KEPCO_FALLBACK_PHONE,
   KEPCO_OFFICE_SOURCE,
+  KEPCO_PHONE_SOURCE_LABEL,
 } from "@/lib/kepco/inquiryContent";
 import type {
   KepcoOfficeConfidence,
@@ -65,6 +67,7 @@ function attachPhoneFields(
     | "fallbackPhone"
     | "phoneStatus"
     | "phoneSource"
+    | "phoneSourceDetail"
     | "phoneLastCheckedAt"
   >,
 ): ResolvedKepcoOffice {
@@ -73,11 +76,13 @@ function attachPhoneFields(
 
   return {
     ...base,
+    departmentHint: KEPCO_DEPARTMENT_HINT,
     officePhone,
     officePhoneDisplay: formatOfficePhoneDisplay(officePhone),
     fallbackPhone: phoneEntry?.fallbackPhone ?? KEPCO_FALLBACK_PHONE,
     phoneStatus: phoneEntry?.phoneStatus ?? ("unknown" satisfies KepcoOfficePhoneStatus),
-    phoneSource: phoneEntry?.source ?? KEPCO_OFFICE_SOURCE,
+    phoneSource: officePhone ? KEPCO_PHONE_SOURCE_LABEL : KEPCO_OFFICE_SOURCE,
+    phoneSourceDetail: formatPhoneSourceDetail(phoneEntry),
     phoneLastCheckedAt: phoneEntry?.lastCheckedAt ?? null,
   };
 }
@@ -104,7 +109,7 @@ function buildResolved(entry: KepcoOfficeRegistryEntry, parsed: ParsedKepcoAddre
   return attachPhoneFields({
     parsedAddress: parsed,
     officeName: entry.officeName,
-    departmentHint: entry.departmentHint,
+    departmentHint: KEPCO_DEPARTMENT_HINT,
     source: entry.source,
     matchLevel: entry.matchLevel,
     confidence: entry.confidence,

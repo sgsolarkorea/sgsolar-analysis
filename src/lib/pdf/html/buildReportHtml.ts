@@ -137,15 +137,21 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
         <div>
           <div class="kepco-field-label">지사 대표번호</div>
           <div class="kepco-field-val">${htmlText(office.officePhoneDisplay)}</div>
+          ${office.phoneSourceDetail ? `<div class="kepco-field-meta">${htmlText(office.phoneSourceDetail)}</div>` : ""}
+          ${office.officePhone ? `<div class="kepco-field-meta">${htmlText(office.phoneSource)}</div>` : ""}
         </div>
         <div>
           <div class="kepco-field-label">보조 연락수단</div>
           <div class="kepco-field-val">한전 ${htmlText(office.fallbackPhone)}</div>
         </div>
         <div>
-          <div class="kepco-field-label">매칭 기준</div>
-          <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
+          <div class="kepco-field-label">문의 부서</div>
+          <div class="kepco-field-val">${htmlText(office.departmentHint)}</div>
         </div>
+      </div>
+      <div class="kepco-match-row">
+        <div class="kepco-field-label">매칭 기준</div>
+        <div class="kepco-field-val">${htmlText(office.matchBasisLabel)}</div>
       </div>
       <div class="kepco-match-row meta">
         <div class="kepco-field-label">기준 행정구역</div>
@@ -153,12 +159,6 @@ function renderKepcoOfficeCard(data: ResolvedSiteReview): string {
       </div>
       ${office.verificationNote ? `<p class="kepco-note">${htmlText(office.verificationNote)}</p>` : ""}
       ${office.inquiryGuide ? `<p class="kepco-note warn">${htmlText(office.inquiryGuide)}</p>` : ""}
-      <div class="kepco-office-grid">
-        <div>
-          <div class="kepco-field-label">문의 부서</div>
-          <div class="kepco-field-val">${htmlText(office.departmentHint)}</div>
-        </div>
-      </div>
       <div class="kepco-lists">
         <div>
           <div class="kepco-field-label">문의 항목</div>

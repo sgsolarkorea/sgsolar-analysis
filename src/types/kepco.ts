@@ -11,12 +11,13 @@ export interface KepcoOfficePhoneEntry {
   officeName: string;
   /** 고객지원/전기사용신청 등 공식 안내 연락처. 없으면 null */
   officePhone: string | null;
+  officeAddress?: string;
+  departmentName?: string;
+  taskName?: string;
   fallbackPhone: string;
   phoneStatus: KepcoOfficePhoneStatus;
   source: string;
   lastCheckedAt: string;
-  /** 업무·부서 참고 (표시용) */
-  departmentNote?: string;
 }
 
 export interface KepcoOfficeRegistryEntry {
@@ -63,5 +64,6 @@ export interface ResolvedKepcoOffice {
   fallbackPhone: string;
   phoneStatus: KepcoOfficePhoneStatus;
   phoneSource: string;
+  phoneSourceDetail: string | null;
   phoneLastCheckedAt: string | null;
 }

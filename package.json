@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:kepco-contacts": "node scripts/build-kepco-office-contacts.mjs",
     "start": "next start",
     "lint": "eslint"
   },
