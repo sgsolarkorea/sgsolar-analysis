@@ -55,7 +55,11 @@ function pickBestMatch(
   return [...candidates].sort((a, b) => {
     const levelDiff = MATCH_LEVEL_SCORE[b.matchLevel] - MATCH_LEVEL_SCORE[a.matchLevel];
     if (levelDiff !== 0) return levelDiff;
-    return CONFIDENCE_SCORE[b.confidence] - CONFIDENCE_SCORE[a.confidence];
+    const confidenceDiff = CONFIDENCE_SCORE[b.confidence] - CONFIDENCE_SCORE[a.confidence];
+    if (confidenceDiff !== 0) return confidenceDiff;
+    const originScore = (origin: KepcoOfficeRegistryEntry["registryOrigin"]) =>
+      origin === "manual" ? 2 : 1;
+    return originScore(b.registryOrigin) - originScore(a.registryOrigin);
   })[0];
 }
 

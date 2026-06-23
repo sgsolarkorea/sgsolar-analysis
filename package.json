@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:kepco-contacts": "node scripts/build-kepco-office-contacts.mjs",
+    "build:kepco-registry": "node scripts/build-kepco-office-registry.mjs",
     "start": "next start",
     "lint": "eslint"
   },

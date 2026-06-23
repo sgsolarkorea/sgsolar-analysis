@@ -2,7 +2,14 @@
 export type KepcoOfficeMatchLevel = "sido" | "sigungu" | "gu" | "eupmyeon" | "dong" | "unknown";
 
 /** 주소 registry 매칭 신뢰도 */
-export type KepcoOfficeConfidence = "verified" | "region_match" | "needs_verification" | "unknown";
+export type KepcoOfficeConfidence =
+  | "verified"
+  | "official_area"
+  | "region_match"
+  | "needs_verification"
+  | "unknown";
+
+export type KepcoOfficeRegistryOrigin = "manual" | "auto";
 
 /** 지사 대표번호 출처 신뢰도 */
 export type KepcoOfficePhoneStatus = "verified" | "official_page" | "needs_verification" | "unknown";
@@ -32,6 +39,7 @@ export interface KepcoOfficeRegistryEntry {
   source: string;
   matchLevel: KepcoOfficeMatchLevel;
   confidence: KepcoOfficeConfidence;
+  registryOrigin?: KepcoOfficeRegistryOrigin;
   verificationNote?: string;
 }
 

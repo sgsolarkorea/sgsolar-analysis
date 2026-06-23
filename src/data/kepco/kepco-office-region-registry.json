@@ -1,0 +1,2080 @@
+{
+  "meta": {
+    "source": "한국전력공사_한전ON 사업소정보_20240913",
+    "generatedAt": "2026-06-23",
+    "entryCount": 207,
+    "conflictRegionCount": 27
+  },
+  "entries": [
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "강릉시",
+      "officeName": "동해지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강릉시 전역(옥계면 제외) 정선군(임계면) 평창군(봉평면 진부면 대관령면 용평면)"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "고성군",
+      "officeName": "속초고성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "속초시 고성군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "동해시",
+      "officeName": "동해지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동해시  강릉시 일부(옥계면)"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "삼척시",
+      "officeName": "태백지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "삼척시 전역 (도계읍 구사리 한내리 및 하장면 제외)"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "속초시",
+      "officeName": "속초고성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "속초시 고성군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "양구군",
+      "officeName": "양구지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "양구군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "양양군",
+      "officeName": "양양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "양양군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "영월군",
+      "officeName": "제천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영월군 정선군 신동읍 충북 단양군 사지원리 일부"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "원주시",
+      "officeName": "원주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "원주시 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "인제군",
+      "officeName": "인제지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "인제군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "정선군",
+      "officeName": "태백지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "정선군 정선읍 화암면 북평면 여량면(고양리 구절리 남곡리 여량리 유천리) 남면(광덕리 낙동리) 삼척시 하장면 일부"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "철원군",
+      "officeName": "철원지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "철원군 전역"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "춘천시",
+      "officeName": "화천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "춘천시 전역(춘천시 남면 북산면 사북면 일부 제외)"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "태백시",
+      "officeName": "태백지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "태백시 전지역 삼척시 도계읍 및 하장면 일부 정선군 남면 일부 경상북도 봉화군 석포면"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "평창군",
+      "officeName": "평창지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "평창군 평창읍 미탄면 방림면 대화면"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "홍천군",
+      "officeName": "홍천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "홍천군 춘천시 일부(남면 한덕리 북산면 조교리) 양평군 일부(단월면 명성리)"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "화천군",
+      "officeName": "화천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "화천군 전 지역 춘천시 북산면 일부 춘천시 사북면 일부"
+    },
+    {
+      "sido": "강원특별자치도",
+      "sigungu": "횡성군",
+      "officeName": "횡성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "횡성군 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "가평군",
+      "officeName": "가평지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "가평군 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "고양시",
+      "officeName": "고양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "고양시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "과천시",
+      "officeName": "서초지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서초구 경기도 과천시"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "광명시",
+      "officeName": "광명지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광명시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "광주시",
+      "officeName": "광주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "경기도 광주시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "구리시",
+      "officeName": "구리지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구리시 전역 / 남양주시 진접읍 진건읍 오남읍 퇴계원읍 별내면 별내동"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "김포시",
+      "officeName": "김포지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "김포시"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "남양주시",
+      "officeName": "남양주지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구리시 전역 / 남양주시 진접읍 진건읍 오남읍 퇴계원읍 별내면 별내동"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "동두천시",
+      "officeName": "동두천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동두천시 전역 / 양주시 은현면 남면 덕정동 봉양동 회암동 율정동 옥정동 고암동 덕계동 회정동"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "부천시",
+      "officeName": "부천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부천시 전지역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "성남시",
+      "officeName": "성남지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "성남시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "수원시",
+      "officeName": "서수원지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "수원시 일부(장안구 팔달구 영통구)"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "시흥시",
+      "officeName": "시흥지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "시흥시(시화공단 제외)"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "안산시",
+      "officeName": "안산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "안산시 전역(대부도 제외)  시흥 시화공단"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "안성시",
+      "officeName": "안성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "안성시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "안양시",
+      "officeName": "안양군포의왕지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "안양시 군포시 의왕시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "양주시",
+      "officeName": "동두천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "의정부시 전역 / 양주시 백석읍 광적면 장흥면 유양동 어둔동 남방동 마전동 광사동 만송동 삼숭동 고읍동 산북동"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "양평군",
+      "officeName": "양평지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "홍천군 춘천시 일부(남면 한덕리 북산면 조교리) 양평군 일부(단월면 명성리)"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "여주시",
+      "officeName": "여주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "여주시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "연천군",
+      "officeName": "연천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "연천군 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "오산시",
+      "officeName": "오산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "향남읍 양감면 정남면 오산시 동탄면"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "용인시",
+      "officeName": "동용인지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "처인구"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "의왕시",
+      "officeName": "안양군포의왕지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "안양시 군포시 의왕시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "의정부시",
+      "officeName": "경기북부본부",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "의정부시 전역 / 양주시 백석읍 광적면 장흥면 유양동 어둔동 남방동 마전동 광사동 만송동 삼숭동 고읍동 산북동"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "이천시",
+      "officeName": "이천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "이천시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "파주시",
+      "officeName": "파주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "파주시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "평택시",
+      "officeName": "서평택지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "우정읍 팔탄면 장안면 포승읍 청북면 안중읍 현덕면"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "포천시",
+      "officeName": "포천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "포천시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "하남시",
+      "officeName": "하남지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "하남시 전역"
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "화성시",
+      "officeName": "당진지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "화성시 일부(마도면 남양읍 봉담읍 매송면 비봉면 송산면 서신면 새솔동) 안산시 단원구 일부(대부북동 대부남동 대부동동 선감동) 인천광역시 옹진군 영흥면"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "거제시",
+      "officeName": "거제지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "거제시 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "거창군",
+      "officeName": "거창지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "거창군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "고성군",
+      "officeName": "사천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "고성군 전역 하이면 제외"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "김해시",
+      "officeName": "김해지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "김해시 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "남해군",
+      "officeName": "남해지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "남해군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "밀양시",
+      "officeName": "밀양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "밀양시 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "사천시",
+      "officeName": "사천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "사천시 전역 고성군 하이면"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "산청군",
+      "officeName": "산청지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "산청군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "양산시",
+      "officeName": "양산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "양산시 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "의령군",
+      "officeName": "의령지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "관할구역 :의령군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "진주시",
+      "officeName": "진주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "진주시 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "창녕군",
+      "officeName": "창녕지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "창녕군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "창원시",
+      "officeName": "마산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "창원시 성산구 창원시 의창구 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "통영시",
+      "officeName": "통영지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "통영시전역 거제 술역리 일부"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "하동군",
+      "officeName": "하동지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "하동군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "함안군",
+      "officeName": "함안지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "함안군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "함양군",
+      "officeName": "함양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "관할구역 :함양군 전역"
+    },
+    {
+      "sido": "경상남도",
+      "sigungu": "합천군",
+      "officeName": "합천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "합천읍 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "경산시",
+      "officeName": "경산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "경산시 일부 : 하양읍 진량읍 와촌면 자인면 용성면 남산면 압량면 남천면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "경주시",
+      "officeName": "경주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "경주시 전역감포읍 안강읍 건천읍 외동읍 양북면 양남면 내남면 산내면 서면 현곡면 강동면 천북면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "고령군",
+      "officeName": "고령지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "고령군 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "구미시",
+      "officeName": "구미지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구미시 가산면 석적읍"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "군위군",
+      "officeName": "군위지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "군위군 전역 응주 가산 용수리"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "김천시",
+      "officeName": "영동지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "김천시 일부 : 아포읍 농소면 남면 개령면 감문면 어모면 봉산면 대항면 감천면 조마면 구성면 지례면 부항면 대덕면 증산면 자산동 평화남산동 양금동 대신동 대곡동 지좌동"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "문경시",
+      "officeName": "단양지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "문경읍 가은읍 영순면 산양면 호계면 산북면 동로면 마성면 농암면 점촌1~5동"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "봉화군",
+      "officeName": "태백지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "태백시 전지역 삼척시 도계읍 및 하장면 일부 정선군 남면 일부 경상북도 봉화군 석포면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "상주시",
+      "officeName": "상주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "상주시 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "성주군",
+      "officeName": "성주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "성주읍 선남면 용암면월항면 가천면 금수면 대가면 벽진면 수륜면 초전면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "영덕군",
+      "officeName": "영덕지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영덕읍 장수면병곡면영해면축산면지품면달산면강구면남정면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "영양군",
+      "officeName": "영양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영양군 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "영주시",
+      "officeName": "단양지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영주시 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "영천시",
+      "officeName": "영천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영천시 전지역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "예천군",
+      "officeName": "예천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "예천읍용문면상리면하리면감천면보문면호명면유천면용궁면개포면지보면풍양면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "울릉군",
+      "officeName": "울릉지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울릉도 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "울진군",
+      "officeName": "울진지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울진읍 평해읍 북면 서면 근남면 원남면 기성면 온정면 죽변면 후포면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "의성군",
+      "officeName": "의성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "의성군 전역"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "청송군",
+      "officeName": "청송지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "청송읍부동면부남면현동면현서면 안덕면 파천면 진보면"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "칠곡군",
+      "officeName": "칠곡지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "다부 학산 금화리"
+    },
+    {
+      "sido": "경상북도",
+      "sigungu": "포항시",
+      "officeName": "포항지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "흥해읍 송라면 청하면 신광면 죽장면 기계면 기북면"
+    },
+    {
+      "sido": "광주광역시",
+      "sigungu": "광산구",
+      "officeName": "광산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광주광역시 광산구"
+    },
+    {
+      "sido": "광주광역시",
+      "sigungu": "남구",
+      "officeName": "서광주지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광주광역시 서구 남구"
+    },
+    {
+      "sido": "광주광역시",
+      "sigungu": "동구",
+      "officeName": "광주전남본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광주광역시 북구 동구"
+    },
+    {
+      "sido": "광주광역시",
+      "sigungu": "북구",
+      "officeName": "광주전남본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광주광역시 북구 동구"
+    },
+    {
+      "sido": "광주광역시",
+      "sigungu": "서구",
+      "officeName": "서광주지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광주광역시 서구 남구"
+    },
+    {
+      "sido": "대구광역시",
+      "sigungu": "달서구",
+      "officeName": "서대구지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "달서구 일부(본리동 및 장기동 일부는 서대구지사 관할) 달성군 일부(화원읍 논공읍 옥포면 현풍면 유가면 구지면)"
+    },
+    {
+      "sido": "대구광역시",
+      "sigungu": "동구",
+      "officeName": "동대구지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동구 수성구 달성군 가창면 전역"
+    },
+    {
+      "sido": "대구광역시",
+      "sigungu": "북구",
+      "officeName": "대구본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "북구 중구 전역"
+    },
+    {
+      "sido": "대구광역시",
+      "sigungu": "서구",
+      "officeName": "서대구지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서구 남구 전역 달서구 일부(감삼동 두류1~3동 성당1~2동 죽전동 본리동 및 장기동 일부) 달성군 일부(다사읍 하빈면)"
+    },
+    {
+      "sido": "대구광역시",
+      "sigungu": "서대구",
+      "officeName": "남대구지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "달서구 일부(본리동 및 장기동 일부는 서대구지사 관할) 달성군 일부(화원읍 논공읍 옥포면 현풍면 유가면 구지면)"
+    },
+    {
+      "sido": "대전광역시",
+      "sigungu": "대덕구",
+      "officeName": "대덕유성지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 유성구 대덕구"
+    },
+    {
+      "sido": "대전광역시",
+      "sigungu": "동구",
+      "officeName": "대전세종충남본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 동구중구"
+    },
+    {
+      "sido": "대전광역시",
+      "sigungu": "동구중구",
+      "officeName": "대전세종충남본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 동구중구"
+    },
+    {
+      "sido": "대전광역시",
+      "sigungu": "서구",
+      "officeName": "서대전지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 서구 충남 계룡시"
+    },
+    {
+      "sido": "대전광역시",
+      "sigungu": "유성구",
+      "officeName": "대덕유성지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 유성구 대덕구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "강서구",
+      "officeName": "서부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강서구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "기장군",
+      "officeName": "기장지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 기장군 전역"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "남구",
+      "officeName": "남부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 남구 수영구 해운대구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "동래구",
+      "officeName": "동래지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 동래구 금정구 연제구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "부산진구",
+      "officeName": "부산울산본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산진구 동구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "사상구",
+      "officeName": "북부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "사상구 북구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "사하구",
+      "officeName": "중부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 중구 서구 사하구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "서구",
+      "officeName": "중부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 중구 서구 사하구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "연제구",
+      "officeName": "동래지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 동래구 금정구 연제구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "영도구",
+      "officeName": "영도지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 영도구 전역"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "중구",
+      "officeName": "중부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 중구 서구 사하구"
+    },
+    {
+      "sido": "부산광역시",
+      "sigungu": "해운대구",
+      "officeName": "남부산지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부산시 남구 수영구 해운대구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "강남구",
+      "officeName": "강남지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서울시 강남구 전역"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "강동구",
+      "officeName": "강동송파지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강동구 송파구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "강북구",
+      "officeName": "강북성북지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강북구 성북구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "구로구",
+      "officeName": "구로금천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구로구 금천구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "금천구",
+      "officeName": "구로금천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구로구 금천구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "노원구",
+      "officeName": "노원도봉지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "도봉구 노원구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "도봉구",
+      "officeName": "노원도봉지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "도봉구 노원구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "동대문구",
+      "officeName": "동대문중랑지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동대문구 중랑구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "동작구",
+      "officeName": "관악동작지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동작구 관악구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "서초구",
+      "officeName": "서초지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서초구 경기도 과천시"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "성동구",
+      "officeName": "광진성동지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "성동구 광진구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "양천구",
+      "officeName": "강서양천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "양천구 강서구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "영등포구",
+      "officeName": "남서울본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영등포구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "은평구",
+      "officeName": "서대문은평지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "은평구 서대문구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "중구",
+      "officeName": "서울본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "중구 종로구"
+    },
+    {
+      "sido": "서울특별시",
+      "sigungu": "중랑구",
+      "officeName": "동대문중랑지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "동대문구 중랑구"
+    },
+    {
+      "sido": "울산광역시",
+      "sigungu": "남구",
+      "officeName": "울산지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울산시 일부(중구 남구)울산시 울주군 일부(범서읍 웅촌면 온산읍 서생면 온양읍 청량면)"
+    },
+    {
+      "sido": "울산광역시",
+      "sigungu": "동구",
+      "officeName": "동울산지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울산시 일부(동구 북구)"
+    },
+    {
+      "sido": "울산광역시",
+      "sigungu": "북구",
+      "officeName": "동울산지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울산시 일부(동구 북구)"
+    },
+    {
+      "sido": "울산광역시",
+      "sigungu": "중구",
+      "officeName": "울산지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "울산시 일부(중구 남구)울산시 울주군 일부(범서읍 웅촌면 온산읍 서생면 온양읍 청량면)"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "계양구",
+      "officeName": "인천본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "계양구 부평구 덕적면 연평면 자월면"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "남동구",
+      "officeName": "남인천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "남동구 연수구"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "단원구",
+      "officeName": "화성지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "화성시 일부(마도면 남양읍 봉담읍 매송면 비봉면 송산면 서신면 새솔동) 안산시 단원구 일부(대부북동 대부남동 대부동동 선감동) 인천광역시 옹진군 영흥면"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "동구",
+      "officeName": "제물포지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "중구 (중앙동해안동관동항동송학동사동신생동신포동답동선화동유동율목동                                                    도원동내동경동용동인현동전동북성동선린동송월동연안동) 동구 미추"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "미추홀구",
+      "officeName": "제물포지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "중구 (중앙동해안동관동항동송학동사동신생동신포동답동선화동유동율목동                                                    도원동내동경동용동인현동전동북성동선린동송월동연안동) 동구 미추"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "부평구",
+      "officeName": "인천본부",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "계양구 부평구 덕적면 연평면 자월면"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "서구",
+      "officeName": "서인천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서구"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "연수구",
+      "officeName": "남인천지사",
+      "matchLevel": "gu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "남동구 연수구"
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "중구",
+      "officeName": "영종지사",
+      "matchLevel": "gu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "중구(중산동운남동 운서동 운북동 남북동 덕교동 을왕동 무의동) 옹진군 북도면"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "강진군",
+      "officeName": "강진지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강진군 전역 완도군 일부(고금면 약산면)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "고흥군",
+      "officeName": "고흥지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "고흥군 전역 완도군 일부(금당면 금일읍 생일면)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "곡성군",
+      "officeName": "곡성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "곡성군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "광양시",
+      "officeName": "광양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "광양시 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "구례군",
+      "officeName": "구례지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "구례군 전역순천시 일부(황전면 선변리 비촌리)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "나주시",
+      "officeName": "나주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "나주시 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "담양군",
+      "officeName": "담양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "담양군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "목포시",
+      "officeName": "목포지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "목포시 전역무안군 일부 : 삼향면(임성 유교 왕산리 남악리 일부)신안군 일부 : 흑산면(대흑산도 대둔도 등) 압해면(매화도 고이도 제외) 임자면 지도읍(선도 제외) 증도면(병풍도 제외)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "무안군",
+      "officeName": "무안지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "무안군 전역(일부 제외) /  제외지역 : 삼향면 남악리왕산리 임성리 유교리(목포지점) 현경면 해운리(함평지점) 신안군 일부(운남면) 압해면(매화도 고이도) 증도면(병풍도) 지도읍(선도)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "보성군",
+      "officeName": "보성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "보성군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "순천시",
+      "officeName": "여수지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "순천시 전역(일부제외) - 제외지역 : 해룡면호두리(여수지점) 황전면 선변/비촌리(구례지점)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "신안군",
+      "officeName": "무안지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "무안군 전역(일부 제외) /  제외지역 : 삼향면 남악리왕산리 임성리 유교리(목포지점) 현경면 해운리(함평지점) 신안군 일부(운남면) 압해면(매화도 고이도) 증도면(병풍도) 지도읍(선도)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "여수시",
+      "officeName": "여수지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "여수시(율촌면 여동리 제외) 순천시 일부(해룡면 호두리)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "영광군",
+      "officeName": "영광지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영광군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "영암군",
+      "officeName": "영암지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영암군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "완도군",
+      "officeName": "완도지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "강진군 전역 완도군 일부(고금면 약산면)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "장성군",
+      "officeName": "장성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "장성군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "장흥군",
+      "officeName": "장흥지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "장흥군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "진도군",
+      "officeName": "진도지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "진도군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "함평군",
+      "officeName": "함평지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "함평군 전역 및 무안군 일부 관할(현경면 해운리)"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "해남군",
+      "officeName": "해남지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "해남군 전역"
+    },
+    {
+      "sido": "전라남도",
+      "sigungu": "화순군",
+      "officeName": "화순지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "화순군 전역"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "고창군",
+      "officeName": "고창지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "고창군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "군산시",
+      "officeName": "군산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "군산시 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "김제시",
+      "officeName": "김제지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "김제시 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "남원시",
+      "officeName": "남원지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "남원시 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "무주군",
+      "officeName": "무주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "무주군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "부안군",
+      "officeName": "부안지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부안군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "순창군",
+      "officeName": "순창지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "순창군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "완주군",
+      "officeName": "남전주지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "전주시 완산구 완주군 일부 (구이면 상관면 이서면)"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "익산시",
+      "officeName": "익산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "익산시 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "임실군",
+      "officeName": "임실지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "임실군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "장수군",
+      "officeName": "장수지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "장수군 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "전주시",
+      "officeName": "남전주지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "전주시 완산구 완주군 일부 (구이면 상관면 이서면)"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "정읍시",
+      "officeName": "정읍지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "정읍시 일대"
+    },
+    {
+      "sido": "전라북도",
+      "sigungu": "진안군",
+      "officeName": "진안지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "진안군 일대"
+    },
+    {
+      "sido": "제주특별자치도",
+      "sigungu": "서귀포시",
+      "officeName": "서귀포지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서귀포시내 전구역 남원읍 대정읍 성산읍 안덕면 표선면"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "계룡시",
+      "officeName": "서대전지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "대전광역시 서구 충남 계룡시"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "공주시",
+      "officeName": "공주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "공주시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "금산군",
+      "officeName": "금산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "금산군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "논산시",
+      "officeName": "논산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "논산시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "당진시",
+      "officeName": "당진지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "당진시 전역 국화도(경기도 화성시 우정읍 국화리)"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "보령시",
+      "officeName": "보령지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "보령시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "부여군",
+      "officeName": "부여지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "부여군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "서산시",
+      "officeName": "서산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서산시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "서천군",
+      "officeName": "서천지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "서천군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "아산시",
+      "officeName": "아산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "아산시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "예산군",
+      "officeName": "예산지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "예산군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "천안시",
+      "officeName": "천안지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "천안시 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "청양군",
+      "officeName": "청양지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "청양군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "태안군",
+      "officeName": "태안지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "태안군 전역"
+    },
+    {
+      "sido": "충청남도",
+      "sigungu": "홍성군",
+      "officeName": "홍성지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "홍성군 전역"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "괴산군",
+      "officeName": "증평괴산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "증평군 괴산군 전역 및 청원군 북이면 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "단양군",
+      "officeName": "단양지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영월군 정선군 신동읍 충북 단양군 사지원리 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "보은군",
+      "officeName": "보은지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "보은군 전역 옥천군 일부 : 청산면청성면(묘금리 제외)"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "영동군",
+      "officeName": "영동지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "영동군 전역 옥천군 일부(청성면 묘금리ㆍ조천리 일부 동이면 우산리 일부) 김천시일부(봉산면 광천리일부)                   김천시 금릉군 봉산면 광천동 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "옥천군",
+      "officeName": "영동지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "보은군 전역 옥천군 일부 : 청산면청성면(묘금리 제외)"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "음성군",
+      "officeName": "진천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "음성군 전역(일부 제외) - 제외지역 : 삼성면 대소면 맹동면 원남면"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "제천시",
+      "officeName": "제천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "제천시 전역 충주시 산척면 일부 영월군 한반도면 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "증평군",
+      "officeName": "증평괴산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "증평군 괴산군 전역 및 청원군 북이면 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "진천군",
+      "officeName": "진천지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "진천군 전역 음성군 일부 : 맹동면(두성리 신돈리 통동리) 삼성면(용성리 상곡리 선정리 청용리 천평리) 대소면(삼호리 오류리 내산리 태생리 삼정리 소석리 미곡리 대풍리 오산리)"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "청원군",
+      "officeName": "증평괴산지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "증평군 괴산군 전역 및 청원군 북이면 일부"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "청주시",
+      "officeName": "동청주지사",
+      "matchLevel": "sigungu",
+      "confidence": "official_area",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "청주시 청원구 상당구"
+    },
+    {
+      "sido": "충청북도",
+      "sigungu": "충주시",
+      "officeName": "충주지사",
+      "matchLevel": "sigungu",
+      "confidence": "needs_verification",
+      "source": "한전ON 관할구역",
+      "registryOrigin": "auto",
+      "jurisdictionSample": "제천시 전역 충주시 산척면 일부 영월군 한반도면 일부"
+    }
+  ]
+}

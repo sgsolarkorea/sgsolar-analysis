@@ -1,16 +1,26 @@
-import type { KepcoOfficeRegistryEntry } from "@/types/kepco";
+import type { KepcoOfficeRegistryEntry, KepcoOfficeRegistryOrigin } from "@/types/kepco";
+import autoRegistryData from "@/data/kepco/kepco-office-region-registry.json";
 import {
   KEPCO_DEPARTMENT_HINT,
   KEPCO_OFFICE_SOURCE,
 } from "@/lib/kepco/inquiryContent";
 
+export const KEPCO_AUTO_REGISTRY_SOURCE = "한전ON 관할구역";
+
 const DEFAULT_ENTRY = {
   departmentHint: KEPCO_DEPARTMENT_HINT,
   source: KEPCO_OFFICE_SOURCE,
+  registryOrigin: "manual" as const,
 } as const;
 
-/** Step 5.1 — 시·군·구 기본 + 구/읍·면 override */
-export const KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = [
+function regionKey(
+  entry: Pick<KepcoOfficeRegistryEntry, "sido" | "sigungu" | "gu" | "eupmyeon" | "dong">,
+): string {
+  return `${entry.sido}|${entry.sigungu}|${entry.gu ?? ""}|${entry.eupmyeon ?? ""}|${entry.dong ?? ""}`;
+}
+
+/** Step 5.1 — 수동 검증 override (읍·면·구 포함) */
+export const MANUAL_KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = [
   // ── 경상남도 ──
   {
     sido: "경상남도",
@@ -233,3 +243,33 @@ export const KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = [
     ...DEFAULT_ENTRY,
   },
 ];
+
+type AutoRegistryEntry = Omit<KepcoOfficeRegistryEntry, "departmentHint"> & {
+  registryOrigin: KepcoOfficeRegistryOrigin;
+  jurisdictionSample?: string;
+};
+
+const manualKeys = new Set(MANUAL_KEPCO_OFFICE_REGISTRY.map(regionKey));
+
+const AUTO_KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = (
+  autoRegistryData.entries as AutoRegistryEntry[]
+)
+  .filter((entry) => !manualKeys.has(regionKey(entry)))
+  .map((entry) => ({
+    ...entry,
+    departmentHint: KEPCO_DEPARTMENT_HINT,
+    registryOrigin: "auto" as const,
+    source: entry.source ?? KEPCO_AUTO_REGISTRY_SOURCE,
+  }));
+
+export const KEPCO_OFFICE_REGISTRY: KepcoOfficeRegistryEntry[] = [
+  ...MANUAL_KEPCO_OFFICE_REGISTRY,
+  ...AUTO_KEPCO_OFFICE_REGISTRY,
+];
+
+export const KEPCO_OFFICE_REGISTRY_STATS = {
+  manualCount: MANUAL_KEPCO_OFFICE_REGISTRY.length,
+  autoCount: AUTO_KEPCO_OFFICE_REGISTRY.length,
+  totalCount: KEPCO_OFFICE_REGISTRY.length,
+  autoMeta: autoRegistryData.meta,
+};
