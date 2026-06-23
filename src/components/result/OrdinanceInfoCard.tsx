@@ -41,7 +41,7 @@ export default function OrdinanceInfoCard({ card }: OrdinanceInfoCardProps) {
       </div>
 
       <div className="px-5 py-4 sm:px-6 sm:py-5">
-        {card.showDistances && card.summaryBullets.length > 0 ? (
+        {card.summaryBullets.length > 0 ? (
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               핵심 요약

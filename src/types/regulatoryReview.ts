@@ -254,6 +254,8 @@ export interface OrdinanceDisplayPolicy {
   isUrbanMetro: boolean;
   hideSetbackDistances: boolean;
   hideOrdinanceDistances: boolean;
+  /** 이격거리 GIS 표에 학교 행 포함 여부 (조례에 학교 근거 있을 때만) */
+  includeSchoolSetback: boolean;
   displayStatus: OrdinanceDisplayStatus;
   urbanNotice?: UrbanOrdinanceNotice;
   reviewReason?: string;

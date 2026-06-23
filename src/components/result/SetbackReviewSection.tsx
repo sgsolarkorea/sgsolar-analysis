@@ -85,8 +85,13 @@ export default function SetbackReviewSection({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {review.rows.map((row) => (
-                <tr key={row.item} className="hover:bg-slate-50/60">
+              {review.rows
+                .filter(
+                  (row) =>
+                    (displayPolicy?.includeSchoolSetback ?? false) || row.item !== "학교",
+                )
+                .map((row) => (
+                  <tr key={row.item} className="hover:bg-slate-50/60">
                   <td className="px-3 py-2 align-top text-slate-900">
                     <div className="font-semibold">{row.item}</div>
                     {row.detail && (

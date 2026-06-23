@@ -67,6 +67,10 @@ export function enrichCandidateForDisplay(
         : candidate.distanceExtractionMethod,
     appendixSourceUrl: appendix.appendixSourceUrl ?? candidate.appendixSourceUrl,
     appendixParseSuccess: true,
+    parserConfidence:
+      appendix.distanceExtractionMethod === "hwp" && distanceCount > 0
+        ? "medium"
+        : candidate.parserConfidence,
     parseStats: {
       ...candidate.parseStats,
       solarArticleCount: candidate.parseStats?.solarArticleCount ?? 0,

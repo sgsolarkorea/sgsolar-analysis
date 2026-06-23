@@ -1057,9 +1057,7 @@
           "matchConfidence": "medium"
         }
       ],
-      "requiresManualReview": true,
-      "reviewReason": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요",
-      "suspectDistanceReason": "물류·창고·폐기물·위험시설 등 태양광 외 시설 허가기준",
+      "requiresManualReview": false,
       "isUrbanMetro": false,
       "appendixRefs": [
         {
@@ -1079,7 +1077,7 @@
           "referencedAppendixNumber": "3"
         }
       ],
-      "distanceExtractionMethod": "xml_manual_review",
+      "distanceExtractionMethod": "xml",
       "appendixSourceUrl": null,
       "appendixFileType": null,
       "appendixParseSuccess": false,
@@ -1090,7 +1088,7 @@
         "appendixCount": 2,
         "manualReviewCount": 1
       },
-      "notes": "1000m 이상 거리값은 태양광 이격거리 기준 여부 수동 검토 필요"
+      "notes": "소각·고형연료 1000m는 excludedSections 유지. 확인된 sub-1000m 거리(주거·문화재)는 display 표시"
     },
     {
       "regionKey": "충청남도|논산시",
