@@ -21,6 +21,7 @@ export function buildSetbackGuidance(input: {
   standardM: number;
   distanceM: number | null;
   judgment: SetbackJudgment;
+  regulationConfidence?: string;
 }): string {
   if (input.judgment === "공공데이터 확인 필요") {
     return "해당 항목은 공공데이터에서 확인되지 않았습니다.";
@@ -30,11 +31,15 @@ export function buildSetbackGuidance(input: {
     return "인접 시설 여부 확인이 필요합니다.";
   }
 
+  if (input.regulationConfidence === "needs_verification") {
+    return "공통 참고 기준입니다. 지자체 조례·현장 조건 확인이 필요합니다.";
+  }
+
   if (input.judgment === "거리 검토 필요") {
     return "현장 조건과 지자체 기준에 따라 추가 검토가 필요합니다.";
   }
 
-  return "공공데이터 기준 참고 거리입니다.";
+  return "공공데이터 기준 참고 거리입니다. 지자체 조례 확인이 필요합니다.";
 }
 
 export const SETBACK_SECTION_NOTICE =

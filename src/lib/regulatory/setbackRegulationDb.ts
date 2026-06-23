@@ -96,17 +96,21 @@ export function buildSetbackStandardNotice(regulation: ResolvedSetbackRegulation
   }
 
   if (regulation.confidence === "needs_verification") {
-    return `현재 적용 중인 기준: ${regulation.source} (조례 확인 권장)`;
+    return `${regulation.municipalityLabel} · 공통 참고 기준 적용 중 · 지자체 조례 확인 필요 (조례 확인 권장)`;
   }
 
-  return `현재 적용 중인 기준: ${regulation.source} 기준`;
+  if (regulation.confidence === "ordinance_based") {
+    return `조례 기준 참고: ${regulation.source} · 지자체·현장 확인 필요`;
+  }
+
+  return `조례 기준 참고: ${regulation.source} · 지자체·현장 확인 필요`;
 }
 
 export function buildSetbackStandardColumnLabel(regulation: ResolvedSetbackRegulation): string {
-  if (regulation.isFallback) {
+  if (regulation.isFallback || regulation.confidence === "needs_verification") {
     return "공통 참고 기준";
   }
-  return "적용 기준";
+  return "조례 참고 기준";
 }
 
 export const SETBACK_REGULATION_STATS = {

@@ -409,9 +409,13 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
     data.setbackReview?.appliedStandard?.notice ?? PDF_SETBACK_COMMON_NOTICE;
   const setbackColumnLabel =
     data.setbackReview?.appliedStandard?.columnLabel ?? PDF_SETBACK_STANDARD_COLUMN;
-  const setbackStandardClass = data.setbackReview?.appliedStandard?.isFallback
-    ? "notice compact amber"
-    : "notice compact green";
+  const setbackStandardClass =
+    data.setbackReview?.appliedStandard?.isFallback ||
+    data.setbackReview?.appliedStandard?.confidence === "needs_verification"
+      ? "notice compact amber"
+      : data.setbackReview?.appliedStandard?.confidence === "ordinance_based"
+        ? "notice compact blue"
+        : "notice compact amber";
 
   const setbackTable = `
     ${data.setbackReview?.notice ? `<div class="notice blue">${htmlText(data.setbackReview.notice)}</div>` : ""}

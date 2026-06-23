@@ -1,7 +1,7 @@
 {
   "meta": {
-    "version": "2026-06-23",
-    "description": "지자체별 태양광 이격거리 기준 DB (Step 6). 수동 적재 — 크롤링 없음.",
+    "version": "2026-06-23-qa",
+    "description": "지자체별 태양광 이격거리 기준 DB (Step 6). 수동 적재 — 크롤링 없음. QA: 근거 미확인 값은 needs_verification + 공통 fallback.",
     "fallbackKey": "_common"
   },
   "commonFallback": {
@@ -21,72 +21,76 @@
       "municipalityLabel": "논산시",
       "sido": "충청남도",
       "sigungu": "논산시",
-      "source": "논산시 개발행위허가 운영지침",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
-      "confidence": "ordinance_based",
+      "confidence": "needs_verification",
       "distances": {
-        "residential": 500,
-        "road": 200,
+        "residential": 200,
+        "road": 100,
         "river": 100,
         "school": 100,
         "cultural": 100
-      }
+      },
+      "qaNote": "500m 주거지역 등 기존값은 조례 원문 미확인. 주택 수별 차등·운영지침 여부 확인 필요."
     },
     "충청남도|서산시": {
       "municipalityLabel": "서산시",
       "sido": "충청남도",
       "sigungu": "서산시",
-      "source": "서산시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
-      "confidence": "ordinance_based",
+      "confidence": "needs_verification",
       "distances": {
-        "residential": 300,
+        "residential": 200,
         "road": 100,
         "river": 100,
         "school": 100,
         "cultural": 100
-      }
+      },
+      "qaNote": "서산시는 주택 수별 차등(100~300m) 적용. 단일 300m flat 값은 부정확."
     },
     "경기도|평택시": {
       "municipalityLabel": "평택시",
       "sido": "경기도",
       "sigungu": "평택시",
-      "source": "평택시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
-      "confidence": "ordinance_based",
+      "confidence": "needs_verification",
       "distances": {
         "residential": 200,
         "road": 100,
         "river": 100,
-        "school": 300,
+        "school": 100,
         "cultural": 100
-      }
+      },
+      "qaNote": "학교 300m 등 기존값은 조례 별표 원문 미확인."
     },
     "전라북도|군산시": {
       "municipalityLabel": "군산시",
       "sido": "전라북도",
       "sigungu": "군산시",
-      "source": "군산시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
-      "confidence": "ordinance_based",
+      "confidence": "needs_verification",
       "distances": {
         "residential": 200,
-        "road": 200,
-        "river": 200,
+        "road": 100,
+        "river": 100,
         "school": 100,
         "cultural": 100
-      }
+      },
+      "qaNote": "gunsan.json 요약은 조례 확인 필요 상태. 별표 원문 미검증."
     },
     "전라북도|김제시": {
       "municipalityLabel": "김제시",
       "sido": "전라북도",
       "sigungu": "김제시",
-      "source": "김제시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
       "confidence": "needs_verification",
       "distances": {
         "residential": 200,
-        "road": 200,
+        "road": 100,
         "river": 100,
         "school": 100,
         "cultural": 100
@@ -98,26 +102,27 @@
       "sigungu": "전주시",
       "source": "전주시 도시계획 조례 [별표 26] 태양광 발전시설 허가기준",
       "lastUpdated": "2024-04-01",
-      "confidence": "verified",
+      "confidence": "ordinance_based",
       "distances": {
         "residential": 200,
         "road": 200,
         "river": 200,
         "school": 100,
         "cultural": 100
-      }
+      },
+      "qaNote": "주거·도로·하천 200m는 jeonju.json·입법예고 자료 근거. 학교·문화재는 별표 미명시 → 공통 참고값."
     },
     "전라북도|부안군": {
       "municipalityLabel": "부안군",
       "sido": "전라북도",
       "sigungu": "부안군",
-      "source": "부안군 군계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
       "confidence": "needs_verification",
       "distances": {
         "residential": 200,
-        "road": 200,
-        "river": 200,
+        "road": 100,
+        "river": 100,
         "school": 100,
         "cultural": 100
       }
@@ -126,13 +131,13 @@
       "municipalityLabel": "목포시",
       "sido": "전라남도",
       "sigungu": "목포시",
-      "source": "목포시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
       "confidence": "needs_verification",
       "distances": {
         "residential": 200,
         "road": 100,
-        "river": 200,
+        "river": 100,
         "school": 100,
         "cultural": 100
       }
@@ -141,7 +146,7 @@
       "municipalityLabel": "사천시",
       "sido": "경상남도",
       "sigungu": "사천시",
-      "source": "사천시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
       "confidence": "needs_verification",
       "distances": {
@@ -156,7 +161,7 @@
       "municipalityLabel": "통영시",
       "sido": "경상남도",
       "sigungu": "통영시",
-      "source": "통영시 도시계획 조례 [별표] 태양광 발전시설 허가기준",
+      "source": "지자체 조례 확인 필요",
       "lastUpdated": "2026-06-23",
       "confidence": "needs_verification",
       "distances": {

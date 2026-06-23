@@ -87,7 +87,11 @@ function buildAppliedStandard(regulation: ResolvedSetbackRegulation): SetbackApp
   };
 }
 
-function measureToRow(target: SetbackTargetSpec, result: SetbackMeasureResult): SetbackReviewRow {
+function measureToRow(
+  target: SetbackTargetSpec,
+  result: SetbackMeasureResult,
+  regulation: ResolvedSetbackRegulation,
+): SetbackReviewRow {
   const judgment = resolveSetbackJudgment(target.standardM, result.distanceM);
   return {
     item: target.label,
@@ -101,6 +105,7 @@ function measureToRow(target: SetbackTargetSpec, result: SetbackMeasureResult): 
       standardM: target.standardM,
       distanceM: result.distanceM,
       judgment,
+      regulationConfidence: regulation.confidence,
     }),
   };
 }
@@ -124,7 +129,7 @@ export async function buildSetbackFromGis(
     lookupSetbackRegulation(options?.address ?? "", options?.jibunAddress ?? "");
   const targets = buildTargets(regulation);
   const results = await measureAllSetbackTargets(parcel, targets, options?.counter);
-  const rows = targets.map((target, index) => measureToRow(target, results[index]));
+  const rows = targets.map((target, index) => measureToRow(target, results[index], regulation));
 
   const layerErrors = results
     .filter((result) => result.distanceM == null && result.error)
