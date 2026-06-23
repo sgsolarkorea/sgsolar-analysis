@@ -320,23 +320,23 @@ export function reportBaseStyles(): string {
     .kepco-match-row { margin-bottom: 6px; }
     .kepco-match-row.meta .kepco-field-val { font-weight: 500; color: #64748b; font-size: 7pt; }
     .kepco-status { font-size: 6.5pt !important; }
-    .kepco-note { font-size: 7.5pt; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+    .kepco-note { font-size: 7.5pt; color: #64748b; line-height: 1.5; margin-bottom: 8px; word-break: keep-all; }
     .kepco-note.warn { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 8px; }
     .kepco-office-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;
     }
     .kepco-field-label { font-size: 6.5pt; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
-    .kepco-field-val { font-size: 8pt; font-weight: 700; color: #334155; margin-top: 3px; line-height: 1.4; }
-    .kepco-field-meta { font-size: 6.5pt; font-weight: 500; color: #64748b; margin-top: 2px; line-height: 1.35; }
+    .kepco-field-val { font-size: 8pt; font-weight: 700; color: #334155; margin-top: 3px; line-height: 1.4; word-break: keep-all; }
+    .kepco-field-meta { font-size: 6.5pt; font-weight: 500; color: #64748b; margin-top: 2px; line-height: 1.35; word-break: keep-all; }
     .kepco-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
-    .kepco-list { margin: 4px 0 0; padding-left: 12px; font-size: 7.5pt; color: #475569; line-height: 1.45; }
+    .kepco-list { margin: 4px 0 0; padding-left: 12px; font-size: 7.5pt; color: #475569; line-height: 1.45; word-break: keep-all; }
     .kepco-list li { margin-bottom: 2px; }
     .kepco-contact-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;
     }
     .kepco-call-guide {
       font-size: 7pt; color: #334155; line-height: 1.45; border-top: 1px solid #d8e1ea; padding-top: 8px;
-      background: #fff; border-radius: 6px; padding: 6px 8px; margin-top: 4px;
+      background: #fff; border-radius: 6px; padding: 6px 8px; margin-top: 4px; word-break: keep-all;
     }
 
     /* ── Consultation page ── */

@@ -42,7 +42,7 @@ function BulletList({ items }: { items: readonly string[] }) {
       {items.map((item) => (
         <li key={item} className="flex gap-2 text-sm leading-snug text-slate-700">
           <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-navy/60" aria-hidden />
-          <span className="min-w-0 break-words">{item}</span>
+          <span className="min-w-0 whitespace-normal break-keep leading-relaxed">{item}</span>
         </li>
       ))}
     </ul>
@@ -69,23 +69,23 @@ export default function KepcoOfficeInquiryCard({
           </p>
         </div>
         <span
-          className={`inline-flex shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${badgeClass}`}
+          className={`inline-flex shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold ${badgeClass}`}
         >
           {office.statusLabel}
         </span>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 items-start gap-6 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-4">
+      <div className="mt-5 grid grid-cols-1 items-start gap-6 md:grid-cols-2 md:gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-4">
         <div className="flex min-w-0 flex-col gap-4">
           <FieldBlock label="관할 사업소">
-            <p className="text-lg font-bold text-navy break-words">{office.officeName}</p>
+            <p className="text-lg font-bold text-navy whitespace-normal break-keep leading-relaxed">{office.officeName}</p>
           </FieldBlock>
 
           <FieldBlock label="지사 대표번호">
             {officePhoneTel ? (
               <a
                 href={`tel:${officePhoneTel}`}
-                className="text-base font-bold text-navy underline-offset-2 hover:underline break-all"
+                className="text-base font-bold text-navy underline-offset-2 hover:underline whitespace-nowrap"
               >
                 {office.officePhoneDisplay}
               </a>
@@ -93,7 +93,7 @@ export default function KepcoOfficeInquiryCard({
               <p className="text-base font-bold text-slate-600">{office.officePhoneDisplay}</p>
             )}
             {office.phoneSourceDetail && (
-              <p className="mt-1.5 text-[11px] leading-relaxed text-slate-400 break-words">
+              <p className="mt-1.5 text-[11px] whitespace-normal break-keep leading-relaxed text-slate-400">
                 {office.phoneSourceDetail}
               </p>
             )}
@@ -109,12 +109,14 @@ export default function KepcoOfficeInquiryCard({
           </FieldBlock>
 
           <FieldBlock label="매칭 기준">
-            <p className="text-sm font-medium text-slate-700 break-words">{office.matchBasisLabel}</p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-400 break-words">
+            <p className="text-sm font-medium whitespace-normal break-keep leading-relaxed text-slate-700">
+              {office.matchBasisLabel}
+            </p>
+            <p className="mt-1 text-[11px] whitespace-normal break-keep leading-relaxed text-slate-400">
               기준 행정구역: {office.parsedMeta}
             </p>
             {office.verificationNote && (
-              <p className="mt-1 text-xs leading-relaxed text-amber-800 break-words">
+              <p className="mt-1 text-xs whitespace-normal break-keep leading-relaxed text-amber-800">
                 {office.verificationNote}
               </p>
             )}
@@ -123,7 +125,9 @@ export default function KepcoOfficeInquiryCard({
 
         <div className="flex min-w-0 flex-col gap-4">
           <FieldBlock label="문의 부서">
-            <p className="text-sm font-semibold text-slate-900 break-words">{office.departmentHint}</p>
+            <p className="text-sm font-semibold whitespace-normal break-keep leading-relaxed text-slate-900">
+              {office.departmentHint}
+            </p>
           </FieldBlock>
 
           <FieldBlock label="문의 항목">
@@ -139,12 +143,12 @@ export default function KepcoOfficeInquiryCard({
       </div>
 
       {office.inquiryGuide && (
-        <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-950 break-words">
+        <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs whitespace-normal break-keep leading-relaxed text-amber-950">
           {office.inquiryGuide}
         </p>
       )}
 
-      <p className="mt-4 rounded-lg border border-slate-200 bg-white/80 px-3 py-2.5 text-xs leading-relaxed text-slate-700 break-words">
+      <p className="mt-4 rounded-lg border border-slate-200 bg-white/80 px-3 py-2.5 text-xs whitespace-normal break-keep leading-relaxed text-slate-700">
         {KEPCO_INQUIRY_CALL_GUIDE}
       </p>
     </div>
