@@ -3,6 +3,8 @@ import type { LayerARegulatoryLevel } from "@/types/landInfo";
 import type { SetbackJudgment } from "@/types/regulatoryReview";
 import { GRADE_MESSAGES } from "@/types/siteReview";
 import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
+import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
+import { hasDetailedGridData } from "@/lib/grid/display";
 
 export const PDF_REPORT_TITLE = "태양광 입지분석 사전 검토 보고서";
 
@@ -45,6 +47,26 @@ export const PDF_PROCESS_STEPS = [
   { step: 3, title: "계통·인허가 검토", desc: "한전 접속·지자체 인허가 가능성 검토" },
   { step: 4, title: "견적 및 상담", desc: "설비 규모·수익성·공사 견적 상담" },
 ] as const;
+
+export const PDF_CASE_STUDY_PLACEHOLDERS = [
+  {
+    title: "토지형 태양광 시공 사례",
+    region: "경남 · 300kW급",
+    desc: "입지·계통·인허가 통합 검토 후 착공 진행",
+  },
+  {
+    title: "건물형 태양광 시공 사례",
+    region: "전남 · 100kW급",
+    desc: "옥상 구조·계통 접속 동시 검토 후 설치",
+  },
+] as const;
+
+export type PdfAssessmentTone = "positive" | "warn" | "neutral";
+
+export interface PdfAssessmentItem {
+  label: string;
+  tone: PdfAssessmentTone;
+}
 
 export type PdfStatusTone = "blue" | "orange" | "amber" | "gray";
 
@@ -89,6 +111,42 @@ export function deriveOverallReviewStatus(data: ResolvedSiteReview): string {
 
 export function formatInstallTypeForPdf(installType: string): string {
   return formatInstallTypeDisplayLabel(installType as InstallTypeOption);
+}
+
+export function formatRecWeightForPdf(data: ResolvedSiteReview): string {
+  return data.profitability?.recWeight ?? formatRecWeightDisplay(data.solarMetrics.recWeight);
+}
+
+export function deriveAssessmentItems(data: ResolvedSiteReview): PdfAssessmentItem[] {
+  const items: PdfAssessmentItem[] = [];
+  const overall = deriveOverallReviewStatus(data);
+  const regulatory = data.layerARegulatoryAnalysis?.rows ?? [];
+  const grid = data.gridInfo;
+
+  if (overall.includes("제한") || overall.includes("추가 검토")) {
+    items.push({ label: "설치 검토 가능 (조건 확인 필요)", tone: "warn" });
+  } else {
+    items.push({ label: "설치 검토 가능", tone: "positive" });
+  }
+
+  if (regulatory.some((row) => row.level === "제한 가능성 높음" || row.level === "추가 검토 필요")) {
+    items.push({ label: "조례·규제 추가 검토 필요", tone: "warn" });
+  } else if (regulatory.length > 0) {
+    items.push({ label: "규제 1차 확인", tone: "positive" });
+  } else {
+    items.push({ label: "규제 데이터 추가 확인", tone: "neutral" });
+  }
+
+  if (hasDetailedGridData(grid)) {
+    if (grid.status === "high") items.push({ label: "계통 여유 충분", tone: "positive" });
+    else if (grid.status === "review") items.push({ label: "계통 추가 확인 필요", tone: "warn" });
+    else if (grid.status === "difficult") items.push({ label: "계통 접속 검토 필요", tone: "warn" });
+    else items.push({ label: "계통 1차 확인", tone: "neutral" });
+  } else {
+    items.push({ label: "계통 확인 필요", tone: "neutral" });
+  }
+
+  return items;
 }
 
 export function deriveExecutiveSummary(data: ResolvedSiteReview): string {

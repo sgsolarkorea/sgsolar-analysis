@@ -10,6 +10,7 @@ import {
   formatSolarCapacityKw,
 } from "@/lib/grid/evaluate";
 import {
+  PDF_CASE_STUDY_PLACEHOLDERS,
   PDF_CONSULTATION_CHECKLIST,
   PDF_CTA,
   PDF_CTA_BUTTON,
@@ -20,9 +21,11 @@ import {
   PDF_SETBACK_COMMON_NOTICE,
   PDF_SETBACK_FOOTER,
   PDF_SETBACK_STANDARD_COLUMN,
+  deriveAssessmentItems,
   deriveExecutiveSummary,
   deriveOverallReviewStatus,
   formatInstallTypeForPdf,
+  formatRecWeightForPdf,
 } from "@/lib/pdf/reportContent";
 import { htmlText } from "@/lib/pdf/html/escape";
 import { reportBaseStyles } from "@/lib/pdf/html/reportStyles";
@@ -110,10 +113,10 @@ function renderLocationFallback(data: ResolvedSiteReview, reason: string): strin
     </div>`;
 }
 
-function renderMapBlock(data: ResolvedSiteReview, assets: HtmlReportAssets): string {
-  const mapBody =
+function renderPageOneMapPanel(data: ResolvedSiteReview, assets: HtmlReportAssets): string {
+  const mapInner =
     assets.mapAvailable && assets.mapDataUrl
-      ? `<div class="map-stage">
+      ? `<div class="map-stage map-stage-lg">
           <div class="map-wrap">
             <img src="${assets.mapDataUrl}" alt="입지 위치 지도" width="${assets.mapWidth}" height="${assets.mapHeight}" />
           </div>
@@ -122,13 +125,82 @@ function renderMapBlock(data: ResolvedSiteReview, assets: HtmlReportAssets): str
       : renderLocationFallback(data, assets.mapFailureReason ?? "no-key");
 
   return `
-    <div class="map-card avoid-break">
-      <div class="map-head">
-        <h3>입지 위치</h3>
-        <span>${htmlText(data.analyzedAt)}</span>
+    <div class="page-one-map avoid-break">
+      <div class="map-panel-head">
+        <span class="map-panel-label">Site Location</span>
+        <span class="map-panel-date">${htmlText(data.analyzedAt)}</span>
       </div>
-      ${mapBody}
+      ${mapInner}
       <div class="map-caption">${htmlText(data.address)}</div>
+    </div>`;
+}
+
+function renderPageOneKpiStack(data: ResolvedSiteReview): string {
+  const grid = data.gridInfo;
+  const gridLabel = cleanGridLabel(grid.statusLabel);
+  const recWeight = formatRecWeightForPdf(data);
+
+  const kpis = [
+    { label: "예상 설비용량", value: data.capacity, variant: "primary" },
+    { label: "예상 연매출", value: data.annualRevenue, variant: "revenue" },
+    { label: "예상 시공비", value: data.constructionCost, variant: "cost" },
+    { label: "REC 가중치", value: recWeight, variant: "rec" },
+    { label: "계통 상태", value: gridLabel, variant: "grid", dot: GRID_DOT[grid.status] },
+  ];
+
+  return `
+    <div class="page-one-kpis avoid-break">
+      <div class="kpi-stack-title">핵심 지표</div>
+      ${kpis
+        .map(
+          (kpi) => `
+        <div class="hero-kpi hero-kpi-${kpi.variant}">
+          <div class="hero-kpi-label">${htmlText(kpi.label)}</div>
+          <div class="hero-kpi-value">
+            ${kpi.dot ? `<span class="grid-status-dot ${kpi.dot}"></span>` : ""}
+            ${htmlText(kpi.value)}
+          </div>
+        </div>`,
+        )
+        .join("")}
+    </div>`;
+}
+
+function renderAssessmentCard(data: ResolvedSiteReview): string {
+  const items = deriveAssessmentItems(data);
+  const summary = deriveExecutiveSummary(data);
+
+  return `
+    <div class="assessment-card avoid-break">
+      <div class="assessment-head">
+        <div class="assessment-title">종합 평가</div>
+        <div class="assessment-sub">${htmlText(deriveOverallReviewStatus(data))}</div>
+      </div>
+      <div class="assessment-pills">
+        ${items
+          .map(
+            (item) =>
+              `<span class="assessment-pill pill-${item.tone}">${htmlText(item.label)}</span>`,
+          )
+          .join("")}
+      </div>
+      <p class="assessment-note">${htmlText(summary)}</p>
+    </div>`;
+}
+
+function renderCaseStudyCards(): string {
+  return `
+    <div class="case-study-grid avoid-break">
+      ${PDF_CASE_STUDY_PLACEHOLDERS.map(
+        (item) => `
+        <div class="case-study-card">
+          <div class="case-tag">Reference Project</div>
+          <div class="case-title">${htmlText(item.title)}</div>
+          <div class="case-region">${htmlText(item.region)}</div>
+          <div class="case-desc">${htmlText(item.desc)}</div>
+          <div class="case-placeholder">상담 시 유사 사례 자료 제공</div>
+        </div>`,
+      ).join("")}
     </div>`;
 }
 
@@ -216,8 +288,6 @@ function renderGridBars(data: ResolvedSiteReview, expectedMw: number): string {
 export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAssets): string {
   const m = data.solarMetrics;
   const installType = formatInstallTypeForPdf(m.installType);
-  const overallStatus = deriveOverallReviewStatus(data);
-  const executiveSummary = deriveExecutiveSummary(data);
   const expectedMw = Math.round((m.capacityKw / 1000) * 1000) / 1000;
   const grid = data.gridInfo;
   const hasGrid = hasDetailedGridData(grid);
@@ -350,60 +420,40 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 <body>
   <div class="report">
     <section class="page-one">
-      <header class="hero avoid-break">
-        <div class="hero-inner">
-          <div class="hero-top">
-            <div class="hero-brand">
-              ${logoHtml}
-              <div class="brand-tag">Solar Site Pre-Review Report</div>
-            </div>
-            <div class="hero-date">분석일 ${htmlText(data.analyzedAt)}</div>
+      <header class="cover-band avoid-break">
+        <div class="cover-left">
+          ${logoHtml}
+          <div class="cover-meta">
+            <div class="cover-tag">Solar Consulting Report</div>
+            <h1>${htmlText(PDF_REPORT_TITLE)}</h1>
+            <p class="cover-sub">${htmlText(PDF_REPORT_SUBTITLE)}</p>
           </div>
-          <h1>${htmlText(PDF_REPORT_TITLE)}</h1>
-          <p class="hero-sub">${htmlText(PDF_REPORT_SUBTITLE)}</p>
-          <div class="hero-address">${htmlText(data.address)}</div>
+        </div>
+        <div class="cover-right">
+          <div class="cover-date-label">Analysis Date</div>
+          <div class="cover-date">${htmlText(data.analyzedAt)}</div>
+          <div class="cover-address">${htmlText(data.address)}</div>
         </div>
       </header>
 
-      <div class="kpi-address avoid-break">
-        <div class="label">분석 주소</div>
-        <div class="value">${htmlText(data.address)}</div>
-      </div>
-      <div class="kpi-grid avoid-break">
-        <div class="kpi-card">
-          <div class="label">예상 설비용량</div>
-          <div class="value">${htmlText(data.capacity)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="label">설치 유형</div>
-          <div class="value">${htmlText(installType)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="label">종합 검토 상태</div>
-          <div class="value">${htmlText(overallStatus)}</div>
-        </div>
-        <div class="kpi-card">
-          <div class="label">분석일</div>
-          <div class="value">${htmlText(data.analyzedAt)}</div>
-        </div>
+      <div class="page-label page-one-label">01 Executive Summary</div>
+      <div class="page-one-split avoid-break">
+        ${renderPageOneMapPanel(data, assets)}
+        ${renderPageOneKpiStack(data)}
       </div>
 
-      ${renderMapBlock(data, assets)}
+      ${renderAssessmentCard(data)}
 
-      <div class="exec-summary avoid-break">
-        <div class="exec-label">종합 검토 요약</div>
-        <p>${htmlText(executiveSummary)}</p>
-      </div>
-
-      <div class="notice compact">${htmlText(PDF_LEGAL_DISCLAIMER)}</div>
+      <div class="notice compact page-one-disclaimer">${htmlText(PDF_LEGAL_DISCLAIMER)}</div>
     </section>
 
     <section class="section page-break">
       <div class="section-head">
         <div class="accent"></div>
         <div>
-          <h2>입지분석 개요 · 용량 산정</h2>
-          <p>토지·건물 기준 설치 검토 요약</p>
+          <div class="page-label">02 Technical Review</div>
+          <h2>기술 검토</h2>
+          <p>입지분석 · 용량 산정 · 계통 검토</p>
         </div>
       </div>
 
@@ -466,10 +516,11 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 
     <section class="section page-break">
       <div class="section-head">
-        <div class="accent"></div>
+        <div class="accent accent-risk"></div>
         <div>
-          <h2>법·규제 분석</h2>
-          <p>공공 토지이용계획 기반 1차 규제 검토</p>
+          <div class="page-label">03 Risk Review</div>
+          <h2>리스크 검토</h2>
+          <p>법·규제 · 이격거리 1차 검토</p>
         </div>
       </div>
       ${regulatoryTable}
@@ -486,13 +537,23 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
 
     <section class="section page-break avoid-break">
       <div class="section-head">
-        <div class="accent"></div>
+        <div class="accent accent-cta"></div>
         <div>
-          <h2>상담 전 확인사항</h2>
-          <p>SG SOLAR 전문 상담 준비</p>
+          <div class="page-label">04 Consultation</div>
+          <h2>상담 전환</h2>
+          <p>시공 사례 · 확인사항 · 진행 절차</p>
         </div>
       </div>
 
+      <div class="subsection-head">
+        <h3>시공 사례</h3>
+        <p>유사 규모·유형 참고 사례 (상담 시 상세 자료 제공)</p>
+      </div>
+      ${renderCaseStudyCards()}
+
+      <div class="subsection-head">
+        <h3>상담 전 확인사항</h3>
+      </div>
       ${renderChecklistSection()}
 
       <div class="section-head" style="margin-top:4px">

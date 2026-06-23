@@ -14,71 +14,126 @@ export function reportBaseStyles(): string {
     h1, h2, h3 { font-weight: 700; color: #0b1736; line-height: 1.35; }
     .report { width: 100%; max-width: 188mm; margin: 0 auto; }
 
-    /* ── Page 1 Hero ── */
-    .hero {
-      position: relative;
-      overflow: hidden;
-      border-radius: 14px;
-      padding: 22px 22px 20px;
-      margin-bottom: 14px;
-      color: #fff;
-      background: linear-gradient(135deg, #0b1736 0%, #111c3d 48%, #1a3270 100%);
-      box-shadow: 0 8px 24px rgba(11, 23, 54, 0.18);
+    /* ── Page 1 Cover band ── */
+    .cover-band {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;
+      padding: 16px 18px; margin-bottom: 12px; border-radius: 12px;
+      background: linear-gradient(135deg, #0b1736 0%, #111c3d 55%, #1a3270 100%);
+      color: #fff; box-shadow: 0 10px 28px rgba(11, 23, 54, 0.22);
+      position: relative; overflow: hidden;
     }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
+    .cover-band::before {
+      content: ''; position: absolute; inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: 0.55;
-      pointer-events: none;
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 24px 24px; pointer-events: none;
     }
-    .hero::after {
-      content: '';
-      position: absolute; top: -40px; right: -20px;
-      width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
-      pointer-events: none;
+    .cover-left { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+    .cover-left img { height: 28px; width: auto; filter: brightness(0) invert(1); }
+    .cover-left .brand-text { font-size: 15pt; font-weight: 700; }
+    .cover-tag { font-size: 7pt; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.72; margin-bottom: 4px; }
+    .cover-band h1 { font-size: 13pt; color: #fff; margin-bottom: 3px; letter-spacing: -0.02em; }
+    .cover-sub { font-size: 7.5pt; opacity: 0.82; line-height: 1.45; max-width: 280px; }
+    .cover-right { text-align: right; position: relative; z-index: 1; min-width: 38%; }
+    .cover-date-label { font-size: 6.5pt; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.65; }
+    .cover-date { font-size: 10pt; font-weight: 700; margin: 2px 0 8px; }
+    .cover-address { font-size: 8pt; opacity: 0.88; line-height: 1.45; word-break: keep-all; }
+
+    /* ── Page 1 Split ── */
+    .page-one-split {
+      display: flex; gap: 10px; margin-bottom: 10px; align-items: stretch; min-height: 248px;
     }
-    .hero-inner { position: relative; z-index: 1; }
-    .hero-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 16px; margin-bottom: 14px;
+    .page-one-map {
+      flex: 0 0 60%; border: 1px solid #d8e1ea; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(11, 23, 54, 0.08); display: flex; flex-direction: column;
     }
-    .hero-brand img { height: 30px; width: auto; filter: brightness(0) invert(1); }
-    .hero-brand .brand-text { font-size: 16pt; font-weight: 700; letter-spacing: 0.02em; }
-    .hero-brand .brand-tag { font-size: 7.5pt; opacity: 0.75; margin-top: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
-    .hero-date { font-size: 8pt; opacity: 0.85; text-align: right; white-space: nowrap; }
-    .hero h1 { font-size: 19pt; color: #fff; margin-bottom: 6px; letter-spacing: -0.02em; }
-    .hero .hero-sub { font-size: 9pt; opacity: 0.88; max-width: 92%; line-height: 1.5; }
-    .hero-address {
-      margin-top: 12px; padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      font-size: 8.5pt; opacity: 0.9;
+    .map-panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; background: #0b1736; color: #eef3f8;
+    }
+    .map-panel-label { font-size: 7pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .map-panel-date { font-size: 7pt; opacity: 0.75; }
+    .map-stage-lg { position: relative; flex: 1; min-height: 200px; background: #eef3f8; }
+    .map-stage-lg .map-wrap { height: 100%; min-height: 200px; }
+    .map-stage-lg .map-wrap img { width: 100%; height: 100%; min-height: 200px; object-fit: cover; }
+    .page-one-map .location-card { flex: 1; border-top: none; min-height: 200px; }
+
+    .page-one-kpis {
+      flex: 0 0 calc(40% - 10px); display: flex; flex-direction: column; gap: 6px;
+    }
+    .kpi-stack-title {
+      font-size: 7pt; font-weight: 700; color: #64748b; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0 2px 2px;
+    }
+    .hero-kpi {
+      flex: 1; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center;
+      border: 1px solid #d8e1ea; min-height: 42px;
+    }
+    .hero-kpi-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+    .hero-kpi-value { font-size: 10pt; font-weight: 700; line-height: 1.3; word-break: keep-all; display: flex; align-items: center; gap: 6px; }
+    .hero-kpi-primary {
+      background: linear-gradient(135deg, #0b1736, #1a3270); color: #fff; border-color: #0b1736;
+      box-shadow: 0 4px 12px rgba(11, 23, 54, 0.18);
+    }
+    .hero-kpi-primary .hero-kpi-label { color: rgba(255,255,255,0.72); }
+    .hero-kpi-primary .hero-kpi-value { font-size: 12pt; color: #fff; }
+    .hero-kpi-revenue { background: #fff; border-left: 3px solid #f59e0b; }
+    .hero-kpi-revenue .hero-kpi-value { color: #0b1736; font-size: 10.5pt; }
+    .hero-kpi-cost { background: #f8fafc; }
+    .hero-kpi-cost .hero-kpi-value { color: #334155; }
+    .hero-kpi-rec { background: #fffbeb; border-color: #fde68a; }
+    .hero-kpi-rec .hero-kpi-value { color: #b45309; }
+    .hero-kpi-grid { background: #eef3f8; }
+    .hero-kpi-grid .hero-kpi-value { color: #0b1736; font-size: 9pt; }
+
+    /* ── Assessment card ── */
+    .assessment-card {
+      border: 1px solid #d8e1ea; border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+      background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+      box-shadow: 0 4px 14px rgba(11, 23, 54, 0.06);
+    }
+    .assessment-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .assessment-title { font-size: 11pt; font-weight: 700; color: #0b1736; }
+    .assessment-sub { font-size: 8pt; font-weight: 700; color: #64748b; }
+    .assessment-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .assessment-pill {
+      display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 7.5pt; font-weight: 700;
+      border: 1px solid;
+    }
+    .pill-positive { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .pill-warn { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .pill-neutral { background: #f8fafc; color: #475569; border-color: #d8e1ea; }
+    .assessment-note { font-size: 8pt; color: #64748b; line-height: 1.6; }
+    .page-one-disclaimer { margin-top: 4px; }
+    .page-one-label { margin-bottom: 6px; }
+
+    .page-label {
+      font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #94a3b8; margin-bottom: 2px;
+    }
+    .accent-risk { background: linear-gradient(180deg, #ea580c, #f59e0b); }
+    .accent-cta { background: linear-gradient(180deg, #f59e0b, #0b1736); }
+    .subsection-head { margin: 12px 0 8px; }
+    .subsection-head h3 { font-size: 10pt; color: #0b1736; margin-bottom: 2px; }
+    .subsection-head p { font-size: 7.5pt; color: #64748b; }
+
+    /* ── Case study ── */
+    .case-study-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .case-study-card {
+      border: 1px solid #d8e1ea; border-radius: 12px; padding: 14px;
+      background: linear-gradient(145deg, #fff 0%, #eef3f8 100%);
+      box-shadow: 0 3px 10px rgba(11, 23, 54, 0.05);
+    }
+    .case-tag { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
+    .case-title { font-size: 10pt; font-weight: 700; color: #0b1736; margin-bottom: 4px; }
+    .case-region { font-size: 8pt; font-weight: 700; color: #f59e0b; margin-bottom: 6px; }
+    .case-desc { font-size: 7.5pt; color: #475569; line-height: 1.5; margin-bottom: 8px; }
+    .case-placeholder {
+      font-size: 7pt; color: #64748b; padding-top: 8px; border-top: 1px dashed #d8e1ea;
     }
 
-    /* ── KPI ── */
-    .kpi-address {
-      background: #eef3f8; border: 1px solid #d8e1ea; border-radius: 10px;
-      padding: 10px 12px; margin-bottom: 8px;
-      box-shadow: 0 2px 6px rgba(11, 23, 54, 0.04);
-    }
-    .kpi-address .label { font-size: 7pt; color: #64748b; margin-bottom: 4px; font-weight: 700; }
-    .kpi-address .value { font-size: 9.5pt; font-weight: 700; color: #0b1736; word-break: keep-all; line-height: 1.35; }
-    .kpi-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px;
-    }
-    .kpi-card {
-      background: #eef3f8; border: 1px solid #d8e1ea; border-radius: 10px;
-      padding: 10px 11px;
-      box-shadow: 0 2px 6px rgba(11, 23, 54, 0.04);
-    }
-    .kpi-card .label { font-size: 7pt; color: #64748b; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.02em; }
-    .kpi-card .value { font-size: 9pt; font-weight: 700; color: #0b1736; word-break: keep-all; line-height: 1.35; }
-
-    /* ── Map ── */
+    /* ── Legacy map (page 2+) ── */
     .map-stage {
       position: relative; height: 210px; background: #eef3f8;
     }
@@ -126,17 +181,6 @@ export function reportBaseStyles(): string {
     .location-card .loc-val { color: #334155; word-break: keep-all; }
     .location-card .loc-note { font-size: 7.5pt; color: #64748b; margin-top: 6px; }
 
-    /* ── Executive summary ── */
-    .exec-summary {
-      background: #fff; border: 1px solid #d8e1ea; border-left: 3px solid #f59e0b;
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
-      box-shadow: 0 2px 6px rgba(11, 23, 54, 0.04);
-    }
-    .exec-summary .exec-label {
-      font-size: 7.5pt; font-weight: 700; color: #64748b; letter-spacing: 0.04em;
-      text-transform: uppercase; margin-bottom: 6px;
-    }
-    .exec-summary p { font-size: 9pt; color: #334155; line-height: 1.65; }
 
     /* ── Sections ── */
     .section { margin-bottom: 16px; }

@@ -4,13 +4,18 @@ import type { Profitability } from "@/types/siteReview";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { KpiCard } from "@/components/ui/InfoCard";
 import { REVENUE_WARNING } from "@/data/sampleData";
+import { MOUNTAIN_REC_WEIGHT_NOTE } from "@/lib/site/mountainLand";
 import { scrollToSection } from "@/components/layout/ScrollLink";
 
 interface RevenueAnalysisProps {
   profitability: Profitability;
+  showMountainRecNote?: boolean;
 }
 
-export default function RevenueAnalysis({ profitability }: RevenueAnalysisProps) {
+export default function RevenueAnalysis({
+  profitability,
+  showMountainRecNote = false,
+}: RevenueAnalysisProps) {
   const cards = [
     { label: "예상 설치용량", value: profitability.estimatedCapacity ?? "—" },
     { label: "예상 발전량", value: profitability.annualGeneration },
@@ -34,7 +39,13 @@ export default function RevenueAnalysis({ profitability }: RevenueAnalysisProps)
           ))}
         </div>
         <div className="border-t border-amber-200 bg-amber-50 px-5 py-3 sm:px-6">
-          <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">
+          {profitability.recWeight && (
+            <p className="text-xs leading-relaxed text-amber-900 sm:text-sm">
+              REC 가중치: {profitability.recWeight}
+              {showMountainRecNote ? ` · ${MOUNTAIN_REC_WEIGHT_NOTE}` : ""}
+            </p>
+          )}
+          <p className={`text-xs leading-relaxed text-amber-900 sm:text-sm ${profitability.recWeight ? "mt-2" : ""}`}>
             ⚠ {REVENUE_WARNING}
           </p>
         </div>
