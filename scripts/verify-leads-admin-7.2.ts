@@ -1,8 +1,8 @@
 /**
- * Step 7.2 — Admin leads dashboard verification
+ * Step 7.2 / 7.2b — Admin leads dashboard verification
  */
 import { computeLeadAdminKpi } from "../src/lib/leads/adminMetrics";
-import { createLeadRecord } from "../src/lib/leads/storage";
+import { createLeadRecord, deleteLead, saveLead } from "../src/lib/leads/storage";
 import { leadTypeToScore } from "../src/types/lead";
 import type { LeadRecord } from "../src/types/lead";
 
@@ -17,40 +17,60 @@ function assert(label: string, condition: boolean) {
   }
 }
 
-const sampleLeads: LeadRecord[] = [
-  createLeadRecord({
-    leadType: "consultation",
-    name: "홍길동",
-    phone: "01011112222",
-    address: "충남 서산시",
-    installType: "토지형",
-  }),
-  createLeadRecord({
-    leadType: "pdf_download",
-    name: "김철수",
-    phone: "01033334444",
-    address: "전북 전주시",
-    installType: "토지형",
-  }),
-  createLeadRecord({
-    leadType: "save_result",
-    phone: "01055556666",
-    address: "경기 평택시",
-  }),
-];
+async function main() {
+  const sampleLeads: LeadRecord[] = [
+    createLeadRecord({
+      leadType: "consultation",
+      name: "홍길동",
+      phone: "01011112222",
+      address: "충남 서산시",
+      installType: "토지형",
+    }),
+    createLeadRecord({
+      leadType: "pdf_download",
+      name: "김철수",
+      phone: "01033334444",
+      address: "전북 전주시",
+      installType: "토지형",
+    }),
+    createLeadRecord({
+      leadType: "save_result",
+      phone: "01055556666",
+      address: "경기 평택시",
+    }),
+  ];
 
-sampleLeads[1].status = "contacted";
-sampleLeads[2].status = "contracted";
+  sampleLeads[1].status = "contacted";
+  sampleLeads[2].status = "contracted";
 
-const kpi = computeLeadAdminKpi(sampleLeads);
-assert("kpi total", kpi.total === 3);
-assert("kpi new", kpi.newLeads === 1);
-assert("kpi inConsultation", kpi.inConsultation === 1);
-assert("kpi contracted", kpi.contracted === 1);
+  const kpi = computeLeadAdminKpi(sampleLeads);
+  assert("kpi total", kpi.total === 3);
+  assert("kpi new", kpi.newLeads === 1);
+  assert("kpi inConsultation", kpi.inConsultation === 1);
+  assert("kpi contracted", kpi.contracted === 1);
 
-assert("consultation score HOT", leadTypeToScore("consultation") === "HOT");
-assert("pdf score WARM", leadTypeToScore("pdf_download") === "WARM");
-assert("save score COLD", leadTypeToScore("save_result") === "COLD");
+  assert("consultation score HOT", leadTypeToScore("consultation") === "HOT");
+  assert("pdf score WARM", leadTypeToScore("pdf_download") === "WARM");
+  assert("save score COLD", leadTypeToScore("save_result") === "COLD");
 
-if (failed) process.exit(1);
-console.log("\nAll Step 7.2 admin leads checks passed");
+  if (process.env.NODE_ENV === "development") {
+    const temp = createLeadRecord({
+      leadType: "save_result",
+      phone: "01077778888",
+      address: "삭제 테스트 주소",
+    });
+    await saveLead(temp);
+    const deleted = await deleteLead(temp.id);
+    assert("deleteLead success", deleted.deleted);
+    const missing = await deleteLead(temp.id);
+    assert("deleteLead missing id safe", !missing.deleted);
+    const unknown = await deleteLead("00000000-0000-4000-8000-000000009999");
+    assert("deleteLead unknown id safe", !unknown.deleted);
+  }
+
+  if (failed) process.exit(1);
+  console.log("\nAll Step 7.2 admin leads checks passed");
+}
+
+void main();
+

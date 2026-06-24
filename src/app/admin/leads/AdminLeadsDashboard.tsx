@@ -164,13 +164,16 @@ function DetailPanel({
   lead,
   onClose,
   onStatusUpdated,
+  onDeleted,
 }: {
   lead: LeadRecord;
   onClose: () => void;
   onStatusUpdated: (updated: LeadRecord) => void;
+  onDeleted: (id: string) => void;
 }) {
   const [status, setStatus] = useState<LeadStatus>(lead.status);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -198,6 +201,26 @@ function DetailPanel({
       setMessage(error instanceof Error ? error.message : "상태 변경에 실패했습니다.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm("이 리드를 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setMessage("");
+    try {
+      const res = await fetch(`/api/admin/leads/${lead.id}`, { method: "DELETE" });
+      const data = (await res.json()) as { error?: string; ok?: boolean };
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? "리드 삭제에 실패했습니다.");
+      }
+      onDeleted(lead.id);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "리드 삭제에 실패했습니다.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -290,6 +313,22 @@ function DetailPanel({
             )}
           </div>
         </div>
+
+        <div className="mt-8 rounded-xl border border-rose-200 bg-rose-50/40 p-4">
+          <p className="text-sm font-bold text-rose-900">위험 구역</p>
+          <p className="mt-1 text-xs leading-relaxed text-rose-800">
+            테스트 리드나 중복·오입력 데이터를 삭제할 수 있습니다. 삭제된 리드는 복구할 수 없으니
+            신중하게 진행해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={() => void handleDelete()}
+            disabled={deleting || saving}
+            className="mt-4 rounded-lg border border-rose-300 bg-white px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {deleting ? "삭제 중..." : "리드 삭제"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -329,6 +368,7 @@ export default function AdminLeadsDashboard() {
   const [leadTypeFilter, setLeadTypeFilter] = useState<LeadTypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
+  const [notice, setNotice] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -366,6 +406,14 @@ export default function AdminLeadsDashboard() {
     setKpi(computeLeadAdminKpi(nextLeads));
   }
 
+  function handleLeadDeleted(id: string) {
+    const nextLeads = leads.filter((lead) => lead.id !== id);
+    setLeads(nextLeads);
+    setKpi(computeLeadAdminKpi(nextLeads));
+    setSelectedId(null);
+    setNotice("리드가 삭제되었습니다.");
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <AdminNav active="leads" />
@@ -381,6 +429,12 @@ export default function AdminLeadsDashboard() {
           PDF 다운로드 · 상담 신청 · 결과 저장 전환 포인트에서 수집된 리드를 leadType·status별로 관리합니다.
         </p>
       </div>
+
+      {notice && (
+        <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+          {notice}
+        </p>
+      )}
 
       {kpi && (
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -534,6 +588,7 @@ export default function AdminLeadsDashboard() {
                 lead={selectedLead}
                 onClose={() => setSelectedId(null)}
                 onStatusUpdated={handleStatusUpdated}
+                onDeleted={handleLeadDeleted}
               />
             </div>
           )}

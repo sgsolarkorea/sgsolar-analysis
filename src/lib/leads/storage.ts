@@ -184,3 +184,53 @@ export async function updateLeadStatus(
 
   return { updated: false, storage: "none" };
 }
+
+async function deleteRedisLead(id: string, lead: LeadRecord): Promise<boolean> {
+  const redis = getRedisClient();
+  if (!redis) return false;
+
+  await redis.del(leadEntryKey(id));
+  await redis.zrem(LEADS_INDEX_KEY, id);
+  await redis.zrem(leadTypeIndexKey(lead.leadType), id);
+  return true;
+}
+
+function deleteDevMemoryLead(id: string): boolean {
+  if (!devMemoryStore.has(id)) return false;
+
+  devMemoryStore.delete(id);
+  const index = devMemoryIndex.indexOf(id);
+  if (index >= 0) {
+    devMemoryIndex.splice(index, 1);
+  }
+  return true;
+}
+
+export async function deleteLead(
+  id: string,
+): Promise<{ deleted: boolean; storage: "redis" | "memory" | "none" }> {
+  const existing = await getLeadById(id);
+  if (!existing) {
+    return { deleted: false, storage: "none" };
+  }
+
+  try {
+    if (getRedisClient()) {
+      const deleted = await deleteRedisLead(id, existing);
+      if (deleted) {
+        return { deleted: true, storage: "redis" };
+      }
+    }
+  } catch (error) {
+    console.warn("[Leads] Redis delete failed:", error);
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    const deleted = deleteDevMemoryLead(id);
+    if (deleted) {
+      return { deleted: true, storage: "memory" };
+    }
+  }
+
+  return { deleted: false, storage: "none" };
+}
