@@ -8,6 +8,7 @@ import {
   sendLeadKakaoNotification,
   sendLeadSmsNotification,
 } from "../src/lib/leads/adapters/solapi";
+import { LEAD_CRM_DEFAULTS } from "../src/lib/leads/leadRecordHelpers";
 import { notifyLeadCreated } from "../src/lib/leads/notifier";
 import type { LeadRecord } from "../src/types/lead";
 
@@ -21,6 +22,7 @@ const sampleLead: LeadRecord = {
   phone: "010-1234-5678",
   address: "충남 서산시 대산읍",
   estimatedCapacityKw: 300,
+  ...LEAD_CRM_DEFAULTS,
 };
 
 let failed = 0;

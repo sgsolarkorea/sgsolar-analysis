@@ -1,6 +1,7 @@
 /**
  * Step 7.4 — Lead notifier verification
  */
+import { LEAD_CRM_DEFAULTS } from "../src/lib/leads/leadRecordHelpers";
 import { isLeadEmailRequired, notifyLeadCreated } from "../src/lib/leads/notifier";
 import type { LeadRecord } from "../src/types/lead";
 
@@ -12,6 +13,7 @@ const sampleLead: LeadRecord = {
   source: "result_save",
   phone: "01000000000",
   address: "테스트 주소",
+  ...LEAD_CRM_DEFAULTS,
 };
 
 let failed = 0;

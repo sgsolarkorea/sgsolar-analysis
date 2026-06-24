@@ -1,3 +1,4 @@
+import { isLeadOverdue, normalizeLeadRecord } from "@/lib/leads/leadRecordHelpers";
 import type { LeadRecord, LeadStatus } from "@/types/lead";
 
 export interface LeadAdminKpi {
@@ -7,6 +8,8 @@ export interface LeadAdminKpi {
   contracted: number;
   todayCount: number;
   last7DaysCount: number;
+  todayFollowUpCount: number;
+  overdueCount: number;
 }
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
@@ -29,18 +32,30 @@ function isWithinLastDays(iso: string, days: number): boolean {
   return Number.isFinite(created) && created >= cutoff;
 }
 
+function isActiveFollowUpStatus(status: LeadStatus): boolean {
+  return status !== "contracted" && status !== "rejected";
+}
+
 export function computeLeadAdminKpi(leads: LeadRecord[]): LeadAdminKpi {
   const todayKey = todayKstDateKey();
+  const normalized = leads.map(normalizeLeadRecord);
 
   return {
-    total: leads.length,
-    newLeads: leads.filter((lead) => lead.status === "new").length,
-    inConsultation: leads.filter((lead) =>
+    total: normalized.length,
+    newLeads: normalized.filter((lead) => lead.status === "new").length,
+    inConsultation: normalized.filter((lead) =>
       lead.status === "contacted" || lead.status === "quoted",
     ).length,
-    contracted: leads.filter((lead) => lead.status === "contracted").length,
-    todayCount: leads.filter((lead) => toKstDateKey(lead.createdAt) === todayKey).length,
-    last7DaysCount: leads.filter((lead) => isWithinLastDays(lead.createdAt, 7)).length,
+    contracted: normalized.filter((lead) => lead.status === "contracted").length,
+    todayCount: normalized.filter((lead) => toKstDateKey(lead.createdAt) === todayKey).length,
+    last7DaysCount: normalized.filter((lead) => isWithinLastDays(lead.createdAt, 7)).length,
+    todayFollowUpCount: normalized.filter(
+      (lead) =>
+        lead.nextFollowUpAt &&
+        isActiveFollowUpStatus(lead.status) &&
+        toKstDateKey(lead.nextFollowUpAt) === todayKey,
+    ).length,
+    overdueCount: normalized.filter((lead) => isLeadOverdue(lead)).length,
   };
 }
 

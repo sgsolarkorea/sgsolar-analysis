@@ -1,6 +1,9 @@
 import { randomUUID } from "crypto";
 import { getRedisClient } from "@/lib/searchHistory/redis";
 import { LEADS_INDEX_KEY, leadEntryKey, leadTypeIndexKey } from "@/lib/leads/redisKeys";
+import { LEAD_CRM_DEFAULTS } from "@/lib/leads/leadRecordHelpers";
+import type { LeadUpdateInput } from "@/lib/leads/leadRecordHelpers";
+import { mergeLeadUpdate, normalizeLeadRecord } from "@/lib/leads/leadRecordHelpers";
 import type { LeadRecord, LeadRequestBody, LeadStatus } from "@/types/lead";
 import { leadTypeToSource } from "@/types/lead";
 
@@ -28,6 +31,7 @@ export function createLeadRecord(input: LeadRequestBody): LeadRecord {
     ...(input.message?.trim() ? { message: input.message.trim() } : {}),
     ...(input.searchHistoryId?.trim() ? { searchHistoryId: input.searchHistoryId.trim() } : {}),
     ...(input.analysisContext ? { analysisContext: input.analysisContext } : {}),
+    ...LEAD_CRM_DEFAULTS,
   };
 }
 
@@ -77,14 +81,15 @@ export async function listLeadsByType(leadType: string, limit = 100): Promise<Le
     const ids = await redis.zrange<string[]>(leadTypeIndexKey(leadType), 0, limit - 1, { rev: true });
     if (!ids.length) return [];
     const entries = await Promise.all(ids.map((id) => redis.get<LeadRecord>(leadEntryKey(id))));
-    return entries.filter((entry): entry is LeadRecord => entry !== null);
+    return entries.filter((entry): entry is LeadRecord => entry !== null).map(normalizeLeadRecord);
   }
 
   if (process.env.NODE_ENV === "development") {
     return devMemoryIndex
       .map((id) => devMemoryStore.get(id))
       .filter((entry): entry is LeadRecord => entry != null && entry.leadType === leadType)
-      .slice(0, limit);
+      .slice(0, limit)
+      .map(normalizeLeadRecord);
   }
 
   return [];
@@ -97,14 +102,15 @@ async function listRedisLeads(limit: number): Promise<LeadRecord[]> {
   const ids = await redis.zrange<string[]>(LEADS_INDEX_KEY, 0, limit - 1, { rev: true });
   if (!ids.length) return [];
   const entries = await Promise.all(ids.map((id) => redis.get<LeadRecord>(leadEntryKey(id))));
-  return entries.filter((entry): entry is LeadRecord => entry !== null);
+  return entries.filter((entry): entry is LeadRecord => entry !== null).map(normalizeLeadRecord);
 }
 
 function listDevMemoryLeads(limit: number): LeadRecord[] {
   return devMemoryIndex
     .map((id) => devMemoryStore.get(id))
     .filter((entry): entry is LeadRecord => entry != null)
-    .slice(0, limit);
+    .slice(0, limit)
+    .map(normalizeLeadRecord);
 }
 
 export async function listAllLeads(limit = 1000): Promise<LeadRecord[]> {
@@ -128,61 +134,66 @@ export async function getLeadById(id: string): Promise<LeadRecord | null> {
   const redis = getRedisClient();
   if (redis) {
     const entry = await redis.get<LeadRecord>(leadEntryKey(id));
-    return entry ?? null;
+    return entry ? normalizeLeadRecord(entry) : null;
   }
 
   if (process.env.NODE_ENV === "development") {
-    return devMemoryStore.get(id) ?? null;
+    const entry = devMemoryStore.get(id);
+    return entry ? normalizeLeadRecord(entry) : null;
   }
 
   return null;
 }
 
-async function updateRedisLeadStatus(
-  id: string,
-  status: LeadStatus,
-): Promise<LeadRecord | null> {
+async function updateRedisLead(id: string, patch: LeadUpdateInput): Promise<LeadRecord | null> {
   const redis = getRedisClient();
   if (!redis) return null;
 
   const existing = await redis.get<LeadRecord>(leadEntryKey(id));
   if (!existing) return null;
 
-  const updated: LeadRecord = { ...existing, status };
+  const updated = mergeLeadUpdate(existing, patch);
   await redis.set(leadEntryKey(id), updated);
   return updated;
 }
 
-function updateDevMemoryLeadStatus(id: string, status: LeadStatus): LeadRecord | null {
+function updateDevMemoryLead(id: string, patch: LeadUpdateInput): LeadRecord | null {
   const existing = devMemoryStore.get(id);
   if (!existing) return null;
 
-  const updated: LeadRecord = { ...existing, status };
+  const updated = mergeLeadUpdate(existing, patch);
   devMemoryStore.set(id, updated);
   return updated;
 }
 
-export async function updateLeadStatus(
+export async function updateLead(
   id: string,
-  status: LeadStatus,
+  patch: LeadUpdateInput,
 ): Promise<{ updated: boolean; lead?: LeadRecord; storage: "redis" | "memory" | "none" }> {
   try {
-    const updatedRedis = await updateRedisLeadStatus(id, status);
+    const updatedRedis = await updateRedisLead(id, patch);
     if (updatedRedis) {
       return { updated: true, lead: updatedRedis, storage: "redis" };
     }
   } catch (error) {
-    console.warn("[Leads] Redis status update failed:", error);
+    console.warn("[Leads] Redis update failed:", error);
   }
 
   if (process.env.NODE_ENV === "development") {
-    const updatedMemory = updateDevMemoryLeadStatus(id, status);
+    const updatedMemory = updateDevMemoryLead(id, patch);
     if (updatedMemory) {
       return { updated: true, lead: updatedMemory, storage: "memory" };
     }
   }
 
   return { updated: false, storage: "none" };
+}
+
+export async function updateLeadStatus(
+  id: string,
+  status: LeadStatus,
+): Promise<{ updated: boolean; lead?: LeadRecord; storage: "redis" | "memory" | "none" }> {
+  return updateLead(id, { status });
 }
 
 async function deleteRedisLead(id: string, lead: LeadRecord): Promise<boolean> {

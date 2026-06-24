@@ -29,6 +29,13 @@ export interface LeadRecord {
   message?: string;
   searchHistoryId?: string;
   analysisContext?: ConsultationAnalysisContext;
+  memo: string;
+  nextAction: string;
+  nextFollowUpAt: string | null;
+  contactedAt: string | null;
+  quotedAt: string | null;
+  contractedAt: string | null;
+  lostReason: string | null;
 }
 
 export interface LeadRequestBody {

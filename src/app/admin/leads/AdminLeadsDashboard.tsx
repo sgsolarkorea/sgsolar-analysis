@@ -10,6 +10,14 @@ import {
 } from "@/lib/leads/adminAlerts";
 import type { LeadAdminKpi } from "@/lib/leads/adminMetrics";
 import { computeLeadAdminKpi, LEAD_STATUSES } from "@/lib/leads/adminMetrics";
+import {
+  formatFollowUpLabel,
+  fromDatetimeLocalValue,
+  isLeadOverdue,
+  LEAD_NEXT_ACTION_OPTIONS,
+  normalizeLeadRecord,
+  toDatetimeLocalValue,
+} from "@/lib/leads/leadRecordHelpers";
 import { LEAD_ADMIN_POLL_INTERVAL_MS } from "@/lib/leads/adminPolling";
 import {
   LEAD_SCORE_LABELS,
@@ -78,7 +86,10 @@ function formatCapacityKw(lead: LeadRecord): string {
   return fromContext || "—";
 }
 
-function newLeadRowClass(isNew: boolean, selected: boolean): string {
+function newLeadRowClass(isNew: boolean, selected: boolean, overdue: boolean): string {
+  if (overdue) {
+    return "bg-amber-50 ring-2 ring-inset ring-amber-400";
+  }
   if (isNew) {
     return "bg-emerald-50 ring-2 ring-inset ring-emerald-300";
   }
@@ -187,42 +198,63 @@ function FilterChip({
 function DetailPanel({
   lead,
   onClose,
-  onStatusUpdated,
+  onLeadUpdated,
   onDeleted,
 }: {
   lead: LeadRecord;
   onClose: () => void;
-  onStatusUpdated: (updated: LeadRecord) => void;
+  onLeadUpdated: (updated: LeadRecord) => void;
   onDeleted: (id: string) => void;
 }) {
-  const [status, setStatus] = useState<LeadStatus>(lead.status);
+  const normalized = normalizeLeadRecord(lead);
+  const [status, setStatus] = useState<LeadStatus>(normalized.status);
+  const [memo, setMemo] = useState(normalized.memo);
+  const [nextAction, setNextAction] = useState(normalized.nextAction);
+  const [nextFollowUpLocal, setNextFollowUpLocal] = useState(
+    toDatetimeLocalValue(normalized.nextFollowUpAt),
+  );
+  const [lostReason, setLostReason] = useState(normalized.lostReason ?? "");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setStatus(lead.status);
+    const next = normalizeLeadRecord(lead);
+    setStatus(next.status);
+    setMemo(next.memo);
+    setNextAction(next.nextAction);
+    setNextFollowUpLocal(toDatetimeLocalValue(next.nextFollowUpAt));
+    setLostReason(next.lostReason ?? "");
     setMessage("");
   }, [lead]);
 
-  async function handleSaveStatus() {
-    if (status === lead.status) return;
+  async function handleSaveConsultationInfo() {
     setSaving(true);
     setMessage("");
     try {
+      const payload: Record<string, unknown> = {
+        status,
+        memo,
+        nextAction,
+        nextFollowUpAt: fromDatetimeLocalValue(nextFollowUpLocal),
+      };
+      if (status === "hold" || status === "rejected") {
+        payload.lostReason = lostReason;
+      }
+
       const res = await fetch(`/api/admin/leads/${lead.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(payload),
       });
       const data = (await res.json()) as { error?: string; lead?: LeadRecord };
       if (!res.ok || !data.lead) {
-        throw new Error(data.error ?? "상태 변경에 실패했습니다.");
+        throw new Error(data.error ?? "상담 정보 저장에 실패했습니다.");
       }
-      onStatusUpdated(data.lead);
-      setMessage("상태가 저장되었습니다.");
+      onLeadUpdated(data.lead);
+      setMessage("상담 정보가 저장되었습니다.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "상태 변경에 실패했습니다.");
+      setMessage(error instanceof Error ? error.message : "상담 정보 저장에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -286,6 +318,9 @@ function DetailPanel({
             )}
           />
           <InfoBlock label="source" value={lead.source} />
+          <InfoBlock label="상담 시작" value={formatFollowUpLabel(normalized.contactedAt)} />
+          <InfoBlock label="견적 시각" value={formatFollowUpLabel(normalized.quotedAt)} />
+          <InfoBlock label="계약 시각" value={formatFollowUpLabel(normalized.contractedAt)} />
         </div>
 
         {lead.message && (
@@ -303,9 +338,75 @@ function DetailPanel({
         {lead.pdfUrl && <LinkBlock label="PDF URL" href={lead.pdfUrl} />}
 
         <div className="rounded-xl border border-navy/15 bg-slate-50 p-4">
-          <p className="text-sm font-bold text-navy">상태 변경</p>
-          <p className="mt-1 text-xs text-slate-600">계약 전환 관리를 위해 리드 상태를 업데이트합니다.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <p className="text-sm font-bold text-navy">상담 관리</p>
+          <p className="mt-1 text-xs text-slate-600">메모, 다음 액션, 연락 예정일, 상태를 함께 저장합니다.</p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <label htmlFor={`memo-${lead.id}`} className="mb-1.5 block text-xs font-semibold text-slate-700">
+                상담 메모
+              </label>
+              <textarea
+                id={`memo-${lead.id}`}
+                value={memo}
+                onChange={(event) => setMemo(event.target.value)}
+                rows={4}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-navy/20 focus:ring-2"
+                placeholder="통화 내용, 현장 메모, 고객 요청사항 등"
+              />
+            </div>
+
+            <div>
+              <label htmlFor={`next-action-${lead.id}`} className="mb-1.5 block text-xs font-semibold text-slate-700">
+                다음 액션
+              </label>
+              <select
+                id={`next-action-${lead.id}`}
+                value={nextAction}
+                onChange={(event) => setNextAction(event.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-navy/20 focus:ring-2"
+              >
+                <option value="">선택하세요</option>
+                {LEAD_NEXT_ACTION_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor={`follow-up-${lead.id}`} className="mb-1.5 block text-xs font-semibold text-slate-700">
+                다음 연락 예정일
+              </label>
+              <input
+                id={`follow-up-${lead.id}`}
+                type="datetime-local"
+                value={nextFollowUpLocal}
+                onChange={(event) => setNextFollowUpLocal(event.target.value)}
+                className="w-full max-w-sm rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-navy/20 focus:ring-2"
+              />
+            </div>
+
+            {(status === "hold" || status === "rejected") && (
+              <div>
+                <label htmlFor={`lost-reason-${lead.id}`} className="mb-1.5 block text-xs font-semibold text-slate-700">
+                  실패/보류 사유
+                </label>
+                <input
+                  id={`lost-reason-${lead.id}`}
+                  type="text"
+                  value={lostReason}
+                  onChange={(event) => setLostReason(event.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-navy/20 focus:ring-2"
+                  placeholder="보류 또는 거절 사유"
+                />
+              </div>
+            )}
+          </div>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">status</p>
+          <div className="mt-2 flex flex-wrap gap-2">
             {LEAD_STATUSES.map((item) => (
               <button
                 key={item}
@@ -321,14 +422,15 @@ function DetailPanel({
               </button>
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => void handleSaveStatus()}
-              disabled={saving || status === lead.status}
+              onClick={() => void handleSaveConsultationInfo()}
+              disabled={saving}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {saving ? "저장 중..." : "상태 저장"}
+              {saving ? "저장 중..." : "상담 정보 저장"}
             </button>
             {message && (
               <p className={`text-xs font-medium ${message.includes("실패") ? "text-rose-700" : "text-emerald-700"}`}>
@@ -492,8 +594,8 @@ export default function AdminLeadsDashboard() {
     setRecentAlerts([]);
   }
 
-  function handleStatusUpdated(updated: LeadRecord) {
-    const nextLeads = leads.map((lead) => (lead.id === updated.id ? updated : lead));
+  function handleLeadUpdated(updated: LeadRecord) {
+    const nextLeads = leads.map((item) => (item.id === updated.id ? updated : item));
     setLeads(nextLeads);
     setKpi(computeLeadAdminKpi(nextLeads));
   }
@@ -579,9 +681,11 @@ export default function AdminLeadsDashboard() {
       )}
 
       {kpi && (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <KpiCard label="총 리드" value={kpi.total} />
           <KpiCard label="신규 리드" value={kpi.newLeads} hint={unreadNewCount > 0 ? `+${unreadNewCount} 실시간` : undefined} />
+          <KpiCard label="오늘 연락 예정" value={kpi.todayFollowUpCount} />
+          <KpiCard label="지연 리드" value={kpi.overdueCount} hint="nextFollowUpAt 경과" />
           <KpiCard label="상담중" value={kpi.inConsultation} hint="contacted + quoted" />
           <KpiCard label="계약 완료" value={kpi.contracted} />
           <KpiCard label="오늘 유입" value={kpi.todayCount} />
@@ -648,23 +752,28 @@ export default function AdminLeadsDashboard() {
                   <th className="px-3 py-3 font-semibold">용량</th>
                   <th className="px-3 py-3 font-semibold">leadType</th>
                   <th className="px-3 py-3 font-semibold">status</th>
+                  <th className="px-3 py-3 font-semibold">다음 액션</th>
+                  <th className="px-3 py-3 font-semibold">연락 예정</th>
+                  <th className="px-3 py-3 font-semibold">지연</th>
                   <th className="px-3 py-3 font-semibold">작업</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredLeads.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-slate-500">
+                    <td colSpan={12} className="px-4 py-10 text-center text-slate-500">
                       표시할 리드가 없습니다.
                     </td>
                   </tr>
                 ) : (
                   filteredLeads.map((lead) => {
+                    const normalized = normalizeLeadRecord(lead);
                     const isNew = newLeadIds.has(lead.id);
+                    const overdue = isLeadOverdue(normalized);
                     return (
                     <tr
                       key={lead.id}
-                      className={`hover:bg-slate-50 ${newLeadRowClass(isNew, selectedId === lead.id)}`}
+                      className={`hover:bg-slate-50 ${newLeadRowClass(isNew, selectedId === lead.id, overdue)}`}
                     >
                       <td className="whitespace-nowrap px-3 py-3 text-slate-700">
                         <div className="flex items-center gap-2">
@@ -691,6 +800,21 @@ export default function AdminLeadsDashboard() {
                       <td className="px-3 py-3">
                         <StatusBadge status={lead.status} />
                       </td>
+                      <td className="px-3 py-3 text-slate-700">
+                        {displayValue(normalized.nextAction, "—")}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-3 text-slate-700">
+                        {formatFollowUpLabel(normalized.nextFollowUpAt)}
+                      </td>
+                      <td className="px-3 py-3">
+                        {overdue ? (
+                          <span className="rounded bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-700">
+                            지연
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
                       <td className="px-3 py-3">
                         <button
                           type="button"
@@ -715,12 +839,18 @@ export default function AdminLeadsDashboard() {
               </div>
             ) : (
               filteredLeads.map((lead) => {
+                const normalized = normalizeLeadRecord(lead);
                 const isNew = newLeadIds.has(lead.id);
+                const overdue = isLeadOverdue(normalized);
                 return (
                 <div
                   key={lead.id}
                   className={`rounded-xl border bg-white p-4 shadow-sm ${
-                    isNew ? "border-emerald-300 bg-emerald-50/40" : "border-slate-200"
+                    overdue
+                      ? "border-amber-400 bg-amber-50/50 ring-2 ring-inset ring-amber-300"
+                      : isNew
+                        ? "border-emerald-300 bg-emerald-50/40"
+                        : "border-slate-200"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -743,6 +873,25 @@ export default function AdminLeadsDashboard() {
                   </div>
                   <p className="mt-2 text-sm text-slate-700">{lead.address}</p>
                   <p className="mt-1 text-xs text-slate-500">용량 {formatCapacityKw(lead)}</p>
+                  {(normalized.nextAction || normalized.nextFollowUpAt) && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                      {normalized.nextAction && (
+                        <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
+                          {normalized.nextAction}
+                        </span>
+                      )}
+                      {normalized.nextFollowUpAt && (
+                        <span className="text-slate-600">
+                          연락 예정 {formatFollowUpLabel(normalized.nextFollowUpAt)}
+                        </span>
+                      )}
+                      {overdue && (
+                        <span className="rounded bg-rose-100 px-2 py-0.5 font-bold text-rose-700">
+                          지연
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <LeadTypeBadge leadType={lead.leadType} />
                     <button
@@ -764,7 +913,7 @@ export default function AdminLeadsDashboard() {
               <DetailPanel
                 lead={selectedLead}
                 onClose={() => setSelectedId(null)}
-                onStatusUpdated={handleStatusUpdated}
+                onLeadUpdated={handleLeadUpdated}
                 onDeleted={handleLeadDeleted}
               />
             </div>

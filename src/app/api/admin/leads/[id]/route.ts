@@ -1,21 +1,12 @@
 import { NextResponse } from "next/server";
 import { adminApiGuard } from "@/lib/admin/auth";
-import { LEAD_STATUSES } from "@/lib/leads/adminMetrics";
-import { deleteLead, updateLeadStatus } from "@/lib/leads/storage";
-import type { LeadStatus } from "@/types/lead";
+import { parseLeadAdminPatch } from "@/lib/leads/adminPatch";
+import { deleteLead, updateLead } from "@/lib/leads/storage";
 
 export const dynamic = "force-dynamic";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
-}
-
-function parseStatus(body: unknown): LeadStatus | null {
-  if (!body || typeof body !== "object") return null;
-  const raw = (body as Record<string, unknown>).status;
-  if (typeof raw !== "string") return null;
-  const status = raw.trim() as LeadStatus;
-  return LEAD_STATUSES.includes(status) ? status : null;
 }
 
 function parseLeadId(id: string | undefined): string | null {
@@ -35,12 +26,12 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
 
     const body = await request.json();
-    const status = parseStatus(body);
-    if (!status) {
-      return NextResponse.json({ error: "상태 값이 올바르지 않습니다." }, { status: 400 });
+    const patch = parseLeadAdminPatch(body);
+    if (!patch) {
+      return NextResponse.json({ error: "변경할 필드가 없거나 값 형식이 올바르지 않습니다." }, { status: 400 });
     }
 
-    const result = await updateLeadStatus(parsedId, status);
+    const result = await updateLead(parsedId, patch);
     if (!result.updated || !result.lead) {
       return NextResponse.json({ error: "리드를 찾을 수 없거나 저장에 실패했습니다." }, { status: 404 });
     }
@@ -51,8 +42,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       storage: result.storage,
     });
   } catch (error) {
-    console.error("[Admin Leads] Status update failed:", error);
-    return NextResponse.json({ error: "상태 변경 중 오류가 발생했습니다." }, { status: 500 });
+    console.error("[Admin Leads] Update failed:", error);
+    return NextResponse.json({ error: "리드 업데이트 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
 
