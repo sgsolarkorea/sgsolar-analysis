@@ -185,6 +185,19 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
                   </>
                 ) : (
                   <>
+                    {(layout.diagnostics?.usedBuildingCount ?? metrics.usedBuildingCount) != null &&
+                      (layout.diagnostics?.usedBuildingCount ?? metrics.usedBuildingCount)! > 0 && (
+                        <>
+                          <MetricCard
+                            label="감지 건물 수"
+                            value={`${(layout.diagnostics?.detectedBuildingCount ?? metrics.detectedBuildingCount ?? layout.diagnostics?.usedBuildingCount ?? metrics.usedBuildingCount)?.toLocaleString("ko-KR")}동`}
+                          />
+                          <MetricCard
+                            label="배치 반영 건물 수"
+                            value={`${(layout.diagnostics?.usedBuildingCount ?? metrics.usedBuildingCount)?.toLocaleString("ko-KR")}동`}
+                          />
+                        </>
+                      )}
                     <MetricCard
                       label="대지면적"
                       value={

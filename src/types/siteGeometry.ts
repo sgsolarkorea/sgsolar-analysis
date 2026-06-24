@@ -15,6 +15,12 @@ export interface SiteGeometryBundle {
   buildingFootprintAreaSqm: number | null;
   buildingPolygonCount?: number;
   buildingFootprintAreaSumSqm?: number | null;
+  /** 건축물대장 건축면적 합산 (㎡) */
+  registryBuildingAreaSqm?: number | null;
+  detectedBuildingCount?: number;
+  usedBuildingCount?: number;
+  excludedBuildingCount?: number;
+  excludedBuildingReasons?: string[];
 }
 
 export interface SiteGeometryResult {
@@ -26,6 +32,14 @@ export interface SiteGeometryResult {
   buildingPolygonCount?: number;
   buildingFootprintAreaSumSqm?: number | null;
   roofUsableAreaSqm: number | null;
+  /** 다동 건물 — setback 적용 지붕 polygon (건물형) */
+  buildingLayoutBoundaries?: LatLngPoint[][];
+  buildingSourceBoundaries?: LatLngPoint[][];
+  detectedBuildingCount?: number;
+  usedBuildingCount?: number;
+  excludedBuildingCount?: number;
+  excludedBuildingReasons?: string[];
+  registryBuildingAreaSqm?: number | null;
   /** 토지형 setback 후 usableArea (㎡) */
   landUsableAreaSqm: number | null;
   /** 용량 산정에 사용할 면적 (㎡) */

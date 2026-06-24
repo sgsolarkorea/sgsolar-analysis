@@ -5,6 +5,10 @@ import {
 } from "@/lib/api/vworld";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
+import {
+  resolveBuildingCapacityFootprintSqm,
+  selectParcelBuildingPolygons,
+} from "@/lib/solar/buildingFootprintSelection";
 import { createVirtualParcelRectangle } from "@/lib/solar/moduleLayout";
 import {
   applySetback,
@@ -70,6 +74,7 @@ export async function fetchSiteGeometryBundle(input: {
   lng: number;
   landAreaSqm?: number | null;
   buildingAreaSqm?: number | null;
+  registryBuildingCount?: number;
 }): Promise<SiteGeometryBundle> {
   const cadastralPolygon = await resolveCadastralRing(input.pnu, input.lat, input.lng);
   const cadastralAreaSqm = ringArea(cadastralPolygon);
@@ -77,28 +82,32 @@ export async function fetchSiteGeometryBundle(input: {
   let buildingPolygons: LatLngPoint[][] = [];
 
   if (input.pnu) {
-    const building = await fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng);
+    const building = await fetchBuildingPolygonByPnu(
+      input.pnu,
+      input.lat,
+      input.lng,
+      cadastralPolygon,
+    );
     buildingPolygon = building?.ring?.length ? building.ring : null;
     buildingPolygons = building?.rings?.length ? building.rings : buildingPolygon ? [buildingPolygon] : [];
   }
 
-  if (cadastralAreaSqm != null) {
-    buildingPolygons = buildingPolygons.filter((ring) => {
-      const area = ringArea(ring);
-      return area != null && area < cadastralAreaSqm * 0.85;
-    });
-    buildingPolygon =
-      buildingPolygons
-        .map((ring) => ({ ring, area: ringArea(ring) ?? 0 }))
-        .sort((a, b) => b.area - a.area)[0]?.ring ?? null;
-  }
+  const selection = selectParcelBuildingPolygons({
+    cadastralRing: cadastralPolygon,
+    buildingRings: buildingPolygons,
+    cadastralAreaSqm,
+  });
+  buildingPolygons = selection.usedPolygons;
+  buildingPolygon = buildingPolygons[0] ?? null;
 
-  const buildingFootprintAreaSumSqm = ringsAreaSum(buildingPolygons);
+  const polygonFootprintSumSqm = selection.polygonFootprintSumSqm;
   const registryBuildingAreaSqm = input.buildingAreaSqm ?? null;
-  const buildingFootprintAreaSqm =
-    registryBuildingAreaSqm != null && registryBuildingAreaSqm > (buildingFootprintAreaSumSqm ?? 0)
-      ? registryBuildingAreaSqm
-      : buildingFootprintAreaSumSqm ?? ringArea(buildingPolygon);
+  const buildingFootprintAreaSqm = resolveBuildingCapacityFootprintSqm({
+    polygonFootprintSumSqm,
+    registryBuildingAreaSqm,
+    usedBuildingCount: selection.usedBuildingCount,
+    registryBuildingCount: input.registryBuildingCount,
+  });
 
   return {
     landAreaSqm: input.landAreaSqm ?? null,
@@ -108,8 +117,13 @@ export async function fetchSiteGeometryBundle(input: {
     buildingPolygons,
     buildingPolygon,
     buildingFootprintAreaSqm,
-    buildingPolygonCount: buildingPolygons.length,
-    buildingFootprintAreaSumSqm: buildingFootprintAreaSqm,
+    buildingPolygonCount: selection.detectedBuildingCount,
+    buildingFootprintAreaSumSqm: polygonFootprintSumSqm,
+    registryBuildingAreaSqm,
+    detectedBuildingCount: selection.detectedBuildingCount,
+    usedBuildingCount: selection.usedBuildingCount,
+    excludedBuildingCount: selection.excludedBuildingCount,
+    excludedBuildingReasons: selection.excluded.map((item) => item.reason),
   };
 }
 
@@ -229,16 +243,38 @@ export function resolveSiteGeometryFromBundle(
       setbackBoundary: [],
       referenceCadastral,
       polygonSource: "building",
+      detectedBuildingCount: bundle.detectedBuildingCount,
+      usedBuildingCount: bundle.usedBuildingCount,
+      excludedBuildingCount: bundle.excludedBuildingCount,
+      excludedBuildingReasons: bundle.excludedBuildingReasons,
+      registryBuildingAreaSqm: bundle.registryBuildingAreaSqm ?? bundle.buildingAreaSqm,
     };
   }
 
+  const buildingLayoutBoundaries: LatLngPoint[][] = [];
+  const buildingSourceBoundaries: LatLngPoint[][] = [];
+  for (const ring of bundle.buildingPolygons ?? []) {
+    if (ring.length < 3) continue;
+    const { sourceBoundary, setbackBoundary, boundary } = withSetback(
+      ring,
+      moduleLayoutConfig.roofSetbackM,
+    );
+    buildingSourceBoundaries.push(sourceBoundary);
+    buildingLayoutBoundaries.push(boundary.length >= 3 ? boundary : setbackBoundary);
+  }
+
+  const primaryRing =
+    buildingLayoutBoundaries[0]?.length >= 3
+      ? bundle.buildingPolygons?.[0] ?? buildingSource.ring
+      : buildingSource.ring;
   const { sourceBoundary, setbackBoundary, boundary } = withSetback(
-    buildingSource.ring,
+    primaryRing,
     moduleLayoutConfig.roofSetbackM,
   );
+
   const footprintArea =
-    bundle.buildingFootprintAreaSumSqm ??
     bundle.buildingFootprintAreaSqm ??
+    bundle.buildingFootprintAreaSumSqm ??
     ringArea(sourceBoundary) ??
     bundle.buildingAreaSqm ??
     0;
@@ -258,11 +294,20 @@ export function resolveSiteGeometryFromBundle(
     roofUsableAreaSqm: roofUsable,
     landUsableAreaSqm: null,
     capacityAreaSqm: footprintArea,
-    layoutBoundary: boundary,
-    sourceBoundary,
-    setbackBoundary,
+    layoutBoundary: buildingLayoutBoundaries[0]?.length >= 3 ? buildingLayoutBoundaries[0] : boundary,
+    sourceBoundary: buildingSourceBoundaries[0]?.length >= 3 ? buildingSourceBoundaries[0] : sourceBoundary,
+    setbackBoundary: buildingLayoutBoundaries[0]?.length >= 3 ? buildingLayoutBoundaries[0] : setbackBoundary,
+    buildingLayoutBoundaries:
+      buildingLayoutBoundaries.length > 0 ? buildingLayoutBoundaries : undefined,
+    buildingSourceBoundaries:
+      buildingSourceBoundaries.length > 0 ? buildingSourceBoundaries : undefined,
     referenceCadastral,
     polygonSource: buildingSource.polygonSource,
+    detectedBuildingCount: bundle.detectedBuildingCount,
+    usedBuildingCount: bundle.usedBuildingCount ?? buildingLayoutBoundaries.length,
+    excludedBuildingCount: bundle.excludedBuildingCount,
+    excludedBuildingReasons: bundle.excludedBuildingReasons,
+    registryBuildingAreaSqm: bundle.registryBuildingAreaSqm ?? bundle.buildingAreaSqm,
   };
 }
 

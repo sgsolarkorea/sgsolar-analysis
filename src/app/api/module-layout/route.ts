@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { InstallTypeOption } from "@/data/resultUx";
 import { INSTALL_TYPE_OPTIONS } from "@/data/resultUx";
-import { computeModuleLayout } from "@/lib/solar/moduleLayout";
+import { computeModuleLayout, computeMultiBuildingRoofModuleLayout } from "@/lib/solar/moduleLayout";
 import { resolveLayoutBoundary } from "@/lib/solar/resolveLayoutBoundary";
 import type { SiteGeometryResult } from "@/types/siteGeometry";
 import {
@@ -73,6 +73,7 @@ function buildDiagnostics(input: {
   landLayout?: LandBlockPlacementDiagnostics;
   roofLayout?: RoofPlacementDiagnostics;
   polygonOutsideModuleCount?: number;
+  multiBuildingLayoutRule?: string;
 }): ModuleLayoutDiagnostics {
   const orientationRad = computePolygonOrientation(input.boundary);
   const rawRing = input.sourceBoundary.length >= 3 ? input.sourceBoundary : input.boundary;
@@ -151,6 +152,12 @@ function buildDiagnostics(input: {
     roofPolygonBoundingBox: roof?.roofPolygonBoundingBox,
     centerOffsetM: roof?.centerOffsetM,
     sequentialFillRejectedReason: roof?.sequentialFillRejectedReason,
+    registryBuildingAreaSqm: g.registryBuildingAreaSqm,
+    detectedBuildingCount: g.detectedBuildingCount,
+    usedBuildingCount: g.usedBuildingCount,
+    excludedBuildingCount: g.excludedBuildingCount,
+    excludedBuildingReasons: g.excludedBuildingReasons,
+    multiBuildingLayoutRule: input.multiBuildingLayoutRule,
   };
 }
 
@@ -211,15 +218,28 @@ export async function GET(request: Request) {
     );
   }
 
-  const layout = computeModuleLayout({
-    boundary,
-    polygonSource,
-    capacityKw,
-    installType,
-    moduleCount: Number.isFinite(moduleCount) ? moduleCount : undefined,
-    centerLat: lat,
-    centerLng: lng,
-  });
+  const layout =
+    installType !== "토지형" &&
+    geometry.buildingLayoutBoundaries &&
+    geometry.buildingLayoutBoundaries.length > 1
+      ? computeMultiBuildingRoofModuleLayout({
+          boundaries: geometry.buildingLayoutBoundaries,
+          polygonSource,
+          capacityKw,
+          installType,
+          moduleCount: Number.isFinite(moduleCount) ? moduleCount : undefined,
+          centerLat: lat,
+          centerLng: lng,
+        })
+      : computeModuleLayout({
+          boundary,
+          polygonSource,
+          capacityKw,
+          installType,
+          moduleCount: Number.isFinite(moduleCount) ? moduleCount : undefined,
+          centerLat: lat,
+          centerLng: lng,
+        });
 
   const diagnostics = buildDiagnostics({
     geometry,
@@ -240,6 +260,9 @@ export async function GET(request: Request) {
       modules: layout.modules,
       boundary: layout.boundary,
     }),
+    multiBuildingLayoutRule: layout.stats.capacityLayoutRule?.startsWith("multi-building-roof")
+      ? layout.stats.capacityLayoutRule
+      : undefined,
   });
 
   if (!overlayOnly && layout.stats.placedModuleCount <= 0) {

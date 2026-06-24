@@ -665,7 +665,7 @@ async function fetchBuildingPolygonFromDataLayer(
       params.set("service", "data");
       params.set("request", "GetFeature");
       params.set("data", dataLayer);
-      params.set("size", "20");
+      params.set("size", "100");
       params.set("page", "1");
       params.set("geometry", "true");
       params.set("attribute", "true");
@@ -695,21 +695,166 @@ async function fetchBuildingPolygonFromDataLayer(
   return null;
 }
 
-/** PNU → VWorld 건물 폴리곤 (lat/lng 링) — 면적 최대 건물 1건 */
+function polygonAreaSqmFromRing(ring: LatLngPoint[]): number {
+  let sumLat = 0;
+  let sumLng = 0;
+  for (const point of ring) {
+    sumLat += point.lat;
+    sumLng += point.lng;
+  }
+  const origin = { lat: sumLat / ring.length, lng: sumLng / ring.length };
+  const mPerDegLat = 110_540;
+  const mPerDegLng = 111_320 * Math.cos((origin.lat * Math.PI) / 180);
+  const local = ring.map((point) => ({
+    x: (point.lng - origin.lng) * mPerDegLng,
+    y: (point.lat - origin.lat) * mPerDegLat,
+  }));
+  let sum = 0;
+  for (let i = 0; i < local.length; i++) {
+    const j = (i + 1) % local.length;
+    sum += local[i].x * local[j].y - local[j].x * local[i].y;
+  }
+  return Math.abs(sum) / 2;
+}
+
+function pointInLatLngRing(point: LatLngPoint, polygon: LatLngPoint[]): boolean {
+  if (polygon.length < 3) return false;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lng;
+    const yi = polygon[i].lat;
+    const xj = polygon[j].lng;
+    const yj = polygon[j].lat;
+    const denominator = yj - yi;
+    const intersects =
+      yi > point.lat !== yj > point.lat &&
+      point.lng <
+        ((xj - xi) * (point.lat - yi)) /
+          (Math.abs(denominator) < 1e-12 ? 1e-12 : denominator) +
+          xi;
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
+
+function ringCentroidLatLng(ring: LatLngPoint[]): LatLngPoint {
+  let lat = 0;
+  let lng = 0;
+  for (const point of ring) {
+    lat += point.lat;
+    lng += point.lng;
+  }
+  const n = Math.max(ring.length, 1);
+  return { lat: lat / n, lng: lng / n };
+}
+
+function mergeBuildingRings(existing: LatLngPoint[][], incoming: LatLngPoint[][]): LatLngPoint[][] {
+  const merged = [...existing];
+  for (const ring of incoming) {
+    if (ring.length < 3) continue;
+    const area = polygonAreaSqmFromRing(ring);
+    const duplicate = merged.some((candidate) => {
+      if (candidate.length !== ring.length) return false;
+      const candidateArea = polygonAreaSqmFromRing(candidate);
+      return Math.abs(candidateArea - area) < 1 && candidate[0]?.lat === ring[0]?.lat;
+    });
+    if (!duplicate) merged.push(ring);
+  }
+  return merged;
+}
+
+function featureMatchesParcel(
+  feature: VworldFeatureWithGeometry,
+  pnu: string,
+  cadastralRing: LatLngPoint[],
+): boolean {
+  const featurePnu = String(feature.properties?.pnu ?? feature.properties?.PNU ?? "");
+  if (featurePnu && featurePnu === pnu) return true;
+  const ring = ringFromFeature(feature);
+  if (!ring || ring.length < 3) return false;
+  return pointInLatLngRing(ringCentroidLatLng(ring), cadastralRing);
+}
+
+async function fetchBuildingPolygonsInCadastralParcel(input: {
+  pnu: string;
+  lat: number;
+  lng: number;
+  cadastralRing: LatLngPoint[];
+}): Promise<LatLngPoint[][]> {
+  const apiKey = process.env.VWORLD_API_KEY?.trim();
+  if (!apiKey || input.cadastralRing.length < 3) return [];
+
+  const radiusM = Math.max(
+    80,
+    Math.min(180, Math.sqrt(polygonAreaSqmFromRing(input.cadastralRing)) * 0.75),
+  );
+  const geomFilter = buildSearchBox(input.lat, input.lng, radiusM);
+  const collected: LatLngPoint[][] = [];
+
+  for (const dataLayer of BUILDING_DATA_LAYERS) {
+    for (const domain of getApiDomainCandidates()) {
+      const params = buildDataApiParams(apiKey, domain);
+      params.set("service", "data");
+      params.set("request", "GetFeature");
+      params.set("data", dataLayer);
+      params.set("size", "100");
+      params.set("page", "1");
+      params.set("geometry", "true");
+      params.set("attribute", "true");
+      params.set("crs", "EPSG:4326");
+      params.set("geomFilter", geomFilter);
+
+      const data = await fetchVworldJson<
+        VworldDataResponse & {
+          response?: { result?: { featureCollection?: { features?: VworldFeatureWithGeometry[] } } };
+        }
+      >(`${VWORLD_DATA_API}?${params.toString()}`, `building-parcel-scan-${dataLayer}`);
+
+      const features = data?.response?.result?.featureCollection?.features ?? [];
+      const rings = features
+        .filter((feature) => featureMatchesParcel(feature, input.pnu, input.cadastralRing))
+        .map((feature) => ringFromFeature(feature))
+        .filter((ring): ring is LatLngPoint[] => Boolean(ring?.length));
+      if (rings.length > 0) {
+        collected.push(...rings);
+      }
+    }
+  }
+
+  return collected;
+}
+
+/** PNU → VWorld 건물 폴리곤 (lat/lng 링) — 필지 내 건물 전체 rings 반환 */
 export async function fetchBuildingPolygonByPnu(
   pnu: string,
   lat: number,
   lng: number,
+  cadastralRing?: LatLngPoint[] | null,
 ): Promise<BuildingPolygonResult | null> {
   const apiKey = process.env.VWORLD_API_KEY?.trim();
   if (!apiKey || !pnu) return null;
 
+  let rings: LatLngPoint[][] = [];
   for (const dataLayer of BUILDING_DATA_LAYERS) {
     const result = await fetchBuildingPolygonFromDataLayer(pnu, lat, lng, dataLayer, apiKey);
-    if (result?.ring?.length) return result;
+    if (result?.rings?.length) {
+      rings = mergeBuildingRings(rings, result.rings);
+    }
   }
 
-  return null;
+  if (cadastralRing && cadastralRing.length >= 3) {
+    const parcelRings = await fetchBuildingPolygonsInCadastralParcel({
+      pnu,
+      lat,
+      lng,
+      cadastralRing,
+    });
+    rings = mergeBuildingRings(rings, parcelRings);
+  }
+
+  const ring = pickLargestBuildingRing(rings);
+  if (!ring?.length) return null;
+  return { pnu, ring, rings };
 }
 
 /** 좌표 → PNU → 연속지적도 필지 경계 (pnu 미전달 시) */

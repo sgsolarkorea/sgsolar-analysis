@@ -134,6 +134,10 @@ export function ResultMetricsProvider({
               buildingFootprintAreaSumSqm: g.buildingFootprintAreaSumSqm,
               displayRoofUsableAreaSqm: g.roofUsableAreaSqm,
               displayUsableAreaSqm: g.landUsableAreaSqm ?? g.roofUsableAreaSqm,
+              detectedBuildingCount: g.detectedBuildingCount,
+              usedBuildingCount: g.usedBuildingCount,
+              excludedBuildingCount: g.excludedBuildingCount,
+              registryBuildingAreaSqm: g.registryBuildingAreaSqm,
             };
           })()
         : {};

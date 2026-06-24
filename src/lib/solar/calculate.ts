@@ -94,6 +94,10 @@ export interface CalculateSolarInput {
   buildingFootprintAreaSumSqm?: number | null;
   displayRoofUsableAreaSqm?: number | null;
   displayUsableAreaSqm?: number | null;
+  detectedBuildingCount?: number;
+  usedBuildingCount?: number;
+  excludedBuildingCount?: number;
+  registryBuildingAreaSqm?: number | null;
 }
 
 export interface CalculateSolarOutput {
@@ -140,7 +144,9 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
           ? "토지 Polygon"
           : "토지면적"
         : input.capacityAreaSqm != null && input.capacityAreaSqm > 0
-          ? "건물/지붕 Polygon"
+          ? input.usedBuildingCount && input.usedBuildingCount > 1
+            ? `건물/지붕 Polygon(${input.usedBuildingCount}동)`
+            : "건물/지붕 Polygon"
           : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
@@ -235,6 +241,10 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
     buildingPolygonCount: input.buildingPolygonCount,
     buildingFootprintAreaSumSqm: input.buildingFootprintAreaSumSqm,
     roofUsableAreaSqm: input.displayRoofUsableAreaSqm ?? null,
+    detectedBuildingCount: input.detectedBuildingCount,
+    usedBuildingCount: input.usedBuildingCount,
+    excludedBuildingCount: input.excludedBuildingCount,
+    registryBuildingAreaSqm: input.registryBuildingAreaSqm ?? null,
     usableAreaSqm: input.displayUsableAreaSqm ?? null,
     areaPerKw,
     capacityKw,

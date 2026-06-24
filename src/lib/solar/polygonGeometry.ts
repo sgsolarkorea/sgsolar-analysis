@@ -56,6 +56,14 @@ export function polygonAreaSqm(ring: LatLngPoint[]): number {
   return Math.abs(sum) / 2;
 }
 
+export function pointInLatLngPolygon(point: LatLngPoint, polygon: LatLngPoint[]): boolean {
+  if (polygon.length < 3) return false;
+  const origin = centroid(polygon);
+  const localPoint = toLocal([point], origin)[0];
+  const localPoly = toLocal(polygon, origin);
+  return pointInPolygon(localPoint, localPoly);
+}
+
 export function pointInPolygon(point: LocalPoint, polygon: LocalPoint[]): boolean {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {

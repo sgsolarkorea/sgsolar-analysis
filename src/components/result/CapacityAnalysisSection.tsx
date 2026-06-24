@@ -70,6 +70,48 @@ export default function CapacityAnalysisSection({
             </span>
           </div>
         )}
+        {!isLand && metrics.usedBuildingCount != null && metrics.usedBuildingCount > 0 && (
+          <>
+            <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-slate-500">감지 건물 수</span>
+              <span className="text-sm font-semibold text-slate-900">
+                {(metrics.detectedBuildingCount ?? metrics.usedBuildingCount).toLocaleString("ko-KR")}동
+              </span>
+            </div>
+            <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-slate-500">배치 반영 건물 수</span>
+              <span className="text-sm font-semibold text-slate-900">
+                {metrics.usedBuildingCount.toLocaleString("ko-KR")}동
+              </span>
+            </div>
+          </>
+        )}
+        {!isLand && metrics.roofUsableAreaSqm != null && metrics.roofUsableAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">지붕 유효면적</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.roofUsableAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
+        {!isLand && metrics.registryBuildingAreaSqm != null && metrics.registryBuildingAreaSqm > 0 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">건축물대장 건축면적</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.registryBuildingAreaSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
+        {!isLand && metrics.buildingFootprintAreaSumSqm != null &&
+          metrics.registryBuildingAreaSqm != null &&
+          Math.abs(metrics.buildingFootprintAreaSumSqm - metrics.registryBuildingAreaSqm) > 1 && (
+          <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm text-slate-500">GIS polygon 합산면적</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {metrics.buildingFootprintAreaSumSqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡
+            </span>
+          </div>
+        )}
         {!isLand && metrics.buildingFootprintAreaSqm != null && metrics.buildingFootprintAreaSqm > 0 && (
           <div className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-slate-500">건물/지붕면적</span>

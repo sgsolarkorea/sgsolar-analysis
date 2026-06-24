@@ -73,6 +73,10 @@ export interface SolarMetrics {
   buildingFootprintAreaSumSqm?: number | null;
   /** 지붕 setback 후 유효면적 (㎡) — 건물형 */
   roofUsableAreaSqm?: number | null;
+  detectedBuildingCount?: number;
+  usedBuildingCount?: number;
+  excludedBuildingCount?: number;
+  registryBuildingAreaSqm?: number | null;
   /** setback 후 usableArea (㎡) — 토지형 */
   usableAreaSqm?: number | null;
   areaPerKw: number;

@@ -290,6 +290,14 @@ async function fetchTitleInfo(parsed: ReturnType<typeof parsePnu>): Promise<Buil
   return [];
 }
 
+export async function getBuildingRegistryItemCount(pnu: string | null): Promise<number> {
+  if (!pnu) return 0;
+  const parsed = parsePnu(pnu);
+  if (!parsed) return 0;
+  const items = await fetchTitleInfo(parsed);
+  return items.length;
+}
+
 export async function getBuildingInfoByRegistry(
   input: BuildingInfoInput,
 ): Promise<InfoField[]> {
@@ -327,6 +335,7 @@ export async function getBuildingInfoByRegistry(
         archArea,
         buildingUse: pickField(selected, "mainPurpsCdNm", "main_purps_cd_nm"),
         itemCount: items.length,
+        archAreas: items.map((item) => parseNumericField(item, "archArea", "arch_area")),
       }),
     );
 

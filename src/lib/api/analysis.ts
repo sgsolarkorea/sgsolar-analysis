@@ -5,7 +5,7 @@
 import { unstable_cache } from "next/cache";
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
-import { getBuildingInfoByRegistry } from "@/lib/api/buildingRegistry";
+import { getBuildingInfoByRegistry, getBuildingRegistryItemCount } from "@/lib/api/buildingRegistry";
 import {
   hasLandRecord,
   resolveInfoDataSource,
@@ -90,6 +90,10 @@ export async function calculateSolarProfitability(
     buildingFootprintAreaSumSqm?: number | null;
     displayRoofUsableAreaSqm?: number | null;
     displayUsableAreaSqm?: number | null;
+    detectedBuildingCount?: number;
+    usedBuildingCount?: number;
+    excludedBuildingCount?: number;
+    registryBuildingAreaSqm?: number | null;
   },
 ): Promise<{
   profitability: Profitability;
@@ -115,6 +119,10 @@ export async function calculateSolarProfitability(
     buildingFootprintAreaSumSqm: input.buildingFootprintAreaSumSqm,
     displayRoofUsableAreaSqm: input.displayRoofUsableAreaSqm,
     displayUsableAreaSqm: input.displayUsableAreaSqm,
+    detectedBuildingCount: input.detectedBuildingCount,
+    usedBuildingCount: input.usedBuildingCount,
+    excludedBuildingCount: input.excludedBuildingCount,
+    registryBuildingAreaSqm: input.registryBuildingAreaSqm,
   });
 
   const areas = extractAreasForDebug(input.landInfo, input.buildingInfo);
@@ -211,6 +219,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     pnu: effectivePnu,
     buildingName: geo.buildingName,
   });
+  const registryBuildingCount =
+    effectivePnu != null ? await getBuildingRegistryItemCount(effectivePnu) : 0;
 
   const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
   const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
@@ -224,6 +234,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     lng: geo.lng,
     landAreaSqm,
     buildingAreaSqm,
+    registryBuildingCount,
   });
 
   const siteGeometry = resolveSiteGeometryFromBundle(siteGeometryBundle, {
@@ -246,6 +257,10 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     buildingFootprintAreaSumSqm: siteGeometry.buildingFootprintAreaSumSqm,
     displayRoofUsableAreaSqm: siteGeometry.roofUsableAreaSqm,
     displayUsableAreaSqm: siteGeometry.landUsableAreaSqm ?? siteGeometry.roofUsableAreaSqm,
+    detectedBuildingCount: siteGeometry.detectedBuildingCount,
+    usedBuildingCount: siteGeometry.usedBuildingCount,
+    excludedBuildingCount: siteGeometry.excludedBuildingCount,
+    registryBuildingAreaSqm: siteGeometry.registryBuildingAreaSqm,
   });
 
   const { profitability, solarMetrics, monthlyGeneration } = solarResult;

@@ -593,3 +593,160 @@ export function computeModuleLayout(input: {
     roofLayoutDiagnostics: roofDiagnostics,
   };
 }
+
+function distributeModuleQuotaByArea(areas: number[], targetModuleCount: number): number[] {
+  if (areas.length === 0 || targetModuleCount <= 0) return areas.map(() => 0);
+  const totalArea = areas.reduce((sum, area) => sum + area, 0);
+  if (totalArea <= 0) {
+    const base = Math.floor(targetModuleCount / areas.length);
+    const quotas = areas.map(() => base);
+    for (let i = 0; i < targetModuleCount - base * areas.length; i++) quotas[i % quotas.length]++;
+    return quotas;
+  }
+
+  const raw = areas.map((area) => (targetModuleCount * area) / totalArea);
+  const quotas = raw.map((value) => Math.floor(value));
+  let assigned = quotas.reduce((sum, count) => sum + count, 0);
+  const remainders = raw
+    .map((value, index) => ({ index, remainder: value - Math.floor(value) }))
+    .sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+
+  for (const item of remainders) {
+    if (assigned >= targetModuleCount) break;
+    quotas[item.index]++;
+    assigned++;
+  }
+
+  return quotas;
+}
+
+/** 다동 건물 — 각 지붕 polygon에 모듈 배치 후 합산 */
+export function computeMultiBuildingRoofModuleLayout(input: {
+  boundaries: LatLngPoint[][];
+  polygonSource: ModuleLayoutPolygonSource;
+  capacityKw: number;
+  installType: InstallTypeOption | string;
+  moduleCount?: number;
+  centerLat?: number;
+  centerLng?: number;
+}): ModuleLayoutResult {
+  const validBoundaries = input.boundaries.filter((boundary) => boundary.length >= 3);
+  if (validBoundaries.length <= 1) {
+    return computeModuleLayout({
+      boundary: validBoundaries[0] ?? [],
+      polygonSource: input.polygonSource,
+      capacityKw: input.capacityKw,
+      installType: input.installType,
+      moduleCount: input.moduleCount,
+      centerLat: input.centerLat,
+      centerLng: input.centerLng,
+    });
+  }
+
+  const params = getLayoutParams(input.installType, input.capacityKw);
+  const targetModuleCount =
+    input.moduleCount != null && input.moduleCount > 0
+      ? Math.floor(input.moduleCount)
+      : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
+
+  const roofAreas = validBoundaries.map((boundary) => polygonAreaSqm(boundary));
+  const quotas = distributeModuleQuotaByArea(roofAreas, targetModuleCount);
+
+  let modules: ModuleRect[] = [];
+  let validSlotCount = 0;
+  let rowModuleCounts: number[] = [];
+  let roofDiagnostics: RoofPlacementDiagnostics | undefined;
+  let placedModuleCount = 0;
+
+  for (let i = 0; i < validBoundaries.length; i++) {
+    const quota = quotas[i] ?? 0;
+    if (quota <= 0) continue;
+    const legacy = placeModulesInFootprint(validBoundaries[i], quota, params);
+    modules = modules.concat(legacy.modules);
+    validSlotCount += legacy.validSlotCount;
+    rowModuleCounts = rowModuleCounts.concat(legacy.rowModuleCounts);
+    placedModuleCount += legacy.modules.length;
+    if (!roofDiagnostics && legacy.roofDiagnostics) {
+      roofDiagnostics = legacy.roofDiagnostics;
+    }
+  }
+
+  let remaining = targetModuleCount - placedModuleCount;
+  for (let i = 0; i < validBoundaries.length && remaining > 0; i++) {
+    const legacy = placeModulesInFootprint(validBoundaries[i], remaining, params);
+    const existing = new Set(modules.map((mod) => mod.corners.map((c) => `${c.lat},${c.lng}`).join("|")));
+    for (const mod of legacy.modules) {
+      const key = mod.corners.map((c) => `${c.lat},${c.lng}`).join("|");
+      if (existing.has(key)) continue;
+      modules.push(mod);
+      placedModuleCount++;
+      remaining--;
+      if (remaining <= 0) break;
+    }
+  }
+
+  const primaryBoundary = validBoundaries.reduce((best, boundary) =>
+    polygonAreaSqm(boundary) > polygonAreaSqm(best) ? boundary : best,
+  );
+  const usableAreaSqm = roofAreas.reduce((sum, area) => sum + area, 0);
+  const footprintSqm = moduleRectsFootprintSqm(modules);
+  const polygonUtilizationPct =
+    usableAreaSqm > 0 ? Math.round((footprintSqm / usableAreaSqm) * 1000) / 10 : 0;
+
+  const origin =
+    primaryBoundary.length >= 3
+      ? computeOrientedBounds(primaryBoundary).origin
+      : {
+          lat: input.centerLat ?? 0,
+          lng: input.centerLng ?? 0,
+        };
+
+  let bounds = {
+    minLat: Infinity,
+    maxLat: -Infinity,
+    minLng: Infinity,
+    maxLng: -Infinity,
+  };
+  for (const boundary of validBoundaries) {
+    for (const point of boundary) {
+      bounds.minLat = Math.min(bounds.minLat, point.lat);
+      bounds.maxLat = Math.max(bounds.maxLat, point.lat);
+      bounds.minLng = Math.min(bounds.minLng, point.lng);
+      bounds.maxLng = Math.max(bounds.maxLng, point.lng);
+    }
+  }
+  for (const mod of modules) {
+    for (const corner of mod.corners) {
+      bounds.minLat = Math.min(bounds.minLat, corner.lat);
+      bounds.maxLat = Math.max(bounds.maxLat, corner.lat);
+      bounds.minLng = Math.min(bounds.minLng, corner.lng);
+      bounds.maxLng = Math.max(bounds.maxLng, corner.lng);
+    }
+  }
+
+  return {
+    boundary: primaryBoundary,
+    buildingBoundaries: validBoundaries,
+    modules,
+    center: origin,
+    bounds,
+    polygonSource: input.polygonSource,
+    stats: {
+      capacityKw: input.capacityKw,
+      targetModuleCount,
+      placedModuleCount: modules.length,
+      modulePowerW: moduleLayoutConfig.modulePowerW,
+      layoutMode: params.mode,
+      tiers: 1,
+      rowSpacingM: params.rowSpacingM,
+      tiltDeg: params.tiltDeg,
+      installType: input.installType,
+      validSlotCount,
+      layoutRowCount: rowModuleCounts.length,
+      rowModuleCounts,
+      polygonUtilizationPct,
+      capacityLayoutRule: `multi-building-roof:${validBoundaries.length}`,
+    },
+    roofLayoutDiagnostics: roofDiagnostics,
+  };
+}

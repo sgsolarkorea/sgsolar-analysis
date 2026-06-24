@@ -119,6 +119,13 @@ export interface ModuleLayoutDiagnostics {
   roofPolygonBoundingBox?: { minX: number; maxX: number; minY: number; maxY: number };
   centerOffsetM?: number;
   sequentialFillRejectedReason?: string;
+  registryBuildingAreaSqm?: number | null;
+  detectedBuildingCount?: number;
+  usedBuildingCount?: number;
+  excludedBuildingCount?: number;
+  excludedBuildingReasons?: string[];
+  /** 다동 건물 배치 규칙 */
+  multiBuildingLayoutRule?: string;
 }
 
 export interface ModuleLayoutResult {
@@ -127,6 +134,8 @@ export interface ModuleLayoutResult {
   sourceBoundary?: LatLngPoint[];
   /** sourceBoundary + setback 적용 결과 */
   setbackBoundary?: LatLngPoint[];
+  /** 다동 건물 지붕 polygon (setback 적용) */
+  buildingBoundaries?: LatLngPoint[][];
   modules: ModuleRect[];
   center: LatLngPoint;
   bounds: {

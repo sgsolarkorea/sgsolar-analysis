@@ -127,6 +127,13 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       boundaryOverlays.push(
         `<polygon points="${toPoints(rawRing)}" fill="rgba(34, 197, 94, 0.25)" stroke="#16a34a" stroke-width="2.5" vector-effect="non-scaling-stroke" />`,
       );
+    } else if (layout.buildingBoundaries && layout.buildingBoundaries.length > 0) {
+      for (const ring of layout.buildingBoundaries) {
+        if (ring.length < 3) continue;
+        boundaryOverlays.push(
+          `<polygon points="${toPoints(ring)}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" vector-effect="non-scaling-stroke" />`,
+        );
+      }
     } else if (layout.boundary.length >= 3) {
       boundaryOverlays.push(
         `<polygon points="${toPoints(layout.boundary)}" fill="${boundaryFill}" stroke="${boundaryStroke}" stroke-width="2" vector-effect="non-scaling-stroke" />`,
