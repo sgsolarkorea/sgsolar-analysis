@@ -9,7 +9,10 @@
     "sourceFoundCount": 194,
     "sourceNeedsVerificationCount": 0,
     "sourceNotStartedCount": 111,
-    "collectionMethod": "law.go.kr 자치법규 slug + ordinInfoP (elis gubun=ELIS when present)"
+    "collectionMethod": "law.go.kr 자치법규 slug + ordinInfoP (elis gubun=ELIS when present)",
+    "openapiCollectionAt": "2026-06-24",
+    "openapiCollectionVersion": "2026-06-19-step6.10",
+    "openapiPrimarySource": "openapi.law.go.kr"
   },
   "entries": {
     "강원특별자치도|강릉시": {
@@ -1012,13 +1015,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "평택시 도시계획 조례",
+          "name": "평택시 도시 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122835&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2122835, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2122835",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2122835&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6410000&sborg=4122000&knd=undefined"
         },
         {
           "type": "guideline",
@@ -1242,13 +1250,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "사천시 도시계획 조례",
+          "name": "사천시 도시 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2112751&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2112751, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2112751",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2112751&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4805000&knd=undefined"
         },
         {
           "type": "guideline",
@@ -1397,13 +1410,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "통영시 도시계획 조례",
+          "name": "통영시 도시 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2105587&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2105587, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2105587",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2105587&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4803000&knd=undefined"
         },
         {
           "type": "guideline",
@@ -3638,13 +3656,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "군산시 도시계획 조례",
+          "name": "군산시 도시 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2030847&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2030847, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2030847",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2030847&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3500000&knd=undefined"
         },
         {
           "type": "guideline",
@@ -3846,11 +3869,16 @@
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2122435&gubun=ELIS",
           "status": "source_found",
           "type": "ordinance",
-          "name": "전주시 도시계획 조례",
+          "name": "전주시 도시 계획 조례",
           "appendix": "[별표 26] 태양광 발전시설 허가기준",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2122435, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2122435",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2122435&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3680000&knd=undefined"
         }
       ],
       "linkedSetbackReviewStatus": "source_found"
@@ -4022,10 +4050,15 @@
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2095519&gubun=ELIS",
           "status": "source_found",
           "type": "ordinance",
-          "name": "논산시 도시계획 조례",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "name": "논산시 도시 계획 조례",
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2095519, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2095519",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2095519&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3300000&knd=undefined"
         },
         {
           "sourceUrl": "",
@@ -4115,13 +4148,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "서산시 도시계획 조례",
+          "name": "서산시 도시 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2090923&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2090923, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2090923",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2090923&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3400000&knd=undefined"
         },
         {
           "type": "guideline",
@@ -4363,13 +4401,18 @@
       "sources": [
         {
           "type": "ordinance",
-          "name": "음성군 군계획 조례",
+          "name": "음성군 군 계획 조례",
           "appendix": "[별표] 태양광 발전시설 허가기준",
           "sourceUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106201&gubun=ELIS",
           "status": "source_found",
-          "sourceOrigin": "elis.go.kr",
-          "notes": "law.go.kr ELIS 연계 ordinSeq",
-          "collectedAt": "2026-06-23"
+          "sourceOrigin": "law.go.kr",
+          "notes": "Step 6.10 Open API (MST=2106201, list=drf_html_fallback)",
+          "collectedAt": "2026-06-24",
+          "collectionMethod": "openapi",
+          "openapiMst": "2106201",
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EA%B5%B0%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2106201&ID=undefined",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6430000&sborg=3700000&knd=undefined"
         }
       ]
     },

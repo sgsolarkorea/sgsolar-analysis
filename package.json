@@ -14,6 +14,8 @@
     "build:regulatory-db": "node scripts/build-korea-region-registry.mjs && node scripts/build-regulatory-db.mjs",
     "collect:regulation-sources": "node scripts/collect-regulation-sources.mjs --all",
     "collect:regulation-sources:priority": "node scripts/collect-regulation-sources.mjs --priority",
+    "collect:regulation-sources:openapi": "node scripts/collect-regulation-sources-openapi.mjs --verify",
+    "collect:regulation-sources:openapi:priority": "node scripts/collect-regulation-sources-openapi.mjs --priority",
     "parse:regulation-ordinances": "node scripts/parse-regulation-ordinances.mjs --all",
     "parse:regulation-ordinances:priority": "node scripts/parse-regulation-ordinances.mjs --priority",
     "parse:regulation-ordinances:metro": "node scripts/parse-regulation-ordinances-metro.mjs --with-appendices",

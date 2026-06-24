@@ -103,9 +103,15 @@ export interface RegulationSourceEntry {
   appendix?: string;
   sourceUrl: string;
   status: RegulationSourceStatus;
-  sourceOrigin?: "elis.go.kr" | "law.go.kr" | "municipal" | "unknown";
+  sourceOrigin?: "elis.go.kr" | "law.go.kr" | "openapi.law.go.kr" | "municipal" | "unknown";
   notes?: string;
   collectedAt?: string;
+  /** Step 6.10 — Open API 수집 메타 */
+  openapiMst?: string;
+  openapiListReference?: string;
+  openapiBodyReference?: string;
+  openapiAppendixReference?: string;
+  collectionMethod?: "openapi" | "openapi_slug_fallback" | "slug" | "manual";
 }
 
 /** Step 6.7 — parser output candidate (not yet merged into setback DB) */
@@ -122,6 +128,7 @@ export interface ParsedDistanceSet {
 
 export type DistanceExtractionMethod =
   | "xml"
+  | "openapi_xml"
   | "hwp"
   | "pdf"
   | "manual_review"
@@ -174,6 +181,17 @@ export interface ParsedOrdinanceCandidate {
   parserConfidence: ParserConfidence;
   parserConfidenceBefore?: ParserConfidence;
   distanceExtractionMethod?: DistanceExtractionMethod;
+  /** Step 6.10 — Open API 수집 출처 */
+  sourceCollectionMethod?: "openapi" | "xml" | "slug";
+  openapiMst?: string;
+  openapiListReference?: string | null;
+  openapiBodyReference?: string | null;
+  openapiAppendixReference?: string | null;
+  openapiFetchModes?: {
+    list?: string | null;
+    body?: string | null;
+    appendix?: string | null;
+  };
   appendixSourceUrl?: string | null;
   appendixFileType?: "hwp" | "pdf" | null;
   appendixParseSuccess?: boolean;
