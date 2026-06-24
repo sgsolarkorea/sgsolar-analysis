@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, writeFile } from "fs/promises";
+import { mkdir, readdir, readFile, unlink, writeFile } from "fs/promises";
 import path from "path";
 import type { SearchHistoryEntry, SaveSearchHistoryResult } from "@/types/searchHistory";
 import type { ParcelSnapshot } from "@/types/parcelReview";
@@ -247,4 +247,60 @@ export async function updateSearchHistoryParcels(
 
   await redis.set(searchHistoryEntryKey(updated.id), updated);
   return true;
+}
+
+async function deleteLocalEntry(entry: SearchHistoryEntry): Promise<boolean> {
+  const files = await readdir(LOCAL_DIR).catch(() => [] as string[]);
+  const match = files.find((file) => file.endsWith(`_${entry.id}.json`));
+  if (match) {
+    await unlink(path.join(LOCAL_DIR, match)).catch(() => undefined);
+  }
+
+  const index = await readLocalIndex();
+  await writeLocalIndex(index.filter((itemId) => itemId !== entry.id));
+
+  const addressKey = normalizeSearchAddress(entry.address);
+  const markerFile = path.join(LOCAL_DIR, `_address_${addressKey.replace(/[^\w-]/g, "_")}.txt`);
+  await unlink(markerFile).catch(() => undefined);
+  return true;
+}
+
+async function deleteRedisEntry(entry: SearchHistoryEntry): Promise<boolean> {
+  const redis = getRedisClient();
+  if (!redis) return false;
+
+  await redis.del(searchHistoryEntryKey(entry.id));
+  await redis.zrem(SEARCH_HISTORY_INDEX_KEY, entry.id);
+  await redis.del(searchHistoryAddressKey(normalizeSearchAddress(entry.address)));
+  return true;
+}
+
+export async function deleteSearchHistoryEntry(
+  id: string,
+): Promise<{ deleted: boolean; storage: "redis" | "local" | "none" }> {
+  const entry = await getSearchHistoryEntry(id);
+  if (!entry) {
+    return { deleted: false, storage: "none" };
+  }
+
+  if (shouldUseLocalStorage()) {
+    try {
+      await deleteLocalEntry(entry);
+      return { deleted: true, storage: "local" };
+    } catch (error) {
+      console.warn("[SearchHistory] Local delete failed:", error);
+      return { deleted: false, storage: "none" };
+    }
+  }
+
+  try {
+    const deleted = await deleteRedisEntry(entry);
+    if (deleted) {
+      return { deleted: true, storage: "redis" };
+    }
+  } catch (error) {
+    console.warn("[SearchHistory] Redis delete failed:", error);
+  }
+
+  return { deleted: false, storage: "none" };
 }

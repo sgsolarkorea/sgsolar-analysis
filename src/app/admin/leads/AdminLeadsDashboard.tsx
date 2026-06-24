@@ -601,6 +601,8 @@ export default function AdminLeadsDashboard() {
   const [unreadNewCount, setUnreadNewCount] = useState(0);
   const [recentAlerts, setRecentAlerts] = useState<LeadRecord[]>([]);
   const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const { detectNewLeads } = useLeadIdTracker();
   const highlightTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -689,6 +691,10 @@ export default function AdminLeadsDashboard() {
     [leads, leadTypeFilter, statusFilter, search],
   );
 
+  const filteredLeadIds = useMemo(() => filteredLeads.map((lead) => lead.id), [filteredLeads]);
+  const allFilteredSelected =
+    filteredLeadIds.length > 0 && filteredLeadIds.every((id) => selectedIds.has(id));
+
   const selectedLead =
     filteredLeads.find((lead) => lead.id === selectedId) ??
     leads.find((lead) => lead.id === selectedId) ??
@@ -711,11 +717,96 @@ export default function AdminLeadsDashboard() {
     setStats(computeLeadAdminStats(nextLeads));
     setSelectedId(null);
     setNotice("리드가 삭제되었습니다.");
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
     setNewLeadIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
     });
+  }
+
+  function toggleLeadSelection(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAllFiltered() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allFilteredSelected) {
+        for (const id of filteredLeadIds) next.delete(id);
+      } else {
+        for (const id of filteredLeadIds) next.add(id);
+      }
+      return next;
+    });
+  }
+
+  async function handleBulkDelete() {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    if (
+      !window.confirm(
+        `선택한 리드 ${ids.length}건을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.`,
+      )
+    ) {
+      return;
+    }
+
+    setBulkDeleting(true);
+    setNotice("");
+    try {
+      const res = await fetch("/api/admin/leads/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        deleted?: number;
+        failed?: string[];
+      };
+      if (!res.ok) {
+        throw new Error(data.error ?? "선택 삭제에 실패했습니다.");
+      }
+
+      const failed = data.failed ?? [];
+      const deletedCount = data.deleted ?? 0;
+      const failedSet = new Set(failed);
+      const deletedSet = new Set(ids.filter((id) => !failedSet.has(id)));
+
+      const nextLeads = leads.filter((lead) => !deletedSet.has(lead.id));
+      setLeads(nextLeads);
+      setStats(computeLeadAdminStats(nextLeads));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        for (const id of deletedSet) next.delete(id);
+        return next;
+      });
+      setNewLeadIds((prev) => {
+        const next = new Set(prev);
+        for (const id of deletedSet) next.delete(id);
+        return next;
+      });
+      if (selectedId && deletedSet.has(selectedId)) {
+        setSelectedId(null);
+      }
+
+      const failedMessage = failed.length > 0 ? ` 실패 ${failed.length}건` : "";
+      setNotice(`리드 ${deletedCount}건이 삭제되었습니다.${failedMessage}`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "선택 삭제에 실패했습니다.");
+    } finally {
+      setBulkDeleting(false);
+    }
   }
 
   return (
@@ -857,10 +948,37 @@ export default function AdminLeadsDashboard() {
             {filteredLeads.length}건 표시 (전체 {leads.length}건)
           </p>
 
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3">
+            <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={allFilteredSelected}
+                onChange={toggleSelectAllFiltered}
+                disabled={filteredLeads.length === 0 || bulkDeleting}
+                className="h-4 w-4 rounded border-slate-300 text-navy focus:ring-navy/30"
+              />
+              현재 목록 전체 선택
+            </label>
+            <span className="text-xs text-slate-500">
+              {selectedIds.size > 0 ? `${selectedIds.size}건 선택됨` : "선택된 항목 없음"}
+            </span>
+            <button
+              type="button"
+              onClick={() => void handleBulkDelete()}
+              disabled={selectedIds.size === 0 || bulkDeleting}
+              className="rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-800 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {bulkDeleting ? "삭제 중..." : "선택 삭제"}
+            </button>
+          </div>
+
           <div className="mt-4 hidden overflow-hidden rounded-xl border border-slate-200 bg-white md:block">
             <table className="w-full text-left text-sm">
               <thead className="bg-navy text-white">
                 <tr>
+                  <th className="w-10 px-3 py-3">
+                    <span className="sr-only">선택</span>
+                  </th>
                   <th className="px-3 py-3 font-semibold">접수일시</th>
                   <th className="px-3 py-3 font-semibold">이름</th>
                   <th className="px-3 py-3 font-semibold">연락처</th>
@@ -878,7 +996,7 @@ export default function AdminLeadsDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {filteredLeads.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="px-4 py-10 text-center text-slate-500">
+                    <td colSpan={13} className="px-4 py-10 text-center text-slate-500">
                       표시할 리드가 없습니다.
                     </td>
                   </tr>
@@ -887,11 +1005,22 @@ export default function AdminLeadsDashboard() {
                     const normalized = normalizeLeadRecord(lead);
                     const isNew = newLeadIds.has(lead.id);
                     const overdue = isLeadOverdue(normalized);
+                    const isChecked = selectedIds.has(lead.id);
                     return (
                     <tr
                       key={lead.id}
                       className={`hover:bg-slate-50 ${newLeadRowClass(isNew, selectedId === lead.id, overdue)}`}
                     >
+                      <td className="px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleLeadSelection(lead.id)}
+                          disabled={bulkDeleting}
+                          className="h-4 w-4 rounded border-slate-300 text-navy focus:ring-navy/30"
+                          aria-label={`${displayValue(lead.name, lead.phone)} 선택`}
+                        />
+                      </td>
                       <td className="whitespace-nowrap px-3 py-3 text-slate-700">
                         <div className="flex items-center gap-2">
                           {isNew && (
@@ -970,6 +1099,16 @@ export default function AdminLeadsDashboard() {
                         : "border-slate-200"
                   }`}
                 >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(lead.id)}
+                      onChange={() => toggleLeadSelection(lead.id)}
+                      disabled={bulkDeleting}
+                      className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-navy focus:ring-navy/30"
+                      aria-label={`${displayValue(lead.name, lead.phone)} 선택`}
+                    />
+                    <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -1018,6 +1157,8 @@ export default function AdminLeadsDashboard() {
                     >
                       상세
                     </button>
+                  </div>
+                    </div>
                   </div>
                 </div>
                 );
