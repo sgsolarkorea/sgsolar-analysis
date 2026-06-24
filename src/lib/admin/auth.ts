@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export const ADMIN_COOKIE_NAME = "sg_admin_session";
 
@@ -58,4 +59,12 @@ export async function checkAdminApiAccess(): Promise<AdminApiAccessResult> {
     return { allowed: false, status: 401, error: "Unauthorized" };
   }
   return { allowed: true };
+}
+
+export async function adminApiGuard(): Promise<NextResponse | null> {
+  const access = await checkAdminApiAccess();
+  if (!access.allowed) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+  return null;
 }

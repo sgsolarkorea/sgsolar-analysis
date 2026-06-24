@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdminAuthenticated } from "@/lib/admin/auth";
+import { adminApiGuard } from "@/lib/admin/auth";
 import { listSearchHistory } from "@/lib/searchHistory/storage";
 import type { SearchHistoryEntry } from "@/types/searchHistory";
 
@@ -52,9 +52,8 @@ function entryToCsvRow(entry: SearchHistoryEntry): string {
 }
 
 export async function GET() {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   const entries = await listSearchHistory();
   const header =

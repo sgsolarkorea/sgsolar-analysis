@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { checkAdminApiAccess } from "@/lib/admin/auth";
+import { adminApiGuard } from "@/lib/admin/auth";
 import { computeLeadAdminKpi } from "@/lib/leads/adminMetrics";
 import { listAllLeads } from "@/lib/leads/storage";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const access = await checkAdminApiAccess();
-  if (!access.allowed) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   try {
     const leads = await listAllLeads();

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkAdminApiAccess } from "@/lib/admin/auth";
+import { adminApiGuard } from "@/lib/admin/auth";
 import { LEAD_STATUSES } from "@/lib/leads/adminMetrics";
 import { deleteLead, updateLeadStatus } from "@/lib/leads/storage";
 import type { LeadStatus } from "@/types/lead";
@@ -25,10 +25,8 @@ function parseLeadId(id: string | undefined): string | null {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const access = await checkAdminApiAccess();
-    if (!access.allowed) {
-      return NextResponse.json({ error: access.error }, { status: access.status });
-    }
+    const denied = await adminApiGuard();
+    if (denied) return denied;
 
     const { id } = await context.params;
     const parsedId = parseLeadId(id);
@@ -60,10 +58,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
-    const access = await checkAdminApiAccess();
-    if (!access.allowed) {
-      return NextResponse.json({ error: access.error }, { status: access.status });
-    }
+    const denied = await adminApiGuard();
+    if (denied) return denied;
 
     const { id: rawId } = await context.params;
     const id = parseLeadId(rawId);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdminAuthenticated } from "@/lib/admin/auth";
+import { adminApiGuard } from "@/lib/admin/auth";
 import {
   deleteGridAdminRecord,
   listGridAdminRecords,
@@ -8,17 +8,16 @@ import {
 import type { GridAdminRecord } from "@/types/gridConnection";
 
 export async function GET() {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
+
   const records = await listGridAdminRecords();
   return NextResponse.json({ records });
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   const body = (await request.json().catch(() => null)) as GridAdminRecord | null;
   if (!body?.id || !body.regionKeywords?.length) {
@@ -30,9 +29,8 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");

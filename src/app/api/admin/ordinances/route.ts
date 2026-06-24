@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { isAdminAuthenticated } from "@/lib/admin/auth";
+import { adminApiGuard } from "@/lib/admin/auth";
 import { listOrdinanceAdminRows } from "@/lib/ordinanceLearning/registry";
 import { buildSearchDashboardStats } from "@/lib/ordinanceLearning/stats";
 import { getOrdinanceRecord } from "@/lib/ordinanceLearning/storage";
 
 export async function GET() {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   const [rows, stats] = await Promise.all([listOrdinanceAdminRows(), buildSearchDashboardStats()]);
 
@@ -15,9 +14,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthenticated())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = await adminApiGuard();
+  if (denied) return denied;
 
   const body = (await request.json().catch(() => null)) as { slug?: string } | null;
   if (!body?.slug) {
