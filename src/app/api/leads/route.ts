@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendLeadEmail, type LeadEmailResult } from "@/lib/leads/email";
+import { isLeadEmailRequired, notifyLeadCreated } from "@/lib/leads/notifier";
 import { createLeadRecord, saveLead } from "@/lib/leads/storage";
 import { validateLeadBody } from "@/lib/leads/validate";
 import { linkSearchHistoryToConsultation } from "@/lib/searchHistory/storage";
@@ -25,23 +25,28 @@ export async function POST(request: Request) {
       );
     }
 
-    let emailResult: LeadEmailResult = { sent: false, provider: "none" };
+    let notifyResult;
     try {
-      emailResult = await sendLeadEmail(lead);
+      notifyResult = await notifyLeadCreated(lead);
     } catch (error) {
-      console.error("[Leads] Email failed after save:", error);
-      return NextResponse.json(
-        {
-          error:
-            error instanceof Error
-              ? error.message
-              : "리드는 저장되었으나 이메일 발송에 실패했습니다.",
-          id: lead.id,
-          saved: true,
-        },
-        { status: 502 },
-      );
+      console.error("[Leads] Notification failed after save:", error);
+      if (isLeadEmailRequired(lead)) {
+        return NextResponse.json(
+          {
+            error:
+              error instanceof Error
+                ? error.message
+                : "리드는 저장되었으나 이메일 발송에 실패했습니다.",
+            id: lead.id,
+            saved: true,
+          },
+          { status: 502 },
+        );
+      }
+      notifyResult = { email: { sent: false, provider: "none" as const }, adapters: {} };
     }
+
+    const emailResult = notifyResult.email;
 
     let searchHistoryLinked = false;
     if (validated.data.leadType === "consultation" && validated.data.searchHistoryId) {

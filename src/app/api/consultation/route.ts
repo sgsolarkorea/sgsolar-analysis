@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { sendConsultationEmail } from "@/lib/consultation/email";
+import { sendConsultationEmail, type ConsultationEmailResult } from "@/lib/consultation/email";
+import { isLeadEmailRequired, notifyLeadCreated } from "@/lib/leads/notifier";
 import {
   createConsultationSubmission,
   trySaveConsultation,
@@ -31,7 +32,32 @@ export async function POST(request: Request) {
       console.warn("[Consultation] Lead DB save failed — continuing with legacy email flow");
     }
 
-    const emailResult = await sendConsultationEmail(submission, validated.data.resultPageUrl);
+    let emailResult: ConsultationEmailResult;
+
+    if (leadStorage.saved) {
+      try {
+        const notifyResult = await notifyLeadCreated(lead, {
+          consultationSubmission: submission,
+          resultPageUrl: validated.data.resultPageUrl,
+        });
+        emailResult = {
+          sent: notifyResult.email.sent,
+          autoReplySent: notifyResult.email.autoReplySent ?? false,
+          provider: (notifyResult.email.provider === "resend" || notifyResult.email.provider === "smtp"
+            ? notifyResult.email.provider
+            : "smtp") as ConsultationEmailResult["provider"],
+        };
+      } catch (error) {
+        console.error("[Consultation] Notification failed after lead save:", error);
+        if (isLeadEmailRequired(lead)) {
+          throw error;
+        }
+        emailResult = { sent: false, autoReplySent: false, provider: "smtp" };
+      }
+    } else {
+      console.warn("[Consultation] Lead DB save failed — falling back to consultation email only");
+      emailResult = await sendConsultationEmail(submission, validated.data.resultPageUrl);
+    }
 
     const linked = await linkSearchHistoryToConsultation({
       searchHistoryId: validated.data.searchHistoryId,
