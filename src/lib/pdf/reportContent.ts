@@ -15,7 +15,19 @@ export const PDF_SETBACK_FOOTER =
   "예상 거리는 공공데이터 기반의 1차 참고값입니다. 최종 이격거리 판단은 지자체 조례 및 현장 확인 후 결정됩니다.";
 
 export const PDF_SETBACK_COMMON_NOTICE =
-  "현재 기준거리는 지자체별 조례 DB 적용 전의 공통 참고 기준입니다. 실제 기준은 지자체 조례에 따라 달라질 수 있습니다.";
+  "현재 기준거리는 지자체 조례 반영 전 공통 참고 기준입니다. 실제 기준은 지자체 조례에 따라 달라질 수 있습니다.";
+
+export const PDF_ORDINANCE_INFO_TITLE = "조례정보";
+export const PDF_ORDINANCE_INFO_INTRO =
+  "해당 부지와 관련된 공식 조례 정보입니다. 법규명·원문 URL을 통해 조례 원문을 확인할 수 있습니다.";
+export const PDF_ORDINANCE_INFO_BADGE = "공식 법규 기반";
+export const PDF_ORDINANCE_INFO_DISCLAIMER =
+  "아래 조례는 사전 검토용 참고 자료입니다. 실제 인허가 기준은 조례 원문과 관할 지자체 확인을 통해 검토해야 합니다.";
+export const PDF_ORDINANCE_SUMMARY_TITLE = "지자체 조례 검토";
+export const PDF_ORDINANCE_SUMMARY_INTRO =
+  "조례 원문 기준으로 주요 검토 항목을 요약했습니다. 세부 기준은 상담 시 원문과 함께 재확인합니다.";
+export const PDF_ORDINANCE_PREPARING =
+  "해당 지자체 조례 세부 기준은 상담 시 확인합니다.";
 
 export const PDF_SETBACK_STANDARD_COLUMN = "공통 기준";
 

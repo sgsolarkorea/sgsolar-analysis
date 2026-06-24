@@ -4,6 +4,8 @@ import { getMarketPrice } from "@/lib/api/market";
 import { getKakaoErrorMessage } from "@/lib/api/kakaoErrors";
 import { generateSiteReviewPdf, siteReviewPdfFilename } from "@/lib/pdf/siteReviewPdf";
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
+import { resolveOrdinanceDisplay } from "@/lib/regulatory/resolveOrdinanceDisplay";
+import { resolveOrdinanceInfoList } from "@/lib/regulatory/resolveOrdinanceInfoList";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -47,10 +49,22 @@ async function buildPdfBytes(address: string, parcels?: ParcelSnapshot[]) {
   }
 
   const ordinanceResult = await resolveOrdinanceForAddress(data.address);
+  const ordinanceDisplay = resolveOrdinanceDisplay(
+    data.address,
+    data.jibunAddress,
+    ordinanceResult.data,
+  );
+  const ordinanceInfo = resolveOrdinanceInfoList(
+    data.address,
+    data.jibunAddress,
+    ordinanceDisplay,
+    ordinanceResult.data,
+  );
 
   return generateSiteReviewPdf(data, {
     parcels: parcels && parcels.length > 0 ? parcels : undefined,
-    ordinance: ordinanceResult.data,
+    ordinanceInfo,
+    ordinanceDisplay,
   });
 }
 

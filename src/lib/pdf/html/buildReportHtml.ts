@@ -1,6 +1,7 @@
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import type { LayerARegulatoryLevel } from "@/types/landInfo";
-import type { SetbackJudgment } from "@/types/regulatoryReview";
+import type { SetbackJudgment, OrdinanceDisplayResult, OrdinanceInfoListResult } from "@/types/regulatoryReview";
+import { ORDINANCE_DISPLAY_LABELS } from "@/types/ordinanceLearning";
 import type { GridConnectionStatus } from "@/types/gridConnection";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { formatUnifiedCapacityKw } from "@/lib/solar/capacityResolution";
@@ -21,6 +22,13 @@ import {
   PDF_SETBACK_COMMON_NOTICE,
   PDF_SETBACK_FOOTER,
   PDF_SETBACK_STANDARD_COLUMN,
+  PDF_ORDINANCE_INFO_TITLE,
+  PDF_ORDINANCE_INFO_INTRO,
+  PDF_ORDINANCE_INFO_BADGE,
+  PDF_ORDINANCE_INFO_DISCLAIMER,
+  PDF_ORDINANCE_SUMMARY_TITLE,
+  PDF_ORDINANCE_SUMMARY_INTRO,
+  PDF_ORDINANCE_PREPARING,
   deriveAssessmentItems,
   deriveExecutiveSummary,
   deriveOverallReviewStatus,
@@ -45,6 +53,141 @@ export interface HtmlReportAssets {
   mapHeight: number;
   mapAvailable: boolean;
   mapFailureReason?: string | null;
+}
+
+export interface PdfOrdinanceContext {
+  ordinanceInfo?: OrdinanceInfoListResult;
+  ordinanceDisplay?: OrdinanceDisplayResult;
+}
+
+function formatOrdinanceDate(value: string | null): string {
+  return value ?? "미확인";
+}
+
+function renderOrdinanceUrlCell(url: string | null): string {
+  if (!url) {
+    return `<span style="color:#94a3b8;font-size:7.5pt">미확인</span>`;
+  }
+  return `<a class="ord-link" href="${htmlText(url)}" target="_blank" rel="noopener noreferrer">원문 확인</a>
+    <div class="ord-url">${htmlText(url)}</div>`;
+}
+
+function renderOrdinanceInfoSection(info?: OrdinanceInfoListResult): string {
+  if (!info) return "";
+
+  const rows = info.rows;
+  const tableBody =
+    rows.length === 0
+      ? `<tr><td colspan="4" style="text-align:center;color:#64748b">해당 지역의 공식 조례 목록을 준비 중입니다.</td></tr>`
+      : rows
+          .map(
+            (row) => `
+          <tr>
+            <td style="text-align:center;white-space:nowrap"><span class="ord-kind">${htmlText(row.kind)}</span></td>
+            <td><strong>${htmlText(row.name)}</strong></td>
+            <td style="text-align:center;white-space:nowrap;color:${row.revisedAt ? "#334155" : "#94a3b8"}">${htmlText(formatOrdinanceDate(row.revisedAt))}</td>
+            <td>${renderOrdinanceUrlCell(row.sourceUrl)}</td>
+          </tr>`,
+          )
+          .join("");
+
+  return `
+    <div class="section-head" style="margin-top:18px">
+      <div class="accent"></div>
+      <div>
+        <h2>${htmlText(PDF_ORDINANCE_INFO_TITLE)}</h2>
+        <p>${htmlText(PDF_ORDINANCE_INFO_INTRO)}</p>
+      </div>
+    </div>
+    <div class="ord-info-banner avoid-break">
+      <span class="badge badge-blue">${htmlText(PDF_ORDINANCE_INFO_BADGE)}</span>
+      <span class="ord-info-banner-text">법제처 자치법규 기준 · 조례 원문 URL 제공</span>
+    </div>
+    <div class="card avoid-break">
+      <table>
+        <thead><tr>
+          <th style="width:10%">종류</th>
+          <th style="width:34%">법규명</th>
+          <th style="width:14%">제/개정일</th>
+          <th style="width:42%">원문 확인 URL</th>
+        </tr></thead>
+        <tbody>${tableBody}</tbody>
+      </table>
+    </div>
+    ${
+      info.hasOfficialLinks
+        ? `<p class="notice compact amber" style="margin-top:8px">${htmlText(PDF_ORDINANCE_INFO_DISCLAIMER)}</p>`
+        : ""
+    }`;
+}
+
+function renderOrdinanceSummarySection(display?: OrdinanceDisplayResult): string {
+  if (!display) return "";
+
+  const { policy, cards, municipalityLabel } = display;
+  const statusLabel = ORDINANCE_DISPLAY_LABELS[policy.displayStatus] ?? "조례 검토";
+
+  const cardsHtml =
+    cards.length === 0
+      ? `<div class="notice">${htmlText(PDF_ORDINANCE_PREPARING)}</div>`
+      : cards
+          .map(
+            (card) => `
+          <div class="ord-summary-card avoid-break">
+            <div class="ord-summary-head">
+              <div class="ord-summary-label">${htmlText(municipalityLabel)}</div>
+              <div class="ord-summary-name">${htmlText(card.ordinanceName)}</div>
+              <div class="ord-summary-article">${htmlText(card.articleTitle)}</div>
+              ${card.appendixTitle ? `<div class="ord-summary-appendix">${htmlText(card.appendixTitle)}</div>` : ""}
+            </div>
+            <div class="ord-summary-body">
+              ${
+                card.summaryBullets.length > 0
+                  ? `<ul class="ord-summary-list">${card.summaryBullets
+                      .map((bullet) => `<li>${htmlText(bullet)}</li>`)
+                      .join("")}</ul>`
+                  : `<p class="ord-summary-empty">세부 이격거리는 조례 원문 및 인허가 검토 후 안내됩니다.</p>`
+              }
+              ${
+                card.sourceUrl
+                  ? `<div class="ord-summary-source">
+                      <span class="ord-summary-source-label">원문 URL</span>
+                      <a class="ord-link" href="${htmlText(card.sourceUrl)}" target="_blank" rel="noopener noreferrer">${htmlText(card.sourceUrl)}</a>
+                    </div>`
+                  : ""
+              }
+            </div>
+          </div>`,
+          )
+          .join("");
+
+  const noticeLines = policy.manualOverrideNoticeLines?.length
+    ? `<ul class="ord-notice-list">${policy.manualOverrideNoticeLines
+        .map((line) => `<li>${htmlText(line)}</li>`)
+        .join("")}</ul>`
+    : "";
+
+  const reviewReasonHtml =
+    policy.reviewReason &&
+    (policy.displayStatus === "manual_review" || policy.displayStatus === "manual_pending")
+      ? `<p class="notice amber">${htmlText(policy.reviewReason)}</p>`
+      : "";
+
+  return `
+    <div class="section-head" style="margin-top:18px">
+      <div class="accent"></div>
+      <div>
+        <h2>${htmlText(PDF_ORDINANCE_SUMMARY_TITLE)}</h2>
+        <p>${htmlText(PDF_ORDINANCE_SUMMARY_INTRO)}</p>
+      </div>
+    </div>
+    <div class="ord-status-row avoid-break">
+      <span class="badge badge-blue">${htmlText(statusLabel)}</span>
+      <span class="ord-status-municipality">${htmlText(municipalityLabel)}</span>
+    </div>
+    ${cardsHtml}
+    ${noticeLines}
+    ${reviewReasonHtml}`;
 }
 
 const REGULATORY_BADGE: Record<LayerARegulatoryLevel, string> = {
@@ -345,7 +488,11 @@ function renderGridBars(data: ResolvedSiteReview, expectedMw: number): string {
     </div>`;
 }
 
-export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAssets): string {
+export function buildReportHtml(
+  data: ResolvedSiteReview,
+  assets: HtmlReportAssets,
+  ordinanceContext: PdfOrdinanceContext = {},
+): string {
   const m = data.solarMetrics;
   const installType = formatInstallTypeForPdf(m.installType);
   const expectedMw = Math.round((m.capacityKw / 1000) * 1000) / 1000;
@@ -597,6 +744,9 @@ export function buildReportHtml(data: ResolvedSiteReview, assets: HtmlReportAsse
         </div>
       </div>
       ${regulatoryTable}
+
+      ${renderOrdinanceInfoSection(ordinanceContext.ordinanceInfo)}
+      ${renderOrdinanceSummarySection(ordinanceContext.ordinanceDisplay)}
 
       <div class="section-head" style="margin-top:18px">
         <div class="accent"></div>

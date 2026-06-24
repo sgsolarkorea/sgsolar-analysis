@@ -1,7 +1,10 @@
 import type { LatLngPoint } from "@/types/moduleLayout";
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import type { ParcelSnapshot } from "@/types/parcelReview";
-import type { MunicipalityOrdinanceData } from "@/types/regulatoryReview";
+import type {
+  OrdinanceDisplayResult,
+  OrdinanceInfoListResult,
+} from "@/types/regulatoryReview";
 import { MARKETING_NAME } from "@/data/sampleData";
 import { latLngToStaticMapPixel } from "@/lib/pdf/pdfHelpers";
 import { captureKakaoStaticMapOnPage } from "@/lib/pdf/captureKakaoMap";
@@ -18,7 +21,8 @@ import { PDF_REPORT_TITLE } from "@/lib/pdf/reportContent";
 
 export interface SiteReviewPdfOptions {
   parcels?: ParcelSnapshot[];
-  ordinance?: MunicipalityOrdinanceData | null;
+  ordinanceInfo?: OrdinanceInfoListResult;
+  ordinanceDisplay?: OrdinanceDisplayResult;
 }
 
 function todayFileDate(): string {
@@ -47,7 +51,7 @@ function buildPolygonOverlaySvg(
 
 export async function generateSiteReviewPdf(
   data: ResolvedSiteReview,
-  _options: SiteReviewPdfOptions = {},
+  options: SiteReviewPdfOptions = {},
 ): Promise<Uint8Array> {
   const mapLevel = 3;
   const [fontFacesCss, logoDataUrl] = await Promise.all([
@@ -86,6 +90,9 @@ export async function generateSiteReviewPdf(
       mapHeight: MAP_HEIGHT,
       mapAvailable: Boolean(mapCapture.bytes?.length),
       mapFailureReason: mapCapture.bytes?.length ? null : mapCapture.status,
+    }, {
+      ordinanceInfo: options.ordinanceInfo,
+      ordinanceDisplay: options.ordinanceDisplay,
     });
 
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });

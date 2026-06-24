@@ -395,6 +395,51 @@ export function reportBaseStyles(): string {
       font-size: 7.5pt; color: #94a3b8; text-align: center;
     }
 
+    .ord-info-banner {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 10px; padding: 8px 12px;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+    }
+    .ord-info-banner-text { font-size: 7.5pt; color: #1e3a8a; font-weight: 600; }
+    .ord-kind {
+      display: inline-block; padding: 2px 7px; border-radius: 6px;
+      background: #e0f2fe; color: #0c4a6e; font-size: 7pt; font-weight: 700;
+      border: 1px solid #bae6fd;
+    }
+    .ord-link { color: #0b1736; font-weight: 700; font-size: 7.5pt; text-decoration: underline; }
+    .ord-url {
+      margin-top: 3px; font-size: 6.5pt; color: #64748b; line-height: 1.45;
+      word-break: break-all;
+    }
+    .ord-status-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    }
+    .ord-status-municipality { font-size: 8.5pt; font-weight: 700; color: #0f172a; }
+    .ord-summary-card {
+      margin-bottom: 10px; border: 1px solid #d8e1ea; border-radius: 12px; overflow: hidden;
+      background: #fff; box-shadow: 0 2px 8px rgba(11, 23, 54, 0.04);
+    }
+    .ord-summary-head {
+      padding: 12px 14px; background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+      border-bottom: 1px solid #eef3f8;
+    }
+    .ord-summary-label { font-size: 7pt; font-weight: 700; color: #64748b; letter-spacing: 0.04em; }
+    .ord-summary-name { margin-top: 4px; font-size: 10pt; font-weight: 700; color: #0b1736; line-height: 1.4; }
+    .ord-summary-article { margin-top: 4px; font-size: 9pt; font-weight: 700; color: #1e3a8a; }
+    .ord-summary-appendix { margin-top: 2px; font-size: 7.5pt; color: #64748b; }
+    .ord-summary-body { padding: 12px 14px 14px; }
+    .ord-summary-list { margin: 0; padding-left: 16px; font-size: 8pt; color: #334155; line-height: 1.55; }
+    .ord-summary-list li { margin-bottom: 4px; }
+    .ord-summary-empty { font-size: 8pt; color: #64748b; line-height: 1.55; margin: 0; }
+    .ord-summary-source { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eef3f8; }
+    .ord-summary-source-label { display: block; font-size: 7pt; font-weight: 700; color: #64748b; margin-bottom: 3px; }
+    .ord-notice-list {
+      margin: 8px 0 0; padding: 10px 12px 10px 28px;
+      background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px;
+      font-size: 7.5pt; color: #065f46; line-height: 1.5;
+    }
+
     .page-break { break-before: page; page-break-before: always; }
     .avoid-break { break-inside: avoid; page-break-inside: avoid; }
   `;
