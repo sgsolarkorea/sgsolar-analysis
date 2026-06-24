@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 interface MetricCardProps {
   label: string;
   value: string;
@@ -42,6 +44,26 @@ export function KpiCard({ label, value, unit, emphasis = false }: KpiCardProps) 
         {value}
       </p>
       {unit && <p className="mt-px text-[10px] text-slate-500">{unit}</p>}
+    </div>
+  );
+}
+
+interface PremiumOverviewKpiCardProps {
+  label: string;
+  value: string;
+  icon: ReactNode;
+}
+
+export function PremiumOverviewKpiCard({ label, value, icon }: PremiumOverviewKpiCardProps) {
+  return (
+    <div className="group flex min-h-[8.5rem] flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-blue-50 text-[#1E3A8A] ring-1 ring-sky-100 transition group-hover:from-sky-100 group-hover:to-blue-100">
+        {icon}
+      </div>
+      <p className="text-xs font-semibold text-slate-500">{label}</p>
+      <p className="mt-1.5 text-lg font-bold leading-tight tracking-tight text-[#0B1F3A] sm:text-xl">
+        {value}
+      </p>
     </div>
   );
 }

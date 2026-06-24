@@ -99,6 +99,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         jibunAddress={data.jibunAddress}
         buildingName={data.buildingName}
         analyzedAt={data.analyzedAt}
+        grade={data.grade}
+        recommendation={data.recommendation}
+        suitability={data.suitability}
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
