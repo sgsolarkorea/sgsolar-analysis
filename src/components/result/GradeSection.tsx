@@ -69,7 +69,7 @@ export default function GradeSection({
 
   return (
     <section>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <PremiumOverviewKpiCard label="예상 설치용량" value={capacity} icon={<CapacityIcon />} />
         <PremiumOverviewKpiCard label="예상 발전량" value={annualGeneration} icon={<GenerationIcon />} />
         <PremiumOverviewKpiCard label={thirdLabel} value={thirdValue} icon={<RevenueIcon />} />

@@ -40,7 +40,7 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
         description="추천 유형·설치용량·시공비 등 1차 입지검토 요약입니다."
         compact
       />
-      <div className="mt-10 sm:mt-12">
+      <div className="mt-5 sm:mt-6">
         <GradeSection
         capacity={capacity}
         annualGeneration={annualGeneration}
