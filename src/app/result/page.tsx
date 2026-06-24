@@ -28,6 +28,7 @@ import { GRID_DISCLAIMER } from "@/data/sampleData";
 import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import { resolveOrdinanceDisplay } from "@/lib/regulatory/resolveOrdinanceDisplay";
+import { resolveOrdinanceInfoList } from "@/lib/regulatory/resolveOrdinanceInfoList";
 import { recordSearchHistory } from "@/lib/searchHistory/record";
 import { getFieldValue } from "@/lib/solar/calculate";
 import { primaryParcelFromReview } from "@/lib/api/parcelLookup";
@@ -71,6 +72,12 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   const ordinanceDisplay = resolveOrdinanceDisplay(
     data.address,
     data.jibunAddress,
+    ordinanceResult.data,
+  );
+  const ordinanceInfo = resolveOrdinanceInfoList(
+    data.address,
+    data.jibunAddress,
+    ordinanceDisplay,
     ordinanceResult.data,
   );
 
@@ -140,11 +147,15 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                 fields={data.buildingInfo}
               />
 
+              <LocalOrdinanceSection
+                display={ordinanceDisplay}
+                meta={ordinanceResult.meta}
+                ordinanceInfo={ordinanceInfo}
+              />
               <SetbackReviewSection
                 review={data.setbackReview}
                 displayPolicy={ordinanceDisplay.policy}
               />
-              <LocalOrdinanceSection display={ordinanceDisplay} meta={ordinanceResult.meta} />
 
               <ResultCapacitySection recommendation={data.recommendation} />
               <ResultGenerationSection />

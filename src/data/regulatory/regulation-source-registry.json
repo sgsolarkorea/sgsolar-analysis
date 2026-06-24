@@ -1024,9 +1024,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2122835",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2122835&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6410000&sborg=4122000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2122835",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%8F%89%ED%83%9D%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6410000&sborg=4122000"
         },
         {
           "type": "guideline",
@@ -1259,9 +1259,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2112751",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2112751&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4805000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2112751",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%82%AC%EC%B2%9C%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4805000"
         },
         {
           "type": "guideline",
@@ -1419,9 +1419,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2105587",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2105587&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4803000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2105587",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%ED%86%B5%EC%98%81%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6480000&sborg=4803000"
         },
         {
           "type": "guideline",
@@ -3665,9 +3665,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2030847",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2030847&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3500000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2030847",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EA%B5%B0%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3500000"
         },
         {
           "type": "guideline",
@@ -3876,9 +3876,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2122435",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2122435&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3680000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2122435",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%A0%84%EC%A3%BC%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6450000&sborg=3680000"
         }
       ],
       "linkedSetbackReviewStatus": "source_found"
@@ -4056,9 +4056,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2095519",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2095519&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3300000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2095519",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EB%85%BC%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3300000"
         },
         {
           "sourceUrl": "",
@@ -4157,9 +4157,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2090923",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2090923&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3400000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EB%8F%84%EC%8B%9C%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2090923",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%84%9C%EC%82%B0%EC%8B%9C+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6440000&sborg=3400000"
         },
         {
           "type": "guideline",
@@ -4410,9 +4410,9 @@
           "collectedAt": "2026-06-24",
           "collectionMethod": "openapi",
           "openapiMst": "2106201",
-          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EA%B5%B0%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1&org=undefined&sborg=undefined",
-          "openapiBodyReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=XML&MST=2106201&ID=undefined",
-          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6430000&sborg=3700000&knd=undefined"
+          "openapiListReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordin&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EA%B5%B0%EA%B3%84%ED%9A%8D+%EC%A1%B0%EB%A1%80&display=20&page=1&search=1&nw=1",
+          "openapiBodyReference": "https://www.law.go.kr/DRF/lawService.do?target=ordin&type=XML&MST=2106201",
+          "openapiAppendixReference": "https://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&type=HTML&query=%EC%9D%8C%EC%84%B1%EA%B5%B0+%EC%8B%A0%EC%9E%AC%EC%83%9D%EC%97%90%EB%84%88%EC%A7%80&display=30&page=1&search=1&org=6430000&sborg=3700000"
         }
       ]
     },

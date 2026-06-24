@@ -348,5 +348,25 @@ export interface OrdinanceDisplayResult {
   manualVerifiedAt?: string | null;
 }
 
+/** Step 6.11 — 조례정보 테이블 행 */
+export type OrdinanceInfoKind = "조례" | "규칙" | "지침" | "고시";
+
+export interface OrdinanceInfoRow {
+  id: string;
+  kind: OrdinanceInfoKind;
+  name: string;
+  revisedAt: string | null;
+  sourceUrl: string | null;
+  /** 링크 출처 (표시용) */
+  sourceOriginLabel?: string;
+  priority: number;
+}
+
+export interface OrdinanceInfoListResult {
+  rows: OrdinanceInfoRow[];
+  municipalityLabel: string;
+  hasOfficialLinks: boolean;
+}
+
 /** @deprecated MunicipalityOrdinanceData 사용 */
 export type LocalOrdinanceReview = MunicipalityOrdinanceData;

@@ -1,15 +1,17 @@
 "use client";
 
-import type { OrdinanceDisplayPolicy, OrdinanceDisplayResult } from "@/types/regulatoryReview";
+import type { OrdinanceDisplayPolicy, OrdinanceDisplayResult, OrdinanceInfoListResult } from "@/types/regulatoryReview";
 import type { OrdinanceLoadMeta } from "@/types/ordinanceLearning";
 import { ORDINANCE_DISPLAY_LABELS } from "@/types/ordinanceLearning";
 import SectionHeader from "@/components/ui/SectionHeader";
 import OrdinanceInfoCard from "@/components/result/OrdinanceInfoCard";
+import OrdinanceInfoTable from "@/components/result/OrdinanceInfoTable";
 import UrbanOrdinanceNoticePanel from "@/components/result/UrbanOrdinanceNoticePanel";
 
 interface LocalOrdinanceSectionProps {
   display: OrdinanceDisplayResult;
   meta: OrdinanceLoadMeta;
+  ordinanceInfo: OrdinanceInfoListResult;
 }
 
 function formatReviewDate(iso?: string): string {
@@ -98,7 +100,7 @@ function OrdinancePreparingPanel({
   );
 }
 
-export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceSectionProps) {
+export default function LocalOrdinanceSection({ display, meta, ordinanceInfo }: LocalOrdinanceSectionProps) {
   const {
     policy,
     cards,
@@ -112,7 +114,23 @@ export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceS
   const showPreparing = !showUrbanNotice && cards.length === 0 && meta.isPreparing;
 
   return (
-    <section id="local-ordinance" className="scroll-mt-24">
+    <>
+      <section id="ordinance-info" className="scroll-mt-24">
+        <SectionHeader
+          title="조례정보"
+          description="법제처 자치법규 Open API·공식 source registry 기준으로 관련 조례·규칙을 안내합니다. 법규명을 클릭하면 공식 원문을 새 탭에서 확인할 수 있습니다."
+          compact
+        />
+        <OrdinanceInfoTable rows={ordinanceInfo.rows} />
+        {ordinanceInfo.hasOfficialLinks && (
+          <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-[11px] font-medium leading-snug text-slate-600 sm:text-xs">
+            공식 조례 원문 링크 기준입니다. 세부 이격거리·인허가 요건은 아래 조례 요약과 상담 시
+            함께 검토합니다.
+          </p>
+        )}
+      </section>
+
+      <section id="local-ordinance" className="scroll-mt-24">
       <SectionHeader
         title="지자체 조례 검토"
         description={
@@ -175,6 +193,7 @@ export default function LocalOrdinanceSection({ display, meta }: LocalOrdinanceS
           )}
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }
