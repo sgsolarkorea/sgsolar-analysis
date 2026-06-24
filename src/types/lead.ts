@@ -52,6 +52,34 @@ export const LEAD_TYPE_LABELS: Record<LeadType, string> = {
   save_result: "결과 저장",
 };
 
+export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
+  new: "신규",
+  contacted: "상담중",
+  quoted: "견적",
+  contracted: "계약완료",
+  hold: "보류",
+  rejected: "거절",
+};
+
+export type LeadScore = "HOT" | "WARM" | "COLD";
+
+export const LEAD_SCORE_LABELS: Record<LeadScore, string> = {
+  HOT: "HOT",
+  WARM: "WARM",
+  COLD: "COLD",
+};
+
+export function leadTypeToScore(leadType: LeadType): LeadScore {
+  switch (leadType) {
+    case "consultation":
+      return "HOT";
+    case "pdf_download":
+      return "WARM";
+    case "save_result":
+      return "COLD";
+  }
+}
+
 export function leadTypeToSource(leadType: LeadType): LeadSource {
   switch (leadType) {
     case "pdf_download":

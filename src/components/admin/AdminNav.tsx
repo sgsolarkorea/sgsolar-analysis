@@ -1,11 +1,12 @@
 "use client";
 
 interface AdminNavProps {
-  active: "search-history" | "ordinances" | "grid-data" | "regulatory-review";
+  active: "search-history" | "ordinances" | "grid-data" | "regulatory-review" | "leads";
 }
 
 const LINKS = [
   { id: "search-history" as const, href: "/admin/search-history", label: "조회 이력" },
+  { id: "leads" as const, href: "/admin/leads", label: "리드 관리" },
   { id: "ordinances" as const, href: "/admin/ordinances", label: "조례 학습" },
   { id: "regulatory-review" as const, href: "/admin/regulatory-review", label: "조례 후보 검수" },
   { id: "grid-data" as const, href: "/admin/grid-data", label: "계통 데이터" },
