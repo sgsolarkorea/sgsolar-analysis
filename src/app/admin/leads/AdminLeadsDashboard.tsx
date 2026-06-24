@@ -420,7 +420,7 @@ export default function AdminLeadsDashboard() {
 
       <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950">
         <strong>관리자 리드 대시보드</strong> · Step 7.1 리드 캡처 퍼널에서 수집된 연락처를 조회·관리합니다.
-        로그인은 Step 7.3에서 추가 예정입니다.
+        ADMIN_PASSWORD로 보호된 관리자 전용 화면입니다.
       </div>
 
       <div className="mt-6">

@@ -41,3 +41,21 @@ export async function isAdminAuthenticated(): Promise<boolean> {
 export function isAdminConfigured(): boolean {
   return Boolean(getAdminPassword());
 }
+
+export type AdminApiAccessResult =
+  | { allowed: true }
+  | { allowed: false; status: 401 | 503; error: string };
+
+export async function checkAdminApiAccess(): Promise<AdminApiAccessResult> {
+  if (!isAdminConfigured()) {
+    return {
+      allowed: false,
+      status: 503,
+      error: "관리자 비밀번호가 서버에 설정되지 않았습니다.",
+    };
+  }
+  if (!(await isAdminAuthenticated())) {
+    return { allowed: false, status: 401, error: "Unauthorized" };
+  }
+  return { allowed: true };
+}
