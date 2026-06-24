@@ -58,7 +58,7 @@ function buildManualOverrideCard(entry: SetbackManualOverrideEntry): OrdinanceDi
     appendixTitle: entry.appendixNumber ? `별표 ${entry.appendixNumber}` : undefined,
     summaryBullets,
     sourceUrl: entry.sourceUrl,
-    sourceOriginLabel: "수동 검토 DB",
+    sourceOriginLabel: "지자체 확인",
     showDistances: isVerified && hasExplicitOverrideDistances(entry),
   };
 }

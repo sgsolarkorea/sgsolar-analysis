@@ -76,11 +76,11 @@ function formatDate(value?: string | null): string | null {
 
 function sourceOriginLabel(origin?: string, collectionMethod?: string): string {
   if (collectionMethod === "openapi" || origin === "openapi.law.go.kr") {
-    return "Open API · ELIS";
+    return "공식 자치법규";
   }
-  if (origin === "elis.go.kr") return "ELIS";
+  if (origin === "elis.go.kr") return "법제처 자치법규";
   if (origin === "law.go.kr") return "law.go.kr";
-  if (origin === "municipal") return "지자체";
+  if (origin === "municipal") return "지자체 공식";
   return "공식 조례";
 }
 
@@ -107,7 +107,7 @@ function resolveOfficialUrl(input: {
   if (input.openapiMst) {
     return {
       url: `https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=${input.openapiMst}&gubun=ELIS`,
-      originLabel: "Open API · ELIS",
+      originLabel: "공식 자치법규",
     };
   }
 
@@ -243,7 +243,7 @@ export function resolveOrdinanceInfoList(
       revisedAt: formatDate(candidate.parsedAt),
       sourceUrl: url,
       sourceOriginLabel:
-        candidate.sourceCollectionMethod === "openapi" ? "Open API · ELIS" : originLabel,
+        candidate.sourceCollectionMethod === "openapi" ? "공식 자치법규" : originLabel,
       priority:
         scoreOrdinanceName(candidate.ordinanceName, "ordinance") +
         (candidate.sourceCollectionMethod === "openapi" ? 8 : 0),

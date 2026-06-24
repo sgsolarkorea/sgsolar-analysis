@@ -397,10 +397,11 @@ function buildSummaryBullets(
 
 function resolveSourceOriginLabel(origin?: string, url?: string): string {
   if (origin === "elis.go.kr" || url?.includes("elis") || url?.includes("ELIS")) {
-    return "elis.go.kr";
+    return "법제처 자치법규";
   }
   if (origin === "law.go.kr" || url?.includes("law.go.kr")) return "law.go.kr";
   if (origin === "municipal") return "지자체 공식";
+  if (origin === "openapi.law.go.kr") return "공식 자치법규";
   return "law.go.kr";
 }
 

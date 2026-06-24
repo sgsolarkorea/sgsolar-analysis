@@ -59,7 +59,7 @@ export default function LandInfoCardSection({ detail }: LandInfoCardSectionProps
     <section id="land-info" className="scroll-mt-24">
       <SectionHeader
         title="토지 정보"
-        description="VWorld 토지특성·공시지가 기준으로 조회한 토지 정보입니다."
+        description="공간정보 기반으로 조회한 토지 특성·공시지가 정보입니다."
       />
 
       {!hasApiData && (
@@ -91,7 +91,7 @@ export default function LandInfoCardSection({ detail }: LandInfoCardSectionProps
       </div>
 
       <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
-        공시지가·소유구분은 VWorld API 제공 범위 내에서 표시하며, 미제공 항목은 현장 확인이 필요합니다.
+        공시지가·소유구분은 공간정보 조회 범위 내에서 표시하며, 미제공 항목은 현장 확인이 필요합니다.
       </p>
     </section>
   );

@@ -99,5 +99,5 @@ export const ORDINANCE_DISPLAY_LABELS: Record<OrdinanceDisplayStatus, string> = 
   manual_review: "조례 수동 검토",
   manual_verified: "수동 검토 완료",
   manual_pending: "조례 수동 검토",
-  candidate: "조례 후보 요약",
+  candidate: "조례 요약",
 };

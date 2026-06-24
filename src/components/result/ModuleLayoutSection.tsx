@@ -102,7 +102,7 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
           polygonDebugCompare
             ? "Polygon 3-way 비교"
             : polygonDebugRaw
-              ? "VWorld 원본 Polygon 검증"
+              ? "원본 필지 경계 검증"
               : polygonDebugOverlay
                 ? "Polygon 검증 (Overlay 전용)"
                 : installType === "토지형"
@@ -111,9 +111,9 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
         }
         description={
           polygonDebugCompare
-            ? "녹색=VWorld 원본, 주황=setback, 파란 점선=layout.boundary. 세 Polygon이 형상·위치가 일치하는지 확인합니다."
+            ? "녹색=원본 필지, 주황=setback, 파란 점선=layout.boundary. 세 Polygon이 형상·위치가 일치하는지 확인합니다."
             : polygonDebugRaw
-              ? "VWorld cadastral 원본(sourceBoundary)만 표시합니다. setback·모듈 미적용."
+              ? "지적도 원본 경계(sourceBoundary)만 표시합니다. setback·모듈 미적용."
               : polygonDebugOverlay
                 ? "setback 적용 후 layout.boundary만 표시합니다. 모듈은 숨깁니다."
                 : "위성지도 기준 예상 배치도입니다. 실제 설계 시 현장 조건, 구조검토, 이격거리 및 인허가 기준에 따라 배치가 변경될 수 있습니다."
@@ -140,7 +140,7 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
             <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-600">
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block h-3 w-3 rounded-sm border-2 border-green-600 bg-green-500/30" />
-                VWorld 원본
+                원본 필지
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block h-3 w-3 rounded-sm border-2 border-amber-500 bg-amber-500/35" />

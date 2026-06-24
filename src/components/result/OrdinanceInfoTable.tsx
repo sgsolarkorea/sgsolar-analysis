@@ -18,7 +18,8 @@ function KindBadge({ kind }: { kind: OrdinanceInfoKind }) {
 }
 
 function formatDate(value: string | null): string {
-  return value ?? "확인 필요";
+  if (!value) return "미확인";
+  return value;
 }
 
 function LawNameCell({ row }: { row: OrdinanceInfoRow }) {
@@ -59,29 +60,33 @@ export default function OrdinanceInfoTable({ rows }: OrdinanceInfoTableProps) {
   }
 
   return (
-    <div className="card-premium overflow-hidden rounded-lg shadow-sm">
+    <div className="card-premium overflow-hidden rounded-lg shadow-sm ring-1 ring-slate-100">
       {/* Desktop table */}
       <div className="hidden md:block">
         <table className="w-full table-fixed text-left text-sm">
           <thead className="bg-navy text-white">
             <tr>
-              <th className="w-[12%] px-4 py-3 text-center text-xs font-semibold">종류</th>
-              <th className="w-[58%] px-4 py-3 text-center text-xs font-semibold">법규명</th>
-              <th className="w-[30%] px-4 py-3 text-center text-xs font-semibold">제/개정일</th>
+              <th className="w-[12%] px-4 py-3.5 text-center text-xs font-semibold">종류</th>
+              <th className="w-[58%] px-4 py-3.5 text-center text-xs font-semibold">법규명</th>
+              <th className="w-[30%] px-4 py-3.5 text-center text-xs font-semibold">제/개정일</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white">
             {rows.map((row) => (
               <tr key={row.id} className="hover:bg-slate-50/70">
-                <td className="px-4 py-3 text-center align-middle">
+                <td className="px-4 py-3.5 text-center align-middle">
                   <div className="flex justify-center">
                     <KindBadge kind={row.kind} />
                   </div>
                 </td>
-                <td className="px-4 py-3 text-center align-middle">
+                <td className="px-4 py-3.5 text-center align-middle">
                   <LawNameCell row={row} />
                 </td>
-                <td className="px-4 py-3 text-center align-middle text-slate-700">
+                <td
+                  className={`px-4 py-3.5 text-center align-middle ${
+                    row.revisedAt ? "text-slate-700" : "text-slate-400"
+                  }`}
+                >
                   {formatDate(row.revisedAt)}
                 </td>
               </tr>
@@ -93,10 +98,14 @@ export default function OrdinanceInfoTable({ rows }: OrdinanceInfoTableProps) {
       {/* Mobile stacked cards — no horizontal scroll */}
       <div className="divide-y divide-slate-100 md:hidden">
         {rows.map((row) => (
-          <div key={row.id} className="space-y-2 bg-white px-4 py-3.5">
+          <div key={row.id} className="space-y-2 bg-white px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <KindBadge kind={row.kind} />
-              <span className="shrink-0 text-xs text-slate-500">{formatDate(row.revisedAt)}</span>
+              <span
+                className={`shrink-0 text-xs ${row.revisedAt ? "text-slate-600" : "text-slate-400"}`}
+              >
+                {formatDate(row.revisedAt)}
+              </span>
             </div>
             <div className="text-sm leading-snug">
               <LawNameCell row={row} />

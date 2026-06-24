@@ -174,7 +174,7 @@ function resolveLegacyRegionDistrictAnalysis(
     rows,
     sourceNote:
       landDetail?.dataSource === "api"
-        ? "VWorld 토지특성·용도지역 기준 1차 확인 결과입니다. 조례·인허가 세부 기준은 상담 시 추가 검토합니다."
+        ? "공간정보·용도지역 기준 1차 확인 결과입니다. 조례·인허가 세부 기준은 상담 시 추가 검토합니다."
         : "토지정보 확인 후 지역·지구 분석이 정확해집니다.",
   };
 }

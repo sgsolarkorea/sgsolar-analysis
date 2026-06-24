@@ -63,13 +63,13 @@ export function buildRegionDistrictFromGis(
   const confirmedAt = formatCollectedAt(collectedAt);
 
   const sourceNote = confirmedAt
-    ? `VWorld 토지이용계획(getLandUseAttr) 기준 1차 확인 결과입니다. 확인일 ${confirmedAt}. 세부 인허가·조례 기준은 상담 시 추가 검토합니다.`
-    : "VWorld 토지이용계획(getLandUseAttr) 기준 1차 확인 결과입니다. 세부 인허가·조례 기준은 상담 시 추가 검토합니다.";
+    ? `토지이용계획 GIS 기준 1차 확인 결과입니다. 확인일 ${confirmedAt}. 세부 인허가·조례 기준은 상담 시 추가 검토합니다.`
+    : "토지이용계획 GIS 기준 1차 확인 결과입니다. 세부 인허가·조례 기준은 상담 시 추가 검토합니다.";
 
   return {
     rows,
     sourceNote,
     collectedAt,
-    dataSource: "VWorld 토지이용계획",
+    dataSource: "토지이용계획",
   };
 }
