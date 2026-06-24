@@ -21,6 +21,7 @@ import {
   ResultConsultationSection,
   ResultGenerationSection,
   ResultRevenueSection,
+  ResultSaveSection,
   ResultSiteOverview,
 } from "@/components/result/ResultMetricsSections";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -171,6 +172,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               />
 
               <SimilarCases cases={data.recommendedCases} />
+
+              <ResultSaveSection address={data.address} />
 
               <ResultConsultationSection
                 defaultAddress={data.consultationDefaultAddress}

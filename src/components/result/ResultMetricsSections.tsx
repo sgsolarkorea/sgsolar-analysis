@@ -6,6 +6,7 @@ import CapacityAnalysisSection from "@/components/result/CapacityAnalysisSection
 import RevenueAnalysis from "@/components/result/RevenueAnalysis";
 import HouseholdSavingsAnalysis from "@/components/result/HouseholdSavingsAnalysis";
 import MonthlyGenerationChart from "@/components/result/MonthlyGenerationChart";
+import SaveResultCTA from "@/components/result/SaveResultCTA";
 import ConsultationForm from "@/components/result/ConsultationForm";
 import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
@@ -99,6 +100,10 @@ export function ResultRevenueSection({ showMountainRecNote = false }: { showMoun
   return (
     <RevenueAnalysis profitability={profitability} showMountainRecNote={showMountainRecNote} />
   );
+}
+
+export function ResultSaveSection({ address }: { address: string }) {
+  return <SaveResultCTA address={address} />;
 }
 
 export function ResultConsultationSection({

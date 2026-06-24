@@ -5,6 +5,8 @@ import {
   trySaveConsultation,
 } from "@/lib/consultation/storage";
 import { validateConsultationBody } from "@/lib/consultation/validate";
+import { consultationToLeadInput } from "@/lib/leads/fromConsultation";
+import { createLeadRecord, saveLead } from "@/lib/leads/storage";
 import { linkSearchHistoryToConsultation } from "@/lib/searchHistory/storage";
 
 export async function POST(request: Request) {
@@ -23,6 +25,12 @@ export async function POST(request: Request) {
       console.warn("[Consultation] JSON storage skipped or failed — continuing with email");
     }
 
+    const lead = createLeadRecord(consultationToLeadInput(submission, validated.data));
+    const leadStorage = await saveLead(lead);
+    if (!leadStorage.saved) {
+      console.warn("[Consultation] Lead DB save failed — continuing with legacy email flow");
+    }
+
     const emailResult = await sendConsultationEmail(submission, validated.data.resultPageUrl);
 
     const linked = await linkSearchHistoryToConsultation({
@@ -34,11 +42,14 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       id: submission.id,
+      leadId: leadStorage.saved ? lead.id : undefined,
       submittedAt: submission.submittedAt,
       emailSent: emailResult.sent,
       autoReplySent: emailResult.autoReplySent,
       emailProvider: emailResult.provider,
       jsonSaved: storage.saved,
+      leadSaved: leadStorage.saved,
+      leadStorage: leadStorage.storage,
       searchHistoryLinked: linked,
     });
   } catch (error) {

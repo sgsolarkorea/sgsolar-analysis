@@ -4,6 +4,8 @@ import { useState } from "react";
 import { company } from "@/data/sampleData";
 import { CONSULTATION_INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
 import type { ConsultationAnalysisContext } from "@/types/consultation";
+import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
+import { buildPdfApiUrl } from "@/lib/leads/downloadPdf";
 
 interface ConsultationFormProps {
   defaultAddress?: string;
@@ -16,6 +18,8 @@ export default function ConsultationForm({
   analysisContext,
   searchHistoryId,
 }: ConsultationFormProps) {
+  const { parcels } = useResultMetrics();
+  const hasMultiParcel = parcels.length > 1;
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -39,6 +43,7 @@ export default function ConsultationForm({
         body: JSON.stringify({
           ...form,
           resultPageUrl: window.location.href,
+          pdfUrl: buildPdfApiUrl(form.address || defaultAddress, hasMultiParcel),
           analysisContext,
           ...(searchHistoryId ? { searchHistoryId } : {}),
         }),

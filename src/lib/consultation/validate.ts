@@ -11,6 +11,7 @@ const MAX = {
   address: 200,
   message: 2000,
   resultPageUrl: 500,
+  pdfUrl: 500,
 } as const;
 
 const ALLOWED_INSTALL_TYPES = new Set<string>(
@@ -36,6 +37,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   const email = typeof raw.email === "string" ? raw.email.trim() : "";
   const resultPageUrl =
     typeof raw.resultPageUrl === "string" ? raw.resultPageUrl.trim() : "";
+  const pdfUrl = typeof raw.pdfUrl === "string" ? raw.pdfUrl.trim() : "";
   const searchHistoryId =
     typeof raw.searchHistoryId === "string" ? raw.searchHistoryId.trim() : "";
 
@@ -53,6 +55,9 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
   if (resultPageUrl.length > MAX.resultPageUrl) {
     return { ok: false, error: "결과 페이지 주소가 너무 깁니다." };
   }
+  if (pdfUrl.length > MAX.pdfUrl) {
+    return { ok: false, error: "PDF URL이 너무 깁니다." };
+  }
   if (searchHistoryId && !/^[0-9a-f-]{36}$/i.test(searchHistoryId)) {
     return { ok: false, error: "조회 이력 ID 형식이 올바르지 않습니다." };
   }
@@ -61,6 +66,9 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
     !/^https?:\/\//i.test(resultPageUrl)
   ) {
     return { ok: false, error: "결과 페이지 주소 형식이 올바르지 않습니다." };
+  }
+  if (pdfUrl && !/^https?:\/\//i.test(pdfUrl)) {
+    return { ok: false, error: "PDF URL 형식이 올바르지 않습니다." };
   }
   if (!ALLOWED_INSTALL_TYPES.has(installType)) {
     return { ok: false, error: "설치 유형이 올바르지 않습니다." };
@@ -106,6 +114,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
       message,
       ...(email ? { email } : {}),
       ...(resultPageUrl ? { resultPageUrl } : {}),
+      ...(pdfUrl ? { pdfUrl } : {}),
       ...(analysisContext ? { analysisContext } : {}),
       ...(searchHistoryId ? { searchHistoryId } : {}),
     },

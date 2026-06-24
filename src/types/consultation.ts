@@ -40,6 +40,7 @@ export interface ConsultationRequestBody {
   installType: string;
   message?: string;
   resultPageUrl?: string;
+  pdfUrl?: string;
   analysisContext?: ConsultationAnalysisContext;
   searchHistoryId?: string;
 }
