@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminApiGuard } from "@/lib/admin/auth";
-import { computeLeadAdminKpi } from "@/lib/leads/adminMetrics";
+import { computeLeadAdminStats } from "@/lib/leads/adminMetrics";
 import { listAllLeads } from "@/lib/leads/storage";
 
 export const dynamic = "force-dynamic";
@@ -11,11 +11,12 @@ export async function GET() {
 
   try {
     const leads = await listAllLeads();
-    const kpi = computeLeadAdminKpi(leads);
+    const stats = computeLeadAdminStats(leads);
 
     return NextResponse.json({
       leads,
-      kpi,
+      kpi: stats.kpi,
+      stats,
       count: leads.length,
     });
   } catch (error) {

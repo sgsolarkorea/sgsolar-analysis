@@ -8,8 +8,8 @@ import {
   useLeadIdTracker,
   useLeadNotificationPermissionOnMount,
 } from "@/lib/leads/adminAlerts";
-import type { LeadAdminKpi } from "@/lib/leads/adminMetrics";
-import { computeLeadAdminKpi, LEAD_STATUSES } from "@/lib/leads/adminMetrics";
+import type { LeadAdminKpi, LeadAdminStats } from "@/lib/leads/adminMetrics";
+import { computeLeadAdminStats, LEAD_STATUSES } from "@/lib/leads/adminMetrics";
 import {
   formatFollowUpLabel,
   fromDatetimeLocalValue,
@@ -136,6 +136,107 @@ function KpiCard({ label, value, hint }: { label: string; value: number; hint?: 
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-bold text-navy">{value.toLocaleString("ko-KR")}</p>
       {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </div>
+  );
+}
+
+function KpiRateCard({ label, valuePercent, hint }: { label: string; valuePercent: number; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold text-navy">{valuePercent.toFixed(1)}%</p>
+      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </div>
+  );
+}
+
+function LeadFunnelPanel({ stats }: { stats: LeadAdminStats }) {
+  const maxCount = Math.max(...stats.funnel.map((step) => step.count), 1);
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-sm font-bold text-navy">전환 퍼널</p>
+      <p className="mt-1 text-xs text-slate-500">PDF → 상담 → 견적 → 계약 단계별 리드 수</p>
+      <div className="mt-4 space-y-3">
+        {stats.funnel.map((step, index) => {
+          const widthPercent = Math.max(12, Math.round((step.count / maxCount) * 100));
+          return (
+            <div key={step.id}>
+              <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+                <span className="font-semibold text-slate-700">{step.label}</span>
+                <span className="font-bold text-navy">{step.count.toLocaleString("ko-KR")}</span>
+              </div>
+              <div className="h-8 overflow-hidden rounded-lg bg-slate-100">
+                <div
+                  className="flex h-full items-center rounded-lg bg-gradient-to-r from-navy to-sky-700 px-3 text-xs font-semibold text-white transition-all"
+                  style={{ width: `${widthPercent}%`, minWidth: step.count > 0 ? "3rem" : undefined }}
+                >
+                  {step.count > 0 ? step.count : ""}
+                </div>
+              </div>
+              {index < stats.funnel.length - 1 && (
+                <p className="mt-1 text-center text-[10px] text-slate-400">↓</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function LeadSourcePanel({ stats }: { stats: LeadAdminStats }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-sm font-bold text-navy">유입 경로</p>
+      <p className="mt-1 text-xs text-slate-500">leadType별 건수 및 비율</p>
+      <div className="mt-4 space-y-3">
+        {stats.sources.map((source) => (
+          <div key={source.leadType}>
+            <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+              <LeadTypeBadge leadType={source.leadType} />
+              <span className="font-semibold text-slate-700">
+                {source.count.toLocaleString("ko-KR")}건 · {source.ratioPercent.toFixed(1)}%
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-navy/80"
+                style={{ width: `${Math.min(source.ratioPercent, 100)}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LeadDailyInflowPanel({ stats }: { stats: LeadAdminStats }) {
+  const maxCount = Math.max(...stats.dailyInflow.map((day) => day.count), 1);
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-sm font-bold text-navy">최근 7일 유입 추이</p>
+      <p className="mt-1 text-xs text-slate-500">KST 기준 일별 신규 리드</p>
+      <div className="mt-4 flex h-32 items-end justify-between gap-2">
+        {stats.dailyInflow.map((day) => {
+          const heightPercent = day.count === 0 ? 4 : Math.max(12, Math.round((day.count / maxCount) * 100));
+          return (
+            <div key={day.dateKey} className="flex flex-1 flex-col items-center gap-1">
+              <span className="text-[11px] font-bold text-navy">{day.count}</span>
+              <div className="flex w-full max-w-[2.5rem] flex-1 items-end">
+                <div
+                  className="w-full rounded-t-md bg-sky-600 transition-all"
+                  style={{ height: `${heightPercent}%`, minHeight: day.count > 0 ? "0.75rem" : "0.25rem" }}
+                  title={`${day.label}: ${day.count}건`}
+                />
+              </div>
+              <span className="text-[10px] text-slate-500">{day.label}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -487,7 +588,7 @@ function LinkBlock({ label, href }: { label: string; href: string }) {
 
 export default function AdminLeadsDashboard() {
   const [leads, setLeads] = useState<LeadRecord[]>([]);
-  const [kpi, setKpi] = useState<LeadAdminKpi | null>(null);
+  const [stats, setStats] = useState<LeadAdminStats | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -547,13 +648,17 @@ export default function AdminLeadsDashboard() {
       try {
         const res = await fetch("/api/admin/leads", { cache: "no-store" });
         if (!res.ok) throw new Error("load failed");
-        const data = (await res.json()) as { leads: LeadRecord[]; kpi: LeadAdminKpi };
+        const data = (await res.json()) as {
+          leads: LeadRecord[];
+          kpi: LeadAdminKpi;
+          stats?: LeadAdminStats;
+        };
         const freshLeads = detectNewLeads(data.leads);
         if (!isInitial) {
           registerNewLeads(freshLeads);
         }
         setLeads(data.leads);
-        setKpi(data.kpi);
+        setStats(data.stats ?? computeLeadAdminStats(data.leads));
         setLastRefreshedAt(new Date().toISOString());
       } catch {
         setError("리드 데이터를 불러오지 못했습니다.");
@@ -597,13 +702,13 @@ export default function AdminLeadsDashboard() {
   function handleLeadUpdated(updated: LeadRecord) {
     const nextLeads = leads.map((item) => (item.id === updated.id ? updated : item));
     setLeads(nextLeads);
-    setKpi(computeLeadAdminKpi(nextLeads));
+    setStats(computeLeadAdminStats(nextLeads));
   }
 
   function handleLeadDeleted(id: string) {
     const nextLeads = leads.filter((lead) => lead.id !== id);
     setLeads(nextLeads);
-    setKpi(computeLeadAdminKpi(nextLeads));
+    setStats(computeLeadAdminStats(nextLeads));
     setSelectedId(null);
     setNotice("리드가 삭제되었습니다.");
     setNewLeadIds((prev) => {
@@ -680,17 +785,29 @@ export default function AdminLeadsDashboard() {
         </p>
       )}
 
-      {kpi && (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <KpiCard label="총 리드" value={kpi.total} />
-          <KpiCard label="신규 리드" value={kpi.newLeads} hint={unreadNewCount > 0 ? `+${unreadNewCount} 실시간` : undefined} />
-          <KpiCard label="오늘 연락 예정" value={kpi.todayFollowUpCount} />
-          <KpiCard label="지연 리드" value={kpi.overdueCount} hint="nextFollowUpAt 경과" />
-          <KpiCard label="상담중" value={kpi.inConsultation} hint="contacted + quoted" />
-          <KpiCard label="계약 완료" value={kpi.contracted} />
-          <KpiCard label="오늘 유입" value={kpi.todayCount} />
-          <KpiCard label="최근 7일" value={kpi.last7DaysCount} />
-        </div>
+      {stats && (
+        <>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <KpiCard label="총 리드" value={stats.kpi.total} />
+            <KpiCard label="신규 리드" value={stats.kpi.newLeads} hint={unreadNewCount > 0 ? `+${unreadNewCount} 실시간` : undefined} />
+            <KpiCard label="오늘 연락 예정" value={stats.kpi.todayFollowUpCount} />
+            <KpiCard label="지연 리드" value={stats.kpi.overdueCount} hint="nextFollowUpAt 경과" />
+            <KpiCard label="상담중" value={stats.kpi.inConsultation} hint="contacted + quoted" />
+            <KpiCard label="계약 완료" value={stats.kpi.contracted} />
+            <KpiCard label="오늘 유입" value={stats.kpi.todayCount} />
+            <KpiCard label="최근 7일 유입" value={stats.kpi.last7DaysCount} />
+            <KpiRateCard label="상담 전환율" valuePercent={stats.kpi.consultationConversionRate} hint="consultation / total" />
+            <KpiRateCard label="견적 전환율" valuePercent={stats.kpi.quoteConversionRate} hint="quoted / total" />
+            <KpiRateCard label="계약 전환율" valuePercent={stats.kpi.contractConversionRate} hint="contracted / total" />
+            <KpiCard label="HOT 리드" value={stats.kpi.hotLeads} hint="lead score HOT" />
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <LeadFunnelPanel stats={stats} />
+            <LeadSourcePanel stats={stats} />
+            <LeadDailyInflowPanel stats={stats} />
+          </div>
+        </>
       )}
 
       <div className="mt-6">
