@@ -322,10 +322,46 @@ async function collectRegion(row, reportStats) {
 
 function mergeCandidates(existing, updates) {
   const byKey = new Map(existing.candidates.map((c) => [c.regionKey, c]));
-  for (const candidate of updates) {
-    if (!candidate) continue;
-    byKey.set(candidate.regionKey, candidate);
+
+  for (const incoming of updates) {
+    if (!incoming) continue;
+    const prev = byKey.get(incoming.regionKey);
+
+    if (!prev) {
+      byKey.set(incoming.regionKey, incoming);
+      continue;
+    }
+
+    const prevDistanceCount = prev.parseStats?.distanceCount ?? 0;
+    const incomingDistanceCount = incoming.parseStats?.distanceCount ?? 0;
+    const confidenceRank = { high: 4, medium: 3, low: 2, none: 1 };
+    const prevRank = confidenceRank[prev.parserConfidence] ?? 0;
+    const incomingRank = confidenceRank[incoming.parserConfidence] ?? 0;
+    const keepPrevParse =
+      prevDistanceCount > incomingDistanceCount ||
+      (prevDistanceCount === incomingDistanceCount && prevRank > incomingRank);
+
+    const merged = keepPrevParse
+      ? {
+          ...prev,
+          sourceUrl: incoming.sourceUrl || prev.sourceUrl,
+          ordinanceName: incoming.ordinanceName || prev.ordinanceName,
+          parsedAt: incoming.parsedAt,
+          notes: `${prev.notes ?? ""} | Open API 메타 갱신 (${incoming.openapiFetchModes?.list ?? "openapi"})`.trim(),
+        }
+      : { ...incoming };
+
+    merged.sourceCollectionMethod = "openapi";
+    merged.openapiMst = incoming.openapiMst ?? prev.openapiMst;
+    merged.openapiListReference = incoming.openapiListReference ?? prev.openapiListReference;
+    merged.openapiBodyReference = incoming.openapiBodyReference ?? prev.openapiBodyReference;
+    merged.openapiAppendixReference =
+      incoming.openapiAppendixReference ?? prev.openapiAppendixReference;
+    merged.openapiFetchModes = incoming.openapiFetchModes ?? prev.openapiFetchModes;
+
+    byKey.set(incoming.regionKey, merged);
   }
+
   return [...byKey.values()].sort((a, b) => a.regionKey.localeCompare(b.regionKey, "ko"));
 }
 
