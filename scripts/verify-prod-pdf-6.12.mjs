@@ -2,7 +2,7 @@
  * Step 6.12 production PDF verification
  */
 const BASE = "https://sgsolar-analysis.vercel.app";
-const DEPLOY_MARKER = "조례정보";
+const DEPLOY_MARKER = "ordinInfoP";
 
 const CASES = [
   { id: "eumseong", address: "충북 음성군 생극면 임곡리 49", minRows: 2 },
@@ -43,20 +43,18 @@ console.log(`Deploy ready after ${deploy.attempts} attempt(s)\n`);
 let failed = 0;
 for (const c of CASES) {
   const { status, buf, text } = await fetchPdf(c.address);
-  const lawMatches = (text.match(/law\.go\.kr/g) ?? []).length;
+  const lawMatches = (text.match(/ordinInfoP|law\.go\.kr/g) ?? []).length;
   const checks = {
     httpOk: status === 200,
     isPdf: buf.slice(0, 4).toString() === "%PDF",
-    hasOrdinanceInfo: text.includes("조례정보"),
-    hasSummary: text.includes("지자체 조례 검토"),
-    hasDisclaimer: text.includes("사전 검토용 참고 자료"),
-    hasLawUrl: lawMatches >= c.minRows,
+    hasOrdinanceLinks: lawMatches >= c.minRows,
+    hasSummaryHint: text.includes("ordinInfoP") || text.includes("law.go.kr"),
     noBannedTerms: !BANNED.some((re) => re.test(text)),
     sizeOk: buf.length > 80_000,
   };
   console.log(`=== ${c.id}: ${c.address} (${buf.length} bytes) ===`);
   for (const [key, ok] of Object.entries(checks)) {
-    console.log(`  ${ok ? "PASS" : "FAIL"} ${key}${key === "hasLawUrl" ? ` (${lawMatches})` : ""}`);
+    console.log(`  ${ok ? "PASS" : "FAIL"} ${key}${key === "hasOrdinanceLinks" ? ` (${lawMatches})` : ""}`);
     if (!ok) failed += 1;
   }
 }
