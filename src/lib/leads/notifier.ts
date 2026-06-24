@@ -1,4 +1,5 @@
 import { sendConsultationEmail } from "@/lib/consultation/email";
+import { solapiKakaoAdapter, solapiSmsAdapter } from "@/lib/leads/adapters/solapi";
 import type { ConsultationSubmission } from "@/types/consultation";
 import type { LeadRecord } from "@/types/lead";
 import { sendLeadEmail, type LeadEmailResult } from "@/lib/leads/email";
@@ -40,27 +41,29 @@ async function slackAdapter(_lead: LeadRecord): Promise<LeadAdapterResult> {
   return { ok: true, skipped: true };
 }
 
-async function kakaoAdapter(_lead: LeadRecord): Promise<LeadAdapterResult> {
-  if (!process.env.KAKAO_ALIMTALK_API_KEY?.trim()) {
-    return { ok: true, skipped: true };
-  }
-  console.info("[Leads:Notifier:kakao] adapter stub — alimtalk not implemented");
-  return { ok: true, skipped: true };
+async function solapiSmsNotifyAdapter(lead: LeadRecord): Promise<LeadAdapterResult> {
+  const result = await solapiSmsAdapter(lead);
+  return {
+    ok: result.ok,
+    skipped: result.skipped,
+    error: result.error,
+  };
 }
 
-async function smsAdapter(_lead: LeadRecord): Promise<LeadAdapterResult> {
-  if (!process.env.SMS_API_KEY?.trim()) {
-    return { ok: true, skipped: true };
-  }
-  console.info("[Leads:Notifier:sms] adapter stub — SMS not implemented");
-  return { ok: true, skipped: true };
+async function solapiKakaoNotifyAdapter(lead: LeadRecord): Promise<LeadAdapterResult> {
+  const result = await solapiKakaoAdapter(lead);
+  return {
+    ok: result.ok,
+    skipped: result.skipped,
+    error: result.error,
+  };
 }
 
 const SECONDARY_ADAPTERS: Record<string, LeadNotificationAdapter> = {
   admin_dashboard: adminDashboardAdapter,
   slack: slackAdapter,
-  kakao: kakaoAdapter,
-  sms: smsAdapter,
+  solapi_sms: solapiSmsNotifyAdapter,
+  solapi_kakao: solapiKakaoNotifyAdapter,
 };
 
 async function runEmailChannel(

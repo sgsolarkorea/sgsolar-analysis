@@ -33,8 +33,8 @@ async function main() {
   assert("notifier returns email result", typeof result.email === "object");
   assert("admin_dashboard adapter ran", result.adapters.admin_dashboard?.ok === true);
   assert("slack adapter skipped", result.adapters.slack?.skipped === true);
-  assert("kakao adapter skipped", result.adapters.kakao?.skipped === true);
-  assert("sms adapter skipped", result.adapters.sms?.skipped === true);
+  assert("solapi_sms adapter skipped", result.adapters.solapi_sms?.skipped === true);
+  assert("solapi_kakao adapter skipped", result.adapters.solapi_kakao?.skipped === true);
 
   if (failed) process.exit(1);
   console.log("\nAll Step 7.4 notifier checks passed");
