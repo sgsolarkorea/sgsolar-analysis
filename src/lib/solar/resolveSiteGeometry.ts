@@ -4,12 +4,13 @@ import {
   fetchCadastralPolygonByPnu,
 } from "@/lib/api/vworld";
 import type { InstallTypeOption } from "@/data/resultUx";
-import { moduleLayoutConfig } from "@/data/moduleLayoutConfig";
+import { layoutPolicy } from "@/data/moduleLayoutConfig";
 import {
   resolveBuildingCapacityFootprintSqm,
   selectParcelBuildingPolygons,
 } from "@/lib/solar/buildingFootprintSelection";
 import { createVirtualParcelRectangle } from "@/lib/solar/moduleLayout";
+import { finalizeLandLayoutBoundary } from "@/lib/solar/finalizeLandLayoutBoundary";
 import {
   applySetback,
   closeRing,
@@ -184,13 +185,21 @@ export function resolveSiteGeometryFromBundle(
       : undefined;
 
   if (isLand) {
+    const parcelSetbackM = layoutPolicy.parcelBoundarySetbackM;
+
     if (bundle.cadastralPolygon && bundle.cadastralPolygon.length >= 3) {
-      const { sourceBoundary, setbackBoundary, boundary } = withSetback(
+      const { sourceBoundary, setbackBoundary, boundary: setbackOnlyBoundary } = withSetback(
         bundle.cadastralPolygon,
-        moduleLayoutConfig.landSetbackM,
+        parcelSetbackM,
       );
+      const finalized = finalizeLandLayoutBoundary({
+        setbackBoundary: setbackOnlyBoundary,
+        unionComponentCount: 1,
+      });
+      const landOriginalAreaSqm =
+        bundle.cadastralAreaSqm ?? bundle.landAreaSqm ?? ringArea(sourceBoundary);
       const capacityAreaSqm =
-        bundle.cadastralAreaSqm ?? bundle.landAreaSqm ?? polygonAreaSqm(sourceBoundary);
+        landOriginalAreaSqm ?? polygonAreaSqm(sourceBoundary);
       return {
         installType: input.installType,
         capacityBasis: "land",
@@ -198,19 +207,32 @@ export function resolveSiteGeometryFromBundle(
         landAreaSqm: bundle.landAreaSqm,
         buildingFootprintAreaSqm: bundle.buildingFootprintAreaSqm,
         roofUsableAreaSqm: null,
-        landUsableAreaSqm: ringArea(boundary),
+        landOriginalAreaSqm,
+        landUsableAreaSqm: finalized.landUsableAreaSqm,
+        landUsableAreaSqmBeforeNarrowZone: ringArea(setbackOnlyBoundary),
+        parcelBoundarySetbackM: parcelSetbackM,
         capacityAreaSqm,
-        layoutBoundary: boundary,
+        layoutBoundary: finalized.layoutBoundary,
         sourceBoundary,
-        setbackBoundary,
+        setbackBoundary: setbackOnlyBoundary,
         polygonSource: "cadastral",
+        narrowZone: finalized.narrowZone,
       };
     }
 
-    const virtualRing = closeRing(
+    const virtualSource = closeRing(
       createVirtualParcelRectangle(center, input.capacityKw, input.installType),
     );
-    const capacityAreaSqm = bundle.landAreaSqm ?? polygonAreaSqm(virtualRing);
+    const { sourceBoundary, setbackBoundary, boundary: setbackOnlyBoundary } = withSetback(
+      virtualSource,
+      parcelSetbackM,
+    );
+    const finalized = finalizeLandLayoutBoundary({
+      setbackBoundary: setbackOnlyBoundary,
+      unionComponentCount: 1,
+    });
+    const landOriginalAreaSqm = bundle.landAreaSqm ?? ringArea(sourceBoundary);
+    const capacityAreaSqm = landOriginalAreaSqm ?? polygonAreaSqm(sourceBoundary);
     return {
       installType: input.installType,
       capacityBasis: "land",
@@ -218,12 +240,17 @@ export function resolveSiteGeometryFromBundle(
       landAreaSqm: bundle.landAreaSqm,
       buildingFootprintAreaSqm: bundle.buildingFootprintAreaSqm,
       roofUsableAreaSqm: null,
-      landUsableAreaSqm: ringArea(virtualRing),
+      landOriginalAreaSqm,
+      landUsableAreaSqm: finalized.landUsableAreaSqm,
+      landUsableAreaSqmBeforeNarrowZone: ringArea(setbackOnlyBoundary),
+      parcelBoundarySetbackM: parcelSetbackM,
       capacityAreaSqm,
-      layoutBoundary: virtualRing,
-      sourceBoundary: virtualRing,
-      setbackBoundary: virtualRing,
+      layoutBoundary:
+        finalized.layoutBoundary.length >= 3 ? finalized.layoutBoundary : setbackOnlyBoundary,
+      sourceBoundary,
+      setbackBoundary: setbackOnlyBoundary,
       polygonSource: "virtual",
+      narrowZone: finalized.narrowZone,
     };
   }
 
@@ -251,14 +278,12 @@ export function resolveSiteGeometryFromBundle(
     };
   }
 
+  const roofSetbackM = layoutPolicy.roofEdgeSetbackM;
   const buildingLayoutBoundaries: LatLngPoint[][] = [];
   const buildingSourceBoundaries: LatLngPoint[][] = [];
   for (const ring of bundle.buildingPolygons ?? []) {
     if (ring.length < 3) continue;
-    const { sourceBoundary, setbackBoundary, boundary } = withSetback(
-      ring,
-      moduleLayoutConfig.roofSetbackM,
-    );
+    const { sourceBoundary, setbackBoundary, boundary } = withSetback(ring, roofSetbackM);
     buildingSourceBoundaries.push(sourceBoundary);
     buildingLayoutBoundaries.push(boundary.length >= 3 ? boundary : setbackBoundary);
   }
@@ -267,10 +292,7 @@ export function resolveSiteGeometryFromBundle(
     buildingLayoutBoundaries[0]?.length >= 3
       ? bundle.buildingPolygons?.[0] ?? buildingSource.ring
       : buildingSource.ring;
-  const { sourceBoundary, setbackBoundary, boundary } = withSetback(
-    primaryRing,
-    moduleLayoutConfig.roofSetbackM,
-  );
+  const { sourceBoundary, setbackBoundary, boundary } = withSetback(primaryRing, roofSetbackM);
 
   const footprintArea =
     bundle.buildingFootprintAreaSqm ??
@@ -279,9 +301,7 @@ export function resolveSiteGeometryFromBundle(
     bundle.buildingAreaSqm ??
     0;
   const roofUsable =
-    setbackRingsAreaSum(bundle.buildingPolygons, moduleLayoutConfig.roofSetbackM) ??
-    ringArea(boundary) ??
-    0;
+    setbackRingsAreaSum(bundle.buildingPolygons, roofSetbackM) ?? ringArea(boundary) ?? 0;
 
   return {
     installType: input.installType,
@@ -293,7 +313,8 @@ export function resolveSiteGeometryFromBundle(
     buildingFootprintAreaSumSqm: bundle.buildingFootprintAreaSumSqm,
     roofUsableAreaSqm: roofUsable,
     landUsableAreaSqm: null,
-    capacityAreaSqm: footprintArea,
+    roofEdgeSetbackM: roofSetbackM,
+    capacityAreaSqm: roofUsable,
     layoutBoundary: buildingLayoutBoundaries[0]?.length >= 3 ? buildingLayoutBoundaries[0] : boundary,
     sourceBoundary: buildingSourceBoundaries[0]?.length >= 3 ? buildingSourceBoundaries[0] : sourceBoundary,
     setbackBoundary: buildingLayoutBoundaries[0]?.length >= 3 ? buildingLayoutBoundaries[0] : setbackBoundary,

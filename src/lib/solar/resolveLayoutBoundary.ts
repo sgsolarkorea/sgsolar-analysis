@@ -1,7 +1,13 @@
 import type { InstallTypeOption } from "@/data/resultUx";
 import { resolveSiteGeometry } from "@/lib/solar/resolveSiteGeometry";
+import {
+  resolveMultiParcelSiteGeometry,
+  type ParcelRef,
+} from "@/lib/solar/resolveMultiParcelGeometry";
 import type { LatLngPoint, ModuleLayoutPolygonSource } from "@/types/moduleLayout";
 import type { SiteGeometryResult } from "@/types/siteGeometry";
+
+export type { ParcelRef } from "@/lib/solar/resolveMultiParcelGeometry";
 
 export type LayoutFootprintKind = "building" | "parcel" | "virtual";
 
@@ -30,16 +36,32 @@ export async function resolveLayoutBoundary(input: {
   installType: InstallTypeOption | string;
   buildingAreaSqm?: number;
   landAreaSqm?: number;
+  /** 다중 필지 — 2개 이상이면 union 후 단일 layout boundary */
+  parcels?: ParcelRef[];
 }): Promise<ResolvedLayoutBoundary> {
-  const geometry = await resolveSiteGeometry({
-    pnu: input.pnu,
-    lat: input.lat,
-    lng: input.lng,
-    capacityKw: input.capacityKw,
-    installType: input.installType,
-    landAreaSqm: input.landAreaSqm,
-    buildingAreaSqm: input.buildingAreaSqm,
-  });
+  const isLand = input.installType === "토지형";
+  const parcelRefs =
+    input.parcels?.filter((parcel) => parcel.pnu && Number.isFinite(parcel.lat) && Number.isFinite(parcel.lng)) ??
+    [];
+
+  let geometry: SiteGeometryResult;
+  if (isLand && parcelRefs.length > 1) {
+    geometry = await resolveMultiParcelSiteGeometry({
+      parcels: parcelRefs,
+      capacityKw: input.capacityKw,
+      registryLandAreaSqm: input.landAreaSqm,
+    });
+  } else {
+    geometry = await resolveSiteGeometry({
+      pnu: input.pnu,
+      lat: input.lat,
+      lng: input.lng,
+      capacityKw: input.capacityKw,
+      installType: input.installType,
+      landAreaSqm: input.landAreaSqm,
+      buildingAreaSqm: input.buildingAreaSqm,
+    });
+  }
 
   return {
     boundary: geometry.layoutBoundary,

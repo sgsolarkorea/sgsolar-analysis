@@ -20,7 +20,7 @@ import {
   formatRevenueDisplay,
 } from "@/lib/solar/calculate";
 import { resolveSiteGeometryFromBundle } from "@/lib/solar/resolveSiteGeometry";
-import type { SiteGeometryBundle } from "@/types/siteGeometry";
+import type { SiteGeometryBundle, SiteGeometryResult } from "@/types/siteGeometry";
 import type { ConsultationAnalysisContext } from "@/types/consultation";
 import type { ParcelItem } from "@/types/parcelReview";
 import type {
@@ -68,6 +68,8 @@ interface ResultMetricsContextValue {
   removeParcel: (id: string) => void;
   addParcelsFromCandidates: (candidates: ParcelItem[]) => number;
   primaryParcel: ParcelItem;
+  /** 다중 필지 union geometry fetch 완료 여부 */
+  multiParcelGeometryReady: boolean;
 }
 
 const ResultMetricsContext = createContext<ResultMetricsContextValue | null>(null);
@@ -93,12 +95,54 @@ export function ResultMetricsProvider({
 }: ResultMetricsProviderProps) {
   const [installType, setInstallTypeState] = useState<InstallTypeOption>(initialInstallType);
   const [parcels, setParcels] = useState<ParcelItem[]>([initialPrimaryParcel]);
+  const [multiParcelGeometry, setMultiParcelGeometry] = useState<SiteGeometryResult | null>(null);
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const parcelSummary = useMemo(() => buildParcelReviewSummary(parcels), [parcels]);
 
   const useMultiParcelMetrics =
     multiParcelEnabled && installType === "토지형" && parcelSummary.totalAreaSqm > 0;
+
+  useEffect(() => {
+    if (!useMultiParcelMetrics || parcels.length <= 1) {
+      setMultiParcelGeometry(null);
+      return;
+    }
+
+    let cancelled = false;
+    void fetch("/api/site-geometry/multi-parcel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        parcels: parcels.map((parcel) => ({
+          pnu: parcel.pnu,
+          lat: parcel.lat,
+          lng: parcel.lng,
+        })),
+        capacityKw: initialMetrics.capacityKw,
+        registryLandAreaSqm: parcelSummary.totalAreaSqm,
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return (await res.json()) as { geometry?: SiteGeometryResult };
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setMultiParcelGeometry(data?.geometry ?? null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setMultiParcelGeometry(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [useMultiParcelMetrics, parcels, parcelSummary.totalAreaSqm, initialMetrics.capacityKw]);
+
+  const multiParcelGeometryReady =
+    !useMultiParcelMetrics || parcels.length <= 1 || multiParcelGeometry != null;
 
   const computed = useMemo(() => {
     const shouldUseInitial =
@@ -117,7 +161,15 @@ export function ResultMetricsProvider({
     }
 
     const geometryInput =
-      siteGeometryBundle && !useMultiParcelMetrics
+      useMultiParcelMetrics && multiParcelGeometry
+        ? {
+            capacityAreaSqm: multiParcelGeometry.capacityAreaSqm,
+            capacityBasis: multiParcelGeometry.capacityBasis,
+            displayLandAreaSqm: multiParcelGeometry.landAreaSqm,
+            displayUsableAreaSqm: multiParcelGeometry.landUsableAreaSqm,
+            parcelCount: parcelSummary.parcelCount,
+          }
+        : siteGeometryBundle && !useMultiParcelMetrics
         ? (() => {
             const g = resolveSiteGeometryFromBundle(siteGeometryBundle, {
               lat: initialPrimaryParcel.lat,
@@ -140,15 +192,18 @@ export function ResultMetricsProvider({
               registryBuildingAreaSqm: g.registryBuildingAreaSqm,
             };
           })()
-        : {};
+        : useMultiParcelMetrics
+          ? {
+              overrideLandAreaSqm: parcelSummary.totalAreaSqm,
+              parcelCount: parcelSummary.parcelCount,
+            }
+          : {};
 
     const result = calculateSolarMetrics({
       installType,
       landInfo,
       buildingInfo,
       market: initialMetrics.market,
-      overrideLandAreaSqm: useMultiParcelMetrics ? parcelSummary.totalAreaSqm : undefined,
-      parcelCount: useMultiParcelMetrics ? parcelSummary.parcelCount : undefined,
       ...geometryInput,
     });
 
@@ -174,6 +229,7 @@ export function ResultMetricsProvider({
     siteGeometryBundle,
     initialPrimaryParcel.lat,
     initialPrimaryParcel.lng,
+    multiParcelGeometry,
   ]);
 
   const addParcel = useCallback((parcel: ParcelItem): boolean => {
@@ -261,6 +317,7 @@ export function ResultMetricsProvider({
       removeParcel,
       addParcelsFromCandidates,
       primaryParcel: initialPrimaryParcel,
+      multiParcelGeometryReady,
     };
   }, [
     computed,
@@ -276,6 +333,7 @@ export function ResultMetricsProvider({
     removeParcel,
     addParcelsFromCandidates,
     initialPrimaryParcel,
+    multiParcelGeometryReady,
   ]);
 
   useEffect(() => {

@@ -82,7 +82,7 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
 
     const toPoints = (ring: LatLngPoint[]) => ring.map(toPoint).join(" ");
 
-    const compareMode = layout.overlayCompare === true;
+    const compareMode = layout.overlayCompare === true || layout.overlayRoofDebug === true;
     const rawRing =
       compareMode && layout.sourceBoundary && layout.sourceBoundary.length >= 3
         ? layout.sourceBoundary
@@ -154,6 +154,21 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       })
       .join("");
 
+    const rejectedPaths =
+      layout.roofDebugOverlay?.rejectedCandidateSlots
+        .map((slot) => {
+          const coords = new window.kakao.maps.LatLng(slot.lat, slot.lng);
+          const pixel = projection.containerPointFromCoords(coords);
+          const fill =
+            slot.kind === "center_only"
+              ? "rgba(239,68,68,0.75)"
+              : slot.kind === "edge_tolerance_only"
+                ? "rgba(249,115,22,0.75)"
+                : "rgba(148,163,184,0.55)";
+          return `<circle cx="${pixel.x}" cy="${pixel.y}" r="4" fill="${fill}" stroke="#fff" stroke-width="0.75" vector-effect="non-scaling-stroke" />`;
+        })
+        .join("") ?? "";
+
     svg.innerHTML = `
       <defs>
         <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -164,6 +179,7 @@ export default function ModuleLayoutMap({ layout, address, jibunAddress }: Modul
       </defs>
       ${boundaryOverlay}
       ${modulePaths}
+      ${rejectedPaths}
     `;
   }, [layout]);
 

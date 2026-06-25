@@ -25,12 +25,12 @@ export const yearlyGenerationPerKw = 1_291;
 
 /** 설치유형별 1kW당 필요 면적 (㎡/kW) — SG SOLAR 실무 기준 */
 export const areaPerKwByType = {
-  roof: 6.76,
+  roof: 4.45,
   land: 8.72,
-  barn: 6.76,
-  factory: 6.76,
-  commercial: 6.76,
-  unknown: 6.76,
+  barn: 4.45,
+  factory: 4.45,
+  commercial: 4.45,
+  unknown: 4.45,
 } satisfies Record<SolarInstallCategory, number>;
 
 /** 용량 구간별 시공 단가 (원/kW) — 건물형·토지형 동일 적용 */

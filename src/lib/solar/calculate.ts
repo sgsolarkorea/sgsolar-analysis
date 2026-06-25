@@ -138,7 +138,9 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
 
   const baseAreaLabel =
     isLand && input.parcelCount && input.parcelCount > 1
-      ? `토지 Polygon(총 ${input.parcelCount}필지)`
+      ? input.capacityAreaSqm != null && input.capacityAreaSqm > 0
+        ? `토지 Polygon Union(${input.parcelCount}필지)`
+        : `토지면적(총 ${input.parcelCount}필지)`
       : isLand
         ? input.capacityAreaSqm != null && input.capacityAreaSqm > 0
           ? "토지 Polygon"
@@ -150,6 +152,8 @@ export function calculateSolarMetrics(input: CalculateSolarInput): CalculateSola
           : "건축면적";
 
   const rawCapacityKw = baseAreaSqm > 0 ? baseAreaSqm / areaPerKw : 0;
+  // 대표 용량(A): 건물형 A-only, 토지형도 analyze 단계에서는 A 기준.
+  // 토지형 min(A,B)는 layout diagnostics / Phase 3(토지형 한정)에서 resolveFinalCapacity 사용.
   const { targetModuleCount: moduleCount, capacityKw } = resolveTargetCapacity(
     installType,
     baseAreaSqm,

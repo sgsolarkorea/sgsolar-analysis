@@ -1,4 +1,5 @@
 import { getVisualRowSpacingM, moduleLayoutConfig } from "@/data/moduleLayoutConfig";
+import { resolveArrayLayout, type ArrayLayoutMode, type ArrayLayoutSelectionReason } from "@/lib/solar/arrayLayoutEngine";
 import {
   computeOrientedBounds,
   computePolygonOrientation,
@@ -27,6 +28,8 @@ export type LandLayoutTier = "single" | "double";
 export type CapacityLayoutRule =
   | "land-single-block"
   | "land-double-block-required"
+  | "land-continuous-array"
+  | "land-dual-array"
   | "roof-unchanged";
 
 export interface LandBlockPlacementDiagnostics {
@@ -51,7 +54,7 @@ export interface LandBlockPlacementDiagnostics {
   arrayModuleCounts: number[];
   aisleM: number;
   aisleApplied: boolean;
-  fillStrategy: "physical-array" | "uniform-row-grid" | "two-tier-row-set";
+  fillStrategy: "physical-array" | "uniform-row-grid" | "two-tier-row-set" | "continuous-array" | "dual-array";
   medianSplitUsed: false;
   rowGenerationPattern: string;
   unusedAreaRatio: number;
@@ -60,6 +63,14 @@ export interface LandBlockPlacementDiagnostics {
   innerTierGapM: number;
   setAisleM: number;
   visualScale: number;
+  layoutMode?: ArrayLayoutMode;
+  layoutSelectionReason?: ArrayLayoutSelectionReason;
+  continuousPlacedModuleCount?: number;
+  continuousPlacedKw?: number;
+  dualPlacedModuleCount?: number;
+  dualPlacedKw?: number;
+  selectedPlacedModuleCount?: number;
+  selectedPlacedKw?: number;
   arrayBlockCount: number;
   arrayBlocks: Array<{
     blockIndex: number;
@@ -99,7 +110,7 @@ interface OrientedPoly {
 
 interface LayoutParams {
   kind: "land";
-  mode: "flush" | "row";
+  mode: "continuous_array" | "dual_array";
   rowSpacingM: number;
 }
 
@@ -934,7 +945,7 @@ function polygonLongAxisAzimuth(polygon: LatLngPoint[]): number {
     : candidateB;
 }
 
-function buildLandCandidateAzimuths(polygon: LatLngPoint[]): number[] {
+export function buildLandCandidateAzimuths(polygon: LatLngPoint[]): number[] {
   const shapeAzimuth = polygonLongAxisAzimuth(polygon);
   const southFacingShapeAzimuth =
     shapeAzimuth >= 150 && shapeAzimuth <= 235
@@ -998,21 +1009,21 @@ function tryPlacementAtAzimuth(input: {
   const angleRad = panelAzimuthToLayoutAngleRad(input.azimuthDeg);
   const oriented = toOrientedPolyAtAngle(input.polygon, angleRad);
   const baseRowGapM =
-    input.params.mode === "row"
+    input.params.mode === "dual_array"
       ? getVisualRowSpacingM(input.params.kind, input.params.mode)
       : 0;
   const visualScaleCandidates =
-    input.params.mode === "row"
+    input.params.mode === "dual_array"
       ? [0.96, 0.92, 0.88, 0.86, 0.82, moduleLayoutConfig.visualScale].filter(
           (scale, i, arr) => scale > 0 && arr.indexOf(scale) === i,
         )
       : [moduleLayoutConfig.visualScale];
   const innerTierGapCandidatesM =
-    input.params.mode === "row"
+    input.params.mode === "dual_array"
       ? [0.05, 0.1, 0.15, 0.25, 0.4].filter((gap, i, arr) => gap >= 0 && arr.indexOf(gap) === i)
       : [0];
   const setAisleCandidatesM =
-    input.params.mode === "row"
+    input.params.mode === "dual_array"
       ? [1.2, 1.5, 2, 2.5, baseRowGapM].filter((gap, i, arr) => gap >= 1 && arr.indexOf(gap) === i)
       : [0];
 
@@ -1115,158 +1126,45 @@ function tryPlacementAtAzimuth(input: {
 export function placeLandBlockLayout(
   polygon: LatLngPoint[],
   targetCount: number,
-  params: LayoutParams,
-  capacityKw: number,
+  _params: LayoutParams,
+  _capacityKw: number,
 ): LandBlockPlacementResult {
-  const requireMinArrays = capacityKw > LAND_DOUBLE_BLOCK_THRESHOLD_KW ? 2 : 1;
-  const aisleM = requireMinArrays >= 2 ? LAND_AISLE_M : 0;
-  const capacityLayoutRule: CapacityLayoutRule = requireMinArrays >= 2
-    ? "land-double-block-required"
-    : "land-single-block";
-
-  const candidateScores: Record<string, number> = {};
-  const candidatePlacedCounts: Record<string, number> = {};
-  let best: ReturnType<typeof tryPlacementAtAzimuth> = null;
+  const result = resolveArrayLayout({ polygon, targetCount, kind: "land" });
+  const d = result.diagnostics;
   const candidateAzimuths = buildLandCandidateAzimuths(polygon);
-  let bestAzimuth: number = candidateAzimuths[0];
-  let rejectReason: string | undefined;
-
-  for (const azimuthDeg of candidateAzimuths) {
-    const attempt = tryPlacementAtAzimuth({
-      polygon,
-      targetCount,
-      params,
-      azimuthDeg,
-      requireMinArrays,
-    });
-    if (!attempt || attempt.modules.length === 0) {
-      candidateScores[String(azimuthDeg)] = attempt?.score ?? -1;
-      candidatePlacedCounts[String(azimuthDeg)] = attempt?.modules.length ?? 0;
-      if (attempt?.singleBlockRejectedReason) rejectReason = attempt.singleBlockRejectedReason;
-      continue;
-    }
-    candidateScores[String(azimuthDeg)] = attempt.score;
-    candidatePlacedCounts[String(azimuthDeg)] = attempt.modules.length;
-    if (!best || attempt.score > best.score) {
-      best = attempt;
-      bestAzimuth = azimuthDeg;
-    }
-  }
-
-  if (!best && requireMinArrays >= 2) {
-    rejectReason = rejectReason ?? "double-array-failed-fallback-single";
-    for (const azimuthDeg of candidateAzimuths) {
-      const attempt = tryPlacementAtAzimuth({
-        polygon,
-        targetCount,
-        params,
-        azimuthDeg,
-        requireMinArrays: 1,
-      });
-      if (!attempt || attempt.modules.length === 0) continue;
-      candidateScores[`${azimuthDeg}-fallback`] = attempt.score;
-      candidatePlacedCounts[`${azimuthDeg}-fallback`] = attempt.modules.length;
-      if (!best || attempt.score > best.score) {
-        best = attempt;
-        bestAzimuth = azimuthDeg;
-      }
-    }
-  }
-
-  const rowPattern =
-    requireMinArrays >= 2
-      ? "two-tier-row-set-south-facing"
-      : "two-tier-row-set-single";
-
-  if (!best) {
-    return {
-      modules: [],
-      validSlotCount: 0,
-      rowModuleCounts: [],
-      diagnostics: {
-        layoutTier: requireMinArrays >= 2 ? "double" : "single",
-        blockCount: 0,
-        blockModuleCounts: [],
-        rowCount: 0,
-        rowModuleCounts: [],
-        selectedAzimuthDegrees: 180,
-        candidateAzimuths,
-        candidateScores,
-        candidatePlacedCounts,
-        selectedReason: rejectReason ?? "no-valid-two-tier-row-set",
-        capacityLayoutRule,
-        singleBlockRejectedReason: rejectReason ?? "no-valid-arrays",
-        unusedAreaReason: "no-valid-arrays",
-        arrayCount: 0,
-        arrayTierCount: 0,
-        tierRowsPerArray: TIER_ROWS_PER_ARRAY,
-        arrayModuleCounts: [],
-        aisleM,
-        aisleApplied: false,
-        fillStrategy: "two-tier-row-set",
-        medianSplitUsed: false,
-        rowGenerationPattern: rowPattern,
-        unusedAreaRatio: 1,
-        twoTierSetCount: 0,
-        twoTierSetModuleCounts: [],
-        innerTierGapM: 0,
-        setAisleM: 0,
-        visualScale: moduleLayoutConfig.visualScale,
-        arrayBlockCount: 0,
-        arrayBlocks: [],
-        mainAisleM: requireMinArrays >= 2 ? LAND_MAIN_AISLE_M : 0,
-        mainAisleApplied: false,
-        arrayBlockModuleCounts: [],
-        arrayBlockRowCounts: [],
-        arrayBlockBoundingBoxes: [],
-      },
-    };
-  }
-
-  const arrayModuleCounts = best.arrayModuleCounts;
 
   return {
-    modules: best.modules,
-    validSlotCount: best.validSlotCount,
-    rowModuleCounts: best.rowModuleCounts,
+    modules: result.modules,
+    validSlotCount: result.validSlotCount,
+    rowModuleCounts: result.rowModuleCounts,
     diagnostics: {
-      layoutTier: best.layoutTier,
-      blockCount: best.arrayCount,
-      blockModuleCounts: arrayModuleCounts,
-      rowCount: best.rowModuleCounts.length,
-      rowModuleCounts: best.rowModuleCounts,
-      selectedAzimuthDegrees: bestAzimuth,
+      layoutTier: d.layoutMode === "dual_array" ? "double" : "single",
+      blockCount: d.layoutMode === "dual_array" ? Math.ceil(result.rowModuleCounts.length / 2) : 1,
+      blockModuleCounts: [],
+      rowCount: result.rowModuleCounts.length,
+      rowModuleCounts: result.rowModuleCounts,
+      selectedAzimuthDegrees: d.selectedAzimuthDegrees ?? 180,
       candidateAzimuths,
-      candidateScores,
-      candidatePlacedCounts,
-      selectedReason: buildSelectedReason({
-        selectedAzimuthDegrees: bestAzimuth,
-        candidateScores,
-        candidatePlacedCounts,
-        rowDirectionAspect: best.rowDirectionAspect,
-      }),
-      capacityLayoutRule,
-      singleBlockRejectedReason:
-        requireMinArrays >= 2 && best.rowModuleCounts.length <= 2
-          ? (rejectReason ?? best.singleBlockRejectedReason)
-          : undefined,
-      unusedAreaReason:
-        best.unusedAreaRatio > 0.5 ? "large-unused-area-after-array-fill" : undefined,
-      arrayCount: best.arrayCount,
-      arrayTierCount: best.arrayCount * TIER_ROWS_PER_ARRAY,
+      candidateScores: {},
+      candidatePlacedCounts: {},
+      selectedReason: d.layoutSelectionReason,
+      capacityLayoutRule:
+        d.layoutMode === "dual_array" ? "land-dual-array" : "land-continuous-array",
+      arrayCount: d.layoutMode === "dual_array" ? Math.ceil(result.rowModuleCounts.length / 2) : 1,
+      arrayTierCount: result.rowModuleCounts.length,
       tierRowsPerArray: TIER_ROWS_PER_ARRAY,
-      arrayModuleCounts,
-      aisleM,
-      aisleApplied: best.setAisleM > best.innerTierGapM,
-      fillStrategy: "two-tier-row-set",
+      arrayModuleCounts: [],
+      aisleM: d.dualArraySetAisleM,
+      aisleApplied: d.layoutMode === "dual_array",
+      fillStrategy: d.layoutMode === "dual_array" ? "dual-array" : "continuous-array",
       medianSplitUsed: false,
-      rowGenerationPattern: rowPattern,
-      unusedAreaRatio: best.unusedAreaRatio,
-      twoTierSetCount: best.twoTierSetModuleCounts.length,
-      twoTierSetModuleCounts: best.twoTierSetModuleCounts,
-      innerTierGapM: best.innerTierGapM,
-      setAisleM: best.setAisleM,
-      visualScale: best.visualScale,
+      rowGenerationPattern: d.layoutMode,
+      unusedAreaRatio: 0,
+      twoTierSetCount: d.layoutMode === "dual_array" ? Math.ceil(result.rowModuleCounts.length / 2) : 0,
+      twoTierSetModuleCounts: [],
+      innerTierGapM: d.innerTierGapM,
+      setAisleM: d.dualArraySetAisleM,
+      visualScale: moduleLayoutConfig.visualScale,
       arrayBlockCount: 0,
       arrayBlocks: [],
       mainAisleM: 0,
@@ -1274,6 +1172,14 @@ export function placeLandBlockLayout(
       arrayBlockModuleCounts: [],
       arrayBlockRowCounts: [],
       arrayBlockBoundingBoxes: [],
+      layoutMode: d.layoutMode,
+      layoutSelectionReason: d.layoutSelectionReason,
+      continuousPlacedModuleCount: d.continuousPlacedModuleCount,
+      continuousPlacedKw: d.continuousPlacedKw,
+      dualPlacedModuleCount: d.dualPlacedModuleCount,
+      dualPlacedKw: d.dualPlacedKw,
+      selectedPlacedModuleCount: d.selectedPlacedModuleCount,
+      selectedPlacedKw: d.selectedPlacedKw,
     },
   };
 }

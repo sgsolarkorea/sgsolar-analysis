@@ -2,6 +2,7 @@
  * SG SOLAR 입지검토 API 연동 레이어
  */
 
+import { areaPerKwByType } from "@/data/solarConfig";
 import { unstable_cache } from "next/cache";
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
@@ -367,11 +368,13 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
 }
 
 /** 로딩 화면 prefetch와 결과 페이지 SSR 간 중복 분석 방지 (2분 캐시) */
+const ANALYSIS_CACHE_SALT = `roof-${areaPerKwByType.roof}-usable-v1`;
+
 export async function getCachedAnalyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const normalized = address.trim();
   return unstable_cache(
     () => analyzeSolarSite(normalized),
-    ["analyze-solar-site", normalized],
+    ["analyze-solar-site", ANALYSIS_CACHE_SALT, normalized],
     { revalidate: 120 },
   )();
 }

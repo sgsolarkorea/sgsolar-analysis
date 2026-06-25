@@ -1,13 +1,19 @@
 import type { InstallTypeOption } from "@/data/resultUx";
 import {
   getVisualRowSpacingM,
+  layoutPolicy,
   moduleLayoutConfig,
   resolveModuleLayoutKind,
-  resolveModuleLayoutMode,
   type ModuleLayoutInstallKind,
   type ModuleLayoutMode,
 } from "@/data/moduleLayoutConfig";
 import { areaPerKwByType, modulePowerW } from "@/data/solarConfig";
+import {
+  ARRAY_MODE_THRESHOLD_MODULES,
+  resolveArrayLayout,
+  aggregateRoofDualDiagnostics,
+  type ArrayLayoutDiagnostics,
+} from "@/lib/solar/arrayLayoutEngine";
 import { installTypeToCategory } from "@/lib/solar/calculate";
 import {
   computeOrientedBounds,
@@ -48,14 +54,29 @@ interface ModuleSlot {
   y: number;
 }
 
-function getLayoutParams(
-  installType: InstallTypeOption | string,
-  capacityKw: number,
-): LayoutParams {
+function getLayoutParams(installType: InstallTypeOption | string, _capacityKw: number): LayoutParams {
   const kind = resolveModuleLayoutKind(installType);
-  const mode = resolveModuleLayoutMode(installType, capacityKw);
   const spec = moduleLayoutConfig[kind];
-  return { kind, mode, rowSpacingM: spec.rowSpacingM, tiltDeg: spec.tiltDeg };
+  return { kind, mode: "continuous_array", rowSpacingM: spec.rowSpacingM, tiltDeg: spec.tiltDeg };
+}
+
+function landDiagnosticsToArrayDiagnostics(
+  land: LandBlockPlacementDiagnostics,
+): ArrayLayoutDiagnostics {
+  return {
+    layoutMode: land.layoutMode ?? (land.layoutTier === "double" ? "dual_array" : "continuous_array"),
+    layoutSelectionReason: land.layoutSelectionReason ?? "layout_failed",
+    continuousPlacedModuleCount: land.continuousPlacedModuleCount ?? 0,
+    continuousPlacedKw: land.continuousPlacedKw ?? 0,
+    dualPlacedModuleCount: land.dualPlacedModuleCount ?? 0,
+    dualPlacedKw: land.dualPlacedKw ?? 0,
+    selectedPlacedModuleCount: land.selectedPlacedModuleCount ?? 0,
+    selectedPlacedKw: land.selectedPlacedKw ?? 0,
+    innerTierGapM: land.innerTierGapM,
+    dualArraySetAisleM: land.setAisleM,
+    roofContinuousRowGapM: layoutPolicy.roofContinuousRowGapM,
+    selectedAzimuthDegrees: land.selectedAzimuthDegrees,
+  };
 }
 
 function makePortraitModuleRect(
@@ -385,13 +406,14 @@ function placeModulesInFootprint(
 
   const oriented = toOrientedPoly(polygon);
   const orientationCandidates = [oriented.angleRad, oriented.angleRad + Math.PI / 2];
-  const scale = params.kind === "roof" ? 0.66 : moduleLayoutConfig.visualScale;
+  const scale =
+    params.kind === "roof" ? 1 : moduleLayoutConfig.visualScale;
   const widthM = moduleLayoutConfig.moduleShortM * scale;
   const heightM = moduleLayoutConfig.moduleLongM * scale;
   const rowGapM =
     params.kind === "roof"
-      ? 0.25
-      : params.mode === "row"
+      ? layoutPolicy.roofContinuousRowGapM
+      : params.mode === "dual_array"
         ? getVisualRowSpacingM(params.kind, params.mode)
         : 0;
 
@@ -510,24 +532,30 @@ export function computeModuleLayout(input: {
   let rowModuleCounts: number[];
   let landDiagnostics: LandBlockPlacementDiagnostics | undefined;
   let roofDiagnostics: RoofPlacementDiagnostics | undefined;
+  let arrayLayoutDiagnostics: ArrayLayoutDiagnostics | undefined;
 
   if (params.kind === "land") {
     const landResult = placeLandBlockLayout(
       input.boundary,
       targetModuleCount,
-      { kind: "land", mode: params.mode, rowSpacingM: params.rowSpacingM },
+      { kind: "land", mode: "continuous_array", rowSpacingM: params.rowSpacingM },
       input.capacityKw,
     );
     modules = landResult.modules;
     validSlotCount = landResult.validSlotCount;
     rowModuleCounts = landResult.rowModuleCounts;
     landDiagnostics = landResult.diagnostics;
+    arrayLayoutDiagnostics = landDiagnosticsToArrayDiagnostics(landResult.diagnostics);
   } else {
-    const legacy = placeModulesInFootprint(input.boundary, targetModuleCount, params);
-    modules = legacy.modules;
-    validSlotCount = legacy.validSlotCount;
-    rowModuleCounts = legacy.rowModuleCounts;
-    roofDiagnostics = legacy.roofDiagnostics;
+    const arrayResult = resolveArrayLayout({
+      polygon: input.boundary,
+      targetCount: targetModuleCount,
+      kind: "roof",
+    });
+    modules = arrayResult.modules;
+    validSlotCount = arrayResult.validSlotCount;
+    rowModuleCounts = arrayResult.rowModuleCounts;
+    arrayLayoutDiagnostics = arrayResult.diagnostics;
   }
   const usableAreaSqm = polygonAreaSqm(input.boundary);
   const footprintSqm = moduleRectsFootprintSqm(modules);
@@ -574,8 +602,8 @@ export function computeModuleLayout(input: {
       targetModuleCount,
       placedModuleCount: modules.length,
       modulePowerW: moduleLayoutConfig.modulePowerW,
-      layoutMode: params.mode,
-      tiers: landDiagnostics?.layoutTier === "double" ? 2 : params.mode === "row" && params.kind === "land" ? 2 : 1,
+      layoutMode: arrayLayoutDiagnostics?.layoutMode ?? "continuous_array",
+      tiers: arrayLayoutDiagnostics?.layoutMode === "dual_array" ? 2 : 1,
       rowSpacingM: params.rowSpacingM,
       tiltDeg: params.tiltDeg,
       installType: input.installType,
@@ -583,41 +611,23 @@ export function computeModuleLayout(input: {
       layoutRowCount: rowModuleCounts.length,
       rowModuleCounts,
       polygonUtilizationPct,
-      layoutTier: landDiagnostics?.layoutTier,
+      layoutTier: arrayLayoutDiagnostics?.layoutMode === "dual_array" ? "double" : "single",
       blockCount: landDiagnostics?.blockCount,
       blockModuleCounts: landDiagnostics?.blockModuleCounts,
       selectedAzimuthDegrees: landDiagnostics?.selectedAzimuthDegrees,
       capacityLayoutRule: landDiagnostics?.capacityLayoutRule,
+      continuousPlacedModuleCount: arrayLayoutDiagnostics?.continuousPlacedModuleCount,
+      continuousPlacedKw: arrayLayoutDiagnostics?.continuousPlacedKw,
+      dualPlacedModuleCount: arrayLayoutDiagnostics?.dualPlacedModuleCount,
+      dualPlacedKw: arrayLayoutDiagnostics?.dualPlacedKw,
+      selectedPlacedModuleCount: arrayLayoutDiagnostics?.selectedPlacedModuleCount,
+      selectedPlacedKw: arrayLayoutDiagnostics?.selectedPlacedKw,
+      layoutSelectionReason: arrayLayoutDiagnostics?.layoutSelectionReason,
     },
     landLayoutDiagnostics: landDiagnostics,
     roofLayoutDiagnostics: roofDiagnostics,
+    arrayLayoutDiagnostics,
   };
-}
-
-function distributeModuleQuotaByArea(areas: number[], targetModuleCount: number): number[] {
-  if (areas.length === 0 || targetModuleCount <= 0) return areas.map(() => 0);
-  const totalArea = areas.reduce((sum, area) => sum + area, 0);
-  if (totalArea <= 0) {
-    const base = Math.floor(targetModuleCount / areas.length);
-    const quotas = areas.map(() => base);
-    for (let i = 0; i < targetModuleCount - base * areas.length; i++) quotas[i % quotas.length]++;
-    return quotas;
-  }
-
-  const raw = areas.map((area) => (targetModuleCount * area) / totalArea);
-  const quotas = raw.map((value) => Math.floor(value));
-  let assigned = quotas.reduce((sum, count) => sum + count, 0);
-  const remainders = raw
-    .map((value, index) => ({ index, remainder: value - Math.floor(value) }))
-    .sort((a, b) => b.remainder - a.remainder || a.index - b.index);
-
-  for (const item of remainders) {
-    if (assigned >= targetModuleCount) break;
-    quotas[item.index]++;
-    assigned++;
-  }
-
-  return quotas;
 }
 
 /** 다동 건물 — 각 지붕 polygon에 모듈 배치 후 합산 */
@@ -650,40 +660,122 @@ export function computeMultiBuildingRoofModuleLayout(input: {
       : Math.max(0, Math.floor((input.capacityKw * 1000) / modulePowerW));
 
   const roofAreas = validBoundaries.map((boundary) => polygonAreaSqm(boundary));
-  const quotas = distributeModuleQuotaByArea(roofAreas, targetModuleCount);
 
-  let modules: ModuleRect[] = [];
-  let validSlotCount = 0;
-  let rowModuleCounts: number[] = [];
-  let roofDiagnostics: RoofPlacementDiagnostics | undefined;
-  let placedModuleCount = 0;
+  const maxFillResults = validBoundaries.map((boundary) =>
+    resolveArrayLayout({
+      polygon: boundary,
+      targetCount: targetModuleCount,
+      kind: "roof",
+      forceMode: "continuous_array",
+    }),
+  );
+  const totalContinuousModules = maxFillResults.reduce(
+    (sum, result) => sum + result.placedModuleCount,
+    0,
+  );
+  const useDualArray = totalContinuousModules >= ARRAY_MODE_THRESHOLD_MODULES;
 
-  for (let i = 0; i < validBoundaries.length; i++) {
-    const quota = quotas[i] ?? 0;
-    if (quota <= 0) continue;
-    const legacy = placeModulesInFootprint(validBoundaries[i], quota, params);
-    modules = modules.concat(legacy.modules);
-    validSlotCount += legacy.validSlotCount;
-    rowModuleCounts = rowModuleCounts.concat(legacy.rowModuleCounts);
-    placedModuleCount += legacy.modules.length;
-    if (!roofDiagnostics && legacy.roofDiagnostics) {
-      roofDiagnostics = legacy.roofDiagnostics;
+  const buildingResults = validBoundaries.map((boundary, index) => {
+    if (useDualArray) {
+      return resolveArrayLayout({
+        polygon: boundary,
+        targetCount: targetModuleCount,
+        kind: "roof",
+        forceMode: "dual_array",
+      });
     }
-  }
+    return maxFillResults[index];
+  });
 
-  let remaining = targetModuleCount - placedModuleCount;
-  for (let i = 0; i < validBoundaries.length && remaining > 0; i++) {
-    const legacy = placeModulesInFootprint(validBoundaries[i], remaining, params);
-    const existing = new Set(modules.map((mod) => mod.corners.map((c) => `${c.lat},${c.lng}`).join("|")));
-    for (const mod of legacy.modules) {
-      const key = mod.corners.map((c) => `${c.lat},${c.lng}`).join("|");
-      if (existing.has(key)) continue;
-      modules.push(mod);
-      placedModuleCount++;
-      remaining--;
-      if (remaining <= 0) break;
-    }
-  }
+  const placedModuleCountByBuilding = buildingResults.map((result) => result.placedModuleCount);
+  let modules: ModuleRect[] = buildingResults.flatMap((result) => result.modules);
+  let validSlotCount = buildingResults.reduce((sum, result) => sum + result.validSlotCount, 0);
+  let rowModuleCounts = buildingResults.flatMap((result) => result.rowModuleCounts);
+  let placedModuleCount = modules.length;
+
+  const continuousPlacedModuleCount = maxFillResults.reduce(
+    (sum, result) => sum + result.placedModuleCount,
+    0,
+  );
+  const dualPlacedModuleCount = useDualArray
+    ? buildingResults.reduce((sum, result) => sum + result.placedModuleCount, 0)
+    : 0;
+
+  const buildingDiagnostics = buildingResults.map((result) => result.diagnostics);
+  const aggregatedPortrait = buildingDiagnostics.reduce(
+    (sum, item) => sum + (item.portraitPlacedModuleCount ?? 0),
+    0,
+  );
+  const aggregatedLandscape = buildingDiagnostics.reduce(
+    (sum, item) => sum + (item.landscapePlacedModuleCount ?? 0),
+    0,
+  );
+  const aggregatedTargetQuota = buildingDiagnostics.reduce(
+    (sum, item) => sum + (item.targetQuotaPlacedModuleCount ?? 0),
+    0,
+  );
+  const aggregatedMaxFill = buildingDiagnostics.reduce(
+    (sum, item) => sum + (item.maxFillPlacedModuleCount ?? item.continuousMaxFill ?? 0),
+    0,
+  );
+
+  const arrayLayoutDiagnostics: ArrayLayoutDiagnostics = {
+    layoutMode: useDualArray ? "dual_array" : "continuous_array",
+    layoutSelectionReason: useDualArray
+      ? "dual_required_continuous_ge_30kw"
+      : "continuous_under_30kw",
+    continuousPlacedModuleCount,
+    continuousPlacedKw: Math.round(continuousPlacedModuleCount * 0.64 * 100) / 100,
+    dualPlacedModuleCount,
+    dualPlacedKw: Math.round(dualPlacedModuleCount * 0.64 * 100) / 100,
+    selectedPlacedModuleCount: placedModuleCount,
+    selectedPlacedKw: Math.round(placedModuleCount * 0.64 * 100) / 100,
+    innerTierGapM: layoutPolicy.innerTierGapM,
+    dualArraySetAisleM: layoutPolicy.dualArraySetAisleM,
+    roofContinuousRowGapM: layoutPolicy.roofContinuousRowGapM,
+    placedModuleCountByBuilding,
+    ...aggregateRoofDualDiagnostics(buildingDiagnostics),
+    ...(useDualArray
+      ? {
+          strictPlacedModuleCount: buildingDiagnostics.reduce(
+            (sum, item) => sum + (item.strictPlacedModuleCount ?? 0),
+            0,
+          ),
+          edgeTolerancePlacedModuleCount: placedModuleCount,
+          selectedFittingPolicy: buildingDiagnostics[0]?.selectedFittingPolicy,
+          selectedToleranceM: buildingDiagnostics[0]?.selectedToleranceM,
+          targetQuotaUsedForLayout: false,
+          dualTargetQuotaLimited: false,
+          actualModuleShortM: moduleLayoutConfig.moduleShortM,
+          actualModuleLongM: moduleLayoutConfig.moduleLongM,
+          renderScale: moduleLayoutConfig.roofRenderScale,
+          fittingModuleWidthM: buildingDiagnostics[0]?.fittingModuleWidthM,
+          fittingModuleHeightM: buildingDiagnostics[0]?.fittingModuleHeightM,
+        }
+      : {
+          portraitPlacedModuleCount: aggregatedPortrait,
+          landscapePlacedModuleCount: aggregatedLandscape,
+          mixedPlacedModuleCount: 0,
+          maxFillPlacedModuleCount: aggregatedMaxFill,
+          targetQuotaPlacedModuleCount: aggregatedTargetQuota,
+          targetQuotaLimited: false,
+          strictPlacedModuleCount: buildingDiagnostics.reduce(
+            (sum, item) => sum + (item.strictPlacedModuleCount ?? 0),
+            0,
+          ),
+          edgeTolerancePlacedModuleCount: placedModuleCount,
+          selectedFittingPolicy: buildingDiagnostics[0]?.selectedFittingPolicy,
+          selectedToleranceM: buildingDiagnostics[0]?.selectedToleranceM,
+          targetQuotaUsedForLayout: false,
+          dualTargetQuotaLimited: false,
+          roofContinuousReason: "roof_continuous_max_fill_selected",
+          actualModuleShortM: moduleLayoutConfig.moduleShortM,
+          actualModuleLongM: moduleLayoutConfig.moduleLongM,
+          renderScale: moduleLayoutConfig.roofRenderScale,
+          fittingModuleWidthM: buildingDiagnostics[0]?.fittingModuleWidthM,
+          fittingModuleHeightM: buildingDiagnostics[0]?.fittingModuleHeightM,
+        }),
+  };
 
   const primaryBoundary = validBoundaries.reduce((best, boundary) =>
     polygonAreaSqm(boundary) > polygonAreaSqm(best) ? boundary : best,
@@ -736,8 +828,8 @@ export function computeMultiBuildingRoofModuleLayout(input: {
       targetModuleCount,
       placedModuleCount: modules.length,
       modulePowerW: moduleLayoutConfig.modulePowerW,
-      layoutMode: params.mode,
-      tiers: 1,
+      layoutMode: arrayLayoutDiagnostics.layoutMode,
+      tiers: arrayLayoutDiagnostics.layoutMode === "dual_array" ? 2 : 1,
       rowSpacingM: params.rowSpacingM,
       tiltDeg: params.tiltDeg,
       installType: input.installType,
@@ -745,8 +837,16 @@ export function computeMultiBuildingRoofModuleLayout(input: {
       layoutRowCount: rowModuleCounts.length,
       rowModuleCounts,
       polygonUtilizationPct,
+      layoutTier: arrayLayoutDiagnostics.layoutMode === "dual_array" ? "double" : "single",
       capacityLayoutRule: `multi-building-roof:${validBoundaries.length}`,
+      continuousPlacedModuleCount: arrayLayoutDiagnostics.continuousPlacedModuleCount,
+      continuousPlacedKw: arrayLayoutDiagnostics.continuousPlacedKw,
+      dualPlacedModuleCount: arrayLayoutDiagnostics.dualPlacedModuleCount,
+      dualPlacedKw: arrayLayoutDiagnostics.dualPlacedKw,
+      selectedPlacedModuleCount: arrayLayoutDiagnostics.selectedPlacedModuleCount,
+      selectedPlacedKw: arrayLayoutDiagnostics.selectedPlacedKw,
+      layoutSelectionReason: arrayLayoutDiagnostics.layoutSelectionReason,
     },
-    roofLayoutDiagnostics: roofDiagnostics,
+    arrayLayoutDiagnostics,
   };
 }
