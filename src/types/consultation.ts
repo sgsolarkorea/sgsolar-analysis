@@ -6,6 +6,13 @@ export interface ConsultationAnalysisContext {
   buildingArea?: string;
   installType?: string;
   capacity?: string;
+  /** 화면 대표 용량(kW) — capacity 문자열과 동일 값 */
+  capacityKw?: number;
+  moduleCount?: number;
+  areaPerKw?: number;
+  roofUsableAreaSqm?: number | null;
+  landUsableAreaSqm?: number | null;
+  layoutMode?: string;
   annualGeneration?: string;
   annualRevenue?: string;
   /** 다중 필지 검토 */

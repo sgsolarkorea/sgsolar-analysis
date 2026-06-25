@@ -25,7 +25,7 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
   const polygonDebugRaw = polygonDebug === "raw";
   const polygonDebugCompare = polygonDebug === "compare";
   const polygonDebugRoof = polygonDebug === "roof";
-  const { metrics, installType, primaryParcel, parcels, multiParcelGeometryReady, buildingInfo, landInfo } =
+  const { metrics, installType, primaryParcel, parcels, multiParcelGeometryReady, buildingInfo, landInfo, setLayoutSnapshot } =
     useResultMetrics();
   const [layout, setLayout] = useState<ModuleLayoutResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -117,6 +117,11 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
     polygonDebugCompare,
     polygonDebugRoof,
   ]);
+
+  useEffect(() => {
+    if (!layout?.stats?.layoutMode) return;
+    setLayoutSnapshot({ layoutMode: layout.stats.layoutMode });
+  }, [layout?.stats?.layoutMode, setLayoutSnapshot]);
 
   const targetModules = layout?.stats.targetModuleCount ?? metrics.moduleCount;
   const placedModules = layout?.stats.placedModuleCount ?? 0;
@@ -360,47 +365,6 @@ export default function ModuleLayoutSection({ address, jibunAddress }: ModuleLay
                     value={`${placedModules.toLocaleString("ko-KR")}장`}
                   />
                 )}
-                {installType !== "토지형" &&
-                  layout.diagnostics?.roofDualReason != null && (
-                    <>
-                      <MetricCard
-                        label="dualSetCount"
-                        value={String(layout.diagnostics.dualSetCount ?? "—")}
-                      />
-                      <MetricCard
-                        label="continuousMaxFill"
-                        value={
-                          layout.diagnostics.continuousMaxFill != null
-                            ? `${layout.diagnostics.continuousMaxFill}장`
-                            : "—"
-                        }
-                      />
-                      <MetricCard
-                        label="dualMaxFill"
-                        value={
-                          layout.diagnostics.dualMaxFill != null
-                            ? `${layout.diagnostics.dualMaxFill}장`
-                            : "—"
-                        }
-                      />
-                      <MetricCard
-                        label="dualAisleEffective"
-                        value={layout.diagnostics.dualAisleEffective ? "Y" : "N"}
-                      />
-                      <MetricCard
-                        label="appliedDualAisleM"
-                        value={
-                          layout.diagnostics.appliedDualAisleM != null
-                            ? `${layout.diagnostics.appliedDualAisleM}m`
-                            : "0m"
-                        }
-                      />
-                      <MetricCard
-                        label="roofDualReason"
-                        value={layout.diagnostics.roofDualReason}
-                      />
-                    </>
-                  )}
                 <MetricCard label="모듈 사양" value={`${moduleLayoutConfig.modulePowerW}W`} />
                 <MetricCard
                   label="설치유형"

@@ -2,6 +2,9 @@ import type { ConsultationRequestBody, ConsultationSubmission } from "@/types/co
 import type { LeadRequestBody } from "@/types/lead";
 
 function parseCapacityKw(analysisContext?: ConsultationRequestBody["analysisContext"]): number | null {
+  if (analysisContext?.capacityKw != null && Number.isFinite(analysisContext.capacityKw)) {
+    return analysisContext.capacityKw;
+  }
   const raw = analysisContext?.capacity;
   if (!raw) return null;
   const match = raw.replace(/,/g, "").match(/([\d.]+)/);

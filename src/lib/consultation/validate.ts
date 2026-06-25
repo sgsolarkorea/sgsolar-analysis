@@ -2,6 +2,7 @@ import type {
   ConsultationAnalysisContext,
   ConsultationRequestBody,
 } from "@/types/consultation";
+import { parseConsultationAnalysisContext } from "@/lib/consultation/analysisContextFields";
 import { CONSULTATION_INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
 
 const MAX = {
@@ -76,32 +77,7 @@ export function validateConsultationBody(body: unknown): ConsultationValidationR
 
   let analysisContext: ConsultationAnalysisContext | undefined;
   if (raw.analysisContext && typeof raw.analysisContext === "object") {
-    const ctx = raw.analysisContext as Record<string, unknown>;
-    analysisContext = {
-      ...(typeof ctx.jibunAddress === "string" ? { jibunAddress: ctx.jibunAddress.slice(0, 200) } : {}),
-      ...(typeof ctx.landCategory === "string" ? { landCategory: ctx.landCategory.slice(0, 50) } : {}),
-      ...(typeof ctx.zoning === "string" ? { zoning: ctx.zoning.slice(0, 100) } : {}),
-      ...(typeof ctx.landArea === "string" ? { landArea: ctx.landArea.slice(0, 50) } : {}),
-      ...(typeof ctx.buildingArea === "string" ? { buildingArea: ctx.buildingArea.slice(0, 50) } : {}),
-      ...(typeof ctx.installType === "string" ? { installType: ctx.installType.slice(0, 50) } : {}),
-      ...(typeof ctx.capacity === "string" ? { capacity: ctx.capacity.slice(0, 50) } : {}),
-      ...(typeof ctx.annualGeneration === "string" ? { annualGeneration: ctx.annualGeneration.slice(0, 50) } : {}),
-      ...(typeof ctx.annualRevenue === "string" ? { annualRevenue: ctx.annualRevenue.slice(0, 50) } : {}),
-      ...(typeof ctx.parcelCount === "number" ? { parcelCount: ctx.parcelCount } : {}),
-      ...(typeof ctx.totalLandArea === "string" ? { totalLandArea: ctx.totalLandArea.slice(0, 50) } : {}),
-      ...(Array.isArray(ctx.parcels)
-        ? {
-            parcels: ctx.parcels
-              .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
-              .slice(0, 20)
-              .map((item) => ({
-                jibunAddress: String(item.jibunAddress ?? "").slice(0, 200),
-                areaLabel: String(item.areaLabel ?? "").slice(0, 50),
-                landCategory: String(item.landCategory ?? "").slice(0, 50),
-              })),
-          }
-        : {}),
-    };
+    analysisContext = parseConsultationAnalysisContext(raw.analysisContext);
   }
 
   return {

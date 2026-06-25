@@ -70,6 +70,8 @@ interface ResultMetricsContextValue {
   primaryParcel: ParcelItem;
   /** 다중 필지 union geometry fetch 완료 여부 */
   multiParcelGeometryReady: boolean;
+  /** 가배치도 로드 후 layoutMode 등 diagnostics 스냅샷 (상담 저장용) */
+  setLayoutSnapshot: (snapshot: { layoutMode?: string }) => void;
 }
 
 const ResultMetricsContext = createContext<ResultMetricsContextValue | null>(null);
@@ -96,6 +98,7 @@ export function ResultMetricsProvider({
   const [installType, setInstallTypeState] = useState<InstallTypeOption>(initialInstallType);
   const [parcels, setParcels] = useState<ParcelItem[]>([initialPrimaryParcel]);
   const [multiParcelGeometry, setMultiParcelGeometry] = useState<SiteGeometryResult | null>(null);
+  const [layoutSnapshot, setLayoutSnapshot] = useState<{ layoutMode?: string }>({});
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const parcelSummary = useMemo(() => buildParcelReviewSummary(parcels), [parcels]);
@@ -281,6 +284,10 @@ export function ResultMetricsProvider({
     setInstallTypeState(type);
   }, []);
 
+  const setLayoutSnapshotStable = useCallback((snapshot: { layoutMode?: string }) => {
+    setLayoutSnapshot(snapshot);
+  }, []);
+
   const value = useMemo<ResultMetricsContextValue>(() => {
     const { metrics, profitability, monthlyGeneration } = computed;
 
@@ -300,6 +307,12 @@ export function ResultMetricsProvider({
         ...consultationBase,
         installType: metrics.installType,
         capacity: formatCapacityDisplay(metrics.capacityKw),
+        capacityKw: metrics.capacityKw,
+        moduleCount: metrics.moduleCount,
+        areaPerKw: metrics.areaPerKw,
+        roofUsableAreaSqm: metrics.roofUsableAreaSqm,
+        landUsableAreaSqm: metrics.usableAreaSqm,
+        layoutMode: layoutSnapshot.layoutMode,
         annualGeneration: formatGenerationDisplay(metrics.annualGenerationKwh),
         annualRevenue: formatRevenueDisplay(metrics.totalRevenueWon),
         parcelCount: parcelSummary.parcelCount,
@@ -318,6 +331,7 @@ export function ResultMetricsProvider({
       addParcelsFromCandidates,
       primaryParcel: initialPrimaryParcel,
       multiParcelGeometryReady,
+      setLayoutSnapshot: setLayoutSnapshotStable,
     };
   }, [
     computed,
@@ -334,6 +348,8 @@ export function ResultMetricsProvider({
     addParcelsFromCandidates,
     initialPrimaryParcel,
     multiParcelGeometryReady,
+    layoutSnapshot.layoutMode,
+    setLayoutSnapshotStable,
   ]);
 
   useEffect(() => {

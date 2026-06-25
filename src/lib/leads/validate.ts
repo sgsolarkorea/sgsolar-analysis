@@ -1,4 +1,5 @@
 import type { ConsultationAnalysisContext } from "@/types/consultation";
+import { parseConsultationAnalysisContext } from "@/lib/consultation/analysisContextFields";
 import type { LeadRequestBody, LeadType } from "@/types/lead";
 import { CONSULTATION_INSTALL_TYPE_OPTIONS } from "@/types/siteReview";
 
@@ -30,21 +31,7 @@ function normalizePhone(value: string): string {
 }
 
 function parseAnalysisContext(raw: unknown): ConsultationAnalysisContext | undefined {
-  if (!raw || typeof raw !== "object") return undefined;
-  const ctx = raw as Record<string, unknown>;
-  return {
-    ...(typeof ctx.jibunAddress === "string" ? { jibunAddress: ctx.jibunAddress.slice(0, 200) } : {}),
-    ...(typeof ctx.landCategory === "string" ? { landCategory: ctx.landCategory.slice(0, 50) } : {}),
-    ...(typeof ctx.zoning === "string" ? { zoning: ctx.zoning.slice(0, 100) } : {}),
-    ...(typeof ctx.landArea === "string" ? { landArea: ctx.landArea.slice(0, 50) } : {}),
-    ...(typeof ctx.buildingArea === "string" ? { buildingArea: ctx.buildingArea.slice(0, 50) } : {}),
-    ...(typeof ctx.installType === "string" ? { installType: ctx.installType.slice(0, 50) } : {}),
-    ...(typeof ctx.capacity === "string" ? { capacity: ctx.capacity.slice(0, 50) } : {}),
-    ...(typeof ctx.annualGeneration === "string" ? { annualGeneration: ctx.annualGeneration.slice(0, 50) } : {}),
-    ...(typeof ctx.annualRevenue === "string" ? { annualRevenue: ctx.annualRevenue.slice(0, 50) } : {}),
-    ...(typeof ctx.parcelCount === "number" ? { parcelCount: ctx.parcelCount } : {}),
-    ...(typeof ctx.totalLandArea === "string" ? { totalLandArea: ctx.totalLandArea.slice(0, 50) } : {}),
-  };
+  return parseConsultationAnalysisContext(raw);
 }
 
 export function validateLeadBody(body: unknown): LeadValidationResult {
