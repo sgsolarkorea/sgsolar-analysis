@@ -192,13 +192,13 @@ export default function AddressSearchForm() {
               aria-autocomplete="list"
               aria-expanded={showDropdown}
               aria-controls="address-suggestions"
-              className="h-[58px] w-full border-0 bg-transparent pl-12 pr-4 text-base text-foreground outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-500/35 sm:h-[62px] sm:pl-14 sm:text-[16px]"
+              className="h-[62px] w-full border-0 bg-transparent pl-12 pr-4 text-base text-foreground outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-500/35 sm:h-[64px] sm:pl-14 sm:text-[16px]"
             />
           </div>
 
           <button
             type="submit"
-            className="h-[58px] w-full shrink-0 bg-[#2563eb] px-6 text-base font-extrabold text-white transition-colors hover:bg-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:bg-[#1e40af] sm:h-[62px] sm:w-[188px]"
+            className="h-[62px] w-full shrink-0 bg-[#2563eb] px-6 text-base font-extrabold text-white transition-colors hover:bg-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:bg-[#1e40af] sm:h-[64px] sm:w-[200px]"
           >
             입지검토 시작
           </button>

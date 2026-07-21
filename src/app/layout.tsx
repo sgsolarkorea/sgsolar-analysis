@@ -14,10 +14,7 @@ export const metadata: Metadata = {
   description: siteMetadata.description,
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/brand/sg-solar-logo.png", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon.png", type: "image/png" }],
     apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
   },
   openGraph: {

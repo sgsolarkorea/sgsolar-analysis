@@ -6,8 +6,8 @@ import type { PdfStatusTone } from "@/lib/pdf/reportContent";
 export const PAGE = { width: 595, height: 842 } as const;
 export const MARGIN = 48;
 
-/** /public/sgsolar-logo.png — 없으면 텍스트·아이콘 로고로 대체 */
-export const BRAND_LOGO_FILENAME = "sgsolar-logo.png";
+/** Official on-light logo for PDF (black on transparent) */
+export const BRAND_LOGO_FILENAME = "brand/sg-solar-official-on-light.png";
 
 export const COLORS = {
   navy: { r: 0.08, g: 0.12, b: 0.28 },

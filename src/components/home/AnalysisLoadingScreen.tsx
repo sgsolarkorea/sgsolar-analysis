@@ -19,7 +19,7 @@ const FINISH_ANIMATION_MS = 200;
 function StepIcon({ status }: { status: AnalysisStepStatus }) {
   if (status === "completed") {
     return (
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-navy text-white sm:h-11 sm:w-11">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy text-white">
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
         </svg>
@@ -29,7 +29,7 @@ function StepIcon({ status }: { status: AnalysisStepStatus }) {
 
   if (status === "failed") {
     return (
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-red-300 bg-red-50 sm:h-11 sm:w-11">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-red-300 bg-red-50">
         <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -41,13 +41,11 @@ function StepIcon({ status }: { status: AnalysisStepStatus }) {
 
   return (
     <span
-      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 sm:h-11 sm:w-11 ${
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 ${
         active ? "border-navy bg-navy-light" : "border-slate-200 bg-white"
       }`}
     >
-      <span
-        className={`h-2.5 w-2.5 rounded-full ${active ? "animate-pulse bg-navy" : "bg-slate-300"}`}
-      />
+      <span className={`h-2.5 w-2.5 rounded-full ${active ? "animate-pulse bg-navy" : "bg-slate-300"}`} />
     </span>
   );
 }
@@ -61,6 +59,7 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     })),
   );
   const [apiFailed, setApiFailed] = useState(false);
+  const [elapsedSec, setElapsedSec] = useState(0);
 
   const progress = useMemo(() => computeLoadingProgress(steps), [steps]);
   const completedCount = useMemo(
@@ -80,6 +79,10 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
 
     const resultHref = `/result?address=${encodeURIComponent(address)}`;
     router.prefetch(resultHref);
+
+    const elapsedTimer = window.setInterval(() => {
+      if (!cancelled) setElapsedSec(Math.floor((performance.now() - startedAt) / 1000));
+    }, 500);
 
     const advanceStep = () => {
       if (cancelled || apiDone) return;
@@ -163,81 +166,105 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
 
     return () => {
       cancelled = true;
+      window.clearInterval(elapsedTimer);
       window.cancelAnimationFrame(frame);
     };
   }, [address, router]);
 
+  const delayMessage =
+    elapsedSec >= 20
+      ? "응답이 지연되고 있습니다. 잠시만 더 기다려 주시거나, 주소를 다시 확인해 주세요."
+      : elapsedSec >= 15
+        ? "공공데이터 응답이 지연되고 있습니다. 분석을 계속 진행 중입니다."
+        : elapsedSec >= 8
+          ? "외부 공공데이터를 확인하는 중입니다. 잠시만 기다려 주세요."
+          : null;
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mb-6 flex justify-center pt-2 sm:pt-4">
-        <SgSolarLogo layout="loading" />
-      </div>
-      <div className="card-premium overflow-hidden p-5 sm:p-8">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">분석 진행 중</h1>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              입력하신 주소를 기준으로 입지 정보를 분석하고 있습니다.
-            </p>
-          </div>
-          <span className="shrink-0 rounded-lg bg-navy-light px-3 py-1.5 text-sm font-bold text-navy">
-            {completedCount}/{ANALYSIS_LOADING_STEPS.length}
-          </span>
+    <div className="flex min-h-[calc(100vh-88px)] flex-col bg-slate-50">
+      <div className="mx-auto flex w-full max-w-[920px] flex-1 flex-col justify-center px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mb-8 flex justify-center">
+          <SgSolarLogo layout="loading" variant="dark" />
         </div>
-
-        <div className="mt-6">
-          <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-500">
-            <span>진행률</span>
-            <span>{progress}%</span>
+        <div className="card-premium overflow-visible p-8 sm:p-10">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-[26px] font-bold text-slate-900 sm:text-[30px]">분석 진행 중</h1>
+              <p className="mt-2 text-[15px] leading-relaxed text-slate-600 sm:text-[16px]">
+                입력하신 주소를 기준으로 입지 정보를 분석하고 있습니다.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-lg bg-navy-light px-3 py-1.5 text-sm font-bold text-navy">
+              {completedCount}/{ANALYSIS_LOADING_STEPS.length}
+            </span>
           </div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-navy via-blue-600 to-amber-500 transition-[width] duration-200 ease-out"
-              style={{ width: `${progress}%` }}
-            />
+
+          <div className="mt-7">
+            <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-500">
+              <span>진행률</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-navy via-blue-600 to-amber-500 transition-[width] duration-200 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
-        </div>
 
-        <p className="mt-4 truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-          {address}
-        </p>
-
-        {apiFailed && (
-          <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            분석 중 오류가 발생했습니다. 주소를 확인한 뒤 다시 시도해 주세요.
+          <p className="mt-5 truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+            {address}
           </p>
-        )}
 
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-          {steps.map((step) => {
-            const completed = step.status === "completed";
-            const active = step.status === "active";
-            const failed = step.status === "failed";
-            return (
-              <li
-                key={step.id}
-                className={`flex items-center gap-3 rounded-xl border px-3 py-3 transition-colors ${
-                  completed
-                    ? "border-navy/20 bg-navy-light/40"
-                    : active
-                      ? "border-navy/30 bg-white"
-                      : failed
-                        ? "border-red-200 bg-red-50"
-                        : "border-slate-200 bg-slate-50"
-                }`}
-              >
-                <StepIcon status={step.status} />
-                <span
-                  className={`text-sm font-semibold ${
-                    completed ? "text-navy" : active ? "text-slate-900" : failed ? "text-red-700" : "text-slate-500"
+          {delayMessage && !apiFailed && (
+            <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+              {delayMessage}
+            </p>
+          )}
+
+          {apiFailed && (
+            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
+              분석 중 오류가 발생했습니다. 주소를 확인한 뒤 다시 시도해 주세요.
+            </p>
+          )}
+
+          <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+            {steps.map((step) => {
+              const completed = step.status === "completed";
+              const active = step.status === "active";
+              const failed = step.status === "failed";
+              return (
+                <li
+                  key={step.id}
+                  className={`flex min-h-[72px] items-center gap-3 rounded-xl border px-4 py-3.5 transition-colors ${
+                    completed
+                      ? "border-navy/20 bg-navy-light/40"
+                      : active
+                        ? "border-navy/40 bg-white shadow-sm"
+                        : failed
+                          ? "border-red-200 bg-red-50"
+                          : "border-slate-200 bg-slate-50"
                   }`}
                 >
-                  {step.label}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+                  <StepIcon status={step.status} />
+                  <span
+                    className={`text-[15px] font-semibold ${
+                      completed
+                        ? "text-navy"
+                        : active
+                          ? "text-slate-900"
+                          : failed
+                            ? "text-red-700"
+                            : "text-slate-500"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ export async function loadGmarketFontFacesCss(): Promise<string> {
 }
 
 export async function loadLogoDataUrl(): Promise<string | null> {
-  const b64 = await readBase64("public/sgsolar-logo.png");
+  const b64 = await readBase64("public/brand/sg-solar-official-on-light.png");
   return b64 ? `data:image/png;base64,${b64}` : null;
 }
 

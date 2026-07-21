@@ -98,9 +98,11 @@ export function buildReviewStatusItems(data: ResolvedSiteReview): ReviewStatusIt
     label: "계통연계 검토",
     status: hasDetailedGridData(data.gridInfo)
       ? "reviewable"
-      : data.gridInfo.status === "available"
+      : data.gridInfo.status === "high"
         ? "reviewable"
-        : "needs_review",
+        : data.gridInfo.status === "difficult"
+          ? "needs_review"
+          : "needs_review",
     description: hasDetailedGridData(data.gridInfo)
       ? "공개 계통 데이터를 기준으로 1차 검토했습니다."
       : "한전 계통 접속 가능 여부는 관할 사업소 확인이 필요합니다.",

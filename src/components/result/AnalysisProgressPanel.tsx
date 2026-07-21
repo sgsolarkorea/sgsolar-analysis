@@ -67,10 +67,10 @@ export default function AnalysisProgressPanel({ steps }: AnalysisProgressPanelPr
   }, [steps]);
 
   return (
-    <aside className="hidden lg:block lg:w-56 lg:shrink-0 lg:self-stretch">
-      <div className="sticky top-[4.75rem] z-30 max-h-[calc(100vh-5.25rem)] overflow-y-auto rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-        <h2 className="text-[13px] font-bold text-navy">분석 진행 단계</h2>
-        <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
+    <aside className="hidden lg:block lg:w-[240px] lg:shrink-0 lg:self-stretch xl:w-[250px]">
+      <div className="sticky top-[5.5rem] z-30 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="text-sm font-bold text-navy">분석 진행 단계</h2>
+        <p className="mt-1 text-xs leading-snug text-slate-500">
           분석 항목을 순서대로 확인하세요.
         </p>
 

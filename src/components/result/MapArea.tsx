@@ -10,7 +10,7 @@ interface MapAreaProps {
 export default function MapArea({ address, jibunAddress, lat, lng }: MapAreaProps) {
   return (
     <div className="card-premium overflow-hidden">
-      <div className="relative h-[320px] w-full sm:h-[400px]">
+      <div className="relative h-[420px] w-full sm:h-[500px] lg:h-[540px]">
         <KakaoMapView address={address} jibunAddress={jibunAddress} lat={lat} lng={lng} />
       </div>
       <div className="border-t border-slate-200 bg-slate-50 px-4 py-4 sm:px-6 sm:py-5">

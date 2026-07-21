@@ -1,128 +1,156 @@
 import Link from "next/link";
 import { company } from "@/data/sampleData";
 
-/** Trimmed web assets — padding removed from 500×500 source canvas. */
-export const BRAND_LOGO_MARK_SRC = "/brand/sg-logo-mark-web.png";
-export const BRAND_LOGO_WORDMARK_SRC = "/brand/sg-solar-logo-web.png";
+/**
+ * Official trimmed assets from public/brand/source/공식로고_1200x1200.png
+ * Intrinsic content box after trim+padding: 761×295 (≈2.58:1)
+ * - web: white logo on transparent (dark backgrounds)
+ * - on-light: black logo on transparent (light backgrounds)
+ * Dark-footer separate asset skipped — white logo already reads on navy.
+ */
+export const BRAND_LOGO_OFFICIAL_WEB = "/brand/sg-solar-official-web.png";
+export const BRAND_LOGO_OFFICIAL_ON_LIGHT = "/brand/sg-solar-official-on-light.png";
 
-const MARK_SIZE = { width: 276, height: 68 } as const;
-const WORDMARK_SIZE = { width: 276, height: 101 } as const;
+const OFFICIAL_SIZE = { width: 761, height: 295 } as const;
 
 export type SgSolarLogoLayout =
   | "header"
+  | "mobileHeader"
   | "hero"
   | "loading"
+  | "result"
   | "footer"
-  | "mobile"
+  | "pdf"
+  | "print"
+  | "admin"
   | "compact"
   | "fullWordmark";
 
 interface SgSolarLogoProps {
   layout?: SgSolarLogoLayout;
+  /** light = on dark UI surfaces; dark = on light UI surfaces */
   variant?: "dark" | "light";
   showTagline?: boolean;
   className?: string;
+  /** When false, render image only (PDF/print wrappers). Default true. */
+  link?: boolean;
 }
 
-/** Each variant has independent sizing — do not reuse one height everywhere. */
 const layoutConfig: Record<
   SgSolarLogoLayout,
   {
-    src: string;
-    intrinsic: { width: number; height: number };
     imageClass: string;
     wrapperClass: string;
     taglineClass: string;
-    inlineTagline?: boolean;
+    stackTagline?: boolean;
   }
 > = {
   header: {
-    src: BRAND_LOGO_MARK_SRC,
-    intrinsic: MARK_SIZE,
-    imageClass: "h-[26px] w-auto max-w-[124px] sm:h-[30px]",
+    // height-led: aspect 2.58 → ~124–134px wide at 48–52px tall
+    imageClass: "h-[42px] w-auto max-w-[200px] sm:h-[48px] sm:max-w-[220px]",
     wrapperClass: "inline-flex shrink-0 items-center overflow-visible py-1",
     taglineClass: "",
   },
-  mobile: {
-    src: BRAND_LOGO_MARK_SRC,
-    intrinsic: MARK_SIZE,
-    imageClass: "h-[24px] w-auto max-w-[108px] sm:h-[28px]",
+  mobileHeader: {
+    imageClass: "h-[36px] w-auto max-w-[160px]",
     wrapperClass: "inline-flex shrink-0 items-center overflow-visible py-1",
     taglineClass: "",
   },
   hero: {
-    src: BRAND_LOGO_MARK_SRC,
-    intrinsic: MARK_SIZE,
-    imageClass: "h-[46px] w-auto max-w-[200px] sm:h-[52px]",
-    wrapperClass: "inline-flex items-center gap-3.5 overflow-visible sm:gap-4",
-    taglineClass: "text-[15px] font-semibold tracking-[0.08em] text-white sm:text-base",
-    inlineTagline: true,
+    imageClass: "h-auto w-[210px] max-w-full sm:w-[250px] lg:w-[270px]",
+    wrapperClass: "inline-flex flex-col items-start overflow-visible",
+    taglineClass: "mt-3 text-[15px] font-semibold tracking-[0.08em] text-white sm:text-base",
+    stackTagline: true,
   },
   loading: {
-    src: BRAND_LOGO_MARK_SRC,
-    intrinsic: MARK_SIZE,
-    imageClass: "h-[36px] w-auto max-w-[180px] sm:h-[46px]",
-    wrapperClass: "inline-flex shrink-0 items-center justify-center overflow-visible min-h-[56px] sm:min-h-[64px]",
+    imageClass: "h-auto w-[190px] max-w-[90vw] sm:w-[230px]",
+    wrapperClass:
+      "inline-flex shrink-0 items-center justify-center overflow-visible min-h-[72px] sm:min-h-[88px]",
+    taglineClass: "",
+  },
+  result: {
+    imageClass: "h-[36px] w-auto max-w-[160px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
     taglineClass: "",
   },
   footer: {
-    src: BRAND_LOGO_WORDMARK_SRC,
-    intrinsic: WORDMARK_SIZE,
-    imageClass: "h-[34px] w-auto max-w-[170px] sm:h-[42px] sm:max-w-[190px]",
-    wrapperClass: "inline-flex flex-col items-start gap-2.5 overflow-visible",
+    imageClass: "h-auto w-[210px] max-w-full sm:w-[250px]",
+    wrapperClass: "inline-flex flex-col items-start gap-3 overflow-visible",
     taglineClass: "text-base font-bold tracking-wide text-white sm:text-lg",
+    stackTagline: true,
   },
-  fullWordmark: {
-    src: BRAND_LOGO_WORDMARK_SRC,
-    intrinsic: WORDMARK_SIZE,
-    imageClass: "h-[38px] w-auto max-w-[180px] sm:h-[44px] sm:max-w-[200px]",
+  pdf: {
+    imageClass: "h-auto w-[180px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
+    taglineClass: "",
+  },
+  print: {
+    imageClass: "h-auto w-[160px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
+    taglineClass: "",
+  },
+  admin: {
+    imageClass: "h-[40px] w-auto max-w-[180px]",
     wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
     taglineClass: "",
   },
   compact: {
-    src: BRAND_LOGO_MARK_SRC,
-    intrinsic: MARK_SIZE,
-    imageClass: "h-[28px] w-auto max-w-[120px]",
+    imageClass: "h-[32px] w-auto max-w-[140px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
+    taglineClass: "",
+  },
+  fullWordmark: {
+    imageClass: "h-auto w-[220px] max-w-full sm:w-[260px]",
     wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
     taglineClass: "",
   },
 };
+
+function resolveSrc(variant: "dark" | "light"): string {
+  // light variant = shown on dark backgrounds → white logo
+  // dark variant = shown on light backgrounds → black logo
+  return variant === "light" ? BRAND_LOGO_OFFICIAL_WEB : BRAND_LOGO_OFFICIAL_ON_LIGHT;
+}
 
 export default function SgSolarLogo({
   layout = "header",
   variant = "dark",
   showTagline = false,
   className = "",
+  link = true,
 }: SgSolarLogoProps) {
-  const isLight = variant === "light";
   const config = layoutConfig[layout];
-  const imageClass = `${config.imageClass} object-contain object-center ${
-    isLight ? "" : "invert"
-  }`;
+  const src = resolveSrc(variant);
 
   const logoImage = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={config.src}
+      src={src}
       alt="SG SOLAR"
-      width={config.intrinsic.width}
-      height={config.intrinsic.height}
+      width={OFFICIAL_SIZE.width}
+      height={OFFICIAL_SIZE.height}
       decoding="async"
-      className={imageClass}
+      className={`${config.imageClass} object-contain object-center`}
       style={{ flexShrink: 0 }}
     />
   );
 
-  return (
-    <Link href="/" className={`${config.wrapperClass} ${className}`}>
+  const content = (
+    <>
       {logoImage}
       {showTagline ? (
-        config.inlineTagline ? (
-          <span className={config.taglineClass}>{company.companyName}</span>
-        ) : (
+        config.stackTagline ? (
           <p className={config.taglineClass}>{company.companyName}</p>
+        ) : (
+          <span className={config.taglineClass}>{company.companyName}</span>
         )
       ) : null}
-    </Link>
+    </>
   );
+
+  if (!link) {
+    return <div className={`${config.wrapperClass} ${className}`}>{content}</div>;
+  }
+
+  return <Link href="/" className={`${config.wrapperClass} ${className}`}>{content}</Link>;
 }

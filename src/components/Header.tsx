@@ -12,16 +12,26 @@ const navItems = [
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 shadow-sm backdrop-blur-sm">
-      <div className="site-shell flex h-[76px] items-center justify-between gap-6 sm:h-[80px]">
-        <SgSolarLogo layout="header" className="min-w-0" />
+      <div className="site-shell flex h-[80px] items-center justify-between gap-4 sm:h-[84px] sm:gap-6 lg:h-[88px]">
+        <div className="min-w-0 shrink-0">
+          <span className="lg:hidden">
+            <SgSolarLogo layout="mobileHeader" variant="dark" />
+          </span>
+          <span className="hidden lg:inline-flex">
+            <SgSolarLogo layout="header" variant="dark" />
+          </span>
+        </div>
 
-        <nav className="hidden flex-1 items-center justify-center gap-8 lg:flex xl:gap-10" aria-label="주요 메뉴">
+        <nav
+          className="hidden flex-1 items-center justify-center gap-9 xl:gap-10 lg:flex"
+          aria-label="주요 메뉴"
+        >
           {navItems.map((item) =>
             item.href.startsWith("/") ? (
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2"
+                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 xl:text-base"
               >
                 {item.label}
               </Link>
@@ -29,7 +39,7 @@ export default function Header() {
               <ScrollLink
                 key={item.label}
                 href={item.href}
-                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2"
+                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 xl:text-base"
               >
                 {item.label}
               </ScrollLink>
@@ -39,9 +49,10 @@ export default function Header() {
 
         <ScrollLink
           href="#consultation"
-          className="btn-primary h-11 shrink-0 rounded-xl px-5 text-[15px] font-bold shadow-md sm:h-12 sm:px-6"
+          className="btn-primary h-11 shrink-0 rounded-xl px-4 text-sm font-bold shadow-md sm:h-12 sm:px-6 sm:text-[15px]"
         >
-          무료 컨설팅 상담 신청하기
+          <span className="sm:hidden">무료 상담</span>
+          <span className="hidden sm:inline">무료 컨설팅 상담 신청하기</span>
         </ScrollLink>
       </div>
     </header>

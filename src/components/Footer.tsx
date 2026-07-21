@@ -24,7 +24,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[minmax(220px,280px)_1fr] lg:gap-12">
           <div className="max-w-xs">
             <SgSolarLogo layout="footer" variant="light" showTagline />
-            <p className="mt-4 text-sm leading-relaxed text-slate-300">
+            <p className="mt-3 text-sm leading-relaxed text-slate-300">
               태양광 입지검토 · 발전사업 컨설팅
             </p>
           </div>

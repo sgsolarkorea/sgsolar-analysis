@@ -15,7 +15,7 @@ export default async function AnalyzingPage({ searchParams }: AnalyzingPageProps
   }
 
   return (
-    <section className="min-h-[60vh] bg-slate-50">
+    <section className="bg-slate-50">
       <AnalysisLoadingScreen address={address} />
     </section>
   );
