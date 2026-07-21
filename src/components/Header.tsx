@@ -11,17 +11,17 @@ const navItems = [
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
-      <div className="mx-auto flex h-[72px] max-w-5xl items-center justify-between gap-4 px-4 sm:px-6 sm:h-[76px]">
-        <SgSolarLogo layout="header" />
+    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 shadow-sm backdrop-blur-sm">
+      <div className="site-shell flex h-[76px] items-center justify-between gap-6 sm:h-[80px]">
+        <SgSolarLogo layout="header" className="min-w-0" />
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-8 lg:flex xl:gap-10" aria-label="주요 메뉴">
           {navItems.map((item) =>
             item.href.startsWith("/") ? (
               <Link
                 key={item.label}
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-navy"
+                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2"
               >
                 {item.label}
               </Link>
@@ -29,7 +29,7 @@ export default function Header() {
               <ScrollLink
                 key={item.label}
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-navy"
+                className="text-[15px] font-semibold text-slate-800 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2"
               >
                 {item.label}
               </ScrollLink>
@@ -37,7 +37,10 @@ export default function Header() {
           )}
         </nav>
 
-        <ScrollLink href="#consultation" className="btn-primary h-10 shrink-0 px-4 text-sm sm:px-5">
+        <ScrollLink
+          href="#consultation"
+          className="btn-primary h-11 shrink-0 rounded-xl px-5 text-[15px] font-bold shadow-md sm:h-12 sm:px-6"
+        >
           무료 컨설팅 상담 신청하기
         </ScrollLink>
       </div>

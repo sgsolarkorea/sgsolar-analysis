@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { company } from "@/data/sampleData";
 
-/** Original PNG intrinsic size — display via pixel height + auto width (object-fit: contain). */
-const LOGO_SRC = "/brand/sg-solar-logo.png";
-const LOGO_WIDTH = 640;
-const LOGO_HEIGHT = 320;
+/** Trimmed web assets — padding removed from 500×500 source canvas. */
+export const BRAND_LOGO_MARK_SRC = "/brand/sg-logo-mark-web.png";
+export const BRAND_LOGO_WORDMARK_SRC = "/brand/sg-solar-logo-web.png";
+
+const MARK_SIZE = { width: 276, height: 68 } as const;
+const WORDMARK_SIZE = { width: 276, height: 101 } as const;
 
 export type SgSolarLogoLayout = "header" | "hero" | "footer" | "compact";
 
@@ -15,29 +17,46 @@ interface SgSolarLogoProps {
   className?: string;
 }
 
-const layoutStyles: Record<
+/** Display heights target visible SG symbol, not outer box. */
+const layoutConfig: Record<
   SgSolarLogoLayout,
-  { imageClass: string; taglineGap: string; taglineClass: string }
+  {
+    src: string;
+    intrinsic: { width: number; height: number };
+    imageClass: string;
+    blockClass: string;
+    taglineClass: string;
+    inlineTagline?: boolean;
+  }
 > = {
   header: {
-    imageClass: "h-[36px] sm:h-[44px]",
-    taglineGap: "gap-0",
-    taglineClass: "text-[10px] sm:text-xs",
+    src: BRAND_LOGO_MARK_SRC,
+    intrinsic: MARK_SIZE,
+    imageClass: "h-[26px] w-auto sm:h-[30px]",
+    blockClass: "inline-flex shrink-0 items-center",
+    taglineClass: "",
   },
   hero: {
-    imageClass: "h-[80px]",
-    taglineGap: "gap-3",
-    taglineClass: "text-sm font-semibold tracking-wide sm:text-base",
+    src: BRAND_LOGO_MARK_SRC,
+    intrinsic: MARK_SIZE,
+    imageClass: "h-[48px] w-auto sm:h-[52px]",
+    blockClass: "inline-flex items-center gap-3.5 sm:gap-4",
+    taglineClass: "text-[15px] font-semibold tracking-[0.08em] text-white sm:text-base",
+    inlineTagline: true,
   },
   footer: {
-    imageClass: "h-[60px]",
-    taglineGap: "gap-2.5",
-    taglineClass: "text-xs font-semibold tracking-wide sm:text-sm",
+    src: BRAND_LOGO_MARK_SRC,
+    intrinsic: MARK_SIZE,
+    imageClass: "h-[38px] w-auto sm:h-[42px]",
+    blockClass: "inline-flex flex-col items-start gap-2.5",
+    taglineClass: "text-base font-bold tracking-wide text-white sm:text-lg",
   },
   compact: {
-    imageClass: "h-11",
-    taglineGap: "gap-1",
-    taglineClass: "text-[10px] sm:text-xs",
+    src: BRAND_LOGO_MARK_SRC,
+    intrinsic: MARK_SIZE,
+    imageClass: "h-[30px] w-auto",
+    blockClass: "inline-flex shrink-0 items-center",
+    taglineClass: "",
   },
 };
 
@@ -48,32 +67,32 @@ export default function SgSolarLogo({
   className = "",
 }: SgSolarLogoProps) {
   const isLight = variant === "light";
-  const styles = layoutStyles[layout];
+  const config = layoutConfig[layout];
+  const imageClass = `${config.imageClass} max-w-none object-contain ${
+    isLight ? "" : "invert"
+  }`;
+
+  const logoImage = (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={config.src}
+      alt="SG SOLAR"
+      width={config.intrinsic.width}
+      height={config.intrinsic.height}
+      decoding="async"
+      className={imageClass}
+    />
+  );
 
   return (
-    <Link
-      href="/"
-      className={`inline-flex flex-col items-start ${styles.taglineGap} ${className}`}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={LOGO_SRC}
-        alt="SG SOLAR"
-        width={LOGO_WIDTH}
-        height={LOGO_HEIGHT}
-        decoding="async"
-        className={`w-auto max-w-none object-contain ${styles.imageClass} ${
-          isLight ? "" : "invert"
-        }`}
-      />
+    <Link href="/" className={`${config.blockClass} ${className}`}>
+      {logoImage}
       {showTagline ? (
-        <p
-          className={`leading-none ${styles.taglineClass} ${
-            isLight ? "text-slate-300" : "text-slate-600"
-          }`}
-        >
-          {company.companyName}
-        </p>
+        config.inlineTagline ? (
+          <span className={config.taglineClass}>{company.companyName}</span>
+        ) : (
+          <p className={config.taglineClass}>{company.companyName}</p>
+        )
       ) : null}
     </Link>
   );

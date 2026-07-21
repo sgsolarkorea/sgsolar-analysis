@@ -155,63 +155,80 @@ export default function AddressSearchForm() {
   const showDropdown = isOpen && address.trim().length >= MIN_QUERY_LENGTH;
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div ref={containerRef} className="relative flex-1">
-          <svg
-            className="absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-muted"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => {
-              if (address.trim().length >= MIN_QUERY_LENGTH) setIsOpen(true);
-            }}
-            placeholder="도로명 또는 지번 주소를 입력하세요"
-            autoComplete="off"
-            aria-autocomplete="list"
-            aria-expanded={showDropdown}
-            aria-controls="address-suggestions"
-            className="h-12 w-full rounded-xl border border-border bg-white pl-12 pr-4 text-base text-foreground outline-none focus:border-navy focus:ring-2 focus:ring-navy/10 sm:h-14"
-          />
-
-          {showDropdown && (
-            <div
-              id="address-suggestions"
-              role="listbox"
-              className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl"
+    <form onSubmit={handleSubmit} className="w-full max-w-[840px]">
+      <div ref={containerRef} className="relative">
+        <div className="flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_10px_32px_rgba(0,0,0,0.14)] sm:flex-row sm:items-stretch">
+          <div className="relative min-w-0 flex-1">
+            <svg
+              className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-slate-400 sm:left-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden
             >
-              {status === "loading" && (
-                <p className="px-4 py-3 text-sm text-slate-500">주소 검색 중...</p>
-              )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => {
+                if (address.trim().length >= MIN_QUERY_LENGTH) setIsOpen(true);
+              }}
+              placeholder="도로명 또는 지번 주소를 입력하세요"
+              autoComplete="off"
+              aria-autocomplete="list"
+              aria-expanded={showDropdown}
+              aria-controls="address-suggestions"
+              className="h-[58px] w-full border-0 bg-transparent pl-12 pr-4 text-base text-foreground outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-500/35 sm:h-[62px] sm:pl-14 sm:text-[16px]"
+            />
+          </div>
 
-              {status === "empty" && (
-                <p className="px-4 py-3 text-sm text-slate-500">검색 결과가 없습니다.</p>
-              )}
-
-              {status === "ready" &&
-                suggestions.map((item) => (
-                  <div key={item.id} className="border-b border-slate-100 last:border-b-0">
-                    <SuggestionItem item={item} onSelect={selectSuggestion} />
-                  </div>
-                ))}
-            </div>
-          )}
+          <button
+            type="submit"
+            className="h-[58px] w-full shrink-0 bg-[#2563eb] px-6 text-base font-extrabold text-white transition-colors hover:bg-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:bg-[#1e40af] sm:h-[62px] sm:w-[188px]"
+          >
+            입지검토 시작
+          </button>
         </div>
-        <button type="submit" className="btn-primary h-12 shrink-0 px-8 text-base sm:h-14">
-          입지검토 시작
-        </button>
+
+        {showDropdown && (
+          <div
+            id="address-suggestions"
+            role="listbox"
+            className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl"
+          >
+            {status === "loading" && (
+              <p className="px-4 py-3 text-sm text-slate-500">주소 검색 중...</p>
+            )}
+
+            {status === "empty" && (
+              <p className="px-4 py-3 text-sm text-slate-500">검색 결과가 없습니다.</p>
+            )}
+
+            {status === "ready" &&
+              suggestions.map((item) => (
+                <div key={item.id} className="border-b border-slate-100 last:border-b-0">
+                  <SuggestionItem item={item} onSelect={selectSuggestion} />
+                </div>
+              ))}
+          </div>
+        )}
       </div>
-      <p className="mt-3 text-sm text-slate-400">예시: {DEFAULT_ADDRESS}</p>
+
+      <p className="mt-3 text-sm text-slate-300 sm:mt-2.5">예시: {DEFAULT_ADDRESS}</p>
     </form>
   );
 }

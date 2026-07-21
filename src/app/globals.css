@@ -113,12 +113,36 @@
   color: #ffffff;
   font-weight: 700;
   transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 4px 12px rgba(11, 29, 58, 0.35);
+  box-shadow: 0 2px 8px rgba(11, 29, 58, 0.22);
 }
 
 .btn-primary:hover {
   background-color: #071428;
-  box-shadow: 0 6px 16px rgba(11, 29, 58, 0.4);
+  box-shadow: 0 4px 12px rgba(11, 29, 58, 0.28);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11, 29, 58, 0.22);
+}
+
+.site-shell {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .site-shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-shell {
+    padding-inline: 2rem;
+  }
 }
 
 .btn-primary:active {
