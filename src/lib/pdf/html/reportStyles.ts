@@ -30,7 +30,7 @@ export function reportBaseStyles(): string {
       background-size: 24px 24px; pointer-events: none;
     }
     .cover-left { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
-    .cover-left img { height: 28px; width: auto; filter: brightness(0) invert(1); }
+    .cover-left img { height: 32px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
     .cover-left .brand-text { font-size: 15pt; font-weight: 700; }
     .cover-tag { font-size: 7pt; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.72; margin-bottom: 4px; }
     .cover-band h1 { font-size: 13pt; color: #fff; margin-bottom: 3px; letter-spacing: -0.02em; }

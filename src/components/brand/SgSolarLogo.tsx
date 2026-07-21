@@ -1,61 +1,48 @@
-import { company } from "@/data/sampleData";
+import Image from "next/image";
 import Link from "next/link";
+import { company } from "@/data/sampleData";
 
 interface SgSolarLogoProps {
   size?: "sm" | "md" | "lg";
   variant?: "dark" | "light";
   showTagline?: boolean;
+  className?: string;
 }
 
-const sizes = {
-  sm: { icon: "h-9 w-9", brand: "text-base", sub: "text-[10px]" },
-  md: { icon: "h-10 w-10", brand: "text-xl", sub: "text-xs" },
-  lg: { icon: "h-12 w-12", brand: "text-2xl", sub: "text-sm" },
-};
+/** Header: mobile 32px / desktop 44px (40–48). lg ≈ 48px. */
+const heights = {
+  sm: "h-8 sm:h-11",
+  md: "h-11",
+  lg: "h-12",
+} as const;
 
 export default function SgSolarLogo({
   size = "md",
   variant = "dark",
   showTagline = false,
+  className = "",
 }: SgSolarLogoProps) {
-  const s = sizes[size];
   const isLight = variant === "light";
 
   return (
-    <Link href="/" className="inline-flex items-center gap-2.5">
-      <div
-        className={`${s.icon} flex shrink-0 items-center justify-center rounded-lg ${
-          isLight ? "bg-white/20 ring-1 ring-white/30" : "bg-navy"
-        }`}
-      >
-        <svg viewBox="0 0 32 32" className="h-[55%] w-[55%]" aria-hidden>
-          <circle cx="16" cy="16" r="5" fill="#ffffff" />
-          <g stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round">
-            <line x1="16" y1="3" x2="16" y2="7" />
-            <line x1="16" y1="25" x2="16" y2="29" />
-            <line x1="3" y1="16" x2="7" y2="16" />
-            <line x1="25" y1="16" x2="29" y2="16" />
-          </g>
-        </svg>
-      </div>
-      <div className="min-w-0">
+    <Link href="/" className={`inline-flex flex-col items-start gap-1 ${className}`}>
+      <Image
+        src="/brand/sg-solar-logo.png"
+        alt="SG SOLAR"
+        width={640}
+        height={320}
+        priority={size !== "sm"}
+        className={`${heights[size]} w-auto object-contain ${isLight ? "" : "invert"}`}
+      />
+      {showTagline ? (
         <p
-          className={`${s.brand} font-bold leading-none tracking-tight ${
-            isLight ? "text-white" : "text-slate-900"
+          className={`text-[10px] font-semibold leading-tight tracking-wide sm:text-xs ${
+            isLight ? "text-slate-300" : "text-slate-600"
           }`}
         >
-          {company.brandName}
+          {company.companyName}
         </p>
-        {showTagline && (
-          <p
-            className={`${s.sub} mt-1 font-medium leading-tight ${
-              isLight ? "text-slate-200" : "text-slate-600"
-            }`}
-          >
-            {company.companyName}
-          </p>
-        )}
-      </div>
+      ) : null}
     </Link>
   );
 }

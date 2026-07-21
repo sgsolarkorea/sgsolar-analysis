@@ -516,8 +516,8 @@ export function buildReportHtml(
   const setbackRows = data.setbackReview?.rows ?? [];
 
   const logoHtml = assets.logoDataUrl
-    ? `<img src="${assets.logoDataUrl}" alt="SG SOLAR" />`
-    : `<div class="brand-text">SG SOLAR</div>`;
+    ? `<img src="${assets.logoDataUrl}" alt="SG SOLAR KOREA" />`
+    : `<div class="brand-text">SG SOLAR KOREA</div>`;
 
   const regulatoryTable =
     regulatoryRows.length === 0

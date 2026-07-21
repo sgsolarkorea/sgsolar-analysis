@@ -1,0 +1,17 @@
+{
+  "name": "SG SOLAR KOREA",
+  "short_name": "SG SOLAR",
+  "description": "SG SOLAR KOREA 태양광 입지검토 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1736",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/brand/sg-solar-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

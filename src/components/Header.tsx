@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto flex h-[68px] max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-        <SgSolarLogo size="sm" showTagline />
+        <SgSolarLogo size="sm" />
 
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) =>

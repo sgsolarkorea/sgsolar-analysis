@@ -43,7 +43,7 @@ export const REVENUE_WARNING =
 /** ★ 회사 정보 — 이 객체만 수정하면 Header/Footer/상담 영역에 반영됩니다 */
 export const company: CompanyInfo = {
   brandName: "SG SOLAR",
-  companyName: "신재생에너지한국태양광에스지솔라",
+  companyName: "SG SOLAR KOREA",
   ceo: "박성수",
   phone: "1844-2807",
   fax: "0508-956-6014",
@@ -55,7 +55,7 @@ export const company: CompanyInfo = {
 };
 
 /** 소개·마케팅 문구용 정식 명칭 (로고·이메일·도메인 등은 brandName 유지) */
-export const MARKETING_NAME = "신재생에너지 한국태양광 에스지솔라";
+export const MARKETING_NAME = "SG SOLAR KOREA";
 
 /** 사이트 메타 — layout.tsx 에서 사용 */
 export const siteMetadata = {

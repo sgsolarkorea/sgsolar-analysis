@@ -1,5 +1,6 @@
 "use client";
 
+import SgSolarLogo from "@/components/brand/SgSolarLogo";
 import { useState } from "react";
 
 interface AdminLoginFormProps {
@@ -36,6 +37,9 @@ export default function AdminLoginForm(_props: AdminLoginFormProps) {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
+      <div className="mb-8 flex justify-center">
+        <SgSolarLogo size="md" />
+      </div>
       <div className="card-premium p-6 sm:p-8">
         <h1 className="text-xl font-bold text-slate-900">관리자 로그인</h1>
         <p className="mt-2 text-sm text-slate-600">
