@@ -3,6 +3,10 @@ import {
   KakaoAddressNotFoundError,
   getKakaoErrorMessage,
 } from "@/lib/api/kakaoErrors";
+import { buildReviewOpinionLines, buildReviewStatusItems } from "@/lib/result/buildReviewSummary";
+import { KeyMetricCards } from "@/components/result/KeyMetricCards";
+import ReviewStatusGrid from "@/components/result/ReviewStatusGrid";
+import ReviewOpinionPanel from "@/components/result/ReviewOpinionPanel";
 import ResultHero from "@/components/result/ResultHero";
 import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import MapArea from "@/components/result/MapArea";
@@ -13,7 +17,6 @@ import DetailInfoSection from "@/components/result/DetailInfoSection";
 import GridConnectionSection from "@/components/result/GridConnectionSection";
 import SetbackReviewSection from "@/components/result/SetbackReviewSection";
 import LocalOrdinanceSection from "@/components/result/LocalOrdinanceSection";
-import SimilarCases from "@/components/result/SimilarCases";
 import AddressSearchError from "@/components/result/AddressSearchError";
 import { ResultMetricsProvider } from "@/components/result/ResultMetricsProvider";
 import {
@@ -22,6 +25,7 @@ import {
   ResultGenerationSection,
   ResultRevenueSection,
   ResultSaveSection,
+  ResultSimilarCasesSection,
   ResultSiteOverview,
 } from "@/components/result/ResultMetricsSections";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -92,6 +96,13 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     getFieldValue(data.landInfo, "지목"),
   );
 
+  const reviewStatusItems = buildReviewStatusItems(data);
+  const reviewOpinionLines = buildReviewOpinionLines(data);
+  const analysisAreaLabel =
+    data.solarMetrics.baseAreaSqm > 0
+      ? `${Math.round(data.solarMetrics.baseAreaSqm).toLocaleString("ko-KR")}㎡`
+      : undefined;
+
   return (
     <div className="pb-28 md:pb-20">
       <ResultHero
@@ -99,10 +110,20 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         jibunAddress={data.jibunAddress}
         buildingName={data.buildingName}
         analyzedAt={data.analyzedAt}
-        grade={data.grade}
         recommendation={data.recommendation}
-        suitability={data.suitability}
       />
+
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-10">
+        <KeyMetricCards
+          capacity={data.capacity}
+          annualGeneration={data.annualGeneration}
+          annualRevenue={data.annualRevenue}
+          installType={data.recommendation.split("(")[0]?.trim() || data.recommendation}
+          analysisArea={analysisAreaLabel}
+        />
+        <ReviewStatusGrid items={reviewStatusItems} />
+        <ReviewOpinionPanel lines={reviewOpinionLines} />
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="lg:flex lg:gap-6 lg:py-4">
@@ -116,6 +137,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             initialProfitability={data.profitability}
             initialMonthlyGeneration={data.monthlyGeneration}
             initialPrimaryParcel={primaryParcel}
+            initialRecommendedCases={data.recommendedCases}
+            siteAddress={data.address}
+            siteJibunAddress={data.jibunAddress}
             multiParcelEnabled={multiParcelEnabled}
             searchHistoryId={searchHistory.id}
             consultationBase={consultationBase}
@@ -174,7 +198,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
                 disclaimer={GRID_DISCLAIMER}
               />
 
-              <SimilarCases cases={data.recommendedCases} />
+              <ResultSimilarCasesSection />
 
               <ResultSaveSection address={data.address} />
 

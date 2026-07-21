@@ -274,7 +274,6 @@ export const result: Omit<
   pnu: "4113512345",
   lat: 37.3947,
   lng: 127.1112,
-  grade: "A",
   recommendation: "지붕형 (12° 고정형)",
   capacity: "99.4kW",
   annualGeneration: "128,400kWh/년",

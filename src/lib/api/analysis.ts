@@ -6,6 +6,7 @@ import { areaPerKwByType } from "@/data/solarConfig";
 import { unstable_cache } from "next/cache";
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
+import type { InstallTypeOption } from "@/data/resultUx";
 import { getBuildingInfoByRegistry, getBuildingRegistryItemCount } from "@/lib/api/buildingRegistry";
 import {
   hasLandRecord,
@@ -16,7 +17,9 @@ import { parseJibunLot } from "@/lib/api/jibunParser";
 import { fetchLegalDongCodesByCoord, searchAddressByKakao } from "@/lib/api/kakao";
 import { getMarketPrice } from "@/lib/api/market";
 import { buildPnu } from "@/lib/api/pnu";
-import { recommendConstructionCases, type CaseRecommendInput } from "@/lib/api/recommendCases";
+import { parseCapacityKw, type CaseRecommendInput } from "@/lib/api/recommendCases";
+import { recommendCaseStudies } from "@/lib/api/recommendCaseStudies";
+import type { RecommendedCaseStudy } from "@/data/caseStudies";
 import { getLandInfoByPnu, getLandInfoByVworld } from "@/lib/api/vworld";
 import { resolveRegionDistrictAnalysis } from "@/lib/regulatory/resolveRegionDistrictAnalysis";
 import { buildLayerARegulatoryAnalysis } from "@/lib/regulatory/buildLayerARegulatory";
@@ -38,13 +41,10 @@ import {
   parseAreaSqm,
 } from "@/lib/solar/calculate";
 import { extractAreasForDebug, logSolarCalculationDebug } from "@/lib/solar/debug";
-import { deriveGradeFromCapacity } from "@/lib/solar/grade";
 import type {
-  Grade,
   GridInfo,
   InfoField,
   Profitability,
-  RecommendedConstructionCase,
   ResolvedSiteReview,
   SolarMetrics,
 } from "@/types/siteReview";
@@ -74,10 +74,6 @@ export async function getGridInfo(input: {
 }): Promise<GridInfo> {
   const { resolveGridConnection } = await import("@/lib/grid/resolve");
   return resolveGridConnection(input);
-}
-
-function deriveGrade(capacityKw: number): Grade {
-  return deriveGradeFromCapacity(capacityKw);
 }
 
 export async function calculateSolarProfitability(
@@ -151,10 +147,25 @@ export async function calculateSolarProfitability(
 }
 
 export async function getRecommendedCases(
-  input: CaseRecommendInput,
-): Promise<RecommendedConstructionCase[]> {
-  const { cases } = await import("@/data/sampleData");
-  return recommendConstructionCases(input, cases);
+  input: CaseRecommendInput & {
+    installType?: InstallTypeOption;
+    capacityKw?: number;
+  },
+): Promise<RecommendedCaseStudy[]> {
+  const installType =
+    input.installType ??
+    resolveDefaultInstallType(input.recommendation, input.landInfo, input.buildingInfo);
+  const capacityKw =
+    input.capacityKw != null && input.capacityKw > 0
+      ? input.capacityKw
+      : parseCapacityKw(input.capacity);
+
+  return recommendCaseStudies({
+    installType,
+    capacityKw,
+    address: input.address,
+    jibunAddress: input.jibunAddress,
+  });
 }
 
 async function resolvePnuForBuildingLookup(
@@ -194,7 +205,12 @@ function hasRoadAddress(address: string): boolean {
 }
 
 export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
+  const perfLabel = `[Analysis] ${address.trim()}`;
+  const t0 = Date.now();
+  console.info(`${perfLabel} start`);
+
   const geo = await searchAddressByKakao(address);
+  console.info(`${perfLabel} geocoding ${Date.now() - t0}ms`);
   const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, null);
 
   const [landResult, landByPnu] = await Promise.all([
@@ -216,12 +232,13 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     }
   }
 
-  const buildingInfo = await getBuildingInfo({
-    pnu: effectivePnu,
-    buildingName: geo.buildingName,
-  });
-  const registryBuildingCount =
-    effectivePnu != null ? await getBuildingRegistryItemCount(effectivePnu) : 0;
+  const [buildingInfo, registryBuildingCount] = await Promise.all([
+    getBuildingInfo({
+      pnu: effectivePnu,
+      buildingName: geo.buildingName,
+    }),
+    effectivePnu != null ? getBuildingRegistryItemCount(effectivePnu) : Promise.resolve(0),
+  ]);
 
   const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
   const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
@@ -275,7 +292,6 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   const annualGeneration = formatGenerationDisplay(solarMetrics.annualGenerationKwh);
   const annualRevenue = formatRevenueDisplay(solarMetrics.totalRevenueWon);
   const constructionCost = formatConstructionDisplay(solarMetrics.constructionCostWon);
-  const grade = deriveGrade(solarMetrics.capacityKw);
 
   logSolarCalculationDebug({
     address: geo.address,
@@ -290,23 +306,26 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     source: "analyzeSolarSite",
   });
 
-  const recommendedCases = await getRecommendedCases({
-    address: geo.address,
-    jibunAddress: geo.jibunAddress,
-    landInfo,
-    buildingInfo,
-    capacity,
-    recommendation,
-  });
-
-  const gridInfo = await getGridInfo({
-    lat: geo.lat,
-    lng: geo.lng,
-    address: geo.address,
-    jibunAddress: geo.jibunAddress,
-    capacityKw: solarMetrics.capacityKw,
-    pnu: effectivePnu ?? undefined,
-  });
+  const [recommendedCases, gridInfo] = await Promise.all([
+    getRecommendedCases({
+      address: geo.address,
+      jibunAddress: geo.jibunAddress,
+      landInfo,
+      buildingInfo,
+      capacity,
+      recommendation,
+      installType: solarMetrics.installType as InstallTypeOption,
+      capacityKw: solarMetrics.capacityKw,
+    }),
+    getGridInfo({
+      lat: geo.lat,
+      lng: geo.lng,
+      address: geo.address,
+      jibunAddress: geo.jibunAddress,
+      capacityKw: solarMetrics.capacityKw,
+      pnu: effectivePnu ?? undefined,
+    }),
+  ]);
 
   const siteIntel =
     effectivePnu != null && effectivePnu !== ""
@@ -331,6 +350,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
         jibunAddress: geo.jibunAddress,
       })
     : buildDefaultSetbackReview(solarMetrics.installType, geo.address, geo.jibunAddress);
+
+  console.info(`${perfLabel} complete ${Date.now() - t0}ms`);
 
   return {
     address: geo.address,
@@ -357,7 +378,6 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     annualGeneration,
     annualRevenue,
     constructionCost,
-    grade,
     recommendedCases,
     recommendedBusinessTypes: result.recommendedBusinessTypes,
     businessTypeOptions: result.businessTypeOptions,
@@ -367,14 +387,26 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
   };
 }
 
-/** 로딩 화면 prefetch와 결과 페이지 SSR 간 중복 분석 방지 (2분 캐시) */
+/** 로딩 화면 prefetch와 결과 페이지 SSR 간 중복 분석 방지 */
 const ANALYSIS_CACHE_SALT = `roof-${areaPerKwByType.roof}-usable-v1`;
+const MEMORY_CACHE_TTL_MS = 120_000;
+const memoryCache = new Map<string, { expires: number; value: ResolvedSiteReview }>();
 
 export async function getCachedAnalyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
   const normalized = address.trim();
-  return unstable_cache(
+  const now = Date.now();
+  const cached = memoryCache.get(normalized);
+  if (cached && cached.expires > now) {
+    console.info(`[Analysis] memory cache hit for "${normalized}"`);
+    return cached.value;
+  }
+
+  const value = await unstable_cache(
     () => analyzeSolarSite(normalized),
     ["analyze-solar-site", ANALYSIS_CACHE_SALT, normalized],
     { revalidate: 120 },
   )();
+
+  memoryCache.set(normalized, { value, expires: now + MEMORY_CACHE_TTL_MS });
+  return value;
 }

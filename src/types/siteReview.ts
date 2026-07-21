@@ -1,8 +1,8 @@
 import type { SetbackReview } from "@/types/regulatoryReview";
 import type { LandInfoDetail, LayerARegulatoryAnalysis, RegionDistrictAnalysis } from "@/types/landInfo";
 import type { GridConnectionInfo } from "@/types/gridConnection";
+import type { RecommendedCaseStudy } from "@/data/caseStudies";
 
-export type Grade = "A" | "B" | "C" | "D";
 export type SuitabilityStatus = "pass" | "caution" | "fail";
 export type FieldStatus = "상담 시 확인" | "추가 확인 필요" | "확인 필요";
 export type OrdinanceStatus = "확인 필요" | "상담 필요" | "조건부 가능";
@@ -130,7 +130,7 @@ export interface BusinessTypeOption {
   description: string;
 }
 
-/** 시공사례 — sampleData.cases / result.recommendedCases */
+/** 시공사례 — sampleData.cases (레거시) / recommendConstructionCases */
 export interface ConstructionCase {
   title: string;
   region: string;
@@ -170,7 +170,6 @@ export interface SiteReviewResult {
   buildingName?: string;
   zoneNo?: string;
   analyzedAt: string;
-  grade: Grade;
   recommendation: string;
   capacity: string;
   annualGeneration: string;
@@ -187,7 +186,7 @@ export interface SiteReviewResult {
   profitability: Profitability;
   solarMetrics: SolarMetrics;
   monthlyGeneration: MonthlyGeneration[];
-  recommendedCases: RecommendedConstructionCase[];
+  recommendedCases: RecommendedCaseStudy[];
   recommendedBusinessTypes: string;
   businessTypeOptions: BusinessTypeOption[];
   suitability: SuitabilityItem[];
@@ -196,13 +195,6 @@ export interface SiteReviewResult {
 export type ResolvedSiteReview = SiteReviewResult & {
   consultationDefaultAddress: string;
   siteGeometryBundle?: import("@/types/siteGeometry").SiteGeometryBundle;
-};
-
-export const GRADE_MESSAGES: Record<Grade, string> = {
-  A: "태양광 설치 검토에 유리한 입지입니다.",
-  B: "조건부로 태양광 설치 검토가 가능한 입지입니다.",
-  C: "추가 검토가 필요한 입지입니다.",
-  D: "현재 조건으로는 설치 검토가 어려울 수 있습니다.",
 };
 
 export const CONSULTATION_INSTALL_TYPE_OPTIONS = [

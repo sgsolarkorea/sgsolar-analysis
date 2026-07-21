@@ -50,7 +50,7 @@ export default function Footer() {
         </p>
 
         <div className="mt-6 border-t border-slate-700 pt-6 text-xs text-slate-400 sm:text-sm">
-          @2005. {MARKETING_NAME}. All rights reserved.
+          © 2005–2026 {MARKETING_NAME}. All rights reserved.
         </div>
       </div>
     </footer>

@@ -8,7 +8,14 @@ export const BRAND_LOGO_WORDMARK_SRC = "/brand/sg-solar-logo-web.png";
 const MARK_SIZE = { width: 276, height: 68 } as const;
 const WORDMARK_SIZE = { width: 276, height: 101 } as const;
 
-export type SgSolarLogoLayout = "header" | "hero" | "footer" | "compact";
+export type SgSolarLogoLayout =
+  | "header"
+  | "hero"
+  | "loading"
+  | "footer"
+  | "mobile"
+  | "compact"
+  | "fullWordmark";
 
 interface SgSolarLogoProps {
   layout?: SgSolarLogoLayout;
@@ -17,14 +24,14 @@ interface SgSolarLogoProps {
   className?: string;
 }
 
-/** Display heights target visible SG symbol, not outer box. */
+/** Each variant has independent sizing — do not reuse one height everywhere. */
 const layoutConfig: Record<
   SgSolarLogoLayout,
   {
     src: string;
     intrinsic: { width: number; height: number };
     imageClass: string;
-    blockClass: string;
+    wrapperClass: string;
     taglineClass: string;
     inlineTagline?: boolean;
   }
@@ -32,30 +39,51 @@ const layoutConfig: Record<
   header: {
     src: BRAND_LOGO_MARK_SRC,
     intrinsic: MARK_SIZE,
-    imageClass: "h-[26px] w-auto sm:h-[30px]",
-    blockClass: "inline-flex shrink-0 items-center",
+    imageClass: "h-[26px] w-auto max-w-[124px] sm:h-[30px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible py-1",
+    taglineClass: "",
+  },
+  mobile: {
+    src: BRAND_LOGO_MARK_SRC,
+    intrinsic: MARK_SIZE,
+    imageClass: "h-[24px] w-auto max-w-[108px] sm:h-[28px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible py-1",
     taglineClass: "",
   },
   hero: {
     src: BRAND_LOGO_MARK_SRC,
     intrinsic: MARK_SIZE,
-    imageClass: "h-[48px] w-auto sm:h-[52px]",
-    blockClass: "inline-flex items-center gap-3.5 sm:gap-4",
+    imageClass: "h-[46px] w-auto max-w-[200px] sm:h-[52px]",
+    wrapperClass: "inline-flex items-center gap-3.5 overflow-visible sm:gap-4",
     taglineClass: "text-[15px] font-semibold tracking-[0.08em] text-white sm:text-base",
     inlineTagline: true,
   },
-  footer: {
+  loading: {
     src: BRAND_LOGO_MARK_SRC,
     intrinsic: MARK_SIZE,
-    imageClass: "h-[38px] w-auto sm:h-[42px]",
-    blockClass: "inline-flex flex-col items-start gap-2.5",
+    imageClass: "h-[36px] w-auto max-w-[180px] sm:h-[46px]",
+    wrapperClass: "inline-flex shrink-0 items-center justify-center overflow-visible min-h-[56px] sm:min-h-[64px]",
+    taglineClass: "",
+  },
+  footer: {
+    src: BRAND_LOGO_WORDMARK_SRC,
+    intrinsic: WORDMARK_SIZE,
+    imageClass: "h-[34px] w-auto max-w-[170px] sm:h-[42px] sm:max-w-[190px]",
+    wrapperClass: "inline-flex flex-col items-start gap-2.5 overflow-visible",
     taglineClass: "text-base font-bold tracking-wide text-white sm:text-lg",
+  },
+  fullWordmark: {
+    src: BRAND_LOGO_WORDMARK_SRC,
+    intrinsic: WORDMARK_SIZE,
+    imageClass: "h-[38px] w-auto max-w-[180px] sm:h-[44px] sm:max-w-[200px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
+    taglineClass: "",
   },
   compact: {
     src: BRAND_LOGO_MARK_SRC,
     intrinsic: MARK_SIZE,
-    imageClass: "h-[30px] w-auto",
-    blockClass: "inline-flex shrink-0 items-center",
+    imageClass: "h-[28px] w-auto max-w-[120px]",
+    wrapperClass: "inline-flex shrink-0 items-center overflow-visible",
     taglineClass: "",
   },
 };
@@ -68,7 +96,7 @@ export default function SgSolarLogo({
 }: SgSolarLogoProps) {
   const isLight = variant === "light";
   const config = layoutConfig[layout];
-  const imageClass = `${config.imageClass} max-w-none object-contain ${
+  const imageClass = `${config.imageClass} object-contain object-center ${
     isLight ? "" : "invert"
   }`;
 
@@ -81,11 +109,12 @@ export default function SgSolarLogo({
       height={config.intrinsic.height}
       decoding="async"
       className={imageClass}
+      style={{ flexShrink: 0 }}
     />
   );
 
   return (
-    <Link href="/" className={`${config.blockClass} ${className}`}>
+    <Link href="/" className={`${config.wrapperClass} ${className}`}>
       {logoImage}
       {showTagline ? (
         config.inlineTagline ? (

@@ -1,7 +1,6 @@
 import type { ResolvedSiteReview } from "@/types/siteReview";
 import type { LayerARegulatoryLevel } from "@/types/landInfo";
 import type { SetbackJudgment } from "@/types/regulatoryReview";
-import { GRADE_MESSAGES } from "@/types/siteReview";
 import { formatInstallTypeDisplayLabel, type InstallTypeOption } from "@/data/resultUx";
 import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
 import { hasDetailedGridData } from "@/lib/grid/display";
@@ -118,7 +117,7 @@ export function deriveOverallReviewStatus(data: ResolvedSiteReview): string {
   if (setback.some((row) => row.judgment === "공공데이터 확인 필요" || row.judgment === "데이터 확인 필요")) {
     return "공공데이터 추가 확인 필요";
   }
-  return GRADE_MESSAGES[data.grade]?.replace("입니다.", " 상태") ?? "기본 확인";
+  return "1차 검토 완료";
 }
 
 export function formatInstallTypeForPdf(installType: string): string {

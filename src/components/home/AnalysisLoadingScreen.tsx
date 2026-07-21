@@ -3,19 +3,21 @@
 import SgSolarLogo from "@/components/brand/SgSolarLogo";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ANALYSIS_LOADING_STEPS } from "@/data/analysisLoadingSteps";
+import {
+  ANALYSIS_LOADING_STEPS,
+  type AnalysisStepStatus,
+  computeLoadingProgress,
+  type LoadingStepState,
+} from "@/data/analysisLoadingSteps";
 
 interface AnalysisLoadingScreenProps {
   address: string;
 }
 
-const SLOW_PROGRESS_CAP = 80;
-const MIN_LOADING_MS = 2800;
-const MAX_SLOW_MS = 14000;
-const FINISH_ANIMATION_MS = 350;
+const FINISH_ANIMATION_MS = 200;
 
-function StepIcon({ completed, active }: { completed: boolean; active: boolean }) {
-  if (completed) {
+function StepIcon({ status }: { status: AnalysisStepStatus }) {
+  if (status === "completed") {
     return (
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-navy text-white sm:h-11 sm:w-11">
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -24,6 +26,18 @@ function StepIcon({ completed, active }: { completed: boolean; active: boolean }
       </span>
     );
   }
+
+  if (status === "failed") {
+    return (
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-red-300 bg-red-50 sm:h-11 sm:w-11">
+        <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </span>
+    );
+  }
+
+  const active = status === "active";
 
   return (
     <span
@@ -40,74 +54,109 @@ function StepIcon({ completed, active }: { completed: boolean; active: boolean }
 
 export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreenProps) {
   const router = useRouter();
-  const [progress, setProgress] = useState(0);
+  const [steps, setSteps] = useState<LoadingStepState[]>(() =>
+    ANALYSIS_LOADING_STEPS.map((step, index) => ({
+      ...step,
+      status: index === 0 ? "active" : "pending",
+    })),
+  );
+  const [apiFailed, setApiFailed] = useState(false);
 
-  const completedCount = useMemo(() => {
-    const stepSize = 100 / ANALYSIS_LOADING_STEPS.length;
-    return Math.min(ANALYSIS_LOADING_STEPS.length, Math.floor(progress / stepSize));
-  }, [progress]);
+  const progress = useMemo(() => computeLoadingProgress(steps), [steps]);
+  const completedCount = useMemo(
+    () => steps.filter((step) => step.status === "completed").length,
+    [steps],
+  );
 
   useEffect(() => {
     let cancelled = false;
     let frame = 0;
     let finishing = false;
-    const startedAt = Date.now();
+    const startedAt = performance.now();
+    let stepIndex = 0;
+    let lastStepAdvance = startedAt;
     let apiDone = false;
+    let failed = false;
 
     const resultHref = `/result?address=${encodeURIComponent(address)}`;
     router.prefetch(resultHref);
 
+    const advanceStep = () => {
+      if (cancelled || apiDone) return;
+      const now = performance.now();
+      if (now - lastStepAdvance < 400 || stepIndex >= ANALYSIS_LOADING_STEPS.length - 1) return;
+
+      stepIndex += 1;
+      lastStepAdvance = now;
+      setSteps((prev) =>
+        prev.map((step, index) => {
+          if (index < stepIndex) return { ...step, status: "completed" };
+          if (index === stepIndex) return { ...step, status: "active" };
+          return { ...step, status: "pending" };
+        }),
+      );
+    };
+
     const navigate = () => {
       if (cancelled || finishing) return;
       finishing = true;
-      const finishStart = Date.now();
 
+      setSteps((prev) =>
+        prev.map((step) => ({
+          ...step,
+          status: failed ? (step.status === "active" ? "failed" : step.status) : "completed",
+        })),
+      );
+
+      const finishStart = performance.now();
       const animateFinish = () => {
         if (cancelled) return;
-        const t = Date.now() - finishStart;
-        const ratio = Math.min(t / FINISH_ANIMATION_MS, 1);
-        setProgress(Math.round(SLOW_PROGRESS_CAP + ratio * (100 - SLOW_PROGRESS_CAP)));
-
-        if (ratio < 1) {
+        const t = performance.now() - finishStart;
+        if (t < FINISH_ANIMATION_MS) {
           frame = window.requestAnimationFrame(animateFinish);
-        } else {
+          return;
+        }
+        if (!failed) {
           router.replace(resultHref);
         }
       };
-
       frame = window.requestAnimationFrame(animateFinish);
-    };
-
-    const tryFinish = () => {
-      if (cancelled || finishing || !apiDone) return;
-      if (Date.now() - startedAt >= MIN_LOADING_MS) {
-        navigate();
-      }
     };
 
     const tick = () => {
       if (cancelled || finishing) return;
-
-      const elapsed = Date.now() - startedAt;
-
-      if (!apiDone) {
-        const ratio = Math.min(elapsed / MAX_SLOW_MS, 1);
-        const eased = 1 - Math.pow(1 - ratio, 2.2);
-        setProgress(Math.min(SLOW_PROGRESS_CAP, Math.round(eased * SLOW_PROGRESS_CAP)));
+      advanceStep();
+      if (apiDone) {
+        navigate();
+        return;
       }
-
-      tryFinish();
-
-      if (!finishing) {
-        frame = window.requestAnimationFrame(tick);
-      }
+      frame = window.requestAnimationFrame(tick);
     };
 
+    const perfKey = `analysis:${address.trim()}`;
+    performance.mark(`${perfKey}:start`);
+
     fetch(`/api/analyze?address=${encodeURIComponent(address)}`)
-      .catch(() => undefined)
+      .then(async (response) => {
+        if (!response.ok) {
+          failed = true;
+          setApiFailed(true);
+          return;
+        }
+        performance.mark(`${perfKey}:api-done`);
+        performance.measure(`${perfKey}:total`, `${perfKey}:start`, `${perfKey}:api-done`);
+        const measure = performance.getEntriesByName(`${perfKey}:total`).pop();
+        if (measure) {
+          console.info(`[AnalysisLoading] API completed in ${Math.round(measure.duration)}ms`);
+        }
+      })
+      .catch(() => {
+        failed = true;
+        setApiFailed(true);
+      })
       .finally(() => {
         apiDone = true;
-        tryFinish();
+        navigate();
       });
 
     frame = window.requestAnimationFrame(tick);
@@ -120,8 +169,8 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mb-6 flex justify-center">
-        <SgSolarLogo layout="compact" />
+      <div className="mb-6 flex justify-center pt-2 sm:pt-4">
+        <SgSolarLogo layout="loading" />
       </div>
       <div className="card-premium overflow-hidden p-5 sm:p-8">
         <div className="flex items-start justify-between gap-4">
@@ -153,10 +202,17 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
           {address}
         </p>
 
+        {apiFailed && (
+          <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            분석 중 오류가 발생했습니다. 주소를 확인한 뒤 다시 시도해 주세요.
+          </p>
+        )}
+
         <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-          {ANALYSIS_LOADING_STEPS.map((step, index) => {
-            const completed = index < completedCount;
-            const active = index === completedCount && progress < 100;
+          {steps.map((step) => {
+            const completed = step.status === "completed";
+            const active = step.status === "active";
+            const failed = step.status === "failed";
             return (
               <li
                 key={step.id}
@@ -165,13 +221,15 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
                     ? "border-navy/20 bg-navy-light/40"
                     : active
                       ? "border-navy/30 bg-white"
-                      : "border-slate-200 bg-slate-50"
+                      : failed
+                        ? "border-red-200 bg-red-50"
+                        : "border-slate-200 bg-slate-50"
                 }`}
               >
-                <StepIcon completed={completed} active={active} />
+                <StepIcon status={step.status} />
                 <span
                   className={`text-sm font-semibold ${
-                    completed ? "text-navy" : active ? "text-slate-900" : "text-slate-500"
+                    completed ? "text-navy" : active ? "text-slate-900" : failed ? "text-red-700" : "text-slate-500"
                   }`}
                 >
                   {step.label}

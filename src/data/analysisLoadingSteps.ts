@@ -1,6 +1,12 @@
+export type AnalysisStepStatus = "completed" | "active" | "pending" | "failed" | "skipped";
+
 export interface AnalysisLoadingStep {
   id: string;
   label: string;
+}
+
+export interface LoadingStepState extends AnalysisLoadingStep {
+  status: AnalysisStepStatus;
 }
 
 export const ANALYSIS_LOADING_STEPS: AnalysisLoadingStep[] = [
@@ -14,5 +20,19 @@ export const ANALYSIS_LOADING_STEPS: AnalysisLoadingStep[] = [
   { id: "result", label: "결과 생성" },
 ];
 
-/** 로딩 화면 0~80% 구간 최대 시간 (ms) — AnalysisLoadingScreen 참고 */
-export const ANALYSIS_LOADING_SLOW_MAX_MS = 14000;
+/** Single source of truth: completed steps / total steps */
+export function computeLoadingProgress(steps: LoadingStepState[]): number {
+  const total = steps.length;
+  if (total === 0) return 0;
+
+  const completed = steps.filter((step) => step.status === "completed").length;
+  const active = steps.find((step) => step.status === "active");
+
+  if (!active) {
+    return Math.round((completed / total) * 100);
+  }
+
+  const base = completed / total;
+  const withActive = base + 0.5 / total;
+  return Math.min(100, Math.round(withActive * 100));
+}

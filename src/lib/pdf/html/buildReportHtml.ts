@@ -376,7 +376,7 @@ function renderAssessmentCard(data: ResolvedSiteReview): string {
   return `
     <div class="assessment-card avoid-break">
       <div class="assessment-head">
-        <div class="assessment-title">종합 평가</div>
+        <div class="assessment-title">종합 검토</div>
         <div class="assessment-sub">${htmlText(deriveOverallReviewStatus(data))}</div>
       </div>
       <div class="assessment-pills">
