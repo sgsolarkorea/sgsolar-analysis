@@ -15,9 +15,9 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t border-slate-700 bg-navy text-white">
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-        <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
+        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
           <div>
-            <SgSolarLogo size="md" variant="light" showTagline />
+            <SgSolarLogo layout="footer" variant="light" showTagline />
           </div>
           <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
             {companyItems.map((item) => (

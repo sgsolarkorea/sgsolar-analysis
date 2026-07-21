@@ -23,7 +23,7 @@ export default function HomePage() {
     <>
       <section className="bg-navy">
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
-          <SgSolarLogo size="lg" variant="light" showTagline />
+          <SgSolarLogo layout="hero" variant="light" showTagline />
           <div className="mt-6 max-w-2xl">
             <span className="inline-flex rounded-full border border-slate-400 bg-slate-700 px-4 py-1.5 text-sm font-medium text-white">
               무료 입지검토 · 상담 비용 없음

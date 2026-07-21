@@ -1,42 +1,74 @@
-import Image from "next/image";
 import Link from "next/link";
 import { company } from "@/data/sampleData";
 
+/** Original PNG intrinsic size — display via pixel height + auto width (object-fit: contain). */
+const LOGO_SRC = "/brand/sg-solar-logo.png";
+const LOGO_WIDTH = 640;
+const LOGO_HEIGHT = 320;
+
+export type SgSolarLogoLayout = "header" | "hero" | "footer" | "compact";
+
 interface SgSolarLogoProps {
-  size?: "sm" | "md" | "lg";
+  layout?: SgSolarLogoLayout;
   variant?: "dark" | "light";
   showTagline?: boolean;
   className?: string;
 }
 
-/** Header: mobile 32px / desktop 44px (40–48). lg ≈ 48px. */
-const heights = {
-  sm: "h-8 sm:h-11",
-  md: "h-11",
-  lg: "h-12",
-} as const;
+const layoutStyles: Record<
+  SgSolarLogoLayout,
+  { imageClass: string; taglineGap: string; taglineClass: string }
+> = {
+  header: {
+    imageClass: "h-[36px] sm:h-[44px]",
+    taglineGap: "gap-0",
+    taglineClass: "text-[10px] sm:text-xs",
+  },
+  hero: {
+    imageClass: "h-[80px]",
+    taglineGap: "gap-3",
+    taglineClass: "text-sm font-semibold tracking-wide sm:text-base",
+  },
+  footer: {
+    imageClass: "h-[60px]",
+    taglineGap: "gap-2.5",
+    taglineClass: "text-xs font-semibold tracking-wide sm:text-sm",
+  },
+  compact: {
+    imageClass: "h-11",
+    taglineGap: "gap-1",
+    taglineClass: "text-[10px] sm:text-xs",
+  },
+};
 
 export default function SgSolarLogo({
-  size = "md",
+  layout = "header",
   variant = "dark",
   showTagline = false,
   className = "",
 }: SgSolarLogoProps) {
   const isLight = variant === "light";
+  const styles = layoutStyles[layout];
 
   return (
-    <Link href="/" className={`inline-flex flex-col items-start gap-1 ${className}`}>
-      <Image
-        src="/brand/sg-solar-logo.png"
+    <Link
+      href="/"
+      className={`inline-flex flex-col items-start ${styles.taglineGap} ${className}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={LOGO_SRC}
         alt="SG SOLAR"
-        width={640}
-        height={320}
-        priority={size !== "sm"}
-        className={`${heights[size]} w-auto object-contain ${isLight ? "" : "invert"}`}
+        width={LOGO_WIDTH}
+        height={LOGO_HEIGHT}
+        decoding="async"
+        className={`w-auto max-w-none object-contain ${styles.imageClass} ${
+          isLight ? "" : "invert"
+        }`}
       />
       {showTagline ? (
         <p
-          className={`text-[10px] font-semibold leading-tight tracking-wide sm:text-xs ${
+          className={`leading-none ${styles.taglineClass} ${
             isLight ? "text-slate-300" : "text-slate-600"
           }`}
         >

@@ -121,7 +121,7 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="mb-6 flex justify-center">
-        <SgSolarLogo size="md" />
+        <SgSolarLogo layout="compact" />
       </div>
       <div className="card-premium overflow-hidden p-5 sm:p-8">
         <div className="flex items-start justify-between gap-4">
