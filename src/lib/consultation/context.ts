@@ -13,5 +13,6 @@ export function buildConsultationContext(data: ResolvedSiteReview): Consultation
     capacity: data.capacity,
     annualGeneration: data.annualGeneration,
     annualRevenue: data.annualRevenue,
+    matchedCaseStudyIds: data.recommendedCases.map((item) => item.id),
   };
 }

@@ -306,7 +306,7 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     source: "analyzeSolarSite",
   });
 
-  const [recommendedCases, gridInfo] = await Promise.all([
+  const [recommendedCasesResult, gridInfo, siteIntel] = await Promise.all([
     getRecommendedCases({
       address: geo.address,
       jibunAddress: geo.jibunAddress,
@@ -325,12 +325,12 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
       capacityKw: solarMetrics.capacityKw,
       pnu: effectivePnu ?? undefined,
     }),
+    effectivePnu != null && effectivePnu !== ""
+      ? resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng })
+      : Promise.resolve(null),
   ]);
 
-  const siteIntel =
-    effectivePnu != null && effectivePnu !== ""
-      ? await resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng })
-      : null;
+  const recommendedCases = recommendedCasesResult;
 
   const regionDistrictAnalysis = resolveRegionDistrictAnalysis(
     landInfo,

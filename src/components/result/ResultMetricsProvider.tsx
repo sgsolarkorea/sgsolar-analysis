@@ -11,7 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import type { InstallTypeOption } from "@/data/resultUx";
+import type { RecommendedCaseStudy } from "@/data/caseStudies";
 import { buildParcelReviewSummary, parcelToSnapshot } from "@/lib/parcels/aggregate";
+import { recommendCaseStudies } from "@/lib/api/recommendCaseStudies";
 import {
   calculateSolarMetrics,
   formatCapacityDisplay,
@@ -38,6 +40,9 @@ interface ResultMetricsProviderProps {
   initialProfitability: Profitability;
   initialMonthlyGeneration: MonthlyGeneration[];
   initialPrimaryParcel: ParcelItem;
+  initialRecommendedCases: RecommendedCaseStudy[];
+  siteAddress: string;
+  siteJibunAddress: string;
   multiParcelEnabled: boolean;
   siteGeometryBundle?: SiteGeometryBundle;
   searchHistoryId?: string;
@@ -72,6 +77,7 @@ interface ResultMetricsContextValue {
   multiParcelGeometryReady: boolean;
   /** 가배치도 로드 후 layoutMode 등 diagnostics 스냅샷 (상담 저장용) */
   setLayoutSnapshot: (snapshot: { layoutMode?: string }) => void;
+  recommendedCases: RecommendedCaseStudy[];
 }
 
 const ResultMetricsContext = createContext<ResultMetricsContextValue | null>(null);
@@ -89,6 +95,9 @@ export function ResultMetricsProvider({
   initialProfitability,
   initialMonthlyGeneration,
   initialPrimaryParcel,
+  initialRecommendedCases,
+  siteAddress,
+  siteJibunAddress,
   multiParcelEnabled,
   siteGeometryBundle,
   searchHistoryId,
@@ -235,6 +244,45 @@ export function ResultMetricsProvider({
     multiParcelGeometry,
   ]);
 
+  const recommendedCases = useMemo(() => {
+    const shouldUseInitial =
+      installType === initialInstallType &&
+      parcels.length === 1 &&
+      parcels[0]?.id === initialPrimaryParcel.id &&
+      !useMultiParcelMetrics &&
+      Math.abs(parcelSummary.totalAreaSqm - initialPrimaryParcel.areaSqm) < 0.01;
+
+    if (shouldUseInitial) {
+      return initialRecommendedCases;
+    }
+
+    if (useMultiParcelMetrics && parcels.length > 1 && !multiParcelGeometryReady) {
+      return initialRecommendedCases;
+    }
+
+    const { metrics } = computed;
+
+    return recommendCaseStudies({
+      installType: metrics.installType as InstallTypeOption,
+      capacityKw: metrics.capacityKw,
+      address: siteAddress,
+      jibunAddress: siteJibunAddress,
+    });
+  }, [
+    installType,
+    initialInstallType,
+    parcels,
+    initialPrimaryParcel.id,
+    initialPrimaryParcel.areaSqm,
+    useMultiParcelMetrics,
+    parcelSummary.totalAreaSqm,
+    multiParcelGeometryReady,
+    initialRecommendedCases,
+    computed,
+    siteAddress,
+    siteJibunAddress,
+  ]);
+
   const addParcel = useCallback((parcel: ParcelItem): boolean => {
     let added = false;
     setParcels((prev) => {
@@ -322,6 +370,7 @@ export function ResultMetricsProvider({
           areaLabel: parcel.areaLabel,
           landCategory: parcel.landCategory,
         })),
+        matchedCaseStudyIds: recommendedCases.map((item) => item.id),
       },
       multiParcelEnabled,
       parcels,
@@ -332,6 +381,7 @@ export function ResultMetricsProvider({
       primaryParcel: initialPrimaryParcel,
       multiParcelGeometryReady,
       setLayoutSnapshot: setLayoutSnapshotStable,
+      recommendedCases,
     };
   }, [
     computed,
@@ -350,6 +400,7 @@ export function ResultMetricsProvider({
     multiParcelGeometryReady,
     layoutSnapshot.layoutMode,
     setLayoutSnapshotStable,
+    recommendedCases,
   ]);
 
   useEffect(() => {

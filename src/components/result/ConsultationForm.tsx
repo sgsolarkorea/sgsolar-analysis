@@ -56,7 +56,7 @@ export default function ConsultationForm({
       }
 
       alert(
-        `상담 신청이 접수되었습니다. ${company.companyName} 담당자가 확인 후 연락드리겠습니다.${
+        `상담 신청이 접수되었습니다. SG SOLAR KOREA 담당자가 확인 후 연락드리겠습니다.${
           form.email.trim() ? " 입력하신 이메일로 접수 확인 메일이 발송됩니다." : ""
         }`,
       );
@@ -81,7 +81,7 @@ export default function ConsultationForm({
         <div className="bg-navy px-5 py-5 sm:px-8 sm:py-6">
           <h2 className="text-lg font-bold text-white sm:text-xl">전문가 무료 컨설팅 신청</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-100">
-            입지검토 결과를 바탕으로 {company.companyName} 담당자가 설치 가능성, 예상 견적, 한전
+            입지검토 결과를 바탕으로 SG SOLAR KOREA 담당자가 설치 가능성, 예상 견적, 한전
             접수, 인허가 절차를 안내드립니다.
           </p>
           <p className="mt-2 text-xs text-slate-200 sm:text-sm">
@@ -191,7 +191,8 @@ export default function ConsultationForm({
               {isSubmitting ? "접수 중..." : "무료 컨설팅 상담 신청하기"}
             </button>
             <p className="mt-3 text-center text-xs text-slate-500">
-              입력하신 정보는 상담 목적으로만 사용되며, 제3자에게 제공되지 않습니다.
+              입력하신 정보는 상담 목적으로만 사용되며, {company.companyName} 외 제3자에게 제공되지
+              않습니다.
             </p>
           </div>
         </form>

@@ -24,10 +24,24 @@
     "validate:regulatory-db": "node scripts/validate-regulatory-db.mjs",
     "validate:setback-manual-overrides": "node scripts/validate-setback-manual-overrides.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "verify:case-study-images": "tsx scripts/verify-case-study-images.ts",
+    "verify:case-study-image-ui": "tsx scripts/verify-case-study-image-ui.ts",
+    "prepare:case-study-image": "tsx scripts/prepare-case-study-image.ts",
+    "generate:f8-remotion-assets": "npx tsx scripts/generate-f8-remotion-assets.ts",
+    "remotion:studio": "remotion studio remotion/index.ts",
+    "remotion:render:scene2": "remotion render remotion/index.ts F8Scene2Scan out/f8-scene2-scan.mp4",
+    "qa:full": "node scripts/qa/qa-full.mjs",
+    "qa:holds": "node scripts/qa/qa-render-holds.mjs",
+    "qa:compare": "node scripts/qa/qa-compare-holds.mjs",
+    "qa:comparison": "node scripts/qa/qa-generate-comparison-md.mjs",
+    "qa:dashboard": "node scripts/qa/qa-generate-dashboard.mjs",
+    "token:check": "node scripts/qa/token-check.mjs"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
+    "@remotion/cli": "^4.0.484",
+    "@remotion/player": "^4.0.484",
     "@sparticuz/chromium": "^149.0.0",
     "@upstash/redis": "^1.38.0",
     "next": "16.2.9",
@@ -36,7 +50,9 @@
     "puppeteer-core": "^25.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "resend": "^6.12.4"
+    "remotion": "^4.0.484",
+    "resend": "^6.12.4",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@ohah/hwpjs": "^0.1.0-rc.10",
@@ -48,6 +64,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "kordoc": "^3.5.0",
+    "sharp": "^0.34.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

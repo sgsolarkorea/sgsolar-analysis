@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import PdfDownloadButton from "@/components/result/PdfDownloadButton";
 import { formatReferenceDataMonth } from "@/lib/result/heroDisplay";
 
 interface ResultHeroProps {
@@ -23,11 +26,11 @@ export default function ResultHero({
       <div className="result-hero-pattern pointer-events-none absolute inset-0" aria-hidden />
       <div className="result-hero-glow pointer-events-none absolute inset-0" aria-hidden />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:py-10">
+      <div className="relative mx-auto max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 lg:py-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
               입지검토 결과
@@ -54,18 +57,19 @@ export default function ResultHero({
             </p>
           </div>
 
-          <div className="flex shrink-0 flex-wrap gap-2.5 lg:flex-col lg:items-stretch">
+          <div className="flex w-full shrink-0 flex-col gap-2.5 sm:max-w-md lg:w-[280px] lg:max-w-none">
             <Link
               href="#consultation"
-              className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-navy shadow-sm transition hover:bg-slate-100"
+              className="btn-primary inline-flex h-12 items-center justify-center px-5 text-sm font-bold"
             >
-              상담 신청
+              무료 상담 신청
             </Link>
+            <PdfDownloadButton address={address} variant="hero" />
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               다시 검색

@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 
   try {
     const pdfBytes = await buildPdfBytes(address);
-    return pdfResponse(pdfBytes);
+    return pdfResponse(pdfBytes, address);
   } catch (error) {
     console.error("[PDF] generation failed:", error);
     const message = error instanceof Error ? error.message : getKakaoErrorMessage(error);
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 
   try {
     const pdfBytes = await buildPdfBytes(address, body?.parcels ?? []);
-    return pdfResponse(pdfBytes);
+    return pdfResponse(pdfBytes, address);
   } catch (error) {
     console.error("[PDF] multi-parcel generation failed:", error);
     const message = error instanceof Error ? error.message : getKakaoErrorMessage(error);
@@ -104,13 +104,13 @@ export async function POST(request: Request) {
   }
 }
 
-function pdfResponse(pdfBytes: Uint8Array) {
-  const filename = siteReviewPdfFilename();
+function pdfResponse(pdfBytes: Uint8Array, address?: string) {
+  const filename = siteReviewPdfFilename(address);
   return new NextResponse(Buffer.from(pdfBytes), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
       "Cache-Control": "no-store",
     },
   });

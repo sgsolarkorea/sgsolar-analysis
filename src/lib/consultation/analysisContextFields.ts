@@ -1,5 +1,17 @@
 import type { ConsultationAnalysisContext } from "@/types/consultation";
 
+const CASE_STUDY_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function parseMatchedCaseStudyIds(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const ids = raw
+    .filter((item): item is string => typeof item === "string")
+    .map((id) => id.trim().slice(0, 80))
+    .filter((id) => id.length > 0 && CASE_STUDY_ID_PATTERN.test(id))
+    .slice(0, 10);
+  return ids.length > 0 ? ids : undefined;
+}
+
 /** 상담·리드 analysisContext 공통 필드 파싱 */
 export function parseConsultationAnalysisContext(raw: unknown): ConsultationAnalysisContext | undefined {
   if (!raw || typeof raw !== "object") return undefined;
@@ -8,6 +20,7 @@ export function parseConsultationAnalysisContext(raw: unknown): ConsultationAnal
     const value = ctx[key];
     return typeof value === "number" && Number.isFinite(value) ? value : undefined;
   };
+  const matchedCaseStudyIds = parseMatchedCaseStudyIds(ctx.matchedCaseStudyIds);
   return {
     ...(typeof ctx.jibunAddress === "string" ? { jibunAddress: ctx.jibunAddress.slice(0, 200) } : {}),
     ...(typeof ctx.landCategory === "string" ? { landCategory: ctx.landCategory.slice(0, 50) } : {}),
@@ -38,5 +51,6 @@ export function parseConsultationAnalysisContext(raw: unknown): ConsultationAnal
             })),
         }
       : {}),
+    ...(matchedCaseStudyIds ? { matchedCaseStudyIds } : {}),
   };
 }

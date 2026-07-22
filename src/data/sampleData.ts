@@ -40,10 +40,13 @@ export const GRID_DISCLAIMER =
 export const REVENUE_WARNING =
   "예상 수익은 SMP, REC, 일사량, 자가소비 여부, 설비조건, 가중치, 금융조건에 따라 달라질 수 있습니다.";
 
+/** 법적 사업자명 — Footer·상담 개인정보·계약 표기 등 */
+export const LEGAL_COMPANY_NAME = "신재생에너지한국태양광에스지솔라";
+
 /** ★ 회사 정보 — 이 객체만 수정하면 Header/Footer/상담 영역에 반영됩니다 */
 export const company: CompanyInfo = {
   brandName: "SG SOLAR",
-  companyName: "SG SOLAR KOREA",
+  companyName: LEGAL_COMPANY_NAME,
   ceo: "박성수",
   phone: "1844-2807",
   fax: "0508-956-6014",
@@ -54,7 +57,7 @@ export const company: CompanyInfo = {
   mailOrderNumber: "제2025-전주완산-0896호",
 };
 
-/** 소개·마케팅 문구용 정식 명칭 (로고·이메일·도메인 등은 brandName 유지) */
+/** 브랜드·마케팅 표시명 (로고·카피·Copyright — 법적 사업자명과 구분) */
 export const MARKETING_NAME = "SG SOLAR KOREA";
 
 /** 사이트 메타 — layout.tsx 에서 사용 */

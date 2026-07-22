@@ -4,6 +4,11 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "regions": ["icn1"],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
   "functions": {
     "src/app/api/report/pdf/route.ts": {
       "maxDuration": 60,

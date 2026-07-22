@@ -1,4 +1,4 @@
-export type AnalysisStepStatus = "completed" | "active" | "pending" | "failed" | "skipped";
+export type AnalysisStepStatus = "completed" | "active" | "pending" | "failed" | "skipped" | "delayed";
 
 export interface AnalysisLoadingStep {
   id: string;

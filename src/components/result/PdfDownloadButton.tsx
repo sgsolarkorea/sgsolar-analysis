@@ -9,9 +9,15 @@ import { formatParcelShortLabel } from "@/lib/parcels/format";
 
 interface PdfDownloadButtonProps {
   address: string;
+  variant?: "default" | "hero" | "panel" | "mobile";
+  showParcelHint?: boolean;
 }
 
-export default function PdfDownloadButton({ address }: PdfDownloadButtonProps) {
+export default function PdfDownloadButton({
+  address,
+  variant = "default",
+  showParcelHint = false,
+}: PdfDownloadButtonProps) {
   const { parcels, parcelSummary, metrics, installType } = useResultMetrics();
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,19 +37,25 @@ export default function PdfDownloadButton({ address }: PdfDownloadButtonProps) {
   }
 
   const parcelHint =
-    parcels.length > 1
+    showParcelHint && parcels.length > 1
       ? ` · ${parcelSummary.parcelCount}필지 (${parcels.map((p) => formatParcelShortLabel(p.jibunAddress)).join(", ")})`
       : "";
 
+  const label = loading ? "제안서 생성 중" : `PDF 제안서 다운로드${parcelHint}`;
+
+  const className =
+    variant === "hero"
+      ? "inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/15 disabled:opacity-60"
+      : variant === "panel"
+        ? "btn-outline inline-flex h-12 items-center justify-center gap-2 px-5 text-sm font-bold disabled:opacity-60"
+        : variant === "mobile"
+          ? "btn-outline inline-flex h-11 w-full items-center justify-center gap-2 px-4 text-sm font-bold disabled:opacity-60"
+          : "btn-outline inline-flex h-11 items-center justify-center gap-2 px-4 text-sm font-semibold disabled:opacity-60";
+
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setModalOpen(true)}
-        disabled={loading}
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-400 bg-slate-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-600 disabled:opacity-60"
-      >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button type="button" onClick={() => setModalOpen(true)} disabled={loading} className={className}>
+        <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -51,7 +63,7 @@ export default function PdfDownloadButton({ address }: PdfDownloadButtonProps) {
             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        {loading ? "PDF 생성 중..." : `PDF 제안서 다운로드${parcelHint}`}
+        {label}
       </button>
 
       <LeadCaptureModal

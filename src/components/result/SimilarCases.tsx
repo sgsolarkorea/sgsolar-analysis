@@ -1,6 +1,8 @@
 "use client";
 
-import type { RecommendedConstructionCase } from "@/types/siteReview";
+import { useState } from "react";
+import Image from "next/image";
+import type { RecommendedCaseStudy } from "@/data/caseStudies";
 import { MARKETING_NAME } from "@/data/sampleData";
 import SectionHeader from "@/components/ui/SectionHeader";
 
@@ -14,10 +16,10 @@ const TYPE_GRADIENT: Record<string, string> = {
 };
 
 interface SimilarCasesProps {
-  cases: RecommendedConstructionCase[];
+  cases: RecommendedCaseStudy[];
 }
 
-function openLink(url: string) {
+function openLink(url: string | undefined) {
   if (url && url !== "#") {
     window.open(url, "_blank", "noopener,noreferrer");
   } else {
@@ -25,34 +27,69 @@ function openLink(url: string) {
   }
 }
 
+function CaseThumbnail({ item }: { item: RecommendedCaseStudy }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const gradient = TYPE_GRADIENT[item.installCategory] ?? TYPE_GRADIENT[item.installType] ?? "from-slate-600 to-slate-800";
+  const showFallback = imageFailed || !item.thumbnail.src;
+
+  if (showFallback) {
+    return (
+      <div
+        className={`relative flex h-44 items-center justify-center bg-gradient-to-br ${gradient}`}
+      >
+        <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-white/60 bg-black/20 px-6 py-4 text-center">
+          <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+          <span className="text-xs font-semibold text-white">{item.installCategory}</span>
+          <span className="text-[10px] text-slate-200">사진 준비 중</span>
+        </div>
+        <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
+          {item.installCategory}
+        </span>
+        <span className="absolute right-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white">
+          유사 사례
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative h-44 overflow-hidden">
+      <Image
+        src={item.thumbnail.src}
+        alt={item.thumbnail.alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 33vw"
+        onError={() => setImageFailed(true)}
+      />
+      <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
+        {item.installCategory}
+      </span>
+      <span className="absolute right-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white">
+        유사 사례
+      </span>
+    </div>
+  );
+}
+
 export default function SimilarCases({ cases }: SimilarCasesProps) {
   return (
     <section id="cases" className="scroll-mt-24">
       <SectionHeader
-        title="유사 시공사례"
+        title="비슷한 시공사례"
         description={`${MARKETING_NAME} 과거 시공사례 중 유사한 유형의 현장을 참고용으로 추천합니다. 아래 용량은 본 입지검토 예상 설치용량과 별개의 유사 사례입니다.`}
       />
       <div className="grid gap-5 lg:grid-cols-3">
         {cases.map((item) => (
-          <article key={item.title} className="card-premium flex flex-col overflow-hidden">
-            <div
-              className={`relative flex h-44 items-center justify-center bg-gradient-to-br ${TYPE_GRADIENT[item.type] ?? "from-slate-600 to-slate-800"}`}
-              data-image-url={item.imageUrl}
-            >
-              <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-white/60 bg-black/20 px-6 py-4 text-center">
-                <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="text-xs font-semibold text-white">시공사진 Placeholder</span>
-                <span className="text-[10px] text-slate-200">실제 사진 연동 예정</span>
-              </div>
-              <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
-                {item.type}
-              </span>
-              <span className="absolute right-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white">
-                유사 사례
-              </span>
-            </div>
+          <article key={item.id} className="card-premium flex flex-col overflow-hidden">
+            <CaseThumbnail item={item} />
 
             <div className="flex flex-1 flex-col p-5">
               <p className="rounded-lg border border-navy/15 bg-navy-light px-3 py-2 text-xs leading-relaxed text-slate-700">
@@ -62,15 +99,15 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
               <dl className="mt-3 grid flex-1 gap-2 text-sm">
                 <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
                   <dt className="whitespace-nowrap text-slate-500">지역</dt>
-                  <dd className="text-right font-medium text-slate-900">{item.region}</dd>
+                  <dd className="text-right font-medium text-slate-900">{item.regionLabel}</dd>
                 </div>
                 <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
                   <dt className="whitespace-nowrap text-slate-500">유사 사례 용량</dt>
-                  <dd className="text-right font-bold text-navy">{item.capacity}</dd>
+                  <dd className="text-right font-bold text-navy">{item.capacityLabel}</dd>
                 </div>
                 <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
                   <dt className="whitespace-nowrap text-slate-500">특징</dt>
-                  <dd className="text-right font-medium leading-snug text-slate-900">{item.description}</dd>
+                  <dd className="text-right font-medium leading-snug text-slate-900">{item.summary}</dd>
                 </div>
                 <div className="grid grid-cols-[auto,1fr] items-start gap-x-3 gap-y-1">
                   <dt className="whitespace-nowrap text-slate-500">준공</dt>
@@ -81,14 +118,14 @@ export default function SimilarCases({ cases }: SimilarCasesProps) {
               <div className="mt-auto flex gap-2 pt-4">
                 <button
                   type="button"
-                  onClick={() => openLink(item.blogUrl)}
+                  onClick={() => openLink(item.links.blogUrl)}
                   className="btn-primary h-10 flex-1 text-sm"
                 >
                   시공사례 보기
                 </button>
                 <button
                   type="button"
-                  onClick={() => openLink(item.youtubeUrl)}
+                  onClick={() => openLink(item.links.youtubeUrl)}
                   className="flex h-10 flex-1 items-center justify-center rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 hover:bg-slate-50"
                 >
                   영상 보기

@@ -71,6 +71,12 @@ function formatWonPerYear(amount: number): string {
   return `${formatWon(amount)}/년`;
 }
 
+/** 발전사업 연매출(totalRevenueWon) → 월수익 라벨 (연/12, formatWon과 동일 반올림) */
+export function formatMonthlyRevenueFromAnnualDisplay(annualRevenueWon: number): string {
+  if (annualRevenueWon <= 0 || !Number.isFinite(annualRevenueWon)) return "확인 필요";
+  return `${formatWon(Math.round(annualRevenueWon / 12))}/월`;
+}
+
 function formatSqm(sqm: number): string {
   return `${sqm.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`;
 }

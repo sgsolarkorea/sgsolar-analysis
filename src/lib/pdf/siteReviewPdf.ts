@@ -116,8 +116,15 @@ export async function generateSiteReviewPdf(
   }
 }
 
-export function siteReviewPdfFilename(): string {
-  return `sgsolar-pre-review-${todayFileDate().replace(/-/g, "")}.pdf`;
+export function siteReviewPdfFilename(address?: string): string {
+  const date = todayFileDate().replace(/-/g, "");
+  const region =
+    (address ?? "")
+      .replace(/\s+/g, "")
+      .replace(/[\\/:*?"<>|]+/g, "")
+      .replace(/[^0-9A-Za-z가-힣]/g, "")
+      .slice(0, 28) || "주소";
+  return `SGSOLAR_입지검토_${region}_${date}.pdf`;
 }
 
 export const PDF_DOCUMENT_TITLE = PDF_REPORT_TITLE;

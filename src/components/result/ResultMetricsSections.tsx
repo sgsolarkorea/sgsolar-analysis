@@ -8,7 +8,7 @@ import HouseholdSavingsAnalysis from "@/components/result/HouseholdSavingsAnalys
 import MonthlyGenerationChart from "@/components/result/MonthlyGenerationChart";
 import SaveResultCTA from "@/components/result/SaveResultCTA";
 import ConsultationForm from "@/components/result/ConsultationForm";
-import PdfDownloadButton from "@/components/result/PdfDownloadButton";
+import SimilarCases from "@/components/result/SimilarCases";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { disclaimer as solarDisclaimer } from "@/data/solarConfig";
@@ -32,9 +32,6 @@ export function ResultSiteOverview({ recommendation, address }: ResultSiteOvervi
 
   return (
     <section id="site-overview" className="scroll-mt-24">
-      <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
-        <PdfDownloadButton address={address} />
-      </div>
       <SectionHeader
         title="입지 분석 개요"
         description="추천 유형·설치용량·시공비 등 1차 입지검토 요약입니다."
@@ -121,4 +118,9 @@ export function ResultConsultationSection({
       searchHistoryId={searchHistoryId}
     />
   );
+}
+
+export function ResultSimilarCasesSection() {
+  const { recommendedCases } = useResultMetrics();
+  return <SimilarCases cases={recommendedCases} />;
 }

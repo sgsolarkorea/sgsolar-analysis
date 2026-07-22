@@ -157,10 +157,13 @@ export default function AddressSearchForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-[840px]">
       <div ref={containerRef} className="relative">
-        <div className="flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_10px_32px_rgba(0,0,0,0.14)] sm:flex-row sm:items-stretch">
+        <div className="flex w-full flex-col overflow-hidden rounded-[14px] border border-slate-200/90 bg-white shadow-[0_12px_36px_rgba(0,0,0,0.16)] sm:flex-row sm:items-stretch">
           <div className="relative min-w-0 flex-1">
+            <label htmlFor="home-address-search" className="sr-only">
+              설치 희망 주소
+            </label>
             <svg
-              className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-slate-400 sm:left-5"
+              className="pointer-events-none absolute left-4 top-1/2 z-10 h-[22px] w-[22px] -translate-y-1/2 text-slate-500 sm:left-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -180,6 +183,7 @@ export default function AddressSearchForm() {
               />
             </svg>
             <input
+              id="home-address-search"
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -192,15 +196,18 @@ export default function AddressSearchForm() {
               aria-autocomplete="list"
               aria-expanded={showDropdown}
               aria-controls="address-suggestions"
-              className="h-[62px] w-full border-0 bg-transparent pl-12 pr-4 text-base text-foreground outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-sky-500/35 sm:h-[64px] sm:pl-14 sm:text-[16px]"
+              className="h-[64px] w-full border-0 bg-transparent pl-12 pr-4 text-base text-foreground outline-none placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-sky-500/35 sm:h-[66px] sm:pl-14 sm:text-[16px]"
             />
           </div>
 
           <button
             type="submit"
-            className="h-[62px] w-full shrink-0 bg-[#2563eb] px-6 text-base font-extrabold text-white transition-colors hover:bg-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:bg-[#1e40af] sm:h-[64px] sm:w-[200px]"
+            className="inline-flex h-[64px] w-full shrink-0 items-center justify-center gap-2 bg-[#2563eb] px-6 text-base font-extrabold text-white transition hover:-translate-y-px hover:bg-[#1d4ed8] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:bg-[#1e40af] sm:h-[66px] sm:w-[210px]"
           >
             입지검토 시작
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </button>
         </div>
 
@@ -228,7 +235,10 @@ export default function AddressSearchForm() {
         )}
       </div>
 
-      <p className="mt-3 text-sm text-slate-300 sm:mt-2.5">예시: {DEFAULT_ADDRESS}</p>
+      <p className="mt-3 text-sm leading-relaxed text-slate-300 sm:mt-3">
+        주소 입력만으로 1차 분석을 시작합니다. 회원가입 없이 확인할 수 있습니다.
+      </p>
+      <p className="mt-1.5 text-xs text-slate-400 sm:text-sm">예시: {DEFAULT_ADDRESS}</p>
     </form>
   );
 }

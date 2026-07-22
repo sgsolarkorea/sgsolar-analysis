@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { company } from "@/data/sampleData";
+import { MARKETING_NAME } from "@/data/sampleData";
 
 /**
  * Official trimmed assets from public/brand/source/공식로고_1200x1200.png
@@ -140,9 +140,9 @@ export default function SgSolarLogo({
       {logoImage}
       {showTagline ? (
         config.stackTagline ? (
-          <p className={config.taglineClass}>{company.companyName}</p>
+          <p className={config.taglineClass}>{MARKETING_NAME}</p>
         ) : (
-          <span className={config.taglineClass}>{company.companyName}</span>
+          <span className={config.taglineClass}>{MARKETING_NAME}</span>
         )
       ) : null}
     </>

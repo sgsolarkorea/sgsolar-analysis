@@ -23,6 +23,8 @@ export interface ConsultationAnalysisContext {
     areaLabel: string;
     landCategory: string;
   }>;
+  /** 화면에 표시 중인 비슷한 시공사례 id (상담 접수 시점 기준) */
+  matchedCaseStudyIds?: string[];
 }
 
 export interface ConsultationSubmission {

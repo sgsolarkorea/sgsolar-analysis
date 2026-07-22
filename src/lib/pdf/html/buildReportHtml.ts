@@ -797,7 +797,7 @@ export function buildReportHtml(
 
       <div class="notice amber" style="margin-top:14px">${htmlText(PDF_LEGAL_DISCLAIMER)}</div>
 
-      <div class="footer-note">SG SOLAR · ${htmlText(PDF_REPORT_TITLE)} · ${htmlText(data.address)}</div>
+      <div class="footer-note">신재생에너지한국태양광에스지솔라 · SG SOLAR KOREA · ${htmlText(PDF_REPORT_TITLE)} · ${htmlText(data.address)}</div>
     </section>
   </div>
 </body>
