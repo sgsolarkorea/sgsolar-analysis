@@ -93,7 +93,7 @@ export default function MarketRevenueSection({ embedded = false }: { embedded?: 
   }
 
   return (
-    <div id="market-revenue" aria-labelledby={embedded ? undefined : "market-revenue-heading"}>
+    <div id="market-revenue" className="bg-white px-5 py-6 sm:px-7 sm:py-7" aria-labelledby={embedded ? undefined : "market-revenue-heading"}>
       {!embedded ? (
         <h2 id="market-revenue-heading" className="text-[28px] font-extrabold text-navy sm:text-[32px]">
           시장가격 · 예상 발전수익
@@ -134,10 +134,10 @@ export default function MarketRevenueSection({ embedded = false }: { embedded?: 
         <p className="mt-4 text-sm text-slate-600">시장가격 정보를 불러오지 못했습니다. 입지분석 결과는 정상 표시됩니다.</p>
       ) : null}
 
-      <div className="mt-8 grid gap-8 border-b border-slate-200 pb-8 sm:grid-cols-3">
+      <div className="mt-6 grid gap-6 sm:grid-cols-4">
         <div>
-          <p className="text-sm text-slate-500">{smpLabel}</p>
-          <p className="mt-1 text-[32px] font-extrabold tracking-tight text-navy">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">{smpLabel}</p>
+          <p className="mt-1 text-[30px] font-extrabold tracking-tight text-navy">
             {activeSmp.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}
             <span className="ml-1 text-base font-semibold text-slate-500">원/kWh</span>
           </p>
@@ -147,8 +147,8 @@ export default function MarketRevenueSection({ embedded = false }: { embedded?: 
           </div>
         </div>
         <div>
-          <p className="text-sm text-slate-500">REC</p>
-          <p className="mt-1 text-[32px] font-extrabold tracking-tight text-navy">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">REC</p>
+          <p className="mt-1 text-[30px] font-extrabold tracking-tight text-navy">
             {activeRec.toLocaleString("ko-KR")}
             <span className="ml-1 text-base font-semibold text-slate-500">원/REC</span>
           </p>
@@ -158,19 +158,23 @@ export default function MarketRevenueSection({ embedded = false }: { embedded?: 
           </div>
         </div>
         <div>
-          <p className="text-sm text-slate-500">적용 REC 가중치</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">가중치</p>
           <p className="mt-1 text-[28px] font-extrabold text-navy">{metrics.recWeight}</p>
-          <p className="mt-1 text-sm text-slate-500">{profitability.recWeightReason || "설치유형·용량 기준"}</p>
+          <p className="mt-1 text-[13px] text-slate-500">{profitability.recWeightReason || "설치유형·용량 기준"}</p>
+        </div>
+        <div>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">기준일</p>
+          <p className="mt-1 text-[17px] font-bold text-navy">{smpDate || recDate || "확인 중"}</p>
         </div>
       </div>
 
-      <div className="mt-8">
-        <p className="text-sm font-medium text-slate-500">현재 가격 기준 예상 연간 발전수익</p>
-        <p className="mt-2 text-[44px] font-extrabold tracking-tight text-navy sm:text-[52px]">
+      <div className="mt-10">
+        <p className="text-[14px] font-semibold text-slate-500">현재 가격 기준 예상 연간 발전수익</p>
+        <p className="mt-2 text-[52px] font-extrabold tracking-tight text-navy sm:text-[60px]">
           {formatMarketWonPerYear(revenue.totalRevenueWon)}
         </p>
 
-        <div className="mt-8 max-w-xl space-y-4" aria-label="수익 구성">
+        <div className="mt-7 max-w-2xl space-y-4" aria-label="수익 구성">
           <div>
             <div className="mb-1.5 flex justify-between text-sm">
               <span className="text-slate-600">SMP 수익</span>

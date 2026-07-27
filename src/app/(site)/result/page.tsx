@@ -200,7 +200,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Technical"
           title="설치 규모 · 형태"
           intro="얼마나 설치되고 어떤 모습인지 한눈에 확인합니다."
-          tone="muted"
+          tone="dark"
           className="result-frame-pad result-frame-pad--md"
         >
           <TechnicalFrame />
@@ -248,7 +248,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Business"
           title="시장가격 · 투자수익"
           intro="1년 시장 스냅샷과 20년 장기 투자 시뮬레이션을 구분해 확인합니다."
-          tone="muted"
+          tone="default"
           className="result-frame-pad result-frame-pad--lg"
         >
           <MarketRevenueSection embedded />
@@ -261,6 +261,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Action"
           title="확인사항 · 진행 절차"
           intro="검토가 완료되면 실제 사업은 다음 절차로 진행됩니다."
+          tone="muted"
           className="result-frame-pad result-frame-pad--md"
         >
           <RequiredChecks items={reviewStatusItems} />
@@ -275,7 +276,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Proof"
           title="설치 형태와 사업 역량"
           intro="현재 분석 설치유형을 중심으로 설치 형태 예시와 SG SOLAR 역량을 확인합니다."
-          tone="muted"
+          tone="default"
           className="result-frame-pad result-frame-pad--lg"
         >
           <InstallLookbookSection embedded />

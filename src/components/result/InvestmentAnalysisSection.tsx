@@ -256,14 +256,14 @@ export default function InvestmentAnalysisSection() {
         : "회수 불가";
 
   return (
-    <div id="investment-analysis" className="mt-14 border-t border-slate-200 pt-12" aria-labelledby="investment-heading">
+    <div id="investment-analysis" className="mt-12 bg-[#0b1d3a] px-5 py-10 text-white sm:px-7 sm:py-12" aria-labelledby="investment-heading">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.12em] text-sky-700">장기 투자수익 시뮬레이션</p>
-          <h3 id="investment-heading" className="mt-2 text-[26px] font-extrabold text-navy sm:text-[30px]">
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-sky-300">장기 투자수익 시뮬레이션</p>
+          <h3 id="investment-heading" className="mt-2 text-[30px] font-extrabold text-white sm:text-[36px]">
             20년 투자 수익성
           </h3>
-          <p className="mt-2 max-w-2xl text-[15px] text-slate-600">
+          <p className="mt-2 max-w-2xl text-[15px] text-slate-300">
             위 1년 시장수익과 별개입니다. 자동 적용: 설비용량 {capacity || "—"} · 발전량{" "}
             {metrics.annualGenerationKwh.toLocaleString("ko-KR")} kWh · REC 가중치 {metrics.recWeight}
             <span className="text-slate-400"> · engine {INVESTMENT_ENGINE_VERSION}</span>
@@ -272,7 +272,7 @@ export default function InvestmentAnalysisSection() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-11 items-center rounded-xl bg-navy px-4 text-sm font-bold text-white"
+          className="inline-flex h-11 items-center bg-white px-4 text-sm font-bold text-navy"
           aria-expanded={open}
         >
           {open ? "투자조건 접기" : "투자조건 조정"}
@@ -280,7 +280,7 @@ export default function InvestmentAnalysisSection() {
       </div>
 
       {open ? (
-        <div className="mt-6 space-y-8 border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="mt-6 space-y-8 bg-white p-5 text-slate-900 sm:p-6">
           <div>
             <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-slate-500">투자금</p>
             <div className="mt-3 grid gap-4 sm:grid-cols-3">
@@ -411,38 +411,38 @@ export default function InvestmentAnalysisSection() {
       ) : null}
 
       {!canRun ? (
-        <p className="mt-6 text-sm text-amber-900">
+        <p className="mt-6 text-sm text-amber-200">
           총 사업비(참고)를 입력하면 장기 투자 시뮬레이션이 계산됩니다.
           {defaultCapex <= 0 ? " 회사 기본 원/kW가 없어 자동 채우지 않습니다." : ""}
         </p>
       ) : result ? (
         <>
-          <div className="mt-10 grid items-start gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-12">
+          <div className="mt-10 grid items-start gap-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-14">
             <div>
-              <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-slate-500">
+              <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-sky-200">
                 현재 적용 투자조건 기준
               </p>
-              <p className="mt-5 text-[14px] text-slate-500">예상 투자금 회수</p>
-              <p className="mt-1 text-[52px] font-extrabold leading-none tracking-tight text-navy sm:text-[56px]">
+              <p className="mt-5 text-[14px] text-slate-300">예상 투자금 회수</p>
+              <p className="mt-1 text-[62px] font-extrabold leading-none tracking-tight text-white sm:text-[72px]">
                 {paybackLabel}
               </p>
-              <p className="mt-8 text-[14px] text-slate-500">자기자본 IRR · Equity IRR</p>
-              <p className="mt-1 text-[48px] font-extrabold leading-none tracking-tight text-sky-700 sm:text-[52px]">
+              <p className="mt-8 text-[14px] text-slate-300">자기자본 IRR · Equity IRR</p>
+              <p className="mt-1 text-[54px] font-extrabold leading-none tracking-tight text-sky-300 sm:text-[60px]">
                 {formatPct(result.equityIrr)}
               </p>
 
-              <div className="mt-10 space-y-3 border-t border-slate-200 pt-6 text-[14px]">
+              <div className="mt-10 space-y-3 border-t border-white/20 pt-6 text-[14px]">
                 <div className="flex justify-between gap-3">
-                  <span className="text-slate-500">참고 사업비</span>
-                  <span className="font-bold text-navy">{formatManwon(totalCapex)}</span>
+                  <span className="text-slate-300">참고 사업비</span>
+                  <span className="font-bold text-white">{formatManwon(totalCapex)}</span>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <span className="text-slate-500">자기자본</span>
-                  <span className="font-bold text-navy">{formatManwon(equity)}</span>
+                  <span className="text-slate-300">자기자본</span>
+                  <span className="font-bold text-white">{formatManwon(equity)}</span>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <span className="text-slate-500">대출</span>
-                  <span className="font-bold text-navy">{formatManwon(loan)}</span>
+                  <span className="text-slate-300">대출</span>
+                  <span className="font-bold text-white">{formatManwon(loan)}</span>
                 </div>
                 {result.fundingGapWon > 0 ? (
                   <div className="flex justify-between gap-3 text-amber-800">
@@ -455,32 +455,34 @@ export default function InvestmentAnalysisSection() {
 
             <div>
               <div className="flex items-end justify-between gap-3">
-                <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-sky-200">
                   20년 누적 현금흐름
                 </p>
                 {result.cashflowPaybackYearsExact != null || result.cashflowPaybackYear != null ? (
-                  <p className="text-[13px] font-semibold text-sky-700">
+                  <p className="text-[13px] font-semibold text-sky-300">
                     예상 회수 {paybackLabel}
                   </p>
                 ) : null}
               </div>
-              <CumulativeCashFlowChart
-                years={result.years}
-                paybackYear={result.cashflowPaybackYear}
-                paybackExact={result.cashflowPaybackYearsExact}
-              />
+              <div className="mt-4 bg-white p-4 sm:p-5">
+                <CumulativeCashFlowChart
+                  years={result.years}
+                  paybackYear={result.cashflowPaybackYear}
+                  paybackExact={result.cashflowPaybackYearsExact}
+                />
+              </div>
             </div>
           </div>
 
           {sensitivity.length > 0 ? (
             <ul className="mt-12 grid gap-6 sm:grid-cols-3">
               {sensitivity.map((s) => (
-                <li key={s.label} className="border-t border-slate-200 pt-4">
-                  <p className="text-[12px] font-semibold text-slate-500">
+                <li key={s.label} className="border-t border-white/20 pt-4">
+                  <p className="text-[12px] font-semibold text-slate-300">
                     {s.label.replace("시장가격", "시장")}
                   </p>
-                  <p className="mt-2 text-[28px] font-extrabold text-navy">{formatPct(s.equityIrr)}</p>
-                  <p className="mt-1 text-[13px] text-slate-500">자기자본 IRR</p>
+                  <p className="mt-2 text-[30px] font-extrabold text-white">{formatPct(s.equityIrr)}</p>
+                  <p className="mt-1 text-[13px] text-slate-300">자기자본 IRR</p>
                 </li>
               ))}
             </ul>
@@ -489,17 +491,17 @@ export default function InvestmentAnalysisSection() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="button"
-              className="text-sm font-semibold text-sky-800 underline-offset-2 hover:underline"
+              className="text-sm font-semibold text-sky-300 underline-offset-2 hover:underline"
               onClick={() => setAdvancedOpen((v) => !v)}
               aria-expanded={advancedOpen}
             >
               {advancedOpen ? "전문 지표 접기" : "전문 수익성 지표 · 가정 보기"}
             </button>
-            <p className="text-sm text-slate-500">입력값과 적용 가정에 따른 추정치입니다.</p>
+            <p className="text-sm text-slate-300">입력값과 적용 가정에 따른 추정치입니다.</p>
           </div>
 
           {advancedOpen ? (
-            <div className="mt-4 space-y-3 text-sm text-slate-600">
+            <div className="mt-4 space-y-3 text-sm text-slate-200">
               <p>
                 NPV({(discountRate * 100).toFixed(1)}%): {formatManwon(result.npvWon ?? 0)} · 20년 누적{" "}
                 {formatManwon(result.totalNetEquityCashflowWon)} · 금리 {(rate * 100).toFixed(2)}% · 거치{" "}

@@ -26,8 +26,8 @@ function Chart({
         <h2 className="text-[28px] font-extrabold text-navy sm:text-[32px]">예상 발전량</h2>
       ) : null}
 
-      <div className="relative mt-2">
-        <div className="relative grid h-[220px] grid-cols-12 items-end gap-1.5 sm:gap-2">
+      <div className="relative mt-4 bg-white px-3 pb-3 pt-4 sm:px-5 sm:pb-4 sm:pt-5">
+        <div className="relative grid h-[280px] grid-cols-12 items-end gap-1.5 sm:h-[320px] sm:gap-2.5">
           <div
             className="pointer-events-none absolute inset-x-0 z-[1] border-t border-dashed border-sky-400/70"
             style={{ bottom: `${avgPct}%` }}
@@ -62,24 +62,24 @@ function Chart({
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap items-end gap-x-12 gap-y-6 border-t border-slate-200 pt-8">
+      <div className="mt-10 flex flex-wrap items-end gap-x-12 gap-y-6 pt-2">
         <div>
           <p className="text-[13px] text-slate-500">예상 연간 발전량</p>
-          <p className="mt-1 text-[40px] font-extrabold tracking-tight text-navy sm:text-[48px]">
+          <p className="mt-1 text-[48px] font-extrabold tracking-tight text-navy sm:text-[58px]">
             {annualKwh.toLocaleString("ko-KR")}
             <span className="ml-1 text-[16px] font-semibold text-slate-500">kWh</span>
           </p>
         </div>
         <div>
           <p className="text-[13px] text-slate-500">월평균</p>
-          <p className="mt-1 text-[28px] font-extrabold text-navy">
+          <p className="mt-1 text-[30px] font-extrabold text-navy">
             {monthlyAvg.toLocaleString("ko-KR")}
             <span className="ml-1 text-[14px] font-semibold text-slate-500">kWh</span>
           </p>
         </div>
         <div>
           <p className="text-[13px] text-slate-500">최대 발전 예상월</p>
-          <p className="mt-1 text-[28px] font-extrabold text-sky-700">{peak?.month || "—"}</p>
+          <p className="mt-1 text-[32px] font-extrabold text-sky-700">{peak?.month || "—"}</p>
         </div>
       </div>
 

@@ -22,68 +22,73 @@ function reviewPointsFor(installType: string): string[] {
 
 /** FRAME 02 — photo is the hero (~60%), capacity typography secondary. */
 export default function TechnicalFrame() {
-  const { metrics, capacity, installType } = useResultMetrics();
+  const { metrics, capacity, installType, siteAddress } = useResultMetrics();
   const usable = metrics.usableAreaSqm ?? metrics.roofUsableAreaSqm ?? metrics.baseAreaSqm;
-  const visual = resolveInstallVisual(installType);
+  const visual = resolveInstallVisual(installType, {
+    usage: "technical",
+    seed: `${siteAddress}:${installType}:technical`,
+  });
   const points = reviewPointsFor(installType);
 
   return (
-    <div className="grid items-stretch gap-8 lg:grid-cols-[0.38fr_0.62fr] lg:gap-10">
-      <div className="flex flex-col justify-center order-2 lg:order-1">
-        <p className="text-[13px] font-medium text-slate-500">예상 설치용량</p>
-        <p className="mt-2 text-[52px] font-extrabold leading-none tracking-tight text-navy sm:text-[60px]">
+    <div className="overflow-hidden bg-gradient-to-br from-[#07182f] via-[#0b1d3a] to-[#12315d] p-5 text-white sm:p-7 lg:p-8">
+      <div className="grid items-stretch gap-8 lg:grid-cols-[0.38fr_0.62fr] lg:gap-10">
+      <div className="order-2 flex flex-col justify-center lg:order-1">
+        <p className="text-[13px] font-semibold text-sky-200/90">예상 설치용량</p>
+        <p className="mt-2 text-[58px] font-extrabold leading-none tracking-tight text-white sm:text-[68px]">
           {capacity || "—"}
         </p>
-        <p className="mt-4 text-[18px] font-semibold text-navy">{installType || "설치형태 확인 중"}</p>
+        <p className="mt-3 text-[20px] font-bold text-sky-100">{installType || "설치형태 확인 중"}</p>
 
-        <div className="mt-10 space-y-5 border-t border-slate-200 pt-8">
+        <div className="mt-10 space-y-5 border-t border-white/20 pt-8">
           <div>
-            <p className="text-[13px] text-slate-500">예상 모듈</p>
-            <p className="mt-1 text-[26px] font-extrabold text-slate-900">
+            <p className="text-[13px] text-sky-200/90">예상 모듈</p>
+            <p className="mt-1 text-[30px] font-extrabold text-white">
               {metrics.moduleCount > 0 ? `${metrics.moduleCount.toLocaleString("ko-KR")}장` : "—"}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-5">
             <div>
-              <p className="text-[13px] text-slate-500">활용 면적</p>
-              <p className="mt-1 text-[20px] font-bold text-slate-900">
+              <p className="text-[13px] text-sky-200/90">활용 면적</p>
+              <p className="mt-1 text-[22px] font-bold text-white">
                 {usable != null && usable > 0 ? `${Math.round(usable).toLocaleString("ko-KR")}㎡` : "—"}
               </p>
             </div>
             <div>
-              <p className="text-[13px] text-slate-500">분석 면적</p>
-              <p className="mt-1 text-[20px] font-bold text-slate-900">
+              <p className="text-[13px] text-sky-200/90">분석 면적</p>
+              <p className="mt-1 text-[22px] font-bold text-white">
                 {metrics.baseAreaSqm > 0 ? `${Math.round(metrics.baseAreaSqm).toLocaleString("ko-KR")}㎡` : "—"}
               </p>
             </div>
           </div>
         </div>
 
-        <ul className="mt-8 space-y-1 text-[14px] leading-relaxed text-slate-600">
+        <ul className="mt-8 space-y-1 text-[14px] leading-relaxed text-slate-200">
           {points.slice(0, 3).map((point) => (
             <li key={point}>· {point}</li>
           ))}
         </ul>
-        <p className="mt-4 text-[13px] text-slate-500">
+        <p className="mt-4 text-[13px] text-sky-100/75">
           참고 사업비는 설치조건에 따라 실제 견적과 달라질 수 있습니다.
         </p>
       </div>
 
-      <div className="relative order-1 min-h-[300px] overflow-hidden bg-slate-900 sm:min-h-[400px] lg:order-2 lg:min-h-[520px]">
+      <div className="relative order-1 min-h-[320px] overflow-hidden bg-slate-900 sm:min-h-[420px] lg:order-2 lg:min-h-[560px]">
         <Image
           src={visual.src}
           alt={visual.alt}
           fill
-          className="object-cover"
+          className="object-cover object-center"
           sizes="(max-width: 1024px) 100vw, 62vw"
-          priority={false}
+          priority
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent px-5 pb-6 pt-24 sm:px-7">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/28 to-transparent px-5 pb-6 pt-24 sm:px-7">
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-sky-200">예상 설치 형태</p>
           <p className="mt-1 text-[26px] font-extrabold text-white sm:text-[30px]">{visual.label}</p>
           <p className="mt-1 text-[18px] font-semibold text-white/90">{capacity || "—"}</p>
         </div>
       </div>
+    </div>
     </div>
   );
 }

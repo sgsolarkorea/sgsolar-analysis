@@ -28,18 +28,18 @@ export default function ResultFrame({
     tone === "dark"
       ? "bg-navy text-white"
       : tone === "muted"
-        ? "bg-[#F4F7FB]"
+        ? "bg-[#EFF4FA]"
         : "bg-transparent";
 
   const titleClass =
     tone === "dark"
-      ? "text-[30px] font-extrabold tracking-tight text-white sm:text-[34px]"
-      : "text-[30px] font-extrabold tracking-tight text-navy sm:text-[34px]";
+      ? "text-[34px] font-extrabold tracking-tight text-white sm:text-[40px]"
+      : "text-[34px] font-extrabold tracking-tight text-navy sm:text-[40px]";
 
   const introClass =
     tone === "dark"
-      ? "mt-2 max-w-2xl text-[16px] leading-relaxed text-slate-300"
-      : "mt-2 max-w-2xl text-[16px] leading-relaxed text-slate-600";
+      ? "mt-2 max-w-3xl text-[16px] leading-relaxed text-slate-300 sm:text-[17px]"
+      : "mt-2 max-w-3xl text-[16px] leading-relaxed text-slate-600 sm:text-[17px]";
 
   const eyebrowClass =
     tone === "dark"
