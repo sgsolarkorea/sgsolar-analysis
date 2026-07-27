@@ -5,7 +5,6 @@ import {
 } from "@/components/result/ResultMetricsSections";
 import ResultPdfCtaPanel from "@/components/result/ResultPdfCtaPanel";
 import MobileResultActions from "@/components/result/MobileResultActions";
-import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
 import { type InstallTypeOption } from "@/data/resultUx";
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
@@ -27,12 +26,12 @@ import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import MapArea from "@/components/result/MapArea";
 import ResultHero from "@/components/result/ResultHero";
 import ResultStickyNav from "@/components/result/ResultStickyNav";
-import BusinessCoreSummary from "@/components/result/BusinessCoreSummary";
+import ResultFrame from "@/components/result/ResultFrame";
+import TechnicalFrame from "@/components/result/TechnicalFrame";
 import PermitGateSection from "@/components/result/PermitGateSection";
 import GenerationSection from "@/components/result/GenerationSection";
 import MarketRevenueSection from "@/components/result/MarketRevenueSection";
 import InvestmentAnalysisSection from "@/components/result/InvestmentAnalysisSection";
-import InstallationVisualSection from "@/components/result/InstallationVisualSection";
 import RequiredChecks from "@/components/result/RequiredChecks";
 import BusinessRoadmapSection from "@/components/result/BusinessRoadmapSection";
 import SgSolarSupportSection from "@/components/result/SgSolarSupportSection";
@@ -86,7 +85,7 @@ async function DeferredOrdinanceSection({
 
 function OrdinanceSkeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="animate-pulse py-6">
       <div className="h-5 w-40 rounded bg-slate-200" />
       <div className="mt-3 h-4 w-full max-w-md rounded bg-slate-100" />
       <div className="mt-6 h-28 rounded-xl bg-slate-100" />
@@ -168,44 +167,56 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
         <ResultStickyNav />
 
-        <div className="mx-auto max-w-[1360px] px-4 py-8 sm:px-6 sm:py-10">
-          {showMountainWarning && (
-            <div className="mb-14">
-              <MountainLandWarningBanner />
-            </div>
-          )}
-
-          {/* 01 입지 위치 */}
-          <section id="site-location" className="scroll-mt-28">
-            <SectionHeader
-              title="입지 위치"
-              description="입력하신 주소의 위치를 지도에서 먼저 확인하세요."
-            />
-            <MapArea
-              address={data.address}
-              jibunAddress={data.jibunAddress}
-              lat={data.lat}
-              lng={data.lng}
-              installType={installTypeLabel}
-              areaLabel={analysisAreaLabel}
-              landCategory={getFieldValue(data.landInfo, "지목") || undefined}
-              zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
-              buildingPresent={hasBuilding}
-            />
-          </section>
-
-          {/* 02 예상 설치 규모 */}
-          <div className="mt-20 sm:mt-24">
-            <BusinessCoreSummary />
+        {showMountainWarning ? (
+          <div className="mx-auto max-w-[1360px] px-4 pt-6 sm:px-6">
+            <MountainLandWarningBanner />
           </div>
+        ) : null}
 
-          {/* 03 계통 · 인허가 핵심 검토 */}
-          <div className="mt-20 sm:mt-24">
-            <PermitGateSection items={reviewStatusItems} />
-          </div>
+        {/* FRAME 01 — SITE */}
+        <ResultFrame
+          id="frame-site"
+          eyebrow="Site"
+          title="입지 위치"
+          intro="입력하신 부지의 위치를 지도에서 확인하세요."
+          className="result-frame-pad"
+        >
+          <MapArea
+            address={data.address}
+            jibunAddress={data.jibunAddress}
+            lat={data.lat}
+            lng={data.lng}
+            installType={installTypeLabel}
+            areaLabel={analysisAreaLabel}
+            landCategory={getFieldValue(data.landInfo, "지목") || undefined}
+            zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
+            buildingPresent={hasBuilding}
+          />
+        </ResultFrame>
 
-          {/* 계통 상세 */}
-          <section id="grid" className="mt-14 scroll-mt-28 sm:mt-16">
+        {/* FRAME 02 — TECHNICAL */}
+        <ResultFrame
+          id="frame-technical"
+          eyebrow="Technical"
+          title="설치 규모 · 형태"
+          intro="얼마나 설치되고 어떤 모습인지 한눈에 확인합니다."
+          tone="muted"
+          className="result-frame-pad"
+        >
+          <TechnicalFrame />
+        </ResultFrame>
+
+        {/* FRAME 03 — FEASIBILITY */}
+        <ResultFrame
+          id="frame-feasibility"
+          eyebrow="Feasibility"
+          title="사업 진행 핵심 검토"
+          intro="계통·인허가·조례·현장조건 등 실제 사업에 걸리는 항목을 함께 봅니다."
+          tone="dark"
+          className="result-frame-pad"
+        >
+          <PermitGateSection items={reviewStatusItems} />
+          <div id="grid" className="mt-10 scroll-mt-28 rounded-2xl bg-white p-5 text-navy sm:p-7">
             <GridConnectionSection
               initialGridInfo={data.gridInfo}
               address={data.address}
@@ -214,81 +225,99 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               lng={data.lng}
               disclaimer={GRID_DISCLAIMER}
             />
-          </section>
-
-          {/* 04 발전량 */}
-          <div className="mt-20 sm:mt-24">
-            <GenerationSection />
           </div>
+        </ResultFrame>
 
-          {/* 05 시장가격 · 예상 발전수익 */}
-          <div className="mt-20 sm:mt-24">
-            <MarketRevenueSection />
-          </div>
+        {/* FRAME 04 — ENERGY */}
+        <ResultFrame
+          id="frame-energy"
+          eyebrow="Energy"
+          title="예상 발전량"
+          intro="지역 일사량 기준 연간·월별 예상 발전량입니다."
+          className="result-frame-pad"
+        >
+          <GenerationSection embedded />
+        </ResultFrame>
 
-          {/* 05b 장기 투자수익 시뮬레이션 (CV-passed engine) */}
-          <div className="mt-16 sm:mt-20">
-            <InvestmentAnalysisSection />
-          </div>
+        {/* FRAME 05 — BUSINESS */}
+        <ResultFrame
+          id="frame-business"
+          eyebrow="Business"
+          title="시장가격 · 투자수익"
+          intro="1년 시장 스냅샷과 20년 장기 투자 시뮬레이션을 구분해 확인합니다."
+          tone="muted"
+          className="result-frame-pad"
+        >
+          <MarketRevenueSection embedded />
+          <InvestmentAnalysisSection />
+        </ResultFrame>
 
-          {/* 06 예상 설치 형태 */}
-          <div className="mt-20 sm:mt-24">
-            <InstallationVisualSection />
-          </div>
-
-          {/* 07 사업 진행 전 확인사항 */}
-          <div className="mt-16 sm:mt-20">
-            <RequiredChecks items={reviewStatusItems} />
-          </div>
-
-          {/* 08 사업 진행 로드맵 */}
-          <div className="mt-20 sm:mt-24">
+        {/* FRAME 06 — ACTION */}
+        <ResultFrame
+          id="frame-action"
+          eyebrow="Action"
+          title="확인사항 · 진행 절차"
+          intro="검토가 완료되면 실제 사업은 다음 절차로 진행됩니다."
+          className="result-frame-pad"
+        >
+          <RequiredChecks items={reviewStatusItems} />
+          <div className="mt-14">
             <BusinessRoadmapSection />
           </div>
+        </ResultFrame>
 
-          {/* 09 상세 분석 */}
-          <div className="mt-16 sm:mt-20">
-            <DetailAnalysisAccordion>
-              <MultiParcelSection />
-              <LandInfoCardSection detail={data.landInfoDetail} />
-              <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
-              <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
+        {/* FRAME 07 — PROOF */}
+        <ResultFrame
+          id="frame-proof"
+          eyebrow="Proof"
+          title="분석 이후 실제 사업까지 연결합니다"
+          intro="SG SOLAR 역량과 설치 형태 예시입니다. 검증되지 않은 시공실적을 의미하지 않습니다."
+          tone="muted"
+          className="result-frame-pad"
+        >
+          <SgSolarSupportSection embedded />
+          <div className="mt-16">
+            <InstallLookbookSection embedded />
+          </div>
+        </ResultFrame>
 
-              <DetailInfoSection
-                id="building-info"
-                title="건축물 정보"
-                fields={data.buildingInfo}
+        {/* 분석 근거 (접힘) */}
+        <div className="mx-auto max-w-[1360px] px-4 py-10 sm:px-6">
+          <DetailAnalysisAccordion>
+            <MultiParcelSection />
+            <LandInfoCardSection detail={data.landInfoDetail} />
+            <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
+            <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
+            <DetailInfoSection
+              id="building-info"
+              title="건축물 정보"
+              fields={data.buildingInfo}
+            />
+            <Suspense fallback={<OrdinanceSkeleton />}>
+              <DeferredOrdinanceSection
+                address={data.address}
+                jibunAddress={data.jibunAddress}
+                setbackReview={data.setbackReview}
               />
+            </Suspense>
+            <ResultCapacitySection recommendation={data.recommendation} />
+          </DetailAnalysisAccordion>
+        </div>
 
-              <Suspense fallback={<OrdinanceSkeleton />}>
-                <DeferredOrdinanceSection
-                  address={data.address}
-                  jibunAddress={data.jibunAddress}
-                  setbackReview={data.setbackReview}
-                />
-              </Suspense>
-
-              <ResultCapacitySection recommendation={data.recommendation} />
-            </DetailAnalysisAccordion>
-          </div>
-
-          {/* 10 SG SOLAR 지원업무 */}
-          <div className="mt-20 sm:mt-24">
-            <SgSolarSupportSection />
-          </div>
-
-          {/* 11 설치형태 Lookbook */}
-          <div className="mt-20 sm:mt-24">
-            <InstallLookbookSection />
-          </div>
-
-          {/* 12 PDF · 상담 CTA */}
-          <div className="mt-20 space-y-10 sm:mt-24">
-            <ResultPdfCtaPanel address={data.address} />
+        {/* FRAME 08 — CONVERSION */}
+        <ResultFrame
+          id="frame-conversion"
+          eyebrow="Next Step"
+          title="결과를 가지고 다음 단계로"
+          intro="PDF로 정리하거나 전문가 상담으로 이어서 검토하세요."
+          className="result-frame-pad"
+        >
+          <ResultPdfCtaPanel address={data.address} />
+          <div className="mt-10 space-y-10">
             <ResultSaveSection address={data.address} />
             <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
           </div>
-        </div>
+        </ResultFrame>
 
         <MobileResultActions address={data.address} />
       </div>

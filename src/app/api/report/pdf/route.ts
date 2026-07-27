@@ -14,6 +14,7 @@ import {
   formatRevenueDisplay,
 } from "@/lib/solar/calculate";
 import type { ParcelSnapshot } from "@/types/parcelReview";
+import type { InvestmentScenarioPayload } from "@/lib/investment/scenarioStorage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,9 +23,14 @@ export const maxDuration = 60;
 interface PdfPostBody {
   address: string;
   parcels?: ParcelSnapshot[];
+  investmentScenario?: InvestmentScenarioPayload | null;
 }
 
-async function buildPdfBytes(address: string, parcels?: ParcelSnapshot[]) {
+async function buildPdfBytes(
+  address: string,
+  parcels?: ParcelSnapshot[],
+  investmentScenario?: InvestmentScenarioPayload | null,
+) {
   const data = await analyzeSolarSite(address);
 
   if (parcels && parcels.length > 1) {
@@ -65,6 +71,7 @@ async function buildPdfBytes(address: string, parcels?: ParcelSnapshot[]) {
     parcels: parcels && parcels.length > 0 ? parcels : undefined,
     ordinanceInfo,
     ordinanceDisplay,
+    investmentScenario,
   });
 }
 
@@ -95,7 +102,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const pdfBytes = await buildPdfBytes(address, body?.parcels ?? []);
+    const pdfBytes = await buildPdfBytes(address, body?.parcels ?? [], body?.investmentScenario);
     return pdfResponse(pdfBytes, address);
   } catch (error) {
     console.error("[PDF] multi-parcel generation failed:", error);

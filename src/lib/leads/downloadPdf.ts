@@ -1,17 +1,23 @@
 import { parcelToSnapshot } from "@/lib/parcels/aggregate";
+import {
+  loadInvestmentScenario,
+  type InvestmentScenarioPayload,
+} from "@/lib/investment/scenarioStorage";
 
-export async function downloadResultPdf(address: string, parcels: ReturnType<typeof parcelToSnapshot>[]) {
-  const hasMultiParcel = parcels.length > 1;
-  const res = hasMultiParcel
-    ? await fetch("/api/report/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address,
-          parcels,
-        }),
-      })
-    : await fetch(`/api/report/pdf?${new URLSearchParams({ address }).toString()}`);
+export async function downloadResultPdf(
+  address: string,
+  parcels: ReturnType<typeof parcelToSnapshot>[],
+) {
+  const investmentScenario = loadInvestmentScenario();
+  const res = await fetch("/api/report/pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      address,
+      parcels: parcels.length > 0 ? parcels : undefined,
+      investmentScenario: investmentScenario ?? undefined,
+    }),
+  });
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -31,10 +37,9 @@ export async function downloadResultPdf(address: string, parcels: ReturnType<typ
   URL.revokeObjectURL(url);
 }
 
-export function buildPdfApiUrl(address: string, hasMultiParcel: boolean): string {
+export function buildPdfApiUrl(address: string, _hasMultiParcel: boolean): string {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  if (hasMultiParcel) {
-    return `${origin}/api/report/pdf`;
-  }
   return `${origin}/api/report/pdf?${new URLSearchParams({ address }).toString()}`;
 }
+
+export type { InvestmentScenarioPayload };

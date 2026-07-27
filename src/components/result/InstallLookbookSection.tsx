@@ -3,26 +3,40 @@
 import Image from "next/image";
 import { INSTALL_LOOKBOOK } from "@/data/installLookbook";
 import { getInstallVisualOrFallback } from "@/data/installationVisuals";
+import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 
-export default function InstallLookbookSection() {
-  const featured = INSTALL_LOOKBOOK.find((item) => item.featured) ?? INSTALL_LOOKBOOK[0];
+function featuredIdForInstallType(installType: string): string {
+  if (installType.includes("주차")) return "carport";
+  if (installType.includes("상계") || installType.includes("가정") || installType.includes("주택")) {
+    return "residential";
+  }
+  if (installType.includes("토지")) return "ground";
+  if (installType.includes("지붕") || installType.includes("공장") || installType.includes("창고")) {
+    return "factory";
+  }
+  return "ground";
+}
+
+export default function InstallLookbookSection({ embedded = false }: { embedded?: boolean }) {
+  const { installType } = useResultMetrics();
+  const featuredId = featuredIdForInstallType(installType);
+  const featured =
+    INSTALL_LOOKBOOK.find((item) => item.id === featuredId) ??
+    INSTALL_LOOKBOOK.find((item) => item.featured) ??
+    INSTALL_LOOKBOOK[0];
   const supporting = INSTALL_LOOKBOOK.filter((item) => item.id !== featured.id).slice(0, 3);
   const featuredVisual = getInstallVisualOrFallback(featured.visualKey);
 
   return (
-    <section id="cases" className="scroll-mt-28" aria-labelledby="lookbook-heading">
-      <div className="max-w-3xl">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-sky-700">Installation Lookbook</p>
-        <h2 id="lookbook-heading" className="mt-2 text-[28px] font-extrabold text-navy sm:text-[32px]">
-          비슷한 설치 형태를 미리 확인해보세요
-        </h2>
-        <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
-          부지와 건축물 조건에 따라 적용 가능한 구조와 배치는 달라질 수 있습니다. 아래는 설치 형태
-          예시이며, 특정 시공현장의 용량·지역을 의미하지 않습니다.
-        </p>
-      </div>
+    <div id="cases">
+      {!embedded ? (
+        <div className="max-w-3xl">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-sky-700">Installation Types</p>
+          <h2 className="mt-2 text-[28px] font-extrabold text-navy sm:text-[32px]">설치 형태 예시</h2>
+        </div>
+      ) : null}
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1.7fr_1fr]">
+      <div className={`${embedded ? "" : "mt-10 "}grid gap-8 lg:grid-cols-[1.7fr_1fr]`}>
         <article>
           <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
             <Image
@@ -31,10 +45,10 @@ export default function InstallLookbookSection() {
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 62vw"
-              priority
+              loading="lazy"
             />
             <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2.5 py-1 text-xs font-bold text-navy">
-              설치 형태 예시
+              현재 분석과 동일 유형
             </span>
           </div>
           <div className="mt-4">
@@ -48,11 +62,11 @@ export default function InstallLookbookSection() {
           </div>
         </article>
 
-        <div className="grid gap-6">
+        <div className="grid gap-6 content-start">
           {supporting.map((item) => {
             const visual = getInstallVisualOrFallback(item.visualKey);
             return (
-              <article key={item.id} className="grid grid-cols-[1fr_1.1fr] gap-3 sm:gap-4">
+              <article key={item.id} className="grid grid-cols-[1fr_1.15fr] items-center gap-3 sm:gap-4">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                   <Image
                     src={visual.src}
@@ -60,11 +74,11 @@ export default function InstallLookbookSection() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 40vw, 18vw"
+                    loading="lazy"
                   />
                 </div>
-                <div className="flex min-w-0 flex-col justify-center">
-                  <p className="text-xs font-bold text-sky-700">설치 형태 예시</p>
-                  <h4 className="mt-1 text-base font-bold text-navy">{item.title}</h4>
+                <div className="min-w-0">
+                  <h4 className="text-base font-bold text-navy">{item.title}</h4>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.blurb}</p>
                 </div>
               </article>
@@ -72,6 +86,6 @@ export default function InstallLookbookSection() {
           })}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

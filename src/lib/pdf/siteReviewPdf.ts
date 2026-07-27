@@ -23,6 +23,7 @@ export interface SiteReviewPdfOptions {
   parcels?: ParcelSnapshot[];
   ordinanceInfo?: OrdinanceInfoListResult;
   ordinanceDisplay?: OrdinanceDisplayResult;
+  investmentScenario?: import("@/lib/investment/scenarioStorage").InvestmentScenarioPayload | null;
 }
 
 function todayFileDate(): string {
@@ -93,6 +94,7 @@ export async function generateSiteReviewPdf(
     }, {
       ordinanceInfo: options.ordinanceInfo,
       ordinanceDisplay: options.ordinanceDisplay,
+      investmentScenario: options.investmentScenario,
     });
 
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });

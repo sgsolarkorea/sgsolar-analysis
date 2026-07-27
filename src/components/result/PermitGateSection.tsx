@@ -19,15 +19,6 @@ interface GateItem {
   action: string;
 }
 
-function statusTone(status: ReviewStatusItem["status"]): string {
-  if (status === "confirmed" || status === "reviewable") return "border-sky-400/40 bg-sky-500/10 text-sky-100";
-  if (status === "site_check") return "border-orange-400/40 bg-orange-500/10 text-orange-100";
-  if (status === "needs_review" || status === "insufficient_data") {
-    return "border-amber-400/40 bg-amber-500/10 text-amber-100";
-  }
-  return "border-white/15 bg-white/5 text-slate-200";
-}
-
 export default function PermitGateSection({ items }: PermitGateSectionProps) {
   const { installType } = useResultMetrics();
   const kind = resolveBusinessRoadmapKind(installType);
@@ -50,7 +41,6 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
           statusLabel: grid ? REVIEW_STATUS_MAP[grid.status].label : "한전 확인 필요",
           why: "상계거래 신청과 전력공급부 연계 기술 검토가 필요합니다. 최종 접수는 한전 확인 후 진행됩니다.",
           action: "한전 접수 대상",
-          tone: grid ? statusTone(grid.status) : statusTone("needs_review"),
         },
         secondary: [
           {
@@ -92,7 +82,6 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
         statusLabel: grid ? REVIEW_STATUS_MAP[grid.status].label : "한전 확인 필요",
         why: "접속 가능 용량과 접속 조건은 한전 검토로 최종 확인됩니다. 입지분석만으로 연계가 확정되지 않습니다.",
         action: "한전 확인 필요",
-        tone: grid ? statusTone(grid.status) : statusTone("needs_review"),
       },
       secondary: [
         {
@@ -153,67 +142,58 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
         ];
 
   return (
-    <section id="permit-gate" className="scroll-mt-28" aria-labelledby="permit-gate-heading">
-      <div className="overflow-hidden rounded-[28px] bg-navy text-white">
-        <div className="border-b border-white/10 px-5 py-6 sm:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-sky-300">Business Gate</p>
-          <h2 id="permit-gate-heading" className="mt-2 text-[28px] font-extrabold sm:text-[32px]">
-            사업 진행 핵심 검토
-          </h2>
-          <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-slate-300">
-            실제 사업 진행 시 확인해야 하는 주요 행정·기술 절차입니다. 현재 입지분석만으로 허가·접속이
-            확정되지 않습니다. ({roadmap.label})
+    <div id="permit-gate" className="text-white">
+      <div className="grid gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:gap-12">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-300">Grid Connection</p>
+          <p className="mt-3 text-[26px] font-extrabold sm:text-[30px]">{primary.title}</p>
+          <p className="mt-4 inline-flex rounded-md bg-white/15 px-2.5 py-1 text-sm font-bold">
+            {primary.statusLabel}
           </p>
-        </div>
-
-        <div className="grid gap-0 lg:grid-cols-[1.35fr_1fr]">
-          <div className={`border-white/10 px-5 py-7 sm:px-8 lg:border-r ${primary.tone}`}>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-200">Primary Gate</p>
-            <p className="mt-3 text-[22px] font-extrabold sm:text-[26px]">{primary.title}</p>
-            <p className="mt-3 inline-flex rounded-md bg-white/15 px-2.5 py-1 text-sm font-bold">
-              {primary.statusLabel}
-            </p>
-            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-200">{primary.why}</p>
-            <p className="mt-3 text-sm font-semibold text-sky-200">{primary.action}</p>
-            <Link
-              href="#grid"
-              className="mt-6 inline-flex h-11 items-center rounded-xl bg-white px-4 text-sm font-bold text-navy"
-            >
-              계통 상세 확인
-            </Link>
-          </div>
-
-          <div className="grid sm:grid-cols-2">
-            {secondary.map((gate) => (
-              <div key={gate.key} className="border-b border-white/10 px-5 py-5 last:border-b-0 sm:odd:border-r">
-                <p className="text-sm font-bold text-white">{gate.title}</p>
-                <p className="mt-2 inline-flex rounded-md bg-white/10 px-2 py-0.5 text-xs font-bold">
-                  {gate.statusLabel}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">{gate.why}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 border-t border-white/10 px-5 py-4 sm:px-8">
-          <button
-            type="button"
-            onClick={() => setDetailOpen((v) => !v)}
-            className="inline-flex h-11 items-center rounded-xl border border-white/20 bg-white/5 px-4 text-sm font-bold text-white"
-            aria-expanded={detailOpen}
+          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-200">{primary.why}</p>
+          <p className="mt-3 text-sm font-semibold text-sky-200">{primary.action}</p>
+          <Link
+            href="#grid"
+            className="mt-6 inline-flex h-11 items-center rounded-xl bg-white px-4 text-sm font-bold text-navy"
           >
-            {detailOpen ? "인허가 상세 접기" : "인허가 상세 · 절차 보기"}
-          </button>
-          <Link href="#business-roadmap" className="text-sm font-semibold text-sky-200 underline-offset-2 hover:underline">
-            사업 로드맵 보기
+            계통 상세 확인
           </Link>
+        </div>
+
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-300">Permit Summary</p>
+          <ul className="mt-4 divide-y divide-white/10">
+            {secondary.map((gate) => (
+              <li key={gate.key} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                <div className="min-w-0">
+                  <p className="text-[15px] font-bold text-white">{gate.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-300">{gate.why}</p>
+                </div>
+                <p className="shrink-0 text-sm font-semibold text-sky-200">{gate.statusLabel}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
+      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
+        <button
+          type="button"
+          onClick={() => setDetailOpen((v) => !v)}
+          className="inline-flex h-11 items-center rounded-xl border border-white/20 bg-white/5 px-4 text-sm font-bold text-white"
+          aria-expanded={detailOpen}
+        >
+          {detailOpen ? "인허가 상세 접기" : "인허가 상세 보기"}
+        </button>
+        <Link href="#frame-action" className="text-sm font-semibold text-sky-200 underline-offset-2 hover:underline">
+          진행 절차로 이동
+        </Link>
+        <span className="text-xs text-slate-400">({roadmap.label})</span>
+      </div>
+
       {detailOpen ? (
-        <div id="permit-detail" className="mt-4 border-t border-slate-200 bg-slate-50 px-5 py-6 sm:px-8">
-          <h3 className="text-lg font-extrabold text-navy">인허가 상세</h3>
+        <div id="permit-detail" className="mt-6 rounded-2xl bg-white px-5 py-6 text-navy sm:px-7">
+          <h3 className="text-lg font-extrabold">인허가 상세</h3>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">
             회사소개서 {roadmap.sourceTitle} 절차 기준입니다. 허가 가능 여부를 확정하지 않습니다.
           </p>
@@ -224,12 +204,11 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
                   {String(index + 1).padStart(2, "0")} {item.title}
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.body}</p>
-                <p className="mt-1 text-xs text-slate-500">현재: 입지 1차 검토 · 추후: 계약·설계 이후</p>
               </li>
             ))}
           </ol>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }

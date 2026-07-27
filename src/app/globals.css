@@ -206,3 +206,23 @@
     radial-gradient(ellipse 70% 55% at 85% 15%, rgba(16, 185, 129, 0.18), transparent 55%),
     radial-gradient(ellipse 50% 40% at 10% 90%, rgba(56, 189, 248, 0.12), transparent 50%);
 }
+
+/* Result Design Consolidation — Decision Frame rhythm */
+.result-frame-pad {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 640px) {
+  .result-frame-pad {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .result-frame-pad {
+    padding-top: 6.5rem;
+    padding-bottom: 6.5rem;
+  }
+}

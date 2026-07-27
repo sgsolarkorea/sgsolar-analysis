@@ -60,6 +60,7 @@ export interface HtmlReportAssets {
 export interface PdfOrdinanceContext {
   ordinanceInfo?: OrdinanceInfoListResult;
   ordinanceDisplay?: OrdinanceDisplayResult;
+  investmentScenario?: import("@/lib/investment/scenarioStorage").InvestmentScenarioPayload | null;
 }
 
 function formatOrdinanceDate(value: string | null): string {
@@ -747,7 +748,7 @@ export function buildReportHtml(
         ${gridEquipment}
       </div>
       ${renderKepcoOfficeCard(data)}
-      ${renderInvestmentSection(data)}
+      ${renderInvestmentSection(data, ordinanceContext.investmentScenario)}
     </section>
 
     <section class="section page-break">
