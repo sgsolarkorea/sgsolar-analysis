@@ -273,27 +273,59 @@ export async function analyzeSolarSite(
   }
 
   const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
+  const isCorePhase = options?.phase === "core";
 
-  // Building registry + VWorld geometry are independent once PNU exists
   const tBldGeom = Date.now();
-  const [buildingLookup, siteGeometryBundleRaw] = await Promise.all([
-    getBuildingRegistryLookup({
+  let buildingLookup: Awaited<ReturnType<typeof getBuildingRegistryLookup>>;
+  let siteGeometryBundleRaw: SiteGeometryBundle;
+
+  if (isCorePhase) {
+    // First-useful: skip VWorld polygon round-trips. Capacity uses land/building registry areas;
+    // background `full` enrich fills cadastral/building polygons for map layout.
+    buildingLookup = await getBuildingRegistryLookup({
       pnu: effectivePnu,
       buildingName: geo.buildingName,
-    }),
-    fetchSiteGeometryBundle({
-      pnu: effectivePnu,
-      lat: geo.lat,
-      lng: geo.lng,
+    });
+    const provisionalBuildingArea = parseAreaSqm(
+      getFieldValue(buildingLookup.fields, "건축면적"),
+    );
+    siteGeometryBundleRaw = {
       landAreaSqm,
-      buildingAreaSqm: null,
-      registryBuildingCount: 0,
-    }),
-  ]);
+      buildingAreaSqm: provisionalBuildingArea,
+      cadastralPolygon: null,
+      cadastralAreaSqm: null,
+      buildingPolygons: [],
+      buildingPolygon: null,
+      buildingFootprintAreaSqm: provisionalBuildingArea ?? 0,
+      buildingPolygonCount: 0,
+      buildingFootprintAreaSumSqm: null,
+      registryBuildingAreaSqm: provisionalBuildingArea,
+      detectedBuildingCount: buildingLookup.itemCount,
+      usedBuildingCount: provisionalBuildingArea && provisionalBuildingArea > 0 ? Math.max(1, buildingLookup.itemCount) : 0,
+      excludedBuildingCount: 0,
+    };
+    console.info(`${perfLabel} building+geometry(core-deferred) ${Date.now() - tBldGeom}ms`);
+  } else {
+    [buildingLookup, siteGeometryBundleRaw] = await Promise.all([
+      getBuildingRegistryLookup({
+        pnu: effectivePnu,
+        buildingName: geo.buildingName,
+      }),
+      fetchSiteGeometryBundle({
+        pnu: effectivePnu,
+        lat: geo.lat,
+        lng: geo.lng,
+        landAreaSqm,
+        buildingAreaSqm: null,
+        registryBuildingCount: 0,
+      }),
+    ]);
+    console.info(`${perfLabel} building+geometry ${Date.now() - tBldGeom}ms`);
+  }
+
   const buildingInfo = buildingLookup.fields;
   const registryBuildingCount = buildingLookup.itemCount;
   const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
-  console.info(`${perfLabel} building+geometry ${Date.now() - tBldGeom}ms`);
 
   // Re-apply registry footprint without a second network round-trip
   const siteGeometryBundle: SiteGeometryBundle = {
