@@ -26,8 +26,8 @@ export default function ResultHero({
       <div className="result-hero-pattern pointer-events-none absolute inset-0" aria-hidden />
       <div className="result-hero-glow pointer-events-none absolute inset-0" aria-hidden />
 
-      <div className="relative mx-auto max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 lg:py-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+      <div className="relative mx-auto max-w-[1320px] px-4 py-5 sm:px-6 sm:py-6 lg:py-7">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -36,7 +36,7 @@ export default function ResultHero({
               입지검토 결과
             </span>
 
-            <h1 className="mt-4 text-[28px] font-bold leading-tight tracking-tight text-white sm:text-[34px] lg:text-[38px]">
+            <h1 className="mt-3 text-[26px] font-bold leading-tight tracking-tight text-white sm:text-[32px] lg:text-[36px]">
               {address}
             </h1>
             {(jibunAddress !== address || buildingName) && (

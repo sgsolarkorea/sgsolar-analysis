@@ -7,15 +7,6 @@ import { MARKETING_NAME } from "@/data/sampleData";
 import { resolveInstallVisual } from "@/data/installationVisuals";
 import SectionHeader from "@/components/ui/SectionHeader";
 
-const TYPE_GRADIENT: Record<string, string> = {
-  토지형: "from-emerald-700 to-emerald-900",
-  축사형: "from-slate-600 to-slate-800",
-  상가형: "from-blue-900 to-navy",
-  주택형: "from-amber-700 to-amber-900",
-  공장형: "from-slate-700 to-slate-900",
-  지붕형: "from-blue-800 to-navy",
-};
-
 interface SimilarCasesProps {
   cases: RecommendedCaseStudy[];
 }
@@ -28,97 +19,109 @@ function openLink(url: string | undefined) {
   }
 }
 
-function CaseThumbnail({ item }: { item: RecommendedCaseStudy }) {
-  const [imageFailed, setImageFailed] = useState(false);
-  const gradient = TYPE_GRADIENT[item.installCategory] ?? TYPE_GRADIENT[item.installType] ?? "from-slate-600 to-slate-800";
-  const hasPhoto = Boolean(item.thumbnail.src) && !imageFailed;
-  const visual = resolveInstallVisual(item.installType);
+function resolveCaseImage(item: RecommendedCaseStudy): { src: string; alt: string; actual: boolean } {
+  const visual = resolveInstallVisual(item.installCategory || item.installType);
+  // Prefer type-matched company-profile visual until dedicated project photos are verified.
+  return {
+    src: visual.src,
+    alt: `${item.installCategory || item.installType} 태양광 설치 형태 예시`,
+    actual: false,
+  };
+}
 
-  if (!hasPhoto) {
-    return (
-      <div className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${gradient}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={visual.src}
-          alt={visual.alt}
-          className="absolute inset-0 h-full w-full object-cover opacity-90"
-          loading="lazy"
-          decoding="async"
-        />
-        <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
-          {item.installCategory}
-        </span>
-        <span className="absolute right-3 top-3 rounded-md bg-black/55 px-2.5 py-1 text-[10px] font-semibold text-white">
-          설치 형태 예시
-        </span>
-      </div>
-    );
-  }
+function CaseImage({
+  item,
+  priority = false,
+  className = "aspect-[16/9]",
+}: {
+  item: RecommendedCaseStudy;
+  priority?: boolean;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const image = resolveCaseImage(item);
+  const src = failed ? resolveInstallVisual("지붕형").src : image.src;
 
   return (
-    <div className="relative aspect-[16/9] overflow-hidden">
+    <div className={`relative overflow-hidden bg-slate-100 ${className}`}>
       <Image
-        src={item.thumbnail.src}
-        alt={item.thumbnail.alt}
+        src={src}
+        alt={image.alt}
         fill
+        priority={priority}
         className="object-cover"
-        sizes="(max-width: 1024px) 100vw, 33vw"
-        onError={() => setImageFailed(true)}
+        sizes="(max-width: 1024px) 100vw, 60vw"
+        onError={() => {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn("case image load failed", item.id, image.src);
+          }
+          setFailed(true);
+        }}
       />
-      <span className="absolute left-3 top-3 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-slate-900">
-        {item.installCategory}
-      </span>
-      <span className="absolute right-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white">
-        시공사례
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent px-4 pb-3 pt-10">
+        <p className="text-sm font-bold text-white">{item.regionLabel}</p>
+        <p className="text-xs text-white/85">
+          {item.installCategory} · {item.capacityLabel}
+        </p>
+      </div>
+      <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2.5 py-1 text-xs font-bold text-navy">
+        {image.actual ? "시공사례" : "설치 형태 예시"}
       </span>
     </div>
   );
 }
 
 export default function SimilarCases({ cases }: SimilarCasesProps) {
+  if (!cases.length) return null;
+  const [featured, ...rest] = cases;
+  const side = rest.slice(0, 2);
+
   return (
-    <section id="cases" className="scroll-mt-28">
+    <section id="cases" className="scroll-mt-28 rounded-3xl bg-slate-50/90 px-4 py-8 sm:px-6 sm:py-10">
       <SectionHeader
-        title="시공 사례"
-        description={`${MARKETING_NAME} 유사 유형의 시공사례를 참고용으로 보여드립니다. 용량은 본 입지검토 예상 설치용량과 별개입니다.`}
+        title="시공 / 설치 사례"
+        description={`${MARKETING_NAME} 회사소개서 시공 유형 사진을 설치 형태 예시로 함께 보여드립니다. 표시 용량은 본 입지검토 예상 용량과 별개입니다.`}
       />
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {cases.map((item) => (
-          <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <CaseThumbnail item={item} />
 
-            <div className="flex flex-1 flex-col p-4 sm:p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {item.regionLabel}
-              </p>
-              <h4 className="mt-1 text-base font-bold leading-snug text-slate-900">{item.title}</h4>
-              <dl className="mt-3 grid gap-1.5 text-sm">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-slate-500">설치 유형</dt>
-                  <dd className="font-medium text-slate-900">{item.installCategory}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-slate-500">용량</dt>
-                  <dd className="font-bold text-navy">{item.capacityLabel}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-slate-500">특징</dt>
-                  <dd className="max-w-[60%] text-right font-medium leading-snug text-slate-900">
-                    {item.summary}
-                  </dd>
-                </div>
-              </dl>
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
+        <article className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80">
+          <CaseImage item={featured} priority className="aspect-[16/9] lg:aspect-[3/2]" />
+          <div className="p-5">
+            <h3 className="text-lg font-extrabold text-slate-900">{featured.title}</h3>
+            <p className="mt-2 text-sm text-slate-600">{featured.summary}</p>
+            <button
+              type="button"
+              onClick={() => openLink(featured.links.blogUrl)}
+              className="btn-primary mt-4 h-11 px-5 text-sm"
+            >
+              사례 보기
+            </button>
+          </div>
+        </article>
 
-              <button
-                type="button"
-                onClick={() => openLink(item.links.blogUrl)}
-                className="btn-primary mt-4 h-10 w-full text-sm"
-              >
-                시공사례 보기
-              </button>
-            </div>
-          </article>
-        ))}
+        <div className="grid gap-5">
+          {side.map((item) => (
+            <article
+              key={item.id}
+              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80"
+            >
+              <CaseImage item={item} className="aspect-[4/3]" />
+              <div className="p-4">
+                <h4 className="text-base font-bold text-slate-900">{item.title}</h4>
+                <p className="mt-1 text-sm text-slate-600">
+                  {item.installCategory} · {item.capacityLabel}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => openLink(item.links.blogUrl)}
+                  className="mt-3 text-sm font-semibold text-navy underline-offset-2 hover:underline"
+                >
+                  사례 보기
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

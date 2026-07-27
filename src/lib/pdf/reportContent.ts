@@ -56,10 +56,11 @@ export const PDF_CTA_BUTTON = "전문 상담 요청";
 export const PDF_REPORT_SUBTITLE = "공공데이터 기반 태양광 입지·용량·계통 사전 검토";
 
 export const PDF_PROCESS_STEPS = [
-  { step: 1, title: "주소 검토", desc: "입지 주소 및 토지·건물 공공데이터 확인" },
-  { step: 2, title: "현장 확인", desc: "실측 및 설치 조건·장애물 검토" },
-  { step: 3, title: "계통·인허가 검토", desc: "한전 접속·지자체 인허가 가능성 검토" },
-  { step: 4, title: "견적 및 상담", desc: "설비 규모·수익성·공사 견적 상담" },
+  { step: 1, title: "사전검토", desc: "입지·경제성·조례·한전 선로용량 1차 검토" },
+  { step: 2, title: "계약 · 인허가", desc: "설치규모 확정 및 발전사업·개발행위 검토" },
+  { step: 3, title: "설계 · 계통접수", desc: "모듈·구조·전기 설계 및 한전 계통 접수" },
+  { step: 4, title: "시공 · 검사", desc: "시공·계통연계·사용전검사" },
+  { step: 5, title: "상업운전", desc: "전력수급계약·설비확인·SMP·REC 운영" },
 ] as const;
 
 export const PDF_CASE_STUDY_PLACEHOLDERS = [

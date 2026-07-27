@@ -11,6 +11,7 @@ const NAV = [
   { id: "market-revenue", label: "수익" },
   { id: "install-visual", label: "설치형태" },
   { id: "required-checks", label: "확인사항" },
+  { id: "business-roadmap", label: "로드맵" },
   { id: "cases", label: "사례" },
 ] as const;
 

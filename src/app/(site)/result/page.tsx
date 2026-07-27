@@ -35,7 +35,8 @@ import GenerationSection from "@/components/result/GenerationSection";
 import MarketRevenueSection from "@/components/result/MarketRevenueSection";
 import InstallationVisualSection from "@/components/result/InstallationVisualSection";
 import RequiredChecks from "@/components/result/RequiredChecks";
-import NextSteps from "@/components/result/NextSteps";
+import BusinessRoadmapSection from "@/components/result/BusinessRoadmapSection";
+import SgSolarSupportSection from "@/components/result/SgSolarSupportSection";
 import DetailAnalysisAccordion from "@/components/result/DetailAnalysisAccordion";
 import AddressSearchError from "@/components/result/AddressSearchError";
 import { ResultMetricsProvider } from "@/components/result/ResultMetricsProvider";
@@ -208,7 +209,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
           <RequiredChecks items={reviewStatusItems} />
 
-          <NextSteps />
+          <BusinessRoadmapSection />
 
           <DetailAnalysisAccordion>
             <MultiParcelSection />
@@ -232,6 +233,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
             <ResultCapacitySection recommendation={data.recommendation} />
           </DetailAnalysisAccordion>
+
+          <SgSolarSupportSection />
 
           <ResultSimilarCasesSection />
 
