@@ -1,9 +1,10 @@
-import type { ProgressStatusKind } from "@/components/result/AnalysisProgressPanel";
 import { hasBuildingRecord, hasLandRecord } from "@/lib/api/infoFallbacks";
 import { getFieldValue, parseAreaSqm } from "@/lib/solar/calculate";
 import type { InfoField } from "@/types/siteReview";
 
 export { hasBuildingRecord } from "@/lib/api/infoFallbacks";
+
+export type ProgressStatusKind = "complete" | "available" | "reference" | "caution";
 
 export interface ProgressStepConfig {
   id: string;
@@ -17,38 +18,45 @@ export interface ProgressStepConfig {
 export const ANALYSIS_PROGRESS_STEPS: ProgressStepConfig[] = [
   {
     id: "site-location",
-    label: "입지 분석",
+    label: "위치와 부지",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "토지 특성 및 규제 검토",
+    description: "지도·필지 정보",
   },
   {
-    id: "site-overview",
-    label: "용량 산정",
+    id: "analysis-overview",
+    label: "설치 규모",
     statusLabel: "완료",
     statusKind: "complete",
-    description: "설치 가능 용량 및 예상 발전량 산정",
+    description: "용량·면적 요약",
+  },
+  {
+    id: "business-visual",
+    label: "사업성",
+    statusLabel: "완료",
+    statusKind: "complete",
+    description: "발전량·수익성",
   },
   {
     id: "grid",
-    label: "계통 검토",
+    label: "계통·인허가",
     statusLabel: "가능",
     statusKind: "available",
-    description: "한전 계통 연계 가능 여부 확인",
+    description: "계통·조례 검토",
   },
   {
     id: "cases",
-    label: "시공 사례",
+    label: "성공 사례",
     statusLabel: "확인",
     statusKind: "reference",
-    description: "유사 시공 사례 확인",
+    description: "유사 성공 사례",
   },
   {
     id: "consultation",
-    label: "상담 신청",
+    label: "상담",
     statusLabel: "가능",
     statusKind: "available",
-    description: "전문가 상담 및 설치 문의",
+    description: "전문가 상담",
   },
 ];
 

@@ -57,8 +57,8 @@ const layoutConfig: Record<
     taglineClass: "",
   },
   hero: {
-    imageClass: "h-auto w-[210px] max-w-full sm:w-[250px] lg:w-[270px]",
-    wrapperClass: "inline-flex flex-col items-start overflow-visible",
+    imageClass: "h-auto w-[160px] max-w-full sm:w-[200px] lg:w-[220px]",
+    wrapperClass: "flex w-full max-w-full flex-col items-start overflow-visible",
     taglineClass: "mt-3 text-[15px] font-semibold tracking-[0.08em] text-white sm:text-base",
     stackTagline: true,
   },

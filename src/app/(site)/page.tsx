@@ -52,10 +52,38 @@ const features = [
 ];
 
 const trustItems = [
-  { label: "공공데이터 기반" },
-  { label: "예상 설치용량 산정" },
-  { label: "발전량·수익성 분석" },
-  { label: "전문가 상담 연계" },
+  {
+    label: "공공데이터 기반",
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+      </svg>
+    ),
+  },
+  {
+    label: "설치용량 산정",
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+  },
+  {
+    label: "발전량·수익성 분석",
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    ),
+  },
+  {
+    label: "전문가 상담 연계",
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
 ];
 
 const previewKpis = [
@@ -89,10 +117,10 @@ export default function HomePage() {
 
         <div className="site-shell relative flex min-h-[600px] items-center py-12 sm:min-h-[640px] sm:py-14 lg:min-h-[680px] lg:py-16">
           <div className="grid w-full items-center gap-14 lg:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)] lg:gap-16 xl:gap-[4.5rem]">
-            <div className="max-w-[700px]">
+            <div className="flex max-w-[700px] flex-col items-start">
               <SgSolarLogo layout="hero" variant="light" />
 
-              <span className="mt-6 inline-flex h-9 items-center gap-2 rounded-lg border border-sky-400/30 bg-white/[0.07] px-4 text-[13px] font-semibold text-white sm:mt-6 sm:h-9 sm:text-sm">
+              <span className="mt-6 inline-flex h-9 w-fit items-center gap-2 rounded-[10px] border border-sky-400/30 bg-white/[0.07] px-4 text-[13px] font-semibold text-white sm:text-sm">
                 <svg className="h-4 w-4 shrink-0 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -103,42 +131,44 @@ export default function HomePage() {
                 <span className="text-slate-200">상담 비용 없음</span>
               </span>
 
-              <h1 className="mt-5 max-w-[680px] text-[40px] font-extrabold leading-[1.12] tracking-[-0.02em] text-white sm:mt-5 sm:text-[50px] lg:text-[56px]">
+              <h1 className="mt-[18px] max-w-[680px] text-[40px] font-extrabold leading-[1.12] tracking-[-0.02em] text-white sm:text-[50px] lg:text-[56px]">
                 무료 태양광 입지검토
               </h1>
 
-              <p className="mt-5 max-w-[680px] text-[17px] leading-[1.65] text-slate-100 sm:text-[18px]">
+              <p className="mt-5 max-w-[670px] text-[17px] leading-[1.65] text-slate-100 sm:text-[18px]">
                 {MARKETING_NAME}는 태양광 발전사업의{" "}
                 <span className="font-semibold text-sky-200">20년 생애주기 경험</span>을 바탕으로{" "}
-                <span className="font-semibold text-sky-200">입지검토</span>부터{" "}
-                <span className="font-semibold text-sky-200">설계·인허가·시공·유지관리</span>까지
+                <span className="font-semibold text-sky-200">입지검토</span>부터 설계·인허가·시공·유지관리까지
                 사업 가능성을 분석합니다.
               </p>
 
-              <div className="mt-8 sm:mt-9">
+              <div className="mt-8 w-full sm:mt-9">
                 <AddressSearchForm />
               </div>
 
-              <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2.5 sm:mt-8">
+              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
                 {trustItems.map((item) => (
-                  <li key={item.label} className="inline-flex items-center gap-2 text-[13px] font-medium text-slate-300 sm:text-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400/80" aria-hidden />
+                  <li
+                    key={item.label}
+                    className="inline-flex items-center gap-2 text-[13px] font-medium text-slate-300 sm:text-sm"
+                  >
+                    <span className="text-sky-300">{item.icon}</span>
                     {item.label}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <aside className="hidden self-stretch lg:flex lg:flex-col">
+            <aside className="w-full self-stretch lg:flex lg:flex-col">
               <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/12 bg-white/[0.07] shadow-[0_12px_40px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-                <div className="border-b border-white/10 px-7 py-5">
+                <div className="border-b border-white/10 px-5 py-4 sm:px-7 sm:py-5">
                   <p className="text-[15px] font-bold text-white">주소 하나로 확인하는 입지분석</p>
                   <p className="mt-1.5 text-[13px] leading-relaxed text-slate-300">
-                    위성 지도에서 부지를 확인하고, 설치용량·발전량·수익성을 검토합니다.
+                    위치·면적·설치규모·발전량·수익성을 단계별로 분석합니다.
                   </p>
                 </div>
 
-                <div className="relative mx-7 mt-5 aspect-[4/3] overflow-hidden rounded-xl border border-white/15 bg-[#0a2744]">
+                <div className="relative mx-5 mt-4 aspect-[16/10] overflow-hidden rounded-xl border border-white/15 bg-[#0a2744] sm:mx-7 sm:mt-5 sm:aspect-[4/3]">
                   <div
                     className="absolute inset-0 opacity-40"
                     style={{
@@ -156,19 +186,19 @@ export default function HomePage() {
                     <span className="block h-3.5 w-3.5 rounded-full border-2 border-white bg-amber-400 shadow-md" />
                   </div>
                   <div className="absolute bottom-3 left-3 right-3 rounded-lg border border-white/15 bg-navy/75 px-3 py-2 backdrop-blur-sm">
-                    <p className="truncate text-[11px] font-medium text-slate-200">예시 · 부지 경계 미리보기</p>
+                    <p className="truncate text-[11px] font-medium text-slate-200">분석 예시 · 부지 경계</p>
                     <p className="mt-0.5 text-[12px] font-semibold text-white">주소 입력 후 실제 필지 경계 표시</p>
                   </div>
                 </div>
 
-                <div className="mt-auto grid grid-cols-3 gap-2 px-7 py-5">
+                <div className="mt-auto grid grid-cols-3 gap-2 px-5 py-4 sm:px-7 sm:py-5">
                   {previewKpis.map((kpi) => (
                     <div
                       key={kpi.label}
                       className="rounded-xl border border-white/10 bg-white/[0.05] px-2.5 py-3 text-center"
                     >
                       <p className="text-[11px] font-medium leading-snug text-slate-300">{kpi.label}</p>
-                      <p className="mt-1.5 text-[12px] font-bold text-sky-200/90">예시 · {kpi.unit}</p>
+                      <p className="mt-1.5 text-[12px] font-bold text-sky-200/90">분석 예시 · {kpi.unit}</p>
                     </div>
                   ))}
                 </div>

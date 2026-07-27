@@ -204,7 +204,10 @@ function hasRoadAddress(address: string): boolean {
   return /(?:\d+\s*(?:번길|길|로|대로))/.test(address);
 }
 
-export async function analyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
+export async function analyzeSolarSite(
+  address: string,
+  options?: { phase?: "core" | "full" },
+): Promise<ResolvedSiteReview> {
   const perfLabel = `[Analysis] ${address.trim()}`;
   const t0 = Date.now();
   console.info(`${perfLabel} start`);
@@ -306,6 +309,8 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     source: "analyzeSolarSite",
   });
 
+  const skipGisDetail = options?.phase === "core";
+
   const [recommendedCasesResult, gridInfo, siteIntel] = await Promise.all([
     getRecommendedCases({
       address: geo.address,
@@ -325,9 +330,9 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
       capacityKw: solarMetrics.capacityKw,
       pnu: effectivePnu ?? undefined,
     }),
-    effectivePnu != null && effectivePnu !== ""
-      ? resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng })
-      : Promise.resolve(null),
+    skipGisDetail || effectivePnu == null || effectivePnu === ""
+      ? Promise.resolve(null)
+      : resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng }),
   ]);
 
   const recommendedCases = recommendedCasesResult;
@@ -343,13 +348,14 @@ export async function analyzeSolarSite(address: string): Promise<ResolvedSiteRev
     siteIntel?.meta.collectedAt,
   );
 
-  const setbackReview = siteIntel?.parcel
-    ? await buildSetbackFromGis(siteIntel.parcel, {
-        installType: solarMetrics.installType,
-        address: geo.address,
-        jibunAddress: geo.jibunAddress,
-      })
-    : buildDefaultSetbackReview(solarMetrics.installType, geo.address, geo.jibunAddress);
+  const setbackReview =
+    !skipGisDetail && siteIntel?.parcel
+      ? await buildSetbackFromGis(siteIntel.parcel, {
+          installType: solarMetrics.installType,
+          address: geo.address,
+          jibunAddress: geo.jibunAddress,
+        })
+      : buildDefaultSetbackReview(solarMetrics.installType, geo.address, geo.jibunAddress);
 
   console.info(`${perfLabel} complete ${Date.now() - t0}ms`);
 
@@ -392,21 +398,54 @@ const ANALYSIS_CACHE_SALT = `roof-${areaPerKwByType.roof}-usable-v1`;
 const MEMORY_CACHE_TTL_MS = 120_000;
 const memoryCache = new Map<string, { expires: number; value: ResolvedSiteReview }>();
 
-export async function getCachedAnalyzeSolarSite(address: string): Promise<ResolvedSiteReview> {
+function cacheKey(address: string, phase: "core" | "full") {
+  return `${phase}:${address}`;
+}
+
+export async function getCachedAnalyzeSolarSite(
+  address: string,
+  options?: { phase?: "core" | "full" },
+): Promise<ResolvedSiteReview> {
+  const phase = options?.phase ?? "full";
   const normalized = address.trim();
   const now = Date.now();
-  const cached = memoryCache.get(normalized);
-  if (cached && cached.expires > now) {
-    console.info(`[Analysis] memory cache hit for "${normalized}"`);
-    return cached.value;
+  const key = cacheKey(normalized, phase);
+
+  // Prefer full cache when requesting full (or when full already warmed)
+  if (phase === "full") {
+    const fullCached = memoryCache.get(cacheKey(normalized, "full"));
+    if (fullCached && fullCached.expires > now) {
+      console.info(`[Analysis] memory cache hit (full) for "${normalized}"`);
+      return fullCached.value;
+    }
+  } else {
+    // Core request: use full if already available (better data), else core
+    const fullCached = memoryCache.get(cacheKey(normalized, "full"));
+    if (fullCached && fullCached.expires > now) {
+      console.info(`[Analysis] memory cache hit (full→core) for "${normalized}"`);
+      return fullCached.value;
+    }
+    const coreCached = memoryCache.get(key);
+    if (coreCached && coreCached.expires > now) {
+      console.info(`[Analysis] memory cache hit (core) for "${normalized}"`);
+      return coreCached.value;
+    }
   }
 
   const value = await unstable_cache(
-    () => analyzeSolarSite(normalized),
-    ["analyze-solar-site", ANALYSIS_CACHE_SALT, normalized],
+    () => analyzeSolarSite(normalized, { phase }),
+    ["analyze-solar-site", ANALYSIS_CACHE_SALT, phase, normalized],
     { revalidate: 120 },
   )();
 
-  memoryCache.set(normalized, { value, expires: now + MEMORY_CACHE_TTL_MS });
+  memoryCache.set(key, { value, expires: now + MEMORY_CACHE_TTL_MS });
+
+  // After core completes, warm full analysis in background so /result is fast
+  if (phase === "core") {
+    void getCachedAnalyzeSolarSite(normalized, { phase: "full" }).catch((error) => {
+      console.warn("[Analysis] background full enrich failed", error);
+    });
+  }
+
   return value;
 }

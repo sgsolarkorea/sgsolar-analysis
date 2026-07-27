@@ -182,7 +182,7 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     const perfKey = `analysis:${address.trim()}`;
     performance.mark(`${perfKey}:start`);
 
-    fetch(`/api/analyze?address=${encodeURIComponent(address)}`)
+    fetch(`/api/analyze?address=${encodeURIComponent(address)}&phase=core`)
       .then(async (response) => {
         if (!response.ok) {
           failed = true;

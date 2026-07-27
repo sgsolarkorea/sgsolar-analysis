@@ -1,11 +1,10 @@
+import { Suspense } from "react";
 import {
   ResultCapacitySection,
   ResultConsultationSection,
-  ResultGenerationSection,
   ResultRevenueSection,
   ResultSaveSection,
   ResultSimilarCasesSection,
-  ResultSiteOverview,
 } from "@/components/result/ResultMetricsSections";
 import ResultPdfCtaPanel from "@/components/result/ResultPdfCtaPanel";
 import MobileResultActions from "@/components/result/MobileResultActions";
@@ -31,9 +30,10 @@ import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import MapArea from "@/components/result/MapArea";
 import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import ResultHero from "@/components/result/ResultHero";
-import ReviewOpinionPanel from "@/components/result/ReviewOpinionPanel";
-import ReviewStatusGrid from "@/components/result/ReviewStatusGrid";
-import { KeyMetricCards } from "@/components/result/KeyMetricCards";
+import AnalysisOverview from "@/components/result/AnalysisOverview";
+import RequiredChecks from "@/components/result/RequiredChecks";
+import NextSteps from "@/components/result/NextSteps";
+import BusinessVisual from "@/components/result/BusinessVisual";
 import AddressSearchError from "@/components/result/AddressSearchError";
 import { ResultMetricsProvider } from "@/components/result/ResultMetricsProvider";
 import { getCachedAnalyzeSolarSite } from "@/lib/api/analysis";
@@ -41,8 +41,10 @@ import {
   KakaoAddressNotFoundError,
   getKakaoErrorMessage,
 } from "@/lib/api/kakaoErrors";
-import { buildReviewOpinionLines, buildReviewStatusItems } from "@/lib/result/buildReviewSummary";
-import { Suspense } from "react";
+import { buildReviewStatusItems } from "@/lib/result/buildReviewSummary";
+import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
+import { formatHouseholdMonthlySavings, isHouseholdInstallType } from "@/lib/solar/householdSavings";
+import { REVENUE_WARNING } from "@/data/sampleData";
 
 interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
@@ -95,7 +97,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
   let data;
   try {
-    data = await getCachedAnalyzeSolarSite(params.address ?? "");
+    // Prefer full if background enrich finished; otherwise use core for fast first paint
+    data = await getCachedAnalyzeSolarSite(params.address ?? "", { phase: "core" });
   } catch (error) {
     const detail =
       error instanceof KakaoAddressNotFoundError
@@ -107,7 +110,6 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     );
   }
 
-  // Non-blocking: do not delay first paint / KPI for history persistence
   void recordSearchHistory(data, params.address ?? data.address);
 
   const consultationBase = {
@@ -121,6 +123,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
   const primaryParcel = primaryParcelFromReview(data);
   const multiParcelEnabled = data.solarMetrics.installType === "토지형";
+  const installTypeLabel =
+    data.recommendation.split("(")[0]?.trim() || data.recommendation;
+  const isHousehold = isHouseholdInstallType(data.solarMetrics.installType as InstallTypeOption);
 
   const showMountainWarning = isMountainOrForestSite(
     data.address,
@@ -129,7 +134,6 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   );
 
   const reviewStatusItems = buildReviewStatusItems(data);
-  const reviewOpinionLines = buildReviewOpinionLines(data);
   const analysisAreaLabel =
     data.solarMetrics.baseAreaSqm > 0
       ? `${Math.round(data.solarMetrics.baseAreaSqm).toLocaleString("ko-KR")}㎡`
@@ -160,81 +164,94 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           recommendation={data.recommendation}
         />
 
-        <div className="mx-auto max-w-[1320px] space-y-8 px-4 py-8 sm:px-6 sm:py-10">
-          <KeyMetricCards
-            capacity={data.capacity}
-            annualGeneration={data.annualGeneration}
-            annualRevenue={data.annualRevenue}
-            installType={data.recommendation.split("(")[0]?.trim() || data.recommendation}
-            analysisArea={analysisAreaLabel}
-          />
-          <ReviewStatusGrid items={reviewStatusItems} />
-          <ReviewOpinionPanel lines={reviewOpinionLines} />
-        </div>
-
         <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <div className="lg:flex lg:gap-8 lg:py-4">
+          <div className="lg:flex lg:gap-8 lg:py-6">
             <AnalysisProgressPanel steps={progressSteps} />
 
-            <div className="min-w-0 flex-1 space-y-7 sm:space-y-8">
+            <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
               {showMountainWarning && <MountainLandWarningBanner />}
 
               <section id="site-location" className="scroll-mt-24 mt-8 sm:mt-0">
                 <SectionHeader
                   title="입지 위치"
-                  description="입력하신 주소의 위치를 지도에서 확인할 수 있습니다."
+                  description="입력하신 주소의 위치를 지도에서 먼저 확인하세요."
                 />
                 <MapArea
                   address={data.address}
                   jibunAddress={data.jibunAddress}
                   lat={data.lat}
                   lng={data.lng}
-                  installType={data.recommendation.split("(")[0]?.trim()}
+                  installType={installTypeLabel}
                   areaLabel={analysisAreaLabel}
+                  landCategory={getFieldValue(data.landInfo, "지목") || undefined}
+                  zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
                 />
               </section>
 
-              <ResultSiteOverview recommendation={data.recommendation} address={data.address} />
-
-              <MultiParcelSection />
-
-              <LandInfoCardSection detail={data.landInfoDetail} />
-              <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
-              <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
-
-              <DetailInfoSection
-                id="building-info"
-                title="건축물 정보"
-                fields={data.buildingInfo}
+              <AnalysisOverview
+                capacity={data.capacity}
+                annualGeneration={data.annualGeneration}
+                annualRevenue={data.annualRevenue}
+                constructionCost={data.constructionCost}
+                recWeight={formatRecWeightDisplay(data.solarMetrics.recWeight)}
+                analysisArea={analysisAreaLabel}
+                installType={installTypeLabel}
+                isHousehold={isHousehold}
+                householdSavingsLabel="월 예상 절감액"
+                householdSavingsValue={formatHouseholdMonthlySavings(data.solarMetrics.capacityKw)}
               />
 
-              <Suspense fallback={<OrdinanceSkeleton />}>
-                <DeferredOrdinanceSection
+              <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                ⚠ {REVENUE_WARNING}
+              </p>
+
+              <BusinessVisual />
+
+              <RequiredChecks items={reviewStatusItems} />
+
+              <NextSteps />
+
+              <div id="detail-analysis" className="scroll-mt-24 space-y-8 border-t border-slate-200 pt-10">
+                <h2 className="text-2xl font-extrabold tracking-tight text-navy sm:text-[28px]">
+                  상세 분석
+                </h2>
+
+                <MultiParcelSection />
+                <LandInfoCardSection detail={data.landInfoDetail} />
+                <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
+                <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
+
+                <DetailInfoSection
+                  id="building-info"
+                  title="건축물 정보"
+                  fields={data.buildingInfo}
+                />
+
+                <Suspense fallback={<OrdinanceSkeleton />}>
+                  <DeferredOrdinanceSection
+                    address={data.address}
+                    jibunAddress={data.jibunAddress}
+                    setbackReview={data.setbackReview}
+                  />
+                </Suspense>
+
+                <ResultCapacitySection recommendation={data.recommendation} />
+                <ResultRevenueSection showMountainRecNote={showMountainWarning} />
+
+                <GridConnectionSection
+                  initialGridInfo={data.gridInfo}
                   address={data.address}
                   jibunAddress={data.jibunAddress}
-                  setbackReview={data.setbackReview}
+                  lat={data.lat}
+                  lng={data.lng}
+                  disclaimer={GRID_DISCLAIMER}
                 />
-              </Suspense>
-
-              <ResultCapacitySection recommendation={data.recommendation} />
-              <ResultGenerationSection />
-              <ResultRevenueSection showMountainRecNote={showMountainWarning} />
-
-              <GridConnectionSection
-                initialGridInfo={data.gridInfo}
-                address={data.address}
-                jibunAddress={data.jibunAddress}
-                lat={data.lat}
-                lng={data.lng}
-                disclaimer={GRID_DISCLAIMER}
-              />
+              </div>
 
               <ResultSimilarCasesSection />
 
               <ResultPdfCtaPanel address={data.address} />
-
               <ResultSaveSection address={data.address} />
-
               <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
             </div>
           </div>

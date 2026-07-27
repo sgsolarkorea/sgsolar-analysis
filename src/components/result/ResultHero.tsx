@@ -22,7 +22,7 @@ export default function ResultHero({
   const installTypeLabel = recommendation.split("(")[0]?.trim() || recommendation;
 
   return (
-    <div id="address-check" className="result-hero scroll-mt-24">
+    <div id="result-header" className="result-hero scroll-mt-24">
       <div className="result-hero-pattern pointer-events-none absolute inset-0" aria-hidden />
       <div className="result-hero-glow pointer-events-none absolute inset-0" aria-hidden />
 
@@ -36,7 +36,7 @@ export default function ResultHero({
               입지검토 결과
             </span>
 
-            <h1 className="mt-4 text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-[2rem]">
+            <h1 className="mt-4 text-[28px] font-bold leading-tight tracking-tight text-white sm:text-[34px] lg:text-[38px]">
               {address}
             </h1>
             {(jibunAddress !== address || buildingName) && (
@@ -47,31 +47,24 @@ export default function ResultHero({
             )}
 
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300 sm:text-sm">
-              <span>분석 완료: {analyzedAt}</span>
+              <span>분석 기준일: {analyzedAt}</span>
               <span>참고 데이터: {formatReferenceDataMonth(analyzedAt)}</span>
               <span>추천 유형: {installTypeLabel}</span>
             </div>
-
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-[15px]">
-              본 결과는 공공데이터 및 자체 산정 기준을 활용한 1차 검토자료입니다.
-            </p>
           </div>
 
-          <div className="flex w-full shrink-0 flex-col gap-2.5 sm:max-w-md lg:w-[280px] lg:max-w-none">
+          <div className="flex w-full shrink-0 flex-col gap-3 sm:max-w-md sm:flex-row lg:w-auto lg:max-w-none lg:flex-col">
+            <PdfDownloadButton address={address} variant="hero" />
             <Link
               href="#consultation"
-              className="btn-primary inline-flex h-12 items-center justify-center px-5 text-sm font-bold"
+              className="btn-primary inline-flex h-12 items-center justify-center px-5 text-sm font-bold lg:min-w-[220px]"
             >
               무료 상담 신청
             </Link>
-            <PdfDownloadButton address={address} variant="hero" />
             <Link
               href="/"
               className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
               다시 검색
             </Link>
           </div>

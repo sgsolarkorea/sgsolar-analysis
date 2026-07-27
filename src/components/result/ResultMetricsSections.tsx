@@ -22,6 +22,7 @@ interface ResultSiteOverviewProps {
 }
 
 export function ResultSiteOverview({ recommendation, address }: ResultSiteOverviewProps) {
+  void address;
   const { capacity, annualGeneration, annualRevenue, constructionCost, installType, metrics } =
     useResultMetrics();
   const isHousehold = isHouseholdInstallType(installType);
