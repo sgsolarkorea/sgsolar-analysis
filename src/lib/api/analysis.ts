@@ -322,14 +322,25 @@ export async function analyzeSolarSite(
       installType: solarMetrics.installType as InstallTypeOption,
       capacityKw: solarMetrics.capacityKw,
     }),
-    getGridInfo({
-      lat: geo.lat,
-      lng: geo.lng,
-      address: geo.address,
-      jibunAddress: geo.jibunAddress,
-      capacityKw: solarMetrics.capacityKw,
-      pnu: effectivePnu ?? undefined,
-    }),
+    skipGisDetail
+      ? import("@/lib/grid/resolve").then(({ resolveGridConnectionDeferred }) =>
+          resolveGridConnectionDeferred({
+            lat: geo.lat,
+            lng: geo.lng,
+            address: geo.address,
+            jibunAddress: geo.jibunAddress,
+            capacityKw: solarMetrics.capacityKw,
+            pnu: effectivePnu ?? undefined,
+          }),
+        )
+      : getGridInfo({
+          lat: geo.lat,
+          lng: geo.lng,
+          address: geo.address,
+          jibunAddress: geo.jibunAddress,
+          capacityKw: solarMetrics.capacityKw,
+          pnu: effectivePnu ?? undefined,
+        }),
     skipGisDetail || effectivePnu == null || effectivePnu === ""
       ? Promise.resolve(null)
       : resolveSiteIntel({ pnu: effectivePnu, lat: geo.lat, lng: geo.lng }),

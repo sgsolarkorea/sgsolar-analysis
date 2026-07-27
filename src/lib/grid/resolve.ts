@@ -210,4 +210,19 @@ export async function resolveGridConnection(input: ResolveGridInput): Promise<Gr
   return buildUnknownState(input, placeholderPoles, contacts);
 }
 
+/** Core-phase stub: contacts only, no KEPCO/admin GIS wait. Client GridConnectionSection refetches. */
+export function resolveGridConnectionDeferred(input: ResolveGridInput): GridConnectionInfo {
+  const contacts = resolveGridContacts(input.address, input.jibunAddress);
+  const derivedIds = derivePoleCandidates(input.jibunAddress);
+  const placeholderPoles: GridPoleOption[] = derivedIds.map((poleId) => ({
+    poleId,
+    label: buildPoleLabel(poleId, input.jibunAddress),
+    referenceLocation: input.jibunAddress || input.address,
+    substation: emptyLevel(),
+    transformer: emptyLevel(),
+    distributionLine: emptyLevel(),
+  }));
+  return buildUnknownState(input, placeholderPoles, contacts);
+}
+
 export { GRID_DISCLAIMER_TEXT };
