@@ -31,6 +31,7 @@ import BusinessCoreSummary from "@/components/result/BusinessCoreSummary";
 import PermitGateSection from "@/components/result/PermitGateSection";
 import GenerationSection from "@/components/result/GenerationSection";
 import MarketRevenueSection from "@/components/result/MarketRevenueSection";
+import InvestmentAnalysisSection from "@/components/result/InvestmentAnalysisSection";
 import InstallationVisualSection from "@/components/result/InstallationVisualSection";
 import RequiredChecks from "@/components/result/RequiredChecks";
 import BusinessRoadmapSection from "@/components/result/BusinessRoadmapSection";
@@ -223,6 +224,11 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           {/* 05 시장가격 · 예상 발전수익 */}
           <div className="mt-20 sm:mt-24">
             <MarketRevenueSection />
+          </div>
+
+          {/* 05b 장기 투자수익 시뮬레이션 (CV-passed engine) */}
+          <div className="mt-16 sm:mt-20">
+            <InvestmentAnalysisSection />
           </div>
 
           {/* 06 예상 설치 형태 */}

@@ -7,7 +7,7 @@ import { unstable_cache } from "next/cache";
 import { getTodayString, result } from "@/data/sampleData";
 import { deriveSiteRecommendation, resolveDefaultInstallType } from "@/data/resultUx";
 import type { InstallTypeOption } from "@/data/resultUx";
-import { getBuildingInfoByRegistry, getBuildingRegistryItemCount } from "@/lib/api/buildingRegistry";
+import { getBuildingRegistryLookup } from "@/lib/api/buildingRegistry";
 import {
   hasLandRecord,
   resolveInfoDataSource,
@@ -27,6 +27,7 @@ import { buildSetbackFromGis } from "@/lib/regulatory/buildSetbackFromGis";
 import { buildDefaultSetbackReview } from "@/lib/regulatory/resolveRegulatoryReview";
 import { resolveSiteIntel } from "@/lib/gis/siteIntel";
 import type { LandInfoDetail } from "@/types/landInfo";
+import { resolveBuildingCapacityFootprintSqm } from "@/lib/solar/buildingFootprintSelection";
 import {
   fetchSiteGeometryBundle,
   resolveSiteGeometryFromBundle,
@@ -61,7 +62,8 @@ export async function getBuildingInfo(input: {
   pnu: string | null;
   buildingName?: string;
 }): Promise<InfoField[]> {
-  return getBuildingInfoByRegistry(input);
+  const result = await getBuildingRegistryLookup(input);
+  return result.fields;
 }
 
 export async function getGridInfo(input: {
@@ -92,6 +94,8 @@ export async function calculateSolarProfitability(
     usedBuildingCount?: number;
     excludedBuildingCount?: number;
     registryBuildingAreaSqm?: number | null;
+    /** When provided, skips duplicate market fetch (core path parallelization). */
+    marketPreloaded?: Awaited<ReturnType<typeof getMarketPrice>>;
   },
 ): Promise<{
   profitability: Profitability;
@@ -99,10 +103,12 @@ export async function calculateSolarProfitability(
   monthlyGeneration: ReturnType<typeof calculateSolarMetrics>["monthlyGeneration"];
   installType: ReturnType<typeof resolveDefaultInstallType>;
 }> {
-  const market = await getMarketPrice({
-    address: input.address,
-    jibunAddress: input.jibunAddress,
-  });
+  const market =
+    input.marketPreloaded ??
+    (await getMarketPrice({
+      address: input.address,
+      jibunAddress: input.jibunAddress,
+    }));
   const marketSnapshot = {
     smpPrice: market.smpPrice,
     recPrice: market.recPrice,
@@ -229,48 +235,81 @@ export async function analyzeSolarSite(
 
   const geo = await searchAddressByKakao(address);
   console.info(`${perfLabel} geocoding ${Date.now() - t0}ms`);
-  const { pnu, pnuSource } = await resolvePnuForBuildingLookup(geo, null);
 
-  const [landResult, landByPnu] = await Promise.all([
-    getLandInfoByVworld(geo.lat, geo.lng),
-    pnu ? getLandInfoByPnu(pnu) : Promise.resolve(null),
-  ]);
+  // Start market fetch immediately — independent of land/building/geometry
+  const marketPromise = getMarketPrice({
+    address: geo.address,
+    jibunAddress: geo.jibunAddress,
+  });
+
+  // Prefer VWorld land (includes PNU). Only hit Kakao PNU fallback when needed.
+  const tLand = Date.now();
+  let landResult = await getLandInfoByVworld(geo.lat, geo.lng);
+  let pnu = landResult.pnu;
+  let pnuSource: "vworld" | "kakao-jibun-fallback" | "none" = landResult.pnu ? "vworld" : "none";
+
+  if (!pnu) {
+    const resolved = await resolvePnuForBuildingLookup(geo, null);
+    pnu = resolved.pnu;
+    pnuSource = resolved.pnuSource;
+    if (pnu && !hasLandRecord(landResult.landInfo)) {
+      const landByPnu = await getLandInfoByPnu(pnu);
+      if (landByPnu && hasLandRecord(landByPnu.landInfo)) {
+        landResult = landByPnu;
+        console.info("[Analysis] Land info resolved via Kakao PNU fallback", { pnu });
+      }
+    }
+  }
+  console.info(`${perfLabel} land ${Date.now() - tLand}ms`);
 
   const effectivePnu = landResult.pnu ?? pnu;
   let landInfo = landResult.landInfo;
   let landInfoDetail: LandInfoDetail = landResult.landDetail;
-  if (!hasLandRecord(landInfo) && landByPnu && hasLandRecord(landByPnu.landInfo)) {
-    console.info("[Analysis] Land info resolved via parallel PNU lookup", { pnu: effectivePnu });
-    landInfo = landByPnu.landInfo;
-    landInfoDetail = landByPnu.landDetail;
-  } else if (!hasLandRecord(landInfo)) {
+  if (!hasLandRecord(landInfo)) {
     landInfo = unavailableLandInfo();
     if (effectivePnu) {
       console.warn("[Analysis] Land info unavailable after VWorld + PNU lookup", { pnu: effectivePnu });
     }
   }
 
-  const [buildingInfo, registryBuildingCount] = await Promise.all([
-    getBuildingInfo({
+  const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
+
+  // Building registry + VWorld geometry are independent once PNU exists
+  const tBldGeom = Date.now();
+  const [buildingLookup, siteGeometryBundleRaw] = await Promise.all([
+    getBuildingRegistryLookup({
       pnu: effectivePnu,
       buildingName: geo.buildingName,
     }),
-    effectivePnu != null ? getBuildingRegistryItemCount(effectivePnu) : Promise.resolve(0),
+    fetchSiteGeometryBundle({
+      pnu: effectivePnu,
+      lat: geo.lat,
+      lng: geo.lng,
+      landAreaSqm,
+      buildingAreaSqm: null,
+      registryBuildingCount: 0,
+    }),
   ]);
-
-  const landAreaSqm = parseAreaSqm(getFieldValue(landInfo, "면적"));
+  const buildingInfo = buildingLookup.fields;
+  const registryBuildingCount = buildingLookup.itemCount;
   const buildingAreaSqm = parseAreaSqm(getFieldValue(buildingInfo, "건축면적"));
+  console.info(`${perfLabel} building+geometry ${Date.now() - tBldGeom}ms`);
+
+  // Re-apply registry footprint without a second network round-trip
+  const siteGeometryBundle: SiteGeometryBundle = {
+    ...siteGeometryBundleRaw,
+    buildingAreaSqm,
+    registryBuildingAreaSqm: buildingAreaSqm,
+    buildingFootprintAreaSqm: resolveBuildingCapacityFootprintSqm({
+      polygonFootprintSumSqm: siteGeometryBundleRaw.buildingFootprintAreaSumSqm ?? null,
+      registryBuildingAreaSqm: buildingAreaSqm,
+      usedBuildingCount: siteGeometryBundleRaw.usedBuildingCount ?? 0,
+      registryBuildingCount,
+    }),
+  };
+
   const defaultInstallType = resolveDefaultInstallType("", landInfo, buildingInfo, {
     hasRoadAddress: hasRoadAddress(geo.address),
-  });
-
-  const siteGeometryBundle: SiteGeometryBundle = await fetchSiteGeometryBundle({
-    pnu: effectivePnu,
-    lat: geo.lat,
-    lng: geo.lng,
-    landAreaSqm,
-    buildingAreaSqm,
-    registryBuildingCount,
   });
 
   const siteGeometry = resolveSiteGeometryFromBundle(siteGeometryBundle, {
@@ -279,6 +318,10 @@ export async function analyzeSolarSite(
     capacityKw: 1,
     installType: defaultInstallType,
   });
+
+  const tMarket = Date.now();
+  const marketPreloaded = await marketPromise;
+  console.info(`${perfLabel} market(ready) ${Date.now() - tMarket}ms (parallel overlap)`);
 
   const solarResult = await calculateSolarProfitability({
     address: geo.address,
@@ -298,6 +341,7 @@ export async function analyzeSolarSite(
     usedBuildingCount: siteGeometry.usedBuildingCount,
     excludedBuildingCount: siteGeometry.excludedBuildingCount,
     registryBuildingAreaSqm: siteGeometry.registryBuildingAreaSqm,
+    marketPreloaded,
   });
 
   const { profitability, solarMetrics, monthlyGeneration } = solarResult;
@@ -425,6 +469,10 @@ const ANALYSIS_CACHE_SALT = `roof-${areaPerKwByType.roof}-usable-v1`;
 const MEMORY_CACHE_TTL_MS = 120_000;
 const memoryCache = new Map<string, { expires: number; value: ResolvedSiteReview }>();
 
+function normalizeAnalysisAddress(address: string): string {
+  return address.trim().replace(/\s+/g, " ");
+}
+
 function cacheKey(address: string, phase: "core" | "full") {
   return `${phase}:${address}`;
 }
@@ -434,7 +482,7 @@ export async function getCachedAnalyzeSolarSite(
   options?: { phase?: "core" | "full" },
 ): Promise<ResolvedSiteReview> {
   const phase = options?.phase ?? "full";
-  const normalized = address.trim();
+  const normalized = normalizeAnalysisAddress(address);
   const now = Date.now();
   const key = cacheKey(normalized, phase);
 

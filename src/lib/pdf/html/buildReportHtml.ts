@@ -38,6 +38,7 @@ import {
 } from "@/lib/pdf/reportContent";
 import { htmlText } from "@/lib/pdf/html/escape";
 import { reportBaseStyles } from "@/lib/pdf/html/reportStyles";
+import { renderInvestmentSection } from "@/lib/pdf/html/renderInvestmentSection";
 import {
   KEPCO_INQUIRY_CALL_GUIDE,
   KEPCO_INQUIRY_TOPICS,
@@ -746,6 +747,7 @@ export function buildReportHtml(
         ${gridEquipment}
       </div>
       ${renderKepcoOfficeCard(data)}
+      ${renderInvestmentSection(data)}
     </section>
 
     <section class="section page-break">

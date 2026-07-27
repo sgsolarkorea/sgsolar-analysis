@@ -156,21 +156,30 @@ function buildApiUrls(endpoint: string, params: Record<string, string>): string[
 }
 
 async function requestTitleInfo(url: string): Promise<BuildingTitleItem[] | null> {
-  const response = await fetch(url, { cache: "no-store" });
-  const text = await response.text();
-
-  if (!response.ok) {
-    console.warn(`[BuildingRegistry] HTTP ${response.status}:`, text.slice(0, 200));
-    return null;
-  }
-
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4_000);
   try {
-    const data = JSON.parse(text) as BuildingTitleResponse;
-    const items = extractItems(data);
-    return items;
-  } catch {
-    console.warn("[BuildingRegistry] Non-JSON response:", text.slice(0, 200));
+    const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+    const text = await response.text();
+
+    if (!response.ok) {
+      console.warn(`[BuildingRegistry] HTTP ${response.status}:`, text.slice(0, 200));
+      return null;
+    }
+
+    try {
+      const data = JSON.parse(text) as BuildingTitleResponse;
+      return extractItems(data);
+    } catch {
+      console.warn("[BuildingRegistry] Non-JSON response:", text.slice(0, 200));
+      return null;
+    }
+  } catch (error) {
+    const aborted = error instanceof Error && error.name === "AbortError";
+    console.warn(`[BuildingRegistry] ${aborted ? "timeout" : "fetch failed"}:`, aborted ? url.slice(0, 120) : error);
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -282,34 +291,28 @@ async function fetchTitleInfo(parsed: ReturnType<typeof parsePnu>): Promise<Buil
   const urls = buildApiUrls("getBrTitleInfo", params);
   for (const url of urls) {
     const items = await requestTitleInfo(url);
-    if (items && items.length > 0) {
-      return items;
-    }
+    // null = transport/HTTP failure → try next URL
+    // [] = authoritative empty for this endpoint → stop (do not fan out all key/base variants)
+    // non-empty = success
+    if (items === null) continue;
+    return items;
   }
 
   return [];
 }
 
-export async function getBuildingRegistryItemCount(pnu: string | null): Promise<number> {
-  if (!pnu) return 0;
-  const parsed = parsePnu(pnu);
-  if (!parsed) return 0;
-  const items = await fetchTitleInfo(parsed);
-  return items.length;
-}
-
-export async function getBuildingInfoByRegistry(
+export async function getBuildingRegistryLookup(
   input: BuildingInfoInput,
-): Promise<InfoField[]> {
+): Promise<{ fields: InfoField[]; itemCount: number }> {
   if (!input.pnu) {
     console.warn("[BuildingRegistry] PNU missing — building info unavailable");
-    return unavailableBuildingInfo();
+    return { fields: unavailableBuildingInfo(), itemCount: 0 };
   }
 
   const parsed = parsePnu(input.pnu);
   if (!parsed) {
     console.warn("[BuildingRegistry] Invalid PNU — building info unavailable:", input.pnu);
-    return unavailableBuildingInfo();
+    return { fields: unavailableBuildingInfo(), itemCount: 0 };
   }
 
   try {
@@ -324,7 +327,7 @@ export async function getBuildingInfoByRegistry(
         bun: parsed.bun,
         ji: parsed.ji,
       });
-      return unavailableBuildingInfo();
+      return { fields: unavailableBuildingInfo(), itemCount: items.length };
     }
 
     const archArea = pickField(selected, "archArea", "arch_area");
@@ -339,9 +342,21 @@ export async function getBuildingInfoByRegistry(
       }),
     );
 
-    return mapBuildingToFields(selected);
+    return { fields: mapBuildingToFields(selected), itemCount: items.length };
   } catch (error) {
     console.error("[BuildingRegistry] Lookup failed:", error);
-    return unavailableBuildingInfo();
+    return { fields: unavailableBuildingInfo(), itemCount: 0 };
   }
+}
+
+export async function getBuildingRegistryItemCount(pnu: string | null): Promise<number> {
+  const result = await getBuildingRegistryLookup({ pnu });
+  return result.itemCount;
+}
+
+export async function getBuildingInfoByRegistry(
+  input: BuildingInfoInput,
+): Promise<InfoField[]> {
+  const result = await getBuildingRegistryLookup(input);
+  return result.fields;
 }

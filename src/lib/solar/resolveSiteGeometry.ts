@@ -77,21 +77,21 @@ export async function fetchSiteGeometryBundle(input: {
   buildingAreaSqm?: number | null;
   registryBuildingCount?: number;
 }): Promise<SiteGeometryBundle> {
-  const cadastralPolygon = await resolveCadastralRing(input.pnu, input.lat, input.lng);
+  // Overlap cadastral + building data-layer fetches (independent network calls)
+  const [cadastralPolygon, building] = await Promise.all([
+    resolveCadastralRing(input.pnu, input.lat, input.lng),
+    input.pnu
+      ? fetchBuildingPolygonByPnu(input.pnu, input.lat, input.lng, null)
+      : Promise.resolve(null),
+  ]);
   const cadastralAreaSqm = ringArea(cadastralPolygon);
-  let buildingPolygon: LatLngPoint[] | null = null;
-  let buildingPolygons: LatLngPoint[][] = [];
 
-  if (input.pnu) {
-    const building = await fetchBuildingPolygonByPnu(
-      input.pnu,
-      input.lat,
-      input.lng,
-      cadastralPolygon,
-    );
-    buildingPolygon = building?.ring?.length ? building.ring : null;
-    buildingPolygons = building?.rings?.length ? building.rings : buildingPolygon ? [buildingPolygon] : [];
-  }
+  let buildingPolygon: LatLngPoint[] | null = building?.ring?.length ? building.ring : null;
+  let buildingPolygons: LatLngPoint[][] = building?.rings?.length
+    ? building.rings
+    : buildingPolygon
+      ? [buildingPolygon]
+      : [];
 
   const selection = selectParcelBuildingPolygons({
     cadastralRing: cadastralPolygon,

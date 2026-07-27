@@ -3,7 +3,7 @@
 **Source workbook:** `수익분석 기본 작업.xlsx`  
 **Extract dump:** `docs/reference/excel-revenue-analysis-dump.json`  
 **Cell-level extract:** `docs/reference/INVESTMENT_ENGINE_EXCEL_EXTRACT.md`  
-**Status:** Design only — do **not** expose IRR/NPV to production users until Excel cross-validation passes.
+**Status:** Engine v1.0.0 implemented. Excel S1/S2/S3 cross-validation **PASS**. Production UI exposes long-term simulation for RPS only (separate from 1-year market snapshot). PDF investment section included (engine v1.0.0 + assumption table).
 
 ---
 

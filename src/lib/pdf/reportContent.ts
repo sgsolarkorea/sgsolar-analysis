@@ -13,6 +13,12 @@ export const PDF_LEGAL_DISCLAIMER =
 export const PDF_MARKET_REVENUE_DISCLAIMER =
   "본 예상수익은 표시된 기준일의 SMP 및 REC 가격과 예상 발전량을 적용한 추정값이며, 실제 수익은 시장가격, 발전량, 가중치 및 계약조건 등에 따라 달라질 수 있습니다.";
 
+export const PDF_INVESTMENT_DISCLAIMER =
+  "본 투자 수익성 분석은 입력값 및 설정된 가정을 기반으로 한 추정치이며, 실제 투자수익은 발전량, 시장가격, 금융조건, 시공비, 세금, 계통연계 및 운영조건 등에 따라 달라질 수 있습니다. 보장수익이 아닙니다.";
+
+export const PDF_INVESTMENT_EXCLUDED =
+  "현재 모델 미포함: 법인세·소득세·VAT·토지비·계통부담금·개발행위 비용 등";
+
 export const PDF_SETBACK_FOOTER =
   "예상 거리는 공공데이터 기반의 1차 참고값입니다. 최종 이격거리 판단은 지자체 조례 및 현장 확인 후 결정됩니다.";
 
