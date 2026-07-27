@@ -16,11 +16,11 @@ interface AnalysisLoadingScreenProps {
 
 const BRIEF_STEPS = [
   { id: "address", label: "주소 확인", match: ["address", "location"] },
-  { id: "land", label: "토지정보", match: ["land"] },
-  { id: "building", label: "건축물", match: ["building"] },
-  { id: "capacity", label: "설치규모", match: ["capacity"] },
-  { id: "generation", label: "발전량", match: ["generation"] },
-  { id: "business", label: "사업성", match: ["revenue"] },
+  { id: "land", label: "토지 분석", match: ["land"] },
+  { id: "building", label: "건축물 확인", match: ["building"] },
+  { id: "capacity", label: "설치규모 계산", match: ["capacity"] },
+  { id: "generation", label: "발전량 분석", match: ["generation"] },
+  { id: "business", label: "사업성 분석", match: ["revenue"] },
   { id: "result", label: "결과 정리", match: ["result"] },
 ] as const;
 
@@ -195,40 +195,24 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
           <SgSolarLogo layout="loading" variant="dark" />
         </div>
 
-        <div className="relative flex min-h-[520px] flex-1 flex-col overflow-hidden bg-navy text-white lg:min-h-[560px]">
+        <div className="relative flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-[22px] bg-navy text-white lg:min-h-[560px]">
           <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
             <div className="absolute -left-20 top-10 h-72 w-72 rounded-full border border-sky-400/20" />
             <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full border border-sky-300/15" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(56,189,248,0.18),transparent_42%)]" />
           </div>
 
-          <div className="relative grid flex-1 gap-10 p-6 sm:p-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:p-12">
-            <div className="flex flex-col justify-between">
-              <div>
-                <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-sky-300">Site Analysis</p>
-                <h1 className="mt-4 text-[28px] font-extrabold tracking-tight sm:text-[36px]">
-                  입지를 분석하고 있습니다
-                </h1>
-                <p className="mt-4 max-w-lg text-[17px] font-semibold leading-snug text-white">{address}</p>
-                <p className="mt-4 max-w-lg text-[14px] leading-relaxed text-slate-300">
-                  {stageMessage(activeBriefId, elapsedSec)}
-                </p>
+          <div className="relative grid flex-1 gap-8 p-6 sm:p-8 lg:grid-cols-[0.65fr_0.35fr] lg:gap-10 lg:p-10">
+            <div className="relative min-h-[280px] overflow-hidden rounded-[20px] border border-white/10 bg-[#0a1628] sm:min-h-[360px]">
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,#0f2744_0%,#1a3a5c_45%,#0d2138_100%)]" />
+              <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 30% 40%, rgba(56,189,248,0.35), transparent 55%)" }} />
+              <div className="relative flex h-full flex-col justify-between p-5 sm:p-7">
+                <div>
+                  <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-sky-300">Site Canvas</p>
+                  <p className="mt-3 text-[22px] font-extrabold leading-snug sm:text-[28px]">{address}</p>
+                </div>
+                <p className="max-w-md text-[14px] leading-relaxed text-slate-300">{stageMessage(activeBriefId, elapsedSec)}</p>
               </div>
-
-              {!apiFailed && revealed.length > 0 ? (
-                <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-                  {revealed.map((item) => (
-                    <li key={item.label} className="border-t border-white/15 pt-3">
-                      <p className="text-[12px] text-slate-400">{item.label}</p>
-                      <p className="mt-1 text-[15px] font-bold text-white">{item.value}</p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-10 text-[13px] text-slate-400">
-                  확인된 정보가 준비되는 즉시 결과 화면으로 이동합니다.
-                </p>
-              )}
             </div>
 
             <div className="flex flex-col justify-center">
@@ -265,6 +249,17 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
                   );
                 })}
               </ol>
+
+              {!apiFailed && revealed.length > 0 ? (
+                <ul className="mt-8 space-y-3 border-t border-white/10 pt-5">
+                  {revealed.map((item) => (
+                    <li key={item.label} className="flex items-baseline justify-between gap-3">
+                      <p className="text-[12px] text-slate-400">{item.label}</p>
+                      <p className="text-[14px] font-bold text-white">{item.value}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </div>
         </div>

@@ -6,138 +6,288 @@ export type InstallVisualType =
   | "carport"
   | "building";
 
+export type InstallVisualRole =
+  | "technicalHero"
+  | "proofFeatured"
+  | "proofSupporting"
+  | "detail";
+
 export type InstallVisualUsage = "technical" | "proof_featured" | "proof_supporting";
 
+export type InstallVisualAssetId =
+  | "GROUND_AERIAL_01"
+  | "GROUND_AERIAL_02"
+  | "GROUND_DETAIL_01"
+  | "FACTORY_ROOF_01"
+  | "WAREHOUSE_ROOF_01"
+  | "RESIDENTIAL_ROOF_01"
+  | "RESIDENTIAL_ROOF_02"
+  | "CARPORT_HOME_01"
+  | "CARPORT_COMMERCIAL_01"
+  | "SOLAR_DETAIL_01";
+
 export interface InstallVisualAsset {
-  id: string;
+  id: InstallVisualAssetId;
   src: string;
   type: InstallVisualType;
-  orientation: "landscape";
-  aspectRatio: "16:9";
-  subject: string;
+  role: InstallVisualRole[];
+  orientation: "landscape" | "portrait";
+  aspectRatio: "16:9" | "4:3";
+  priority: number;
   quality: "high";
-  source: "curated";
-  recommendedUsage: InstallVisualUsage[];
+  usage: InstallVisualUsage[];
   label: string;
   alt: string;
+  width: number;
+  height: number;
 }
 
 const VISUAL_ASSETS: InstallVisualAsset[] = [
   {
-    id: "ground-a",
-    src: "/install-visuals/ground.svg",
+    id: "GROUND_AERIAL_01",
+    src: "/install-visuals/ground-aerial-01.webp",
     type: "ground",
+    role: ["technicalHero", "proofSupporting"],
     orientation: "landscape",
     aspectRatio: "16:9",
-    subject: "토지형 발전소 전경 A",
+    priority: 1,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_featured"],
+    usage: ["technical", "proof_supporting"],
     label: "토지형",
     alt: "토지형 태양광 설치 형태 예시",
+    width: 1536,
+    height: 1024,
   },
   {
-    id: "ground-b",
-    src: "/install-visuals/ground-alt.svg",
+    id: "GROUND_AERIAL_02",
+    src: "/install-visuals/ground-aerial-02.webp",
     type: "ground",
+    role: ["proofFeatured", "proofSupporting"],
     orientation: "landscape",
     aspectRatio: "16:9",
-    subject: "토지형 발전소 전경 B",
+    priority: 2,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_featured", "proof_supporting"],
+    usage: ["proof_featured", "proof_supporting"],
     label: "토지형",
     alt: "토지형 태양광 설치 형태 예시",
+    width: 1536,
+    height: 1024,
   },
   {
-    id: "factory-a",
-    src: "/install-visuals/factory-roof.svg",
+    id: "GROUND_DETAIL_01",
+    src: "/install-visuals/ground-detail-01.webp",
+    type: "ground",
+    role: ["detail"],
+    orientation: "landscape",
+    aspectRatio: "4:3",
+    priority: 3,
+    quality: "high",
+    usage: ["proof_supporting"],
+    label: "토지형",
+    alt: "토지형 태양광 설치 형태 예시",
+    width: 1200,
+    height: 800,
+  },
+  {
+    id: "FACTORY_ROOF_01",
+    src: "/install-visuals/factory-roof-01.webp",
     type: "factory",
+    role: ["technicalHero", "proofSupporting"],
     orientation: "landscape",
     aspectRatio: "16:9",
-    subject: "공장 지붕형 태양광",
+    priority: 1,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_supporting"],
+    usage: ["technical", "proof_supporting"],
     label: "공장 지붕형",
     alt: "공장 지붕형 태양광 설치 형태 예시",
+    width: 1536,
+    height: 1024,
   },
   {
-    id: "warehouse-a",
-    src: "/install-visuals/warehouse-roof.svg",
+    id: "WAREHOUSE_ROOF_01",
+    src: "/install-visuals/warehouse-roof-01.webp",
     type: "warehouse",
+    role: ["technicalHero", "proofSupporting"],
     orientation: "landscape",
-    aspectRatio: "16:9",
-    subject: "창고 지붕형 태양광",
+    aspectRatio: "4:3",
+    priority: 2,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_supporting"],
+    usage: ["technical", "proof_supporting"],
     label: "창고 지붕형",
     alt: "창고 지붕형 태양광 설치 형태 예시",
+    width: 1200,
+    height: 800,
   },
   {
-    id: "building-a",
-    src: "/install-visuals/building-roof.svg",
-    type: "building",
-    orientation: "landscape",
-    aspectRatio: "16:9",
-    subject: "건축물 지붕형 태양광 A",
-    quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_featured", "proof_supporting"],
-    label: "건축물 지붕형",
-    alt: "건축물 지붕형 태양광 설치 형태 예시",
-  },
-  {
-    id: "residential-a",
-    src: "/install-visuals/residential.svg",
+    id: "RESIDENTIAL_ROOF_01",
+    src: "/install-visuals/residential-roof-01.webp",
     type: "residential",
+    role: ["technicalHero", "proofSupporting"],
     orientation: "landscape",
-    aspectRatio: "16:9",
-    subject: "주택 지붕형 태양광 A",
+    aspectRatio: "4:3",
+    priority: 1,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_supporting"],
+    usage: ["technical", "proof_supporting"],
     label: "주택 지붕형",
     alt: "주택 지붕형 태양광 설치 형태 예시",
+    width: 1200,
+    height: 800,
   },
   {
-    id: "residential-b",
-    src: "/install-visuals/residential-alt.svg",
+    id: "RESIDENTIAL_ROOF_02",
+    src: "/install-visuals/residential-roof-02.webp",
     type: "residential",
+    role: ["proofFeatured"],
     orientation: "landscape",
-    aspectRatio: "16:9",
-    subject: "주택 지붕형 태양광 B",
+    aspectRatio: "4:3",
+    priority: 2,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["proof_supporting"],
+    usage: ["proof_featured"],
     label: "주택 지붕형",
     alt: "주택 지붕형 태양광 설치 형태 예시",
+    width: 1200,
+    height: 800,
   },
   {
-    id: "carport-a",
-    src: "/install-visuals/carport.svg",
+    id: "CARPORT_HOME_01",
+    src: "/install-visuals/carport-home-01.webp",
     type: "carport",
+    role: ["technicalHero", "proofSupporting"],
     orientation: "landscape",
-    aspectRatio: "16:9",
-    subject: "주차장 캐노피형 태양광",
+    aspectRatio: "4:3",
+    priority: 1,
     quality: "high",
-    source: "curated",
-    recommendedUsage: ["technical", "proof_supporting"],
+    usage: ["technical", "proof_supporting"],
     label: "주차장형",
     alt: "주차장형 태양광 설치 형태 예시",
+    width: 1200,
+    height: 800,
+  },
+  {
+    id: "CARPORT_COMMERCIAL_01",
+    src: "/install-visuals/carport-commercial-01.webp",
+    type: "carport",
+    role: ["proofFeatured", "technicalHero"],
+    orientation: "landscape",
+    aspectRatio: "16:9",
+    priority: 2,
+    quality: "high",
+    usage: ["proof_featured", "technical"],
+    label: "주차장형",
+    alt: "주차장형 태양광 설치 형태 예시",
+    width: 1536,
+    height: 1024,
+  },
+  {
+    id: "SOLAR_DETAIL_01",
+    src: "/install-visuals/solar-detail-01.webp",
+    type: "building",
+    role: ["detail"],
+    orientation: "landscape",
+    aspectRatio: "4:3",
+    priority: 1,
+    quality: "high",
+    usage: ["proof_supporting"],
+    label: "설비 디테일",
+    alt: "태양광 설비 설치 형태 예시",
+    width: 1200,
+    height: 800,
   },
 ];
 
-function normalizeInstallType(installType: string): InstallVisualType {
+export type InstallVisualCategory = "ground" | "building" | "residential" | "carport";
+
+function normalizeCategory(installType: string): InstallVisualCategory {
   const t = installType || "";
-  if (t.includes("토지") || t.includes("노지")) return "ground";
   if (t.includes("주차") || t.includes("캐노피") || t.includes("카포트")) return "carport";
-  if (t.includes("공장")) return "factory";
-  if (t.includes("창고")) return "warehouse";
   if (t.includes("상계") || t.includes("가정") || t.includes("주택")) return "residential";
-  if (t.includes("축사") || t.includes("지붕") || t.includes("상가") || t.includes("건축")) return "building";
+  if (t.includes("토지") || t.includes("노지")) return "ground";
   return "building";
+}
+
+function isWarehouseType(installType: string): boolean {
+  const t = installType || "";
+  return t.includes("창고") || t.includes("물류");
+}
+
+function byId(id: InstallVisualAssetId): InstallVisualAsset {
+  const asset = VISUAL_ASSETS.find((a) => a.id === id);
+  if (!asset) throw new Error(`Missing visual asset: ${id}`);
+  return asset;
+}
+
+function uniqueAssets(ids: InstallVisualAssetId[]): InstallVisualAsset[] {
+  const seen = new Set<string>();
+  return ids
+    .map((id) => byId(id))
+    .filter((asset) => {
+      if (seen.has(asset.id)) return false;
+      seen.add(asset.id);
+      return true;
+    });
+}
+
+export interface InstallVisualSet {
+  technical: InstallVisualAsset;
+  proofFeatured: InstallVisualAsset;
+  proofSupporting: InstallVisualAsset[];
+}
+
+export function resolveInstallVisualSet(installType: string): InstallVisualSet {
+  const category = normalizeCategory(installType);
+
+  if (category === "ground") {
+    return {
+      technical: byId("GROUND_AERIAL_01"),
+      proofFeatured: byId("GROUND_AERIAL_02"),
+      proofSupporting: uniqueAssets([
+        "FACTORY_ROOF_01",
+        "RESIDENTIAL_ROOF_01",
+        "CARPORT_HOME_01",
+      ]),
+    };
+  }
+
+  if (category === "residential") {
+    return {
+      technical: byId("RESIDENTIAL_ROOF_01"),
+      proofFeatured: byId("RESIDENTIAL_ROOF_02"),
+      proofSupporting: uniqueAssets([
+        "CARPORT_HOME_01",
+        "FACTORY_ROOF_01",
+        "GROUND_AERIAL_01",
+      ]),
+    };
+  }
+
+  if (category === "carport") {
+    const commercial = installType.includes("상업") || installType.includes("사업");
+    return {
+      technical: commercial ? byId("CARPORT_COMMERCIAL_01") : byId("CARPORT_HOME_01"),
+      proofFeatured: commercial ? byId("CARPORT_HOME_01") : byId("CARPORT_COMMERCIAL_01"),
+      proofSupporting: uniqueAssets([
+        "RESIDENTIAL_ROOF_01",
+        "FACTORY_ROOF_01",
+        "GROUND_AERIAL_01",
+      ]),
+    };
+  }
+
+  const technicalId: InstallVisualAssetId = isWarehouseType(installType)
+    ? "WAREHOUSE_ROOF_01"
+    : "FACTORY_ROOF_01";
+  const featuredId: InstallVisualAssetId =
+    technicalId === "FACTORY_ROOF_01" ? "WAREHOUSE_ROOF_01" : "FACTORY_ROOF_01";
+
+  return {
+    technical: byId(technicalId),
+    proofFeatured: byId(featuredId),
+    proofSupporting: uniqueAssets([
+      "GROUND_AERIAL_01",
+      "RESIDENTIAL_ROOF_01",
+      "CARPORT_HOME_01",
+    ]),
+  };
 }
 
 function stableHash(input: string): number {
@@ -158,6 +308,10 @@ export function listInstallVisualAssets(): InstallVisualAsset[] {
   return VISUAL_ASSETS;
 }
 
+export function getInstallVisualById(id: InstallVisualAssetId): InstallVisualAsset {
+  return byId(id);
+}
+
 export function resolveInstallVisual(
   installType: string,
   options?: {
@@ -166,26 +320,26 @@ export function resolveInstallVisual(
     excludeSrcs?: string[];
   },
 ): InstallVisualAsset {
-  const type = normalizeInstallType(installType);
+  const set = resolveInstallVisualSet(installType);
   const usage = options?.usage ?? "technical";
   const excludeSrcs = new Set(options?.excludeSrcs ?? []);
+
+  if (usage === "technical") {
+    if (!excludeSrcs.has(set.technical.src)) return set.technical;
+  }
+  if (usage === "proof_featured") {
+    if (!excludeSrcs.has(set.proofFeatured.src)) return set.proofFeatured;
+  }
+  if (usage === "proof_supporting") {
+    const supporting = set.proofSupporting.find((a) => !excludeSrcs.has(a.src));
+    if (supporting) return supporting;
+  }
+
   const seed = options?.seed ?? installType ?? "seed";
-
-  const primaryPool = VISUAL_ASSETS.filter(
-    (asset) =>
-      asset.type === type &&
-      asset.recommendedUsage.includes(usage) &&
-      !excludeSrcs.has(asset.src),
-  );
-  const fallbackTypePool = VISUAL_ASSETS.filter(
-    (asset) => asset.type === type && !excludeSrcs.has(asset.src),
-  );
-  const genericPool = VISUAL_ASSETS.filter((asset) => !excludeSrcs.has(asset.src));
-
+  const pool = VISUAL_ASSETS.filter((asset) => !excludeSrcs.has(asset.src));
   return (
-    pickDeterministic(primaryPool, `${seed}:${type}:${usage}`) ??
-    pickDeterministic(fallbackTypePool, `${seed}:${type}:fallback`) ??
-    pickDeterministic(genericPool, `${seed}:generic`) ??
+    pickDeterministic(pool.filter((a) => a.usage.includes(usage)), `${seed}:${usage}`) ??
+    pickDeterministic(pool, `${seed}:fallback`) ??
     VISUAL_ASSETS[0]
   );
 }
@@ -198,5 +352,6 @@ export function resolveInstallVisualForLookbook(
     excludeSrcs?: string[];
   },
 ): InstallVisualAsset {
+  void type;
   return resolveInstallVisual(type, options);
 }

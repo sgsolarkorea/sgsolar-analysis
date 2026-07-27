@@ -1,7 +1,5 @@
 import {
   ResultCapacitySection,
-  ResultConsultationSection,
-  ResultSaveSection,
 } from "@/components/result/ResultMetricsSections";
 import ResultPdfCtaPanel from "@/components/result/ResultPdfCtaPanel";
 import MobileResultActions from "@/components/result/MobileResultActions";
@@ -316,10 +314,6 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           className="result-frame-pad result-frame-pad--compact"
         >
           <ResultPdfCtaPanel address={data.address} />
-          <div className="mt-10 space-y-10">
-            <ResultSaveSection address={data.address} />
-            <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
-          </div>
         </ResultFrame>
 
         <MobileResultActions address={data.address} />

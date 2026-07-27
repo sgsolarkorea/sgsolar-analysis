@@ -47,7 +47,7 @@ export default function PdfDownloadButton({
     variant === "hero"
       ? "inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/15 disabled:opacity-60"
       : variant === "panel"
-        ? "inline-flex h-12 items-center justify-center gap-2 bg-white px-5 text-sm font-bold text-navy transition hover:bg-slate-100 disabled:opacity-60"
+        ? "inline-flex h-[58px] min-w-[220px] items-center justify-center gap-2 rounded-xl bg-sky-400 px-6 text-sm font-bold text-navy transition hover:bg-sky-300 disabled:opacity-60"
         : variant === "mobile"
           ? "btn-outline inline-flex h-11 w-full items-center justify-center gap-2 px-4 text-sm font-bold disabled:opacity-60"
           : "btn-outline inline-flex h-11 items-center justify-center gap-2 px-4 text-sm font-semibold disabled:opacity-60";

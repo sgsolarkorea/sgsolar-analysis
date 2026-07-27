@@ -15,8 +15,13 @@ interface GateItem {
   key: string;
   title: string;
   statusLabel: string;
-  why: string;
-  action: string;
+  oneLine: string;
+}
+
+function statusDotClass(label: string): string {
+  if (label.includes("확인") || label.includes("검토")) return "bg-amber-400";
+  if (label.includes("완료") || label.includes("가능")) return "bg-emerald-400";
+  return "bg-slate-400";
 }
 
 export default function PermitGateSection({ items }: PermitGateSectionProps) {
@@ -39,37 +44,32 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
           key: "grid",
           title: "한전 계통 · 상계접수",
           statusLabel: grid ? REVIEW_STATUS_MAP[grid.status].label : "한전 확인 필요",
-          why: "상계거래 신청과 전력공급부 연계 기술 검토가 필요합니다. 최종 접수는 한전 확인 후 진행됩니다.",
-          action: "한전 접수 대상",
+          oneLine: "상계거래 신청과 전력공급부 연계 기술 검토가 필요합니다.",
         },
         secondary: [
           {
             key: "permit",
-            title: "인허가 검토",
+            title: "인허가",
             statusLabel: permit ? REVIEW_STATUS_MAP[permit.status].label : "대상 여부 확인",
-            why: "개발행위 면제 여부 등 설치 행정 요건을 확인합니다.",
-            action: "추가 검토 필요",
+            oneLine: "개발행위 면제 여부 등 설치 행정 요건을 확인합니다.",
+          },
+          {
+            key: "development",
+            title: "개발행위",
+            statusLabel: "주소 기준 검토",
+            oneLine: "설치 면적·구조에 따라 개발행위 대상 여부를 확인합니다.",
           },
           {
             key: "ordinance",
-            title: "지자체 조례",
+            title: "조례",
             statusLabel: ordinance ? REVIEW_STATUS_MAP[ordinance.status].label : "조례 확인",
-            why: "이격거리·입지제한 등 지자체 기준을 확인합니다.",
-            action: "조례 확인",
+            oneLine: "이격거리·입지제한 등 지자체 기준을 확인합니다.",
           },
           {
             key: "site",
-            title: "현장조건",
+            title: "현장",
             statusLabel: site ? REVIEW_STATUS_MAP[site.status].label : "현장 확인 필요",
-            why: "지붕·음영·구조는 현장 확인 후 확정됩니다.",
-            action: "현장 확인",
-          },
-          {
-            key: "inspection",
-            title: "사용전점검",
-            statusLabel: "시공 이후",
-            why: "설치 완료 후 전기안전공사 사용전점검이 진행됩니다.",
-            action: "시공 이후",
+            oneLine: "지붕·음영·구조는 현장 확인 후 확정됩니다.",
           },
         ] as GateItem[],
       };
@@ -80,86 +80,70 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
         key: "grid",
         title: "한전 계통연계",
         statusLabel: grid ? REVIEW_STATUS_MAP[grid.status].label : "한전 확인 필요",
-        why: "접속 가능 용량과 접속 조건은 한전 검토로 최종 확인됩니다. 입지분석만으로 연계가 확정되지 않습니다.",
-        action: "한전 확인 필요",
+        oneLine: "접속 가능 용량과 접속 조건은 한전 검토로 최종 확인됩니다.",
       },
       secondary: [
         {
           key: "permit",
-          title: "발전사업 관련 인허가",
+          title: "인허가",
           statusLabel: permit ? REVIEW_STATUS_MAP[permit.status].label : "대상 여부 확인",
-          why: "사업 유형·규모에 따라 발전사업허가 등 절차를 검토합니다.",
-          action: "추가 검토 필요",
+          oneLine: "사업 유형·규모에 따라 발전사업허가 등 절차를 검토합니다.",
         },
         {
           key: "development",
           title: "개발행위",
           statusLabel: "주소 기준 검토",
-          why: installType.includes("토지")
+          oneLine: installType.includes("토지")
             ? "토지형 설치 시 개발행위허가 대상 여부를 확인합니다."
             : "설치 면적·구조에 따라 개발행위 대상 여부를 확인합니다.",
-          action: "대상 여부 확인",
         },
         {
           key: "ordinance",
-          title: "지자체 조례",
+          title: "조례",
           statusLabel: ordinance ? REVIEW_STATUS_MAP[ordinance.status].label : "조례 확인",
-          why: "이격거리·입지제한 등 해당 지자체 조례를 확인합니다.",
-          action: "조례 확인",
+          oneLine: "이격거리·입지제한 등 해당 지자체 조례를 확인합니다.",
         },
         {
           key: "site",
-          title: "현장조건",
+          title: "현장",
           statusLabel: site ? REVIEW_STATUS_MAP[site.status].label : "현장 확인 필요",
-          why: "구조·음영·진입 여건은 현장 확인 후 최종 확정됩니다.",
-          action: "현장 확인",
+          oneLine: "구조·음영·진입 여건은 현장 확인 후 최종 확정됩니다.",
         },
       ] as GateItem[],
     };
   }, [byKey, kind, installType]);
 
-  const detailCategories =
-    kind === "net_metering"
-      ? [
-          { title: "설치 사전검토", body: "입지·경제성·조례·한전 선로용량을 1차로 검토합니다." },
-          { title: "인허가 검토", body: "개발행위 면제 여부 등 설치 관련 행정 요건을 확인합니다. 허가 가능 여부를 확정하지 않습니다." },
-          { title: "설계", body: "모듈배치·구조·전기 설계가 진행됩니다." },
-          { title: "한전 접수", body: "상계거래 신청 및 한전 기술 검토가 필요합니다." },
-          { title: "시공", body: "기자재 입고와 구조물·모듈·전기 시공이 진행됩니다." },
-          { title: "사용전점검", body: "전기안전공사 사용전점검 후 상계거래를 시작합니다." },
-          { title: "상계거래", body: "자가소비·잉여전력 상계 운영이 시작됩니다." },
-        ]
-      : [
-          { title: "사업허가", body: "발전사업허가 신청 등 사업 유형에 맞는 인허가 절차를 검토합니다." },
-          { title: "개발행위", body: "개발행위허가·구조안전 검토 대상 여부를 확인합니다." },
-          { title: "계통접수", body: "전력수급계약 신청, 수급지점 협의, 시설부담금 고지 등이 포함됩니다." },
-          { title: "공사계획", body: "전기공사 감리 배치 및 공사계획 신고가 필요할 수 있습니다." },
-          { title: "계통연계", body: "가공·지중선로 및 한전 외선 공사가 포함될 수 있습니다." },
-          { title: "사용전검사", body: "용량 기준에 따라 전기안전관리자 선임·사용전검사가 진행됩니다." },
-          { title: "전력수급계약", body: "전력수급계약, 병렬운전 협의, 계좌이체거래약정 등이 포함됩니다." },
-          { title: "설비확인", body: "에너지관리공단 설비확인 등록이 필요합니다." },
-          { title: "SMP · REC 운영", body: "상업운전 개시 후 SMP·REC 발급·운영이 진행됩니다." },
-        ];
-
   return (
     <div id="permit-gate" className="text-white">
-      <div className="grid gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-14">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">Grid Connection</p>
-          <p className="mt-4 text-[32px] font-extrabold leading-tight sm:text-[36px]">{primary.title}</p>
-          <p className="mt-5 max-w-md text-[17px] font-semibold leading-snug text-white">{primary.action}</p>
-          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-slate-300">{primary.why}</p>
-          <p className="mt-5 text-[13px] font-medium text-sky-200/90">현재 상태 · {primary.statusLabel}</p>
+      <div className="grid gap-10 lg:grid-cols-[0.45fr_0.55fr] lg:gap-14">
+        <div className="rounded-[20px] bg-[#0a1628]/60 px-5 py-6 sm:px-7 sm:py-8">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/20 text-sky-300">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M12 3L4 9v12h16V9l-8-6z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.14em] text-sky-300">핵심 사업조건</p>
+          <p className="mt-3 text-[30px] font-extrabold leading-tight sm:text-[34px]">{primary.title}</p>
+          <p className="mt-4 text-[16px] leading-relaxed text-slate-200">{primary.oneLine}</p>
+          <p className="mt-5 flex items-center gap-2 text-[14px] font-semibold text-slate-200">
+            <span className={`inline-block h-2 w-2 rounded-full ${statusDotClass(primary.statusLabel)}`} />
+            {primary.statusLabel}
+          </p>
           <Link
             href="#grid"
-            className="mt-8 inline-flex h-11 items-center bg-white px-5 text-sm font-bold text-navy"
+            className="mt-8 inline-flex text-sm font-bold text-sky-200 underline-offset-4 hover:underline"
           >
-            계통 상세 확인
+            계통 상세 확인 →
           </Link>
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">Permit & Site Check</p>
+          <p className="text-[13px] font-bold uppercase tracking-[0.14em] text-sky-300">사업 진행 전 확인</p>
           <ol className="mt-5 space-y-0">
             {secondary.map((gate, index) => (
               <li
@@ -171,45 +155,35 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
                 </span>
                 <div className="min-w-0">
                   <p className="text-[16px] font-bold text-white">{gate.title}</p>
-                  <p className="mt-1 text-[14px] leading-relaxed text-slate-300">{gate.why}</p>
+                  <p className="mt-1 text-[14px] leading-relaxed text-slate-300">{gate.oneLine}</p>
                 </div>
-                <p className="shrink-0 pt-0.5 text-[13px] font-semibold text-slate-200">{gate.statusLabel}</p>
+                <p className="flex shrink-0 items-center gap-2 pt-0.5 text-[13px] font-semibold text-slate-200">
+                  <span className={`inline-block h-2 w-2 rounded-full ${statusDotClass(gate.statusLabel)}`} />
+                  {gate.statusLabel}
+                </p>
               </li>
             ))}
           </ol>
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-white/10 pt-6">
+      <div className="mt-8 border-t border-white/10 pt-5">
         <button
           type="button"
           onClick={() => setDetailOpen((v) => !v)}
-          className="inline-flex h-11 items-center border border-white/25 px-4 text-sm font-bold text-white"
+          className="text-sm font-semibold text-sky-200 underline-offset-2 hover:underline"
           aria-expanded={detailOpen}
         >
           {detailOpen ? "인허가 상세 접기" : "인허가 상세 보기"}
         </button>
-        <Link href="#frame-action" className="text-sm font-semibold text-sky-200 underline-offset-2 hover:underline">
-          진행 절차로 이동
-        </Link>
       </div>
 
       {detailOpen ? (
-        <div id="permit-detail" className="mt-6 bg-white/95 px-5 py-6 text-navy sm:px-7">
+        <div id="permit-detail" className="mt-5 rounded-[20px] bg-white/95 px-5 py-6 text-navy sm:px-7">
           <h3 className="text-lg font-extrabold">인허가 상세</h3>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">
             회사소개서 {roadmap.sourceTitle} 절차 기준입니다. 허가 가능 여부를 확정하지 않습니다.
           </p>
-          <ol className="mt-5 grid gap-4 md:grid-cols-2">
-            {detailCategories.map((item, index) => (
-              <li key={item.title}>
-                <p className="text-sm font-bold text-navy">
-                  {String(index + 1).padStart(2, "0")} {item.title}
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.body}</p>
-              </li>
-            ))}
-          </ol>
         </div>
       ) : null}
     </div>

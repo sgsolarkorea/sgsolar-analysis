@@ -16,6 +16,7 @@ interface KakaoMapViewProps {
   lat: number;
   lng: number;
   showSetbackBuffers?: boolean;
+  showMapTypeToggle?: boolean;
 }
 
 type MapViewType = "roadmap" | "hybrid";
@@ -79,7 +80,8 @@ export default function KakaoMapView({
   jibunAddress,
   lat,
   lng,
-  showSetbackBuffers = true,
+  showSetbackBuffers = false,
+  showMapTypeToggle = false,
 }: KakaoMapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<kakao.maps.Map | null>(null);
@@ -168,32 +170,34 @@ export default function KakaoMapView({
         </div>
       )}
 
-      <div className="absolute right-3 top-3 z-20 flex overflow-hidden rounded-lg border border-white/90 bg-white/95 shadow-md">
-        <button
-          type="button"
-          onClick={() => setMapType("roadmap")}
-          aria-pressed={mapType === "roadmap"}
-          className={`px-2.5 py-1.5 text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${
-            mapType === "roadmap"
-              ? "bg-navy text-white"
-              : "text-slate-700 hover:bg-slate-50"
-          }`}
-        >
-          일반지도
-        </button>
-        <button
-          type="button"
-          onClick={() => setMapType("hybrid")}
-          aria-pressed={mapType === "hybrid"}
-          className={`border-l border-slate-200 px-2.5 py-1.5 text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${
-            mapType === "hybrid"
-              ? "bg-navy text-white"
-              : "text-slate-700 hover:bg-slate-50"
-          }`}
-        >
-          위성지도
-        </button>
-      </div>
+      {showMapTypeToggle ? (
+        <div className="absolute right-3 top-3 z-20 flex overflow-hidden rounded-xl border border-white/90 bg-white/95 shadow-md">
+          <button
+            type="button"
+            onClick={() => setMapType("roadmap")}
+            aria-pressed={mapType === "roadmap"}
+            className={`px-2.5 py-1.5 text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${
+              mapType === "roadmap"
+                ? "bg-navy text-white"
+                : "text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            일반지도
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapType("hybrid")}
+            aria-pressed={mapType === "hybrid"}
+            className={`border-l border-slate-200 px-2.5 py-1.5 text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${
+              mapType === "hybrid"
+                ? "bg-navy text-white"
+                : "text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            위성지도
+          </button>
+        </div>
+      ) : null}
 
       {showSetbackBuffers && mapReady && (
         <div className="absolute bottom-3 left-3 z-20 max-w-[220px] rounded-lg border border-white/90 bg-white/95 px-3 py-2.5 shadow-md">
