@@ -14,16 +14,13 @@ interface AnalysisLoadingScreenProps {
   address: string;
 }
 
-const FINISH_ANIMATION_MS = 200;
-
-/** Condensed journey for briefing UI (maps from full step ids). */
 const BRIEF_STEPS = [
-  { id: "address", label: "주소·위치 확인", match: ["address", "location"] },
-  { id: "land", label: "토지정보 확인", match: ["land"] },
-  { id: "building", label: "건축물·설치조건 분석", match: ["building"] },
-  { id: "capacity", label: "설치규모 산정", match: ["capacity"] },
-  { id: "generation", label: "발전량 산정", match: ["generation"] },
-  { id: "business", label: "사업성 분석", match: ["revenue"] },
+  { id: "address", label: "주소 확인", match: ["address", "location"] },
+  { id: "land", label: "토지정보", match: ["land"] },
+  { id: "building", label: "건축물", match: ["building"] },
+  { id: "capacity", label: "설치규모", match: ["capacity"] },
+  { id: "generation", label: "발전량", match: ["generation"] },
+  { id: "business", label: "사업성", match: ["revenue"] },
   { id: "result", label: "결과 정리", match: ["result"] },
 ] as const;
 
@@ -49,16 +46,6 @@ function stageMessage(activeBriefId: string | undefined, elapsedSec: number): st
     default:
       return "입력하신 주소와 부지 위치를 확인하고 있습니다.";
   }
-}
-
-function BriefMark({ status }: { status: "completed" | "active" | "pending" }) {
-  if (status === "completed") {
-    return <span className="text-base font-bold text-emerald-600" aria-hidden>✓</span>;
-  }
-  if (status === "active") {
-    return <span className="text-sky-600" aria-hidden>●</span>;
-  }
-  return <span className="text-slate-300" aria-hidden>○</span>;
 }
 
 export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreenProps) {
@@ -92,21 +79,16 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     const buildingStatus = steps.find((s) => s.id === "building")?.status ?? "pending";
     const capacityStatus = steps.find((s) => s.id === "capacity")?.status ?? "pending";
 
-    if (addressDone || locationDone) {
-      items.push({ label: "분석 위치", value: "확인 완료" });
-    }
-    if (landDone) {
-      items.push({ label: "토지 정보", value: "조회 완료" });
-    }
-    if (buildingStatus === "completed") {
-      items.push({ label: "건축물", value: "확인 완료" });
-    } else if (buildingStatus === "active" || buildingStatus === "delayed") {
+    if (addressDone || locationDone) items.push({ label: "주소", value: "확인 완료" });
+    if (landDone) items.push({ label: "면적·토지", value: "조회 완료" });
+    if (buildingStatus === "completed") items.push({ label: "건축물", value: "확인 완료" });
+    else if (buildingStatus === "active" || buildingStatus === "delayed") {
       items.push({ label: "건축물", value: "확인 중" });
     }
     if (capacityStatus === "active" || capacityStatus === "delayed") {
-      items.push({ label: "예상 설치용량", value: "계산 중" });
+      items.push({ label: "설치유형", value: "산정 중" });
     } else if (capacityStatus === "completed") {
-      items.push({ label: "예상 설치용량", value: "산정 완료" });
+      items.push({ label: "설치유형", value: "산정 완료" });
     }
     return items;
   }, [steps]);
@@ -137,7 +119,6 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
       if (cancelled || apiDone) return;
       const now = performance.now();
       if (now - lastStepAdvance < 450 || stepIndex >= ANALYSIS_LOADING_STEPS.length - 1) return;
-
       stepIndex += 1;
       lastStepAdvance = now;
       setSteps((prev) =>
@@ -152,7 +133,6 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     const navigate = () => {
       if (cancelled || finishing) return;
       finishing = true;
-
       setSteps((prev) =>
         prev.map((step) => ({
           ...step,
@@ -163,18 +143,8 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
             : "completed",
         })),
       );
-
-      const finishStart = performance.now();
-      const animateFinish = () => {
-        if (cancelled) return;
-        const t = performance.now() - finishStart;
-        if (t < FINISH_ANIMATION_MS) {
-          frame = window.requestAnimationFrame(animateFinish);
-          return;
-        }
-        if (!failed) router.replace(resultHref);
-      };
-      frame = window.requestAnimationFrame(animateFinish);
+      // Navigate immediately when API is ready — no artificial animation wait.
+      if (!failed) router.replace(resultHref);
     };
 
     const tick = () => {
@@ -213,107 +183,94 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
   }, [address, router]);
 
   const retryHref = `/analyzing?address=${encodeURIComponent(address)}`;
+  const activeIndex = Math.max(
+    0,
+    briefStatuses.findIndex((s) => s === "active"),
+  );
 
   return (
-    <div className="flex min-h-[calc(100vh-88px)] flex-col bg-[#F5F8FC]">
-      <div className="mx-auto flex w-full max-w-[1100px] flex-1 flex-col px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mb-6 flex justify-center sm:mb-8">
+    <div className="flex min-h-[calc(100vh-88px)] flex-col bg-[#EEF3F9]">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col px-4 py-8 sm:px-6 sm:py-10">
+        <div className="mb-6 flex justify-center">
           <SgSolarLogo layout="loading" variant="dark" />
         </div>
 
-        <div className="text-center">
-          <h1 className="text-[26px] font-extrabold tracking-tight text-navy sm:text-[32px]">
-            입지 정보를 분석하고 있습니다
-          </h1>
-          <p className="mt-3 text-[15px] font-medium text-slate-700 sm:text-base">{address}</p>
-          <p className="mt-3 text-sm text-slate-500">{stageMessage(activeBriefId, elapsedSec)}</p>
-        </div>
-
-        <div className="mt-8 grid gap-5 lg:grid-cols-[0.42fr_0.58fr]">
-          {/* Mini map / site preview — desktop: left 42% */}
-          <div className="relative hidden min-h-[300px] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 via-navy to-slate-900 p-5 text-white shadow-sm lg:block">
-            <div className="pointer-events-none absolute inset-0 opacity-30" aria-hidden>
-              <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/40" />
-              <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/20" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(56,189,248,0.2),transparent_45%)]" />
-            </div>
-            <p className="relative text-xs font-semibold uppercase tracking-wide text-sky-200">분석 대상 위치</p>
-            <p className="relative mt-3 max-w-[90%] text-lg font-bold leading-snug sm:text-xl">{address}</p>
-            <div className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm backdrop-blur">
-              <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-              위치 핀 · 필지 경계 준비 중
-            </div>
-            {revealed.length > 0 ? (
-              <ul className="relative mt-8 space-y-2 text-sm text-slate-200">
-                {revealed.slice(0, 3).map((item) => (
-                  <li key={item.label} className="flex justify-between gap-4 border-b border-white/10 pb-2">
-                    <span>{item.label}</span>
-                    <span className="font-semibold text-white">{item.value}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="relative mt-auto pt-16 text-xs text-slate-300">
-                결과 화면에서 지도·필지·설치 규모를 확인합니다.
-              </p>
-            )}
+        <div className="relative flex min-h-[520px] flex-1 flex-col overflow-hidden bg-navy text-white lg:min-h-[560px]">
+          <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
+            <div className="absolute -left-20 top-10 h-72 w-72 rounded-full border border-sky-400/20" />
+            <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full border border-sky-300/15" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(56,189,248,0.18),transparent_42%)]" />
           </div>
 
-          {/* Progress steps — desktop right 58% */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-bold text-navy">현재 진행 단계</p>
-              <span className="text-sm font-semibold text-slate-500">{progress}%</span>
+          <div className="relative grid flex-1 gap-10 p-6 sm:p-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:p-12">
+            <div className="flex flex-col justify-between">
+              <div>
+                <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-sky-300">Site Analysis</p>
+                <h1 className="mt-4 text-[28px] font-extrabold tracking-tight sm:text-[36px]">
+                  입지를 분석하고 있습니다
+                </h1>
+                <p className="mt-4 max-w-lg text-[17px] font-semibold leading-snug text-white">{address}</p>
+                <p className="mt-4 max-w-lg text-[14px] leading-relaxed text-slate-300">
+                  {stageMessage(activeBriefId, elapsedSec)}
+                </p>
+              </div>
+
+              {!apiFailed && revealed.length > 0 ? (
+                <ul className="mt-10 grid gap-3 sm:grid-cols-2">
+                  {revealed.map((item) => (
+                    <li key={item.label} className="border-t border-white/15 pt-3">
+                      <p className="text-[12px] text-slate-400">{item.label}</p>
+                      <p className="mt-1 text-[15px] font-bold text-white">{item.value}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-10 text-[13px] text-slate-400">
+                  확인된 정보가 준비되는 즉시 결과 화면으로 이동합니다.
+                </p>
+              )}
             </div>
-            <div className="mb-5 h-2 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-navy to-sky-500 transition-[width] duration-200"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <ol className="space-y-3">
-              {BRIEF_STEPS.map((step, i) => {
-                const status = briefStatuses[i];
-                return (
-                  <li key={step.id} className="flex items-start gap-3 text-[15px]">
-                    <BriefMark status={status} />
-                    <span
-                      className={
+
+            <div className="flex flex-col justify-center">
+              <div className="mb-5 flex items-end justify-between gap-3">
+                <p className="text-[13px] font-bold text-sky-200">현재 분석 단계</p>
+                <p className="text-[28px] font-extrabold tabular-nums text-white">{progress}%</p>
+              </div>
+              <div className="mb-8 h-[3px] overflow-hidden bg-white/15">
+                <div className="h-full bg-sky-400 transition-[width] duration-200" style={{ width: `${progress}%` }} />
+              </div>
+              <ol className="space-y-0">
+                {BRIEF_STEPS.map((step, i) => {
+                  const status = briefStatuses[i];
+                  const isActive = status === "active" || (status === "pending" && i === activeIndex);
+                  return (
+                    <li
+                      key={step.id}
+                      className={`flex items-baseline justify-between gap-4 border-t border-white/10 py-3 ${
                         status === "completed"
-                          ? "font-semibold text-slate-800"
-                          : status === "active"
-                            ? "font-bold text-navy"
-                            : "text-slate-400"
-                      }
+                          ? "text-slate-300"
+                          : isActive
+                            ? "text-white"
+                            : "text-slate-500"
+                      }`}
                     >
-                      {step.label}
-                      {status === "active" ? " 중" : ""}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
+                      <span className={`text-[15px] ${isActive ? "font-bold" : "font-medium"}`}>
+                        {String(i + 1).padStart(2, "0")} {step.label}
+                        {status === "active" ? " 중" : ""}
+                      </span>
+                      <span className="text-[12px] font-semibold">
+                        {status === "completed" ? "완료" : status === "active" ? "진행" : ""}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           </div>
         </div>
 
-        {/* Revealed facts — no invented metrics */}
-        {!apiFailed && revealed.length > 0 ? (
-          <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 py-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-slate-500">현재 확인된 정보</p>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-              {revealed.map((item) => (
-                <li key={item.label} className="rounded-xl bg-slate-50 px-3 py-3">
-                  <p className="text-xs text-slate-500">{item.label}</p>
-                  <p className="mt-1 text-sm font-bold text-navy">{item.value}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {/* Failure only */}
         {apiFailed ? (
-          <div className="mt-5 space-y-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
+          <div className="mt-5 space-y-3 border border-red-200 bg-red-50 px-5 py-4">
             <p className="text-sm font-semibold text-red-800">
               분석 중 오류가 발생했습니다. 주소를 확인한 뒤 다시 분석해 주세요.
             </p>

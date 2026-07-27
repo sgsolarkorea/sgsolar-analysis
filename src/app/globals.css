@@ -207,14 +207,44 @@
     radial-gradient(ellipse 50% 40% at 10% 90%, rgba(56, 189, 248, 0.12), transparent 50%);
 }
 
-/* Result Design Consolidation — Decision Frame rhythm */
+/* Result Design Consolidation — Decision Frame rhythm by role */
 .result-frame-pad {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+.result-frame-pad--compact {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.result-frame-pad--md {
+  padding-top: 3.75rem;
+  padding-bottom: 3.75rem;
+}
+
+.result-frame-pad--lg {
   padding-top: 4.5rem;
   padding-bottom: 4.5rem;
 }
 
 @media (min-width: 640px) {
   .result-frame-pad {
+    padding-top: 4.25rem;
+    padding-bottom: 4.25rem;
+  }
+
+  .result-frame-pad--compact {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .result-frame-pad--md {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+
+  .result-frame-pad--lg {
     padding-top: 5.5rem;
     padding-bottom: 5.5rem;
   }
@@ -222,7 +252,22 @@
 
 @media (min-width: 1024px) {
   .result-frame-pad {
-    padding-top: 6.5rem;
-    padding-bottom: 6.5rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .result-frame-pad--compact {
+    padding-top: 3.25rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .result-frame-pad--md {
+    padding-top: 5.25rem;
+    padding-bottom: 5.25rem;
+  }
+
+  .result-frame-pad--lg {
+    padding-top: 6.25rem;
+    padding-bottom: 6.25rem;
   }
 }

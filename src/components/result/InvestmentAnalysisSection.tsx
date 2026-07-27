@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useResultMetrics } from "@/components/result/ResultMetricsProvider";
 import { isHouseholdInstallType } from "@/lib/solar/householdSavings";
 import { runInvestmentAnalysis } from "@/lib/investment/engine";
@@ -23,8 +23,125 @@ function formatPct(rate: number | null): string {
   return `${(rate * 100).toFixed(2)}%`;
 }
 
+function CumulativeCashFlowChart({
+  years,
+  paybackYear,
+  paybackExact,
+}: {
+  years: { year: number; cumulativeEquityCashFlowWon: number; equityCashFlowWon: number }[];
+  paybackYear: number | null;
+  paybackExact: number | null;
+}) {
+  const [hover, setHover] = useState<{
+    year: number;
+    annual: number;
+    cumulative: number;
+    xPct: number;
+  } | null>(null);
+  const series = years.slice(0, 21);
+  const values = series.map((y) => y.cumulativeEquityCashFlowWon);
+  const maxAbs = Math.max(...values.map((v) => Math.abs(v)), 1);
+  const w = 640;
+  const h = 220;
+  const padX = 8;
+  const padY = 16;
+  const innerW = w - padX * 2;
+  const innerH = h - padY * 2;
+  const zeroY = padY + (maxAbs / (maxAbs * 2)) * innerH;
+
+  const points = series
+    .map((y, i) => {
+      const x = padX + (series.length <= 1 ? 0 : (i / (series.length - 1)) * innerW);
+      const ny = padY + ((maxAbs - y.cumulativeEquityCashFlowWon) / (maxAbs * 2)) * innerH;
+      return `${x},${ny}`;
+    })
+    .join(" ");
+
+  const areaPoints = `${padX},${zeroY} ${points} ${padX + innerW},${zeroY}`;
+  const paybackX =
+    paybackExact != null && series.length > 1
+      ? padX + (Math.min(Math.max(paybackExact, 0), series.length - 1) / (series.length - 1)) * innerW
+      : paybackYear != null && series.length > 1
+        ? padX + (paybackYear / (series.length - 1)) * innerW
+        : null;
+
+  const onMove = (e: MouseEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const idx = Math.round(ratio * (series.length - 1));
+    const y = series[idx];
+    if (!y) return;
+    setHover({
+      year: y.year,
+      annual: y.equityCashFlowWon,
+      cumulative: y.cumulativeEquityCashFlowWon,
+      xPct: (idx / Math.max(series.length - 1, 1)) * 100,
+    });
+  };
+
+  return (
+    <div className="relative mt-4">
+      {hover ? (
+        <div
+          className="pointer-events-none absolute z-10 -translate-x-1/2 rounded bg-navy px-3 py-2 text-[12px] text-white shadow-lg"
+          style={{ left: `${hover.xPct}%`, top: 0 }}
+        >
+          <p className="font-bold">{hover.year}년</p>
+          <p className="mt-1 text-slate-200">
+            연간 {Math.round(hover.annual).toLocaleString("ko-KR")}원
+          </p>
+          <p className="text-slate-200">
+            누적 {Math.round(hover.cumulative).toLocaleString("ko-KR")}원
+          </p>
+        </div>
+      ) : null}
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="h-[200px] w-full sm:h-[240px]"
+        role="img"
+        aria-label="20년 누적 자기자본 현금흐름"
+        onMouseMove={onMove}
+        onMouseLeave={() => setHover(null)}
+      >
+        <line x1={padX} y1={zeroY} x2={padX + innerW} y2={zeroY} stroke="#cbd5e1" strokeWidth="1" />
+        <polygon points={areaPoints} fill="rgba(14, 165, 233, 0.12)" />
+        <polyline
+          points={points}
+          fill="none"
+          stroke="#0B1D3A"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {paybackX != null ? (
+          <>
+            <line
+              x1={paybackX}
+              y1={padY}
+              x2={paybackX}
+              y2={padY + innerH}
+              stroke="#0ea5e9"
+              strokeWidth="1.5"
+              strokeDasharray="4 3"
+            />
+            <circle cx={paybackX} cy={zeroY} r="4.5" fill="#0ea5e9" />
+          </>
+        ) : null}
+      </svg>
+      <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+        <span>0년</span>
+        <span>10년</span>
+        <span>20년</span>
+      </div>
+      <p className="mt-2 text-[12px] text-slate-500">
+        누적 현금흐름 · 점선=회수 시점 · 가로선=손익분기(0)
+      </p>
+    </div>
+  );
+}
+
 /**
- * Long-term investment — default view = 4 key values + cashflow curve.
+ * Long-term investment — default view = payback/IRR + cashflow curve.
  * Settings / NPV / full sensitivity behind progressive disclosure.
  * Engine math unchanged (v1.0.0).
  */
@@ -163,117 +280,132 @@ export default function InvestmentAnalysisSection() {
       </div>
 
       {open ? (
-        <div className="mt-6 grid gap-4 rounded-2xl bg-slate-50 p-5 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">총 사업비 (원) · 참고</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={totalCapex || ""}
-              onChange={(e) => setTotalCapex(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">자기자본 (원)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={equity || ""}
-              onChange={(e) => setEquity(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">대출금 (원)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={loan || ""}
-              onChange={(e) => setLoan(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">대출금리 (연, 소수)</span>
-            <input
-              type="number"
-              step="0.001"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={rate}
-              onChange={(e) => setRate(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">거치기간 (년)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={grace}
-              onChange={(e) => setGrace(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">대출기간 (년)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={term}
-              onChange={(e) => setTerm(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">연 유지보수비 (원)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={om}
-              onChange={(e) => setOm(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">연 보험/기타 (원)</span>
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={insurance}
-              onChange={(e) => setInsurance(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="font-semibold text-slate-700">할인율 (NPV)</span>
-            <input
-              type="number"
-              step="0.001"
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
-              value={discountRate}
-              onChange={(e) => setDiscountRate(Number(e.target.value) || 0)}
-            />
-          </label>
-          <div className="text-sm sm:col-span-2 lg:col-span-3">
-            <span className="font-semibold text-slate-700">장기 가격 기준</span>
-            <div className="mt-1 flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={`rounded-lg px-3 py-2 text-sm font-semibold ${priceMode === "spot" ? "bg-navy text-white" : "bg-white ring-1 ring-slate-300"}`}
-                onClick={() => setPriceMode("spot")}
-              >
-                현재 단가 단순 적용
-              </button>
-              <button
-                type="button"
-                className={`rounded-lg px-3 py-2 text-sm font-semibold ${priceMode === "fixed" ? "bg-navy text-white" : "bg-white ring-1 ring-slate-300"}`}
-                onClick={() => setPriceMode("fixed")}
-              >
-                직접 장기단가
-              </button>
+        <div className="mt-6 space-y-8 border border-slate-200 bg-white p-5 sm:p-6">
+          <div>
+            <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-slate-500">투자금</p>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">총 사업비 (원) · 참고</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={totalCapex || ""}
+                  onChange={(e) => setTotalCapex(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">자기자본 (원)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={equity || ""}
+                  onChange={(e) => setEquity(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">대출금 (원)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={loan || ""}
+                  onChange={(e) => setLoan(Number(e.target.value) || 0)}
+                />
+              </label>
             </div>
-            {priceMode === "fixed" ? (
-              <input
-                type="number"
-                className="mt-2 w-full max-w-xs rounded-lg border border-slate-300 bg-white px-3 py-2"
-                value={fixedBlended}
-                onChange={(e) => setFixedBlended(Number(e.target.value) || 0)}
-                aria-label="통합 원/kWh"
-              />
-            ) : null}
+          </div>
+          <div>
+            <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-slate-500">금융조건</p>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">대출금리 (연, 소수)</span>
+                <input
+                  type="number"
+                  step="0.001"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={rate}
+                  onChange={(e) => setRate(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">거치기간 (년)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={grace}
+                  onChange={(e) => setGrace(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">대출기간 (년)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={term}
+                  onChange={(e) => setTerm(Number(e.target.value) || 0)}
+                />
+              </label>
+            </div>
+          </div>
+          <div>
+            <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-slate-500">운영조건 · 장기가정</p>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">연 유지보수비 (원)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={om}
+                  onChange={(e) => setOm(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">연 보험/기타 (원)</span>
+                <input
+                  type="number"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={insurance}
+                  onChange={(e) => setInsurance(Number(e.target.value) || 0)}
+                />
+              </label>
+              <label className="text-sm">
+                <span className="font-semibold text-slate-700">할인율 (NPV)</span>
+                <input
+                  type="number"
+                  step="0.001"
+                  className="mt-1 w-full border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={discountRate}
+                  onChange={(e) => setDiscountRate(Number(e.target.value) || 0)}
+                />
+              </label>
+            </div>
+            <div className="mt-4 text-sm">
+              <span className="font-semibold text-slate-700">장기 가격 기준</span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={`px-3 py-2 text-sm font-semibold ${priceMode === "spot" ? "bg-navy text-white" : "bg-slate-100 text-slate-700"}`}
+                  onClick={() => setPriceMode("spot")}
+                >
+                  현재 단가 단순 적용
+                </button>
+                <button
+                  type="button"
+                  className={`px-3 py-2 text-sm font-semibold ${priceMode === "fixed" ? "bg-navy text-white" : "bg-slate-100 text-slate-700"}`}
+                  onClick={() => setPriceMode("fixed")}
+                >
+                  직접 장기단가
+                </button>
+              </div>
+              {priceMode === "fixed" ? (
+                <input
+                  type="number"
+                  className="mt-2 w-full max-w-xs border-b border-slate-300 bg-transparent px-0 py-2 outline-none focus:border-navy"
+                  value={fixedBlended}
+                  onChange={(e) => setFixedBlended(Number(e.target.value) || 0)}
+                  aria-label="통합 원/kWh"
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       ) : null}
@@ -285,69 +417,70 @@ export default function InvestmentAnalysisSection() {
         </p>
       ) : result ? (
         <>
-          <div className="mt-10 grid gap-10 lg:grid-cols-[0.9fr_0.75fr_1.2fr]">
+          <div className="mt-10 grid items-start gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-12">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">자금 구조</p>
-              <p className="mt-4 text-sm text-slate-500">참고 사업비</p>
-              <p className="mt-1 text-[28px] font-extrabold text-navy">{formatManwon(totalCapex)}</p>
-              <dl className="mt-5 space-y-2 text-sm">
+              <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                현재 적용 투자조건 기준
+              </p>
+              <p className="mt-5 text-[14px] text-slate-500">예상 투자금 회수</p>
+              <p className="mt-1 text-[52px] font-extrabold leading-none tracking-tight text-navy sm:text-[56px]">
+                {paybackLabel}
+              </p>
+              <p className="mt-8 text-[14px] text-slate-500">자기자본 IRR · Equity IRR</p>
+              <p className="mt-1 text-[48px] font-extrabold leading-none tracking-tight text-sky-700 sm:text-[52px]">
+                {formatPct(result.equityIrr)}
+              </p>
+
+              <div className="mt-10 space-y-3 border-t border-slate-200 pt-6 text-[14px]">
                 <div className="flex justify-between gap-3">
-                  <dt className="text-slate-500">자기자본</dt>
-                  <dd className="font-bold text-navy">{formatManwon(equity)}</dd>
+                  <span className="text-slate-500">참고 사업비</span>
+                  <span className="font-bold text-navy">{formatManwon(totalCapex)}</span>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-slate-500">대출</dt>
-                  <dd className="font-bold text-navy">{formatManwon(loan)}</dd>
+                  <span className="text-slate-500">자기자본</span>
+                  <span className="font-bold text-navy">{formatManwon(equity)}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span className="text-slate-500">대출</span>
+                  <span className="font-bold text-navy">{formatManwon(loan)}</span>
                 </div>
                 {result.fundingGapWon > 0 ? (
                   <div className="flex justify-between gap-3 text-amber-800">
-                    <dt>추가 조달 필요</dt>
-                    <dd className="font-bold">{formatManwon(result.fundingGapWon)}</dd>
+                    <span>추가 조달 필요</span>
+                    <span className="font-bold">{formatManwon(result.fundingGapWon)}</span>
                   </div>
                 ) : null}
-              </dl>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">투자 수익</p>
-              <p className="mt-4 text-sm text-slate-500">예상 투자금 회수</p>
-              <p className="mt-1 text-[36px] font-extrabold tracking-tight text-sky-700">{paybackLabel}</p>
-              <p className="mt-6 text-sm text-slate-500">자기자본 IRR</p>
-              <p className="mt-1 text-[40px] font-extrabold tracking-tight text-navy">{formatPct(result.equityIrr)}</p>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">20년 누적 현금흐름</p>
-              <div className="mt-4 flex h-40 items-end gap-0.5 sm:h-48">
-                {result.years.slice(0, 21).map((y) => {
-                  const maxAbs = Math.max(
-                    ...result.years.map((row) => Math.abs(row.cumulativeEquityCashFlowWon)),
-                    1,
-                  );
-                  const h = Math.max(4, Math.round((Math.abs(y.cumulativeEquityCashFlowWon) / maxAbs) * 100));
-                  const positive = y.cumulativeEquityCashFlowWon >= 0;
-                  const isPayback =
-                    result.cashflowPaybackYear != null && y.year === result.cashflowPaybackYear;
-                  return (
-                    <div
-                      key={y.year}
-                      className={`relative w-full rounded-t ${positive ? "bg-emerald-500" : "bg-slate-300"} ${isPayback ? "ring-2 ring-sky-500 ring-offset-1" : ""}`}
-                      style={{ height: `${h}%` }}
-                      title={`${y.year}년: ${Math.round(y.cumulativeEquityCashFlowWon).toLocaleString("ko-KR")}원`}
-                    />
-                  );
-                })}
               </div>
-              <p className="mt-2 text-xs text-slate-500">회색=미회수 · 초록=누적 회수 이후 · 하늘색 링=회수 시점</p>
+            </div>
+
+            <div>
+              <div className="flex items-end justify-between gap-3">
+                <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                  20년 누적 현금흐름
+                </p>
+                {result.cashflowPaybackYearsExact != null || result.cashflowPaybackYear != null ? (
+                  <p className="text-[13px] font-semibold text-sky-700">
+                    예상 회수 {paybackLabel}
+                  </p>
+                ) : null}
+              </div>
+              <CumulativeCashFlowChart
+                years={result.years}
+                paybackYear={result.cashflowPaybackYear}
+                paybackExact={result.cashflowPaybackYearsExact}
+              />
             </div>
           </div>
 
           {sensitivity.length > 0 ? (
-            <ul className="mt-10 grid gap-3 sm:grid-cols-3">
+            <ul className="mt-12 grid gap-6 sm:grid-cols-3">
               {sensitivity.map((s) => (
-                <li key={s.label} className="border-t border-slate-200 pt-3">
-                  <p className="text-xs font-semibold text-slate-500">{s.label.replace("시장가격", "시장")}</p>
-                  <p className="mt-1 text-xl font-extrabold text-navy">{formatPct(s.equityIrr)}</p>
+                <li key={s.label} className="border-t border-slate-200 pt-4">
+                  <p className="text-[12px] font-semibold text-slate-500">
+                    {s.label.replace("시장가격", "시장")}
+                  </p>
+                  <p className="mt-2 text-[28px] font-extrabold text-navy">{formatPct(s.equityIrr)}</p>
+                  <p className="mt-1 text-[13px] text-slate-500">자기자본 IRR</p>
                 </li>
               ))}
             </ul>

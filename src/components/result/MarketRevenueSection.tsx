@@ -186,7 +186,7 @@ export default function MarketRevenueSection({ embedded = false }: { embedded?: 
               <span className="font-semibold text-navy">{formatMarketWonPerYear(revenue.recRevenueWon)}</span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-emerald-500" style={{ width: `${recPct}%` }} />
+              <div className="h-full rounded-full bg-navy" style={{ width: `${recPct}%` }} />
             </div>
           </div>
         </div>

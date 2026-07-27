@@ -143,44 +143,48 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
 
   return (
     <div id="permit-gate" className="text-white">
-      <div className="grid gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:gap-12">
+      <div className="grid gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-14">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-300">Grid Connection</p>
-          <p className="mt-3 text-[26px] font-extrabold sm:text-[30px]">{primary.title}</p>
-          <p className="mt-4 inline-flex rounded-md bg-white/15 px-2.5 py-1 text-sm font-bold">
-            {primary.statusLabel}
-          </p>
-          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-slate-200">{primary.why}</p>
-          <p className="mt-3 text-sm font-semibold text-sky-200">{primary.action}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">Grid Connection</p>
+          <p className="mt-4 text-[32px] font-extrabold leading-tight sm:text-[36px]">{primary.title}</p>
+          <p className="mt-5 max-w-md text-[17px] font-semibold leading-snug text-white">{primary.action}</p>
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-slate-300">{primary.why}</p>
+          <p className="mt-5 text-[13px] font-medium text-sky-200/90">현재 상태 · {primary.statusLabel}</p>
           <Link
             href="#grid"
-            className="mt-6 inline-flex h-11 items-center rounded-xl bg-white px-4 text-sm font-bold text-navy"
+            className="mt-8 inline-flex h-11 items-center bg-white px-5 text-sm font-bold text-navy"
           >
             계통 상세 확인
           </Link>
         </div>
 
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-sky-300">Permit Summary</p>
-          <ul className="mt-4 divide-y divide-white/10">
-            {secondary.map((gate) => (
-              <li key={gate.key} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">Permit & Site Check</p>
+          <ol className="mt-5 space-y-0">
+            {secondary.map((gate, index) => (
+              <li
+                key={gate.key}
+                className="grid grid-cols-[40px_1fr_auto] items-start gap-3 border-t border-white/10 py-4 first:border-t-0 first:pt-0"
+              >
+                <span className="pt-0.5 text-[13px] font-bold text-sky-300">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <div className="min-w-0">
-                  <p className="text-[15px] font-bold text-white">{gate.title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-300">{gate.why}</p>
+                  <p className="text-[16px] font-bold text-white">{gate.title}</p>
+                  <p className="mt-1 text-[14px] leading-relaxed text-slate-300">{gate.why}</p>
                 </div>
-                <p className="shrink-0 text-sm font-semibold text-sky-200">{gate.statusLabel}</p>
+                <p className="shrink-0 pt-0.5 text-[13px] font-semibold text-slate-200">{gate.statusLabel}</p>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
+      <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-white/10 pt-6">
         <button
           type="button"
           onClick={() => setDetailOpen((v) => !v)}
-          className="inline-flex h-11 items-center rounded-xl border border-white/20 bg-white/5 px-4 text-sm font-bold text-white"
+          className="inline-flex h-11 items-center border border-white/25 px-4 text-sm font-bold text-white"
           aria-expanded={detailOpen}
         >
           {detailOpen ? "인허가 상세 접기" : "인허가 상세 보기"}
@@ -188,11 +192,10 @@ export default function PermitGateSection({ items }: PermitGateSectionProps) {
         <Link href="#frame-action" className="text-sm font-semibold text-sky-200 underline-offset-2 hover:underline">
           진행 절차로 이동
         </Link>
-        <span className="text-xs text-slate-400">({roadmap.label})</span>
       </div>
 
       {detailOpen ? (
-        <div id="permit-detail" className="mt-6 rounded-2xl bg-white px-5 py-6 text-navy sm:px-7">
+        <div id="permit-detail" className="mt-6 bg-white/95 px-5 py-6 text-navy sm:px-7">
           <h3 className="text-lg font-extrabold">인허가 상세</h3>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">
             회사소개서 {roadmap.sourceTitle} 절차 기준입니다. 허가 가능 여부를 확정하지 않습니다.

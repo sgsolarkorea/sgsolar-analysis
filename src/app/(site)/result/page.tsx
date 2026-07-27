@@ -179,7 +179,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Site"
           title="입지 위치"
           intro="입력하신 부지의 위치를 지도에서 확인하세요."
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--lg"
         >
           <MapArea
             address={data.address}
@@ -201,7 +201,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           title="설치 규모 · 형태"
           intro="얼마나 설치되고 어떤 모습인지 한눈에 확인합니다."
           tone="muted"
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--md"
         >
           <TechnicalFrame />
         </ResultFrame>
@@ -213,10 +213,13 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           title="사업 진행 핵심 검토"
           intro="계통·인허가·조례·현장조건 등 실제 사업에 걸리는 항목을 함께 봅니다."
           tone="dark"
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--md"
         >
           <PermitGateSection items={reviewStatusItems} />
-          <div id="grid" className="mt-10 scroll-mt-28 rounded-2xl bg-white p-5 text-navy sm:p-7">
+          <div
+            id="grid"
+            className="mt-10 scroll-mt-28 border-t border-white/15 bg-white/95 px-5 py-6 text-navy sm:px-7 sm:py-8"
+          >
             <GridConnectionSection
               initialGridInfo={data.gridInfo}
               address={data.address}
@@ -234,7 +237,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Energy"
           title="예상 발전량"
           intro="지역 일사량 기준 연간·월별 예상 발전량입니다."
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--md"
         >
           <GenerationSection embedded />
         </ResultFrame>
@@ -246,7 +249,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           title="시장가격 · 투자수익"
           intro="1년 시장 스냅샷과 20년 장기 투자 시뮬레이션을 구분해 확인합니다."
           tone="muted"
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--lg"
         >
           <MarketRevenueSection embedded />
           <InvestmentAnalysisSection />
@@ -258,10 +261,10 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           eyebrow="Action"
           title="확인사항 · 진행 절차"
           intro="검토가 완료되면 실제 사업은 다음 절차로 진행됩니다."
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--md"
         >
           <RequiredChecks items={reviewStatusItems} />
-          <div className="mt-14">
+          <div className="mt-10">
             <BusinessRoadmapSection />
           </div>
         </ResultFrame>
@@ -270,14 +273,14 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         <ResultFrame
           id="frame-proof"
           eyebrow="Proof"
-          title="분석 이후 실제 사업까지 연결합니다"
-          intro="SG SOLAR 역량과 설치 형태 예시입니다. 검증되지 않은 시공실적을 의미하지 않습니다."
+          title="설치 형태와 사업 역량"
+          intro="현재 분석 설치유형을 중심으로 설치 형태 예시와 SG SOLAR 역량을 확인합니다."
           tone="muted"
-          className="result-frame-pad"
+          className="result-frame-pad result-frame-pad--lg"
         >
-          <SgSolarSupportSection embedded />
-          <div className="mt-16">
-            <InstallLookbookSection embedded />
+          <InstallLookbookSection embedded />
+          <div className="mt-14">
+            <SgSolarSupportSection embedded />
           </div>
         </ResultFrame>
 
@@ -308,9 +311,8 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         <ResultFrame
           id="frame-conversion"
           eyebrow="Next Step"
-          title="결과를 가지고 다음 단계로"
-          intro="PDF로 정리하거나 전문가 상담으로 이어서 검토하세요."
-          className="result-frame-pad"
+          title="다음 단계"
+          className="result-frame-pad result-frame-pad--compact"
         >
           <ResultPdfCtaPanel address={data.address} />
           <div className="mt-10 space-y-10">
