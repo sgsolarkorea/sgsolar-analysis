@@ -94,6 +94,9 @@ export interface SolarMetrics {
     recDate: string;
     source: string;
     isFallback: boolean;
+    smpRegion?: "mainland" | "jeju" | "unified";
+    smpChange?: number | null;
+    recChange?: number | null;
   };
   marketDisclaimer: string;
   annualGenerationKwh: number;

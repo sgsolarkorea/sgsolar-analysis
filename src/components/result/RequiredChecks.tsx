@@ -27,11 +27,11 @@ export default function RequiredChecks({ items }: RequiredChecksProps) {
   }, [items]);
 
   return (
-    <section id="required-checks" className="scroll-mt-24" aria-labelledby="required-checks-heading">
+    <section id="required-checks" className="scroll-mt-28" aria-labelledby="required-checks-heading">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 id="required-checks-heading" className="text-2xl font-extrabold tracking-tight text-navy sm:text-[28px]">
-            추가 확인 사항
+            사업 진행 전 확인할 사항
           </h2>
           <p className="mt-2 text-[15px] text-slate-600">
             확인이 필요한 항목을 우선 표시합니다. 최종 판단은 현장·관계기관 검토 후 확정됩니다.

@@ -52,6 +52,7 @@ import type { SiteGeometryBundle } from "@/types/siteGeometry";
 
 export interface ProfitabilityInput {
   address: string;
+  jibunAddress?: string;
   landInfo: InfoField[];
   buildingInfo: InfoField[];
 }
@@ -98,7 +99,21 @@ export async function calculateSolarProfitability(
   monthlyGeneration: ReturnType<typeof calculateSolarMetrics>["monthlyGeneration"];
   installType: ReturnType<typeof resolveDefaultInstallType>;
 }> {
-  const market = await getMarketPrice();
+  const market = await getMarketPrice({
+    address: input.address,
+    jibunAddress: input.jibunAddress,
+  });
+  const marketSnapshot = {
+    smpPrice: market.smpPrice,
+    recPrice: market.recPrice,
+    smpDate: market.smpDate,
+    recDate: market.recDate,
+    source: market.source,
+    isFallback: market.isFallback,
+    smpRegion: market.smpRegion,
+    smpChange: market.smpChange,
+    recChange: market.recChange,
+  };
   const installType = resolveDefaultInstallType("", input.landInfo, input.buildingInfo, {
     hasRoadAddress: input.hasRoadAddress,
   });
@@ -107,7 +122,7 @@ export async function calculateSolarProfitability(
     installType,
     landInfo: input.landInfo,
     buildingInfo: input.buildingInfo,
-    market,
+    market: marketSnapshot,
     capacityAreaSqm: input.capacityAreaSqm,
     capacityBasis: input.capacityBasis,
     displayLandAreaSqm: input.displayLandAreaSqm,
@@ -267,6 +282,7 @@ export async function analyzeSolarSite(
 
   const solarResult = await calculateSolarProfitability({
     address: geo.address,
+    jibunAddress: geo.jibunAddress,
     landInfo,
     buildingInfo,
     hasRoadAddress: hasRoadAddress(geo.address),

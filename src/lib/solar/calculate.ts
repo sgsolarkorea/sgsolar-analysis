@@ -22,6 +22,13 @@ import type { CapacityBasis } from "@/types/siteGeometry";
 
 export { resolveRecWeight } from "@/lib/solar/recWeight";
 
+/** Market snapshot required for solar metrics (history omitted). */
+export type SolarMarketSnapshot = Pick<
+  MarketPriceData,
+  "smpPrice" | "recPrice" | "smpDate" | "recDate" | "source" | "isFallback"
+> &
+  Partial<Pick<MarketPriceData, "smpRegion" | "smpChange" | "recChange">>;
+
 export function installTypeToCategory(type: InstallTypeOption): SolarInstallCategory {
   switch (type) {
     case "토지형":
@@ -85,7 +92,7 @@ export interface CalculateSolarInput {
   installType: InstallTypeOption;
   landInfo: InfoField[];
   buildingInfo: InfoField[];
-  market: MarketPriceData;
+  market: SolarMarketSnapshot;
   /** 다중 필지 합산 면적 (토지형) */
   overrideLandAreaSqm?: number;
   /** 다중 필지 산식 표시용 */

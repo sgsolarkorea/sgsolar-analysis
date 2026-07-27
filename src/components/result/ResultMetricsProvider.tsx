@@ -65,6 +65,8 @@ interface ResultMetricsContextValue {
   annualGeneration: string;
   annualRevenue: string;
   constructionCost: string;
+  siteAddress: string;
+  siteJibunAddress: string;
   consultationContext: ConsultationAnalysisContext;
   multiParcelEnabled: boolean;
   parcels: ParcelItem[];
@@ -351,6 +353,8 @@ export function ResultMetricsProvider({
       annualGeneration: formatGenerationDisplay(metrics.annualGenerationKwh),
       annualRevenue: formatRevenueDisplay(metrics.totalRevenueWon),
       constructionCost: formatConstructionDisplay(metrics.constructionCostWon),
+      siteAddress,
+      siteJibunAddress,
       consultationContext: {
         ...consultationBase,
         installType: metrics.installType,
@@ -390,6 +394,8 @@ export function ResultMetricsProvider({
     landInfo,
     buildingInfo,
     setInstallType,
+    siteAddress,
+    siteJibunAddress,
     multiParcelEnabled,
     parcels,
     parcelSummary,

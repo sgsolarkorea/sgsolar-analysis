@@ -205,10 +205,10 @@ export default function GridConnectionSection({
   const dlRemainingDisplay = formatGridCapacityMwOrKw(gridInfo.distributionLine.remainingMw);
 
   return (
-    <section id="grid" className="scroll-mt-24">
+    <section id="grid" className="scroll-mt-28">
       <SectionHeader
-        title="한전 계통 연계 검토"
-        description="한전 계통 연계 가능 여부를 확인합니다."
+        title="한전 계통연계 검토"
+        description="사업의 주요 Gate입니다. 접속 가능 여부는 한전 검토로 확정됩니다."
         compact
       />
       <p className="mb-3 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium leading-snug text-blue-950 sm:text-sm">

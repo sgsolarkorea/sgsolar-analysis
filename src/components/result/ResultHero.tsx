@@ -59,7 +59,7 @@ export default function ResultHero({
               href="#consultation"
               className="btn-primary inline-flex h-12 items-center justify-center px-5 text-sm font-bold lg:min-w-[220px]"
             >
-              무료 상담 신청
+              무료 전문가 상담
             </Link>
             <Link
               href="/"

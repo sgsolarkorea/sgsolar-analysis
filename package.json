@@ -25,6 +25,7 @@
     "validate:setback-manual-overrides": "node scripts/validate-setback-manual-overrides.mjs",
     "start": "next start",
     "lint": "eslint",
+    "test:market-revenue": "tsx --test src/lib/market/calculateMarketRevenue.test.ts",
     "verify:case-study-images": "tsx scripts/verify-case-study-images.ts",
     "verify:case-study-image-ui": "tsx scripts/verify-case-study-image-ui.ts",
     "prepare:case-study-image": "tsx scripts/prepare-case-study-image.ts",

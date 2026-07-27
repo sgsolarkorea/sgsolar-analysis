@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import {
   ResultCapacitySection,
   ResultConsultationSection,
-  ResultRevenueSection,
   ResultSaveSection,
   ResultSimilarCasesSection,
 } from "@/components/result/ResultMetricsSections";
@@ -10,7 +9,7 @@ import ResultPdfCtaPanel from "@/components/result/ResultPdfCtaPanel";
 import MobileResultActions from "@/components/result/MobileResultActions";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { GRID_DISCLAIMER } from "@/data/sampleData";
-import { resolveProgressSteps, type InstallTypeOption } from "@/data/resultUx";
+import { type InstallTypeOption } from "@/data/resultUx";
 import { resolveOrdinanceForAddress } from "@/lib/ordinanceLearning/registry";
 import { resolveOrdinanceDisplay } from "@/lib/regulatory/resolveOrdinanceDisplay";
 import { resolveOrdinanceInfoList } from "@/lib/regulatory/resolveOrdinanceInfoList";
@@ -28,12 +27,16 @@ import RegulatoryAnalysisSection from "@/components/result/RegulatoryAnalysisSec
 import RegionDistrictSection from "@/components/result/RegionDistrictSection";
 import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import MapArea from "@/components/result/MapArea";
-import AnalysisProgressPanel from "@/components/result/AnalysisProgressPanel";
 import ResultHero from "@/components/result/ResultHero";
-import AnalysisOverview from "@/components/result/AnalysisOverview";
+import ResultStickyNav from "@/components/result/ResultStickyNav";
+import InstallationSizeSection from "@/components/result/InstallationSizeSection";
+import GridGatePanel from "@/components/result/GridGatePanel";
+import GenerationSection from "@/components/result/GenerationSection";
+import MarketRevenueSection from "@/components/result/MarketRevenueSection";
+import InstallationVisualSection from "@/components/result/InstallationVisualSection";
 import RequiredChecks from "@/components/result/RequiredChecks";
 import NextSteps from "@/components/result/NextSteps";
-import BusinessVisual from "@/components/result/BusinessVisual";
+import DetailAnalysisAccordion from "@/components/result/DetailAnalysisAccordion";
 import AddressSearchError from "@/components/result/AddressSearchError";
 import { ResultMetricsProvider } from "@/components/result/ResultMetricsProvider";
 import { getCachedAnalyzeSolarSite } from "@/lib/api/analysis";
@@ -42,9 +45,6 @@ import {
   getKakaoErrorMessage,
 } from "@/lib/api/kakaoErrors";
 import { buildReviewStatusItems } from "@/lib/result/buildReviewSummary";
-import { formatRecWeightDisplay } from "@/lib/solar/formatRecWeight";
-import { formatHouseholdMonthlySavings, isHouseholdInstallType } from "@/lib/solar/householdSavings";
-import { REVENUE_WARNING } from "@/data/sampleData";
 
 interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
@@ -97,7 +97,6 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
   let data;
   try {
-    // Prefer full if background enrich finished; otherwise use core for fast first paint
     data = await getCachedAnalyzeSolarSite(params.address ?? "", { phase: "core" });
   } catch (error) {
     const detail =
@@ -120,12 +119,10 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     buildingArea: getFieldValue(data.buildingInfo, "건축면적"),
   };
 
-  const progressSteps = resolveProgressSteps(data.landInfo, data.buildingInfo);
   const primaryParcel = primaryParcelFromReview(data);
   const multiParcelEnabled = data.solarMetrics.installType === "토지형";
   const installTypeLabel =
     data.recommendation.split("(")[0]?.trim() || data.recommendation;
-  const isHousehold = isHouseholdInstallType(data.solarMetrics.installType as InstallTypeOption);
 
   const showMountainWarning = isMountainOrForestSite(
     data.address,
@@ -164,97 +161,83 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           recommendation={data.recommendation}
         />
 
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <div className="lg:flex lg:gap-8 lg:py-6">
-            <AnalysisProgressPanel steps={progressSteps} />
+        <ResultStickyNav />
 
-            <div className="min-w-0 flex-1 space-y-10 sm:space-y-12">
-              {showMountainWarning && <MountainLandWarningBanner />}
+        <div className="mx-auto max-w-[1320px] space-y-12 px-4 py-8 sm:space-y-14 sm:px-6 sm:py-10">
+          {showMountainWarning && <MountainLandWarningBanner />}
 
-              <section id="site-location" className="scroll-mt-24 mt-8 sm:mt-0">
-                <SectionHeader
-                  title="입지 위치"
-                  description="입력하신 주소의 위치를 지도에서 먼저 확인하세요."
-                />
-                <MapArea
-                  address={data.address}
-                  jibunAddress={data.jibunAddress}
-                  lat={data.lat}
-                  lng={data.lng}
-                  installType={installTypeLabel}
-                  areaLabel={analysisAreaLabel}
-                  landCategory={getFieldValue(data.landInfo, "지목") || undefined}
-                  zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
-                />
-              </section>
+          <section id="site-location" className="scroll-mt-28">
+            <SectionHeader
+              title="입지 위치"
+              description="입력하신 주소의 위치를 지도에서 먼저 확인하세요."
+            />
+            <MapArea
+              address={data.address}
+              jibunAddress={data.jibunAddress}
+              lat={data.lat}
+              lng={data.lng}
+              installType={installTypeLabel}
+              areaLabel={analysisAreaLabel}
+              landCategory={getFieldValue(data.landInfo, "지목") || undefined}
+              zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
+            />
+          </section>
 
-              <AnalysisOverview
-                capacity={data.capacity}
-                annualGeneration={data.annualGeneration}
-                annualRevenue={data.annualRevenue}
-                constructionCost={data.constructionCost}
-                recWeight={formatRecWeightDisplay(data.solarMetrics.recWeight)}
-                analysisArea={analysisAreaLabel}
-                installType={installTypeLabel}
-                isHousehold={isHousehold}
-                householdSavingsLabel="월 예상 절감액"
-                householdSavingsValue={formatHouseholdMonthlySavings(data.solarMetrics.capacityKw)}
-              />
-
-              <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                ⚠ {REVENUE_WARNING}
-              </p>
-
-              <BusinessVisual />
-
-              <RequiredChecks items={reviewStatusItems} />
-
-              <NextSteps />
-
-              <div id="detail-analysis" className="scroll-mt-24 space-y-8 border-t border-slate-200 pt-10">
-                <h2 className="text-2xl font-extrabold tracking-tight text-navy sm:text-[28px]">
-                  상세 분석
-                </h2>
-
-                <MultiParcelSection />
-                <LandInfoCardSection detail={data.landInfoDetail} />
-                <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
-                <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
-
-                <DetailInfoSection
-                  id="building-info"
-                  title="건축물 정보"
-                  fields={data.buildingInfo}
-                />
-
-                <Suspense fallback={<OrdinanceSkeleton />}>
-                  <DeferredOrdinanceSection
-                    address={data.address}
-                    jibunAddress={data.jibunAddress}
-                    setbackReview={data.setbackReview}
-                  />
-                </Suspense>
-
-                <ResultCapacitySection recommendation={data.recommendation} />
-                <ResultRevenueSection showMountainRecNote={showMountainWarning} />
-
-                <GridConnectionSection
-                  initialGridInfo={data.gridInfo}
-                  address={data.address}
-                  jibunAddress={data.jibunAddress}
-                  lat={data.lat}
-                  lng={data.lng}
-                  disclaimer={GRID_DISCLAIMER}
-                />
-              </div>
-
-              <ResultSimilarCasesSection />
-
-              <ResultPdfCtaPanel address={data.address} />
-              <ResultSaveSection address={data.address} />
-              <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
-            </div>
+          <div className="rounded-3xl bg-slate-50/80 px-4 py-8 sm:px-6">
+            <InstallationSizeSection />
           </div>
+
+          <GridGatePanel>
+            <GridConnectionSection
+              initialGridInfo={data.gridInfo}
+              address={data.address}
+              jibunAddress={data.jibunAddress}
+              lat={data.lat}
+              lng={data.lng}
+              disclaimer={GRID_DISCLAIMER}
+            />
+          </GridGatePanel>
+
+          <GenerationSection />
+
+          <div className="rounded-3xl bg-gradient-to-b from-slate-50 to-white px-4 py-8 sm:px-6">
+            <MarketRevenueSection />
+          </div>
+
+          <InstallationVisualSection />
+
+          <RequiredChecks items={reviewStatusItems} />
+
+          <NextSteps />
+
+          <DetailAnalysisAccordion>
+            <MultiParcelSection />
+            <LandInfoCardSection detail={data.landInfoDetail} />
+            <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
+            <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
+
+            <DetailInfoSection
+              id="building-info"
+              title="건축물 정보"
+              fields={data.buildingInfo}
+            />
+
+            <Suspense fallback={<OrdinanceSkeleton />}>
+              <DeferredOrdinanceSection
+                address={data.address}
+                jibunAddress={data.jibunAddress}
+                setbackReview={data.setbackReview}
+              />
+            </Suspense>
+
+            <ResultCapacitySection recommendation={data.recommendation} />
+          </DetailAnalysisAccordion>
+
+          <ResultSimilarCasesSection />
+
+          <ResultPdfCtaPanel address={data.address} />
+          <ResultSaveSection address={data.address} />
+          <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
         </div>
 
         <MobileResultActions address={data.address} />

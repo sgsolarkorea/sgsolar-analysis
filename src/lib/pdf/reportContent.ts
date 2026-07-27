@@ -10,6 +10,9 @@ export const PDF_REPORT_TITLE = "태양광 입지분석 사전 검토 보고서"
 export const PDF_LEGAL_DISCLAIMER =
   "본 보고서는 공공데이터 및 입력 정보를 기반으로 작성된 사전 검토용 자료입니다. 최종 설치 가능 여부는 현장 확인, 구조 검토, 계통 확인, 지자체 인허가 검토를 통해 결정됩니다.";
 
+export const PDF_MARKET_REVENUE_DISCLAIMER =
+  "본 예상수익은 표시된 기준일의 SMP 및 REC 가격과 예상 발전량을 적용한 추정값이며, 실제 수익은 시장가격, 발전량, 가중치 및 계약조건 등에 따라 달라질 수 있습니다.";
+
 export const PDF_SETBACK_FOOTER =
   "예상 거리는 공공데이터 기반의 1차 참고값입니다. 최종 이격거리 판단은 지자체 조례 및 현장 확인 후 결정됩니다.";
 

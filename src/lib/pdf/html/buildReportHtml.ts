@@ -16,6 +16,7 @@ import {
   PDF_CTA,
   PDF_CTA_BUTTON,
   PDF_LEGAL_DISCLAIMER,
+  PDF_MARKET_REVENUE_DISCLAIMER,
   PDF_PROCESS_STEPS,
   PDF_REPORT_SUBTITLE,
   PDF_REPORT_TITLE,
@@ -342,10 +343,14 @@ function renderPageOneKpiStack(data: ResolvedSiteReview): string {
   const grid = data.gridInfo;
   const gridLabel = cleanGridLabel(grid.statusLabel);
   const recWeight = formatRecWeightForPdf(data);
+  const marketDate = data.solarMetrics.market.smpDate || data.solarMetrics.market.recDate;
+  const smpRev = data.profitability?.smpRevenue ?? "—";
+  const recRev = data.profitability?.recRevenue ?? "—";
+  const installForm = formatInstallTypeForPdf(data.solarMetrics.installType);
 
   const kpis = [
     { label: "예상 설비용량", value: data.capacity, variant: "primary" },
-    { label: "예상 연매출", value: data.annualRevenue, variant: "revenue" },
+    { label: "시장가격 기준 예상수익", value: data.annualRevenue, variant: "revenue" },
     { label: "예상 시공비", value: data.constructionCost, variant: "cost" },
     { label: "REC 가중치", value: recWeight, variant: "rec" },
     { label: "계통 상태", value: gridLabel, variant: "grid", dot: GRID_DOT[grid.status] },
@@ -366,6 +371,15 @@ function renderPageOneKpiStack(data: ResolvedSiteReview): string {
         </div>`,
         )
         .join("")}
+      <div class="hero-kpi hero-kpi-rec" style="margin-top:8px">
+        <div class="hero-kpi-label">설치 형태 · 시장가격 기준일</div>
+        <div class="hero-kpi-value" style="font-size:11pt">${htmlText(installForm)} · ${htmlText(marketDate)}</div>
+      </div>
+      <div class="hero-kpi hero-kpi-revenue" style="margin-top:6px">
+        <div class="hero-kpi-label">SMP / REC 예상수익</div>
+        <div class="hero-kpi-value" style="font-size:11pt">${htmlText(smpRev)} / ${htmlText(recRev)}</div>
+      </div>
+      <p style="margin-top:8px;font-size:8pt;line-height:1.45;color:#64748b">${htmlText(PDF_MARKET_REVENUE_DISCLAIMER)}</p>
     </div>`;
 }
 
