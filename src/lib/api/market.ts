@@ -113,11 +113,7 @@ function parseMarketPayload(
     smpRegion = "mainland";
   } else if (unified !== null && unified > 0) {
     smp = unified;
-    smpRegion = mainland !== null || jeju !== null ? (preferJeju ? "jeju" : "mainland") : "unified";
-    if (preferJeju && jeju === null && mainland === null) smpRegion = "unified";
-    if (!preferJeju && mainland === null && jeju === null) smpRegion = "unified";
-    if (!preferJeju && mainland === null && unified !== null) smpRegion = "mainland";
-    if (preferJeju && jeju === null && unified !== null) smpRegion = "unified";
+    smpRegion = preferJeju ? "jeju" : "mainland";
   }
 
   const rec = parseNumber(json.rec?.price ?? json.recPrice);
@@ -154,7 +150,8 @@ function fallbackMarket(options?: { address?: string; jibunAddress?: string }): 
     recDate: today,
     source: "solarConfig.ts fallback",
     isFallback: true,
-    smpRegion: preferJeju ? "unified" : "mainland",
+    // Region reflects site geography even when only a unified fallback price exists.
+    smpRegion: preferJeju ? "jeju" : "mainland",
     smpChange: null,
     recChange: null,
     history: [],

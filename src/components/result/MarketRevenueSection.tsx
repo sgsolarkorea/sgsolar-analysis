@@ -13,7 +13,8 @@ import type { MarketPriceData } from "@/lib/api/market";
 type PriceMode = "today" | "avg30";
 
 function ChangeBadge({ value }: { value: number | null | undefined }) {
-  if (value == null || !Number.isFinite(value) || value === 0) {
+  if (value == null || !Number.isFinite(value)) return null;
+  if (value === 0) {
     return <span className="text-xs font-medium text-slate-500">보합</span>;
   }
   const up = value > 0;
