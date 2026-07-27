@@ -41,7 +41,8 @@ export const NET_METERING_ROADMAP: BusinessRoadmapDefinition = {
   label: "가정용 상계거래",
   sourcePage: 10,
   sourceTitle: "가정용 상계거래형 태양광 프로세스",
-  durationNote: "총 공정 약 2주 (회사소개서 기준, 한전 승압비용·VAT 별도)",
+  durationNote:
+    "일반적인 진행 예시: 총 공정 약 2주 (회사소개서 기준). 한전 승압비용·VAT 별도이며 외부 변수에 따라 달라질 수 있습니다.",
   phases: [
     {
       id: "nm-1",
@@ -102,7 +103,8 @@ export const RPS_ROADMAP: BusinessRoadmapDefinition = {
   label: "사업용 RPS",
   sourcePage: 20,
   sourceTitle: "사업용 RPS 태양광 프로세스",
-  durationNote: "총 공정 약 6개월 (회사소개서 기준, 한전계통연계비·VAT 별도)",
+  durationNote:
+    "일반적인 진행 예시: 총 공정 약 6개월 (회사소개서 기준). 한전계통연계비·VAT 별도이며 외부 변수에 따라 달라질 수 있습니다.",
   phases: [
     {
       id: "rps-1",
@@ -171,7 +173,8 @@ export const PPA_ROADMAP: BusinessRoadmapDefinition = {
   label: "자가 PPA",
   sourcePage: 15,
   sourceTitle: "자가 PPA 태양광 프로세스",
-  durationNote: "총 공정 약 3~4개월 (회사소개서 기준, 한전계통연계비·VAT 별도)",
+  durationNote:
+    "일반적인 진행 예시: 총 공정 약 3~4개월 (회사소개서 기준). 한전계통연계비·VAT 별도이며 외부 변수에 따라 달라질 수 있습니다.",
   phases: [
     {
       id: "ppa-1",

@@ -9,6 +9,7 @@ interface MapAreaProps {
   areaLabel?: string;
   landCategory?: string;
   zoning?: string;
+  buildingPresent?: boolean;
 }
 
 export default function MapArea({
@@ -20,17 +21,19 @@ export default function MapArea({
   areaLabel,
   landCategory,
   zoning,
+  buildingPresent,
 }: MapAreaProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="relative h-[480px] w-full sm:h-[520px] lg:h-[560px]">
+      <div className="relative h-[480px] w-full sm:h-[540px] lg:h-[600px]">
         <KakaoMapView address={address} jibunAddress={jibunAddress} lat={lat} lng={lng} />
-        <div className="pointer-events-none absolute left-3 top-3 z-10 max-w-[min(100%,300px)] rounded-xl border border-white/70 bg-white/95 px-3.5 py-3 shadow-md backdrop-blur-sm">
-          <p className="truncate text-sm font-semibold text-slate-900">{address}</p>
-          <dl className="mt-2 grid gap-1.5 text-[12px] text-slate-600">
+        <div className="pointer-events-none absolute left-3 top-3 z-10 max-w-[min(100%,320px)] rounded-xl border border-white/70 bg-white/95 px-4 py-3.5 shadow-md backdrop-blur-sm">
+          <p className="text-xs font-bold uppercase tracking-wide text-sky-700">분석 부지</p>
+          <p className="mt-1 truncate text-sm font-semibold text-slate-900">{address}</p>
+          <dl className="mt-2.5 grid gap-1.5 text-[12px] text-slate-600">
             {areaLabel ? (
               <div className="flex justify-between gap-4">
-                <dt>분석 면적</dt>
+                <dt>면적</dt>
                 <dd className="font-semibold text-slate-900">{areaLabel}</dd>
               </div>
             ) : null}
@@ -42,13 +45,17 @@ export default function MapArea({
             ) : null}
             {zoning ? (
               <div className="flex justify-between gap-4">
-                <dt>용도</dt>
+                <dt>용도지역</dt>
                 <dd className="font-semibold text-slate-900">{zoning}</dd>
               </div>
             ) : null}
+            <div className="flex justify-between gap-4">
+              <dt>건축물</dt>
+              <dd className="font-semibold text-slate-900">{buildingPresent ? "확인됨" : "확인 필요"}</dd>
+            </div>
             {installType ? (
               <div className="flex justify-between gap-4">
-                <dt>설치 형태</dt>
+                <dt>예상 설치 형태</dt>
                 <dd className="font-semibold text-slate-900">{installType}</dd>
               </div>
             ) : null}

@@ -137,7 +137,9 @@ export default function BusinessRoadmapSection() {
       </div>
 
       {roadmap.durationNote ? (
-        <p className="mt-4 text-sm text-slate-500">{roadmap.durationNote}</p>
+        <p className="mt-4 rounded-xl border border-slate-200/80 bg-white/70 px-4 py-3 text-sm text-slate-600">
+          {roadmap.durationNote}
+        </p>
       ) : null}
 
       {/* Desktop / tablet journey */}

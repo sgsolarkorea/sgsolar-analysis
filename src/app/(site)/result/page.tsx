@@ -29,12 +29,11 @@ import LandInfoCardSection from "@/components/result/LandInfoCardSection";
 import MapArea from "@/components/result/MapArea";
 import ResultHero from "@/components/result/ResultHero";
 import ResultStickyNav from "@/components/result/ResultStickyNav";
-import InstallationSizeSection from "@/components/result/InstallationSizeSection";
-import GridGatePanel from "@/components/result/GridGatePanel";
+import BusinessCoreSummary from "@/components/result/BusinessCoreSummary";
+import PermitGateSection from "@/components/result/PermitGateSection";
 import GenerationSection from "@/components/result/GenerationSection";
 import MarketRevenueSection from "@/components/result/MarketRevenueSection";
 import InstallationVisualSection from "@/components/result/InstallationVisualSection";
-import RequiredChecks from "@/components/result/RequiredChecks";
 import BusinessRoadmapSection from "@/components/result/BusinessRoadmapSection";
 import SgSolarSupportSection from "@/components/result/SgSolarSupportSection";
 import DetailAnalysisAccordion from "@/components/result/DetailAnalysisAccordion";
@@ -136,6 +135,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     data.solarMetrics.baseAreaSqm > 0
       ? `${Math.round(data.solarMetrics.baseAreaSqm).toLocaleString("ko-KR")}㎡`
       : undefined;
+  const hasBuilding =
+    data.buildingInfo.some((f) => f.value && f.value !== "-" && f.value !== "정보 없음") ||
+    Boolean(data.buildingName);
 
   return (
     <ResultMetricsProvider
@@ -164,9 +166,10 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
         <ResultStickyNav />
 
-        <div className="mx-auto max-w-[1320px] space-y-12 px-4 py-8 sm:space-y-14 sm:px-6 sm:py-10">
+        <div className="mx-auto max-w-[1360px] space-y-14 px-4 py-8 sm:space-y-16 sm:px-6 sm:py-10">
           {showMountainWarning && <MountainLandWarningBanner />}
 
+          {/* 01 입지 위치 */}
           <section id="site-location" className="scroll-mt-28">
             <SectionHeader
               title="입지 위치"
@@ -181,14 +184,18 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               areaLabel={analysisAreaLabel}
               landCategory={getFieldValue(data.landInfo, "지목") || undefined}
               zoning={getFieldValue(data.landInfo, "용도지역") || undefined}
+              buildingPresent={hasBuilding}
             />
           </section>
 
-          <div className="rounded-3xl bg-slate-50/80 px-4 py-8 sm:px-6">
-            <InstallationSizeSection />
-          </div>
+          {/* 02 설치규모·핵심 사업성 */}
+          <BusinessCoreSummary />
 
-          <GridGatePanel>
+          {/* 03 인허가·계통 핵심 Gate */}
+          <PermitGateSection items={reviewStatusItems} />
+
+          {/* 계통 상세 (Gate에서 연결) */}
+          <section id="grid" className="scroll-mt-28">
             <GridConnectionSection
               initialGridInfo={data.gridInfo}
               address={data.address}
@@ -197,20 +204,21 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               lng={data.lng}
               disclaimer={GRID_DISCLAIMER}
             />
-          </GridGatePanel>
+          </section>
 
+          {/* 04 발전량 */}
           <GenerationSection />
 
-          <div className="rounded-3xl bg-gradient-to-b from-slate-50 to-white px-4 py-8 sm:px-6">
-            <MarketRevenueSection />
-          </div>
+          {/* 05 시장가격·예상수익 */}
+          <MarketRevenueSection />
 
+          {/* 06 예상 설치 형태 */}
           <InstallationVisualSection />
 
-          <RequiredChecks items={reviewStatusItems} />
-
+          {/* 07 사업 진행 로드맵 */}
           <BusinessRoadmapSection />
 
+          {/* 08 상세 분석 */}
           <DetailAnalysisAccordion>
             <MultiParcelSection />
             <LandInfoCardSection detail={data.landInfoDetail} />
@@ -234,10 +242,13 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             <ResultCapacitySection recommendation={data.recommendation} />
           </DetailAnalysisAccordion>
 
+          {/* 09 SG SOLAR 지원업무 */}
           <SgSolarSupportSection />
 
+          {/* 10 설치형태 / 시공사례 */}
           <ResultSimilarCasesSection />
 
+          {/* 11 PDF·상담 */}
           <ResultPdfCtaPanel address={data.address} />
           <ResultSaveSection address={data.address} />
           <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />

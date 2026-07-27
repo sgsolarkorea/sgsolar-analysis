@@ -5,12 +5,12 @@ import { scrollToSection } from "@/components/layout/ScrollLink";
 
 const NAV = [
   { id: "site-location", label: "입지" },
-  { id: "installation-size", label: "설치규모" },
+  { id: "business-summary", label: "사업성" },
+  { id: "permit-gate", label: "인허가" },
   { id: "grid", label: "계통" },
   { id: "generation", label: "발전량" },
   { id: "market-revenue", label: "수익" },
   { id: "install-visual", label: "설치형태" },
-  { id: "required-checks", label: "확인사항" },
   { id: "business-roadmap", label: "로드맵" },
   { id: "cases", label: "사례" },
 ] as const;
@@ -39,7 +39,7 @@ export default function ResultStickyNav() {
       aria-label="결과 섹션"
       className="sticky top-[72px] z-30 border-b border-slate-200 bg-white/95 backdrop-blur"
     >
-      <div className="mx-auto flex max-w-[1320px] gap-1 overflow-x-auto px-4 py-2 sm:px-6">
+      <div className="mx-auto flex max-w-[1360px] gap-1 overflow-x-auto px-4 py-2 sm:px-6">
         {NAV.map((item) => {
           const active = activeId === item.id;
           return (
