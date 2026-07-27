@@ -18,20 +18,37 @@ const FINISH_ANIMATION_MS = 200;
 
 /** Condensed journey for briefing UI (maps from full step ids). */
 const BRIEF_STEPS = [
-  { id: "address", label: "주소 및 위치 확인", match: ["address", "location"] },
-  { id: "land", label: "토지 정보 확인", match: ["land"] },
+  { id: "address", label: "주소·위치 확인", match: ["address", "location"] },
+  { id: "land", label: "토지정보 확인", match: ["land"] },
   { id: "building", label: "건축물·설치조건 분석", match: ["building"] },
-  { id: "capacity", label: "설치용량 산정", match: ["capacity"] },
-  { id: "business", label: "사업성 분석", match: ["generation", "revenue"] },
+  { id: "capacity", label: "설치규모 산정", match: ["capacity"] },
+  { id: "generation", label: "발전량 산정", match: ["generation"] },
+  { id: "business", label: "사업성 분석", match: ["revenue"] },
   { id: "result", label: "결과 정리", match: ["result"] },
 ] as const;
 
-function statusMessage(elapsedSec: number): string {
-  if (elapsedSec >= 20) return "분석이 평소보다 조금 오래 걸리고 있습니다.";
-  if (elapsedSec >= 15) return "일부 외부 데이터 응답을 기다리고 있습니다. 먼저 확인된 결과부터 준비하고 있습니다.";
-  if (elapsedSec >= 12) return "예상 설치규모와 발전량을 산정하고 있습니다.";
-  if (elapsedSec >= 8) return "공공데이터와 설치조건을 함께 검토하고 있습니다.";
-  return "입력하신 주소의 토지·건축물 정보를 확인하고 있습니다.";
+function stageMessage(activeBriefId: string | undefined, elapsedSec: number): string {
+  if (elapsedSec >= 20) {
+    return "외부 공공데이터 응답을 기다리고 있습니다. 확인된 결과부터 우선 준비하고 있습니다.";
+  }
+  switch (activeBriefId) {
+    case "address":
+      return "입력하신 주소와 부지 위치를 확인하고 있습니다.";
+    case "land":
+      return "토지 경계와 면적, 용도 정보를 확인하고 있습니다.";
+    case "building":
+      return "건축물 정보와 설치 활용 가능 조건을 확인하고 있습니다.";
+    case "capacity":
+      return "활용 가능한 면적을 기준으로 예상 설치규모를 산정하고 있습니다.";
+    case "generation":
+      return "설치규모를 기준으로 예상 발전량을 계산하고 있습니다.";
+    case "business":
+      return "시장가격과 발전량을 기준으로 사업성을 분석하고 있습니다.";
+    case "result":
+      return "확인된 결과를 정리하고 있습니다.";
+    default:
+      return "입력하신 주소와 부지 위치를 확인하고 있습니다.";
+  }
 }
 
 function BriefMark({ status }: { status: "completed" | "active" | "pending" }) {
@@ -72,9 +89,8 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     const addressDone = steps.find((s) => s.id === "address")?.status === "completed";
     const locationDone = steps.find((s) => s.id === "location")?.status === "completed";
     const landDone = steps.find((s) => s.id === "land")?.status === "completed";
-    const buildingActiveOrDone = ["completed", "active", "delayed"].includes(
-      steps.find((s) => s.id === "building")?.status ?? "",
-    );
+    const buildingStatus = steps.find((s) => s.id === "building")?.status ?? "pending";
+    const capacityStatus = steps.find((s) => s.id === "capacity")?.status ?? "pending";
 
     if (addressDone || locationDone) {
       items.push({ label: "분석 위치", value: "확인 완료" });
@@ -82,11 +98,23 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
     if (landDone) {
       items.push({ label: "토지 정보", value: "조회 완료" });
     }
-    if (buildingActiveOrDone || landDone) {
-      items.push({ label: "건축물·설치조건", value: buildingActiveOrDone ? "확인 중" : "대기" });
+    if (buildingStatus === "completed") {
+      items.push({ label: "건축물", value: "확인 완료" });
+    } else if (buildingStatus === "active" || buildingStatus === "delayed") {
+      items.push({ label: "건축물", value: "확인 중" });
+    }
+    if (capacityStatus === "active" || capacityStatus === "delayed") {
+      items.push({ label: "예상 설치용량", value: "계산 중" });
+    } else if (capacityStatus === "completed") {
+      items.push({ label: "예상 설치용량", value: "산정 완료" });
     }
     return items;
   }, [steps]);
+
+  const activeBriefId = useMemo(() => {
+    const idx = briefStatuses.findIndex((s) => s === "active");
+    return idx >= 0 ? BRIEF_STEPS[idx].id : briefStatuses.every((s) => s === "completed") ? "result" : "address";
+  }, [briefStatuses]);
 
   useEffect(() => {
     let cancelled = false;
@@ -198,30 +226,41 @@ export default function AnalysisLoadingScreen({ address }: AnalysisLoadingScreen
             입지 정보를 분석하고 있습니다
           </h1>
           <p className="mt-3 text-[15px] font-medium text-slate-700 sm:text-base">{address}</p>
-          <p className="mt-3 text-sm text-slate-500">{statusMessage(elapsedSec)}</p>
+          <p className="mt-3 text-sm text-slate-500">{stageMessage(activeBriefId, elapsedSec)}</p>
         </div>
 
-        <div className="mt-8 grid gap-5 lg:grid-cols-[1.05fr_1fr]">
-          {/* Mini map / site preview — desktop only to keep mobile short */}
-          <div className="relative hidden min-h-[280px] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 via-navy to-slate-900 p-5 text-white shadow-sm sm:min-h-[300px] lg:block">
+        <div className="mt-8 grid gap-5 lg:grid-cols-[0.42fr_0.58fr]">
+          {/* Mini map / site preview — desktop: left 42% */}
+          <div className="relative hidden min-h-[300px] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 via-navy to-slate-900 p-5 text-white shadow-sm lg:block">
             <div className="pointer-events-none absolute inset-0 opacity-30" aria-hidden>
               <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/40" />
               <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/20" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(56,189,248,0.2),transparent_45%)]" />
             </div>
-            <p className="relative text-xs font-semibold uppercase tracking-wide text-sky-200">분석 부지</p>
+            <p className="relative text-xs font-semibold uppercase tracking-wide text-sky-200">분석 대상 위치</p>
             <p className="relative mt-3 max-w-[90%] text-lg font-bold leading-snug sm:text-xl">{address}</p>
             <div className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm backdrop-blur">
               <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-              위치 핀 · 분석 경계 준비 중
+              위치 핀 · 필지 경계 준비 중
             </div>
-            <p className="relative mt-auto pt-16 text-xs text-slate-300">
-              결과 화면에서 지도·필지·설치 규모를 확인합니다.
-            </p>
+            {revealed.length > 0 ? (
+              <ul className="relative mt-8 space-y-2 text-sm text-slate-200">
+                {revealed.slice(0, 3).map((item) => (
+                  <li key={item.label} className="flex justify-between gap-4 border-b border-white/10 pb-2">
+                    <span>{item.label}</span>
+                    <span className="font-semibold text-white">{item.value}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="relative mt-auto pt-16 text-xs text-slate-300">
+                결과 화면에서 지도·필지·설치 규모를 확인합니다.
+              </p>
+            )}
           </div>
 
-          {/* Progress steps */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 lg:col-span-1">
+          {/* Progress steps — desktop right 58% */}
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm font-bold text-navy">현재 진행 단계</p>
               <span className="text-sm font-semibold text-slate-500">{progress}%</span>

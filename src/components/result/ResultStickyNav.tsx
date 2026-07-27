@@ -5,14 +5,14 @@ import { scrollToSection } from "@/components/layout/ScrollLink";
 
 const NAV = [
   { id: "site-location", label: "입지" },
-  { id: "business-summary", label: "사업성" },
+  { id: "business-summary", label: "규모" },
   { id: "permit-gate", label: "인허가" },
-  { id: "grid", label: "계통" },
   { id: "generation", label: "발전량" },
   { id: "market-revenue", label: "수익" },
   { id: "install-visual", label: "설치형태" },
+  { id: "required-checks", label: "확인" },
   { id: "business-roadmap", label: "로드맵" },
-  { id: "cases", label: "사례" },
+  { id: "cases", label: "형태" },
 ] as const;
 
 export default function ResultStickyNav() {

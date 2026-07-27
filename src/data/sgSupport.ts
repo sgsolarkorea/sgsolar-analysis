@@ -1,50 +1,32 @@
 /**
- * SG SOLAR support scope from company profile p06 사업영역.
+ * SG SOLAR support — company profile business areas, grouped into 3 categories.
  */
 
-export interface SupportServiceItem {
+export interface SupportCategory {
   id: string;
   title: string;
   description: string;
   scopes: string[];
 }
 
-export const SG_SUPPORT_SERVICES: SupportServiceItem[] = [
+export const SG_SUPPORT_CATEGORIES: SupportCategory[] = [
   {
-    id: "epc",
-    title: "설계 · 시공",
-    description: "모듈배치·구조·전기 설계와 시공까지 일관 진행합니다.",
-    scopes: ["모듈·구조·전기 설계", "기자재·시공 관리"],
+    id: "design-permit",
+    title: "설계 · 인허가",
+    description: "배치·구조·전기 설계와 발전사업 행정절차 검토를 지원합니다.",
+    scopes: ["모듈·구조·전기 설계", "인허가 · 대관"],
   },
   {
-    id: "permit",
-    title: "인허가 · 대관",
-    description: "발전사업 진행에 필요한 행정절차 검토와 대관 업무를 지원합니다.",
-    scopes: ["발전사업 관련 인허가", "개발행위 및 신고 절차"],
+    id: "grid-construction",
+    title: "계통 · 시공",
+    description: "한전 연계 협의부터 구조물·모듈·전기 시공까지 연결합니다.",
+    scopes: ["한전 계통연계", "구조물·모듈·전기 시공"],
   },
   {
-    id: "grid",
-    title: "계통연계",
-    description: "한전 접수·수급지점 협의 등 계통 관련 절차를 함께합니다.",
-    scopes: ["한전 계통 접수", "접속·수급지점 협의"],
-  },
-  {
-    id: "smp-rec",
-    title: "SMP · REC 운영",
-    description: "설비확인 등록과 SMP·REC 발급·정산 업무를 지원합니다.",
-    scopes: ["설비확인 등록", "SMP·REC 발급·정산"],
-  },
-  {
-    id: "om",
-    title: "유지보수 · 리파워링",
-    description: "기존 발전소 성능점검·기자재 교체·용량 증설을 검토합니다.",
-    scopes: ["성능점검·유지보수", "기자재 교체·증설"],
-  },
-  {
-    id: "consult",
-    title: "발전사업 컨설팅",
-    description: "상계거래·자가 PPA·사업용 RPS 유형별 사업 방향을 안내합니다.",
-    scopes: ["사업유형 검토", "경제성·진행 절차 안내"],
+    id: "operation",
+    title: "운영 · 관리",
+    description: "설비확인·SMP·REC 운영과 유지관리·리파워링을 지원합니다.",
+    scopes: ["SMP · REC 운영", "유지보수 · 리파워링"],
   },
 ];
 
@@ -66,3 +48,13 @@ export const SG_TRUST_FACTS: { label: string; detail: string }[] = [
     detail: "본사(완주) 및 서울·경기·광주·대구·영남·충북 지사",
   },
 ];
+
+/** @deprecated Prefer SG_SUPPORT_CATEGORIES */
+export const SG_SUPPORT_SERVICES = SG_SUPPORT_CATEGORIES.flatMap((cat) =>
+  cat.scopes.map((scope, index) => ({
+    id: `${cat.id}-${index}`,
+    title: scope,
+    description: cat.description,
+    scopes: [scope],
+  })),
+);

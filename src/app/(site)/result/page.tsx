@@ -1,9 +1,7 @@
-import { Suspense } from "react";
 import {
   ResultCapacitySection,
   ResultConsultationSection,
   ResultSaveSection,
-  ResultSimilarCasesSection,
 } from "@/components/result/ResultMetricsSections";
 import ResultPdfCtaPanel from "@/components/result/ResultPdfCtaPanel";
 import MobileResultActions from "@/components/result/MobileResultActions";
@@ -34,8 +32,10 @@ import PermitGateSection from "@/components/result/PermitGateSection";
 import GenerationSection from "@/components/result/GenerationSection";
 import MarketRevenueSection from "@/components/result/MarketRevenueSection";
 import InstallationVisualSection from "@/components/result/InstallationVisualSection";
+import RequiredChecks from "@/components/result/RequiredChecks";
 import BusinessRoadmapSection from "@/components/result/BusinessRoadmapSection";
 import SgSolarSupportSection from "@/components/result/SgSolarSupportSection";
+import InstallLookbookSection from "@/components/result/InstallLookbookSection";
 import DetailAnalysisAccordion from "@/components/result/DetailAnalysisAccordion";
 import AddressSearchError from "@/components/result/AddressSearchError";
 import { ResultMetricsProvider } from "@/components/result/ResultMetricsProvider";
@@ -45,6 +45,7 @@ import {
   getKakaoErrorMessage,
 } from "@/lib/api/kakaoErrors";
 import { buildReviewStatusItems } from "@/lib/result/buildReviewSummary";
+import { Suspense } from "react";
 
 interface ResultPageProps {
   searchParams: Promise<{ address?: string }>;
@@ -166,8 +167,12 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
         <ResultStickyNav />
 
-        <div className="mx-auto max-w-[1360px] space-y-14 px-4 py-8 sm:space-y-16 sm:px-6 sm:py-10">
-          {showMountainWarning && <MountainLandWarningBanner />}
+        <div className="mx-auto max-w-[1360px] px-4 py-8 sm:px-6 sm:py-10">
+          {showMountainWarning && (
+            <div className="mb-14">
+              <MountainLandWarningBanner />
+            </div>
+          )}
 
           {/* 01 입지 위치 */}
           <section id="site-location" className="scroll-mt-28">
@@ -188,14 +193,18 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
             />
           </section>
 
-          {/* 02 설치규모·핵심 사업성 */}
-          <BusinessCoreSummary />
+          {/* 02 예상 설치 규모 */}
+          <div className="mt-20 sm:mt-24">
+            <BusinessCoreSummary />
+          </div>
 
-          {/* 03 인허가·계통 핵심 Gate */}
-          <PermitGateSection items={reviewStatusItems} />
+          {/* 03 계통 · 인허가 핵심 검토 */}
+          <div className="mt-20 sm:mt-24">
+            <PermitGateSection items={reviewStatusItems} />
+          </div>
 
-          {/* 계통 상세 (Gate에서 연결) */}
-          <section id="grid" className="scroll-mt-28">
+          {/* 계통 상세 */}
+          <section id="grid" className="mt-14 scroll-mt-28 sm:mt-16">
             <GridConnectionSection
               initialGridInfo={data.gridInfo}
               address={data.address}
@@ -207,51 +216,72 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           </section>
 
           {/* 04 발전량 */}
-          <GenerationSection />
+          <div className="mt-20 sm:mt-24">
+            <GenerationSection />
+          </div>
 
-          {/* 05 시장가격·예상수익 */}
-          <MarketRevenueSection />
+          {/* 05 시장가격 · 예상 발전수익 */}
+          <div className="mt-20 sm:mt-24">
+            <MarketRevenueSection />
+          </div>
 
           {/* 06 예상 설치 형태 */}
-          <InstallationVisualSection />
+          <div className="mt-20 sm:mt-24">
+            <InstallationVisualSection />
+          </div>
 
-          {/* 07 사업 진행 로드맵 */}
-          <BusinessRoadmapSection />
+          {/* 07 사업 진행 전 확인사항 */}
+          <div className="mt-16 sm:mt-20">
+            <RequiredChecks items={reviewStatusItems} />
+          </div>
 
-          {/* 08 상세 분석 */}
-          <DetailAnalysisAccordion>
-            <MultiParcelSection />
-            <LandInfoCardSection detail={data.landInfoDetail} />
-            <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
-            <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
+          {/* 08 사업 진행 로드맵 */}
+          <div className="mt-20 sm:mt-24">
+            <BusinessRoadmapSection />
+          </div>
 
-            <DetailInfoSection
-              id="building-info"
-              title="건축물 정보"
-              fields={data.buildingInfo}
-            />
+          {/* 09 상세 분석 */}
+          <div className="mt-16 sm:mt-20">
+            <DetailAnalysisAccordion>
+              <MultiParcelSection />
+              <LandInfoCardSection detail={data.landInfoDetail} />
+              <RegionDistrictSection analysis={data.regionDistrictAnalysis} />
+              <RegulatoryAnalysisSection analysis={data.layerARegulatoryAnalysis} />
 
-            <Suspense fallback={<OrdinanceSkeleton />}>
-              <DeferredOrdinanceSection
-                address={data.address}
-                jibunAddress={data.jibunAddress}
-                setbackReview={data.setbackReview}
+              <DetailInfoSection
+                id="building-info"
+                title="건축물 정보"
+                fields={data.buildingInfo}
               />
-            </Suspense>
 
-            <ResultCapacitySection recommendation={data.recommendation} />
-          </DetailAnalysisAccordion>
+              <Suspense fallback={<OrdinanceSkeleton />}>
+                <DeferredOrdinanceSection
+                  address={data.address}
+                  jibunAddress={data.jibunAddress}
+                  setbackReview={data.setbackReview}
+                />
+              </Suspense>
 
-          {/* 09 SG SOLAR 지원업무 */}
-          <SgSolarSupportSection />
+              <ResultCapacitySection recommendation={data.recommendation} />
+            </DetailAnalysisAccordion>
+          </div>
 
-          {/* 10 설치형태 / 시공사례 */}
-          <ResultSimilarCasesSection />
+          {/* 10 SG SOLAR 지원업무 */}
+          <div className="mt-20 sm:mt-24">
+            <SgSolarSupportSection />
+          </div>
 
-          {/* 11 PDF·상담 */}
-          <ResultPdfCtaPanel address={data.address} />
-          <ResultSaveSection address={data.address} />
-          <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
+          {/* 11 설치형태 Lookbook */}
+          <div className="mt-20 sm:mt-24">
+            <InstallLookbookSection />
+          </div>
+
+          {/* 12 PDF · 상담 CTA */}
+          <div className="mt-20 space-y-10 sm:mt-24">
+            <ResultPdfCtaPanel address={data.address} />
+            <ResultSaveSection address={data.address} />
+            <ResultConsultationSection defaultAddress={data.consultationDefaultAddress} />
+          </div>
         </div>
 
         <MobileResultActions address={data.address} />

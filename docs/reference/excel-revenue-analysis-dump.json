@@ -1,0 +1,2477 @@
+{
+  "sheets": [
+    {
+      "name": "입력값",
+      "max_row": 50,
+      "max_col": 4,
+      "cells": [
+        {
+          "addr": "A1",
+          "formula_or_raw": "☀️ 태양광 발전 수익분석",
+          "cached": "☀️ 태양광 발전 수익분석"
+        },
+        {
+          "addr": "A2",
+          "formula_or_raw": "※ 노란색 셀만 수정하세요. 나머지는 자동 계산됩니다.",
+          "cached": "※ 노란색 셀만 수정하세요. 나머지는 자동 계산됩니다."
+        },
+        {
+          "addr": "A4",
+          "formula_or_raw": "[설비 및 투자 정보]",
+          "cached": "[설비 및 투자 정보]"
+        },
+        {
+          "addr": "A5",
+          "formula_or_raw": "설비용량",
+          "cached": "설비용량"
+        },
+        {
+          "addr": "B5",
+          "formula_or_raw": 100,
+          "cached": 100
+        },
+        {
+          "addr": "C5",
+          "formula_or_raw": "kW",
+          "cached": "kW"
+        },
+        {
+          "addr": "A6",
+          "formula_or_raw": "총 설치비",
+          "cached": "총 설치비"
+        },
+        {
+          "addr": "B6",
+          "formula_or_raw": 230000000,
+          "cached": 230000000
+        },
+        {
+          "addr": "C6",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "A7",
+          "formula_or_raw": "kW당 설치비",
+          "cached": "kW당 설치비"
+        },
+        {
+          "addr": "B7",
+          "formula_or_raw": "=B6/B5",
+          "cached": 2300000
+        },
+        {
+          "addr": "C7",
+          "formula_or_raw": "원/kW",
+          "cached": "원/kW"
+        },
+        {
+          "addr": "A8",
+          "formula_or_raw": "자기자본",
+          "cached": "자기자본"
+        },
+        {
+          "addr": "B8",
+          "formula_or_raw": 90000000,
+          "cached": 90000000
+        },
+        {
+          "addr": "C8",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "A9",
+          "formula_or_raw": "대출금",
+          "cached": "대출금"
+        },
+        {
+          "addr": "B9",
+          "formula_or_raw": "=B6-B8",
+          "cached": 140000000
+        },
+        {
+          "addr": "C9",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "A10",
+          "formula_or_raw": "대출금리",
+          "cached": "대출금리"
+        },
+        {
+          "addr": "B10",
+          "formula_or_raw": 0.047,
+          "cached": 0.047
+        },
+        {
+          "addr": "C10",
+          "formula_or_raw": "(연이율)",
+          "cached": "(연이율)"
+        },
+        {
+          "addr": "A11",
+          "formula_or_raw": "대출기간",
+          "cached": "대출기간"
+        },
+        {
+          "addr": "B11",
+          "formula_or_raw": 20,
+          "cached": 20
+        },
+        {
+          "addr": "C11",
+          "formula_or_raw": "년",
+          "cached": "년"
+        },
+        {
+          "addr": "A12",
+          "formula_or_raw": "거치기간",
+          "cached": "거치기간"
+        },
+        {
+          "addr": "B12",
+          "formula_or_raw": 3,
+          "cached": 3
+        },
+        {
+          "addr": "C12",
+          "formula_or_raw": "년",
+          "cached": "년"
+        },
+        {
+          "addr": "A13",
+          "formula_or_raw": "분석기간",
+          "cached": "분석기간"
+        },
+        {
+          "addr": "B13",
+          "formula_or_raw": 20,
+          "cached": 20
+        },
+        {
+          "addr": "C13",
+          "formula_or_raw": "년",
+          "cached": "년"
+        },
+        {
+          "addr": "A14",
+          "formula_or_raw": "할인율(NPV용)",
+          "cached": "할인율(NPV용)"
+        },
+        {
+          "addr": "B14",
+          "formula_or_raw": 0.05,
+          "cached": 0.05
+        },
+        {
+          "addr": "C14",
+          "formula_or_raw": "(연이율)",
+          "cached": "(연이율)"
+        },
+        {
+          "addr": "A16",
+          "formula_or_raw": "[발전 및 판매 정보]",
+          "cached": "[발전 및 판매 정보]"
+        },
+        {
+          "addr": "A17",
+          "formula_or_raw": "평균 이용률",
+          "cached": "평균 이용률"
+        },
+        {
+          "addr": "B17",
+          "formula_or_raw": 0.15,
+          "cached": 0.15
+        },
+        {
+          "addr": "C17",
+          "formula_or_raw": "(15%=하루평균3.6시간)",
+          "cached": "(15%=하루평균3.6시간)"
+        },
+        {
+          "addr": "A18",
+          "formula_or_raw": "연간 예상 발전량",
+          "cached": "연간 예상 발전량"
+        },
+        {
+          "addr": "B18",
+          "formula_or_raw": "=B5*B17*24*365",
+          "cached": 131400
+        },
+        {
+          "addr": "C18",
+          "formula_or_raw": "kWh/년",
+          "cached": "kWh/년"
+        },
+        {
+          "addr": "A19",
+          "formula_or_raw": "전력판매단가(SMP)",
+          "cached": "전력판매단가(SMP)"
+        },
+        {
+          "addr": "B19",
+          "formula_or_raw": 123,
+          "cached": 123
+        },
+        {
+          "addr": "C19",
+          "formula_or_raw": "원/kWh",
+          "cached": "원/kWh"
+        },
+        {
+          "addr": "A20",
+          "formula_or_raw": "REC 단가",
+          "cached": "REC 단가"
+        },
+        {
+          "addr": "B20",
+          "formula_or_raw": 70,
+          "cached": 70
+        },
+        {
+          "addr": "C20",
+          "formula_or_raw": "원/kWh",
+          "cached": "원/kWh"
+        },
+        {
+          "addr": "A21",
+          "formula_or_raw": "평균 판매단가",
+          "cached": "평균 판매단가"
+        },
+        {
+          "addr": "B21",
+          "formula_or_raw": "=B19+B20",
+          "cached": 193
+        },
+        {
+          "addr": "C21",
+          "formula_or_raw": "원/kWh",
+          "cached": "원/kWh"
+        },
+        {
+          "addr": "A22",
+          "formula_or_raw": "성능저하율",
+          "cached": "성능저하율"
+        },
+        {
+          "addr": "B22",
+          "formula_or_raw": 0.005,
+          "cached": 0.005
+        },
+        {
+          "addr": "C22",
+          "formula_or_raw": "(연간)",
+          "cached": "(연간)"
+        },
+        {
+          "addr": "A23",
+          "formula_or_raw": "인버터 교체연도",
+          "cached": "인버터 교체연도"
+        },
+        {
+          "addr": "B23",
+          "formula_or_raw": 10,
+          "cached": 10
+        },
+        {
+          "addr": "C23",
+          "formula_or_raw": "년차",
+          "cached": "년차"
+        },
+        {
+          "addr": "A25",
+          "formula_or_raw": "[비용 정보]",
+          "cached": "[비용 정보]"
+        },
+        {
+          "addr": "A26",
+          "formula_or_raw": "연 유지보수비",
+          "cached": "연 유지보수비"
+        },
+        {
+          "addr": "B26",
+          "formula_or_raw": 1500000,
+          "cached": 1500000
+        },
+        {
+          "addr": "C26",
+          "formula_or_raw": "원/년",
+          "cached": "원/년"
+        },
+        {
+          "addr": "A27",
+          "formula_or_raw": "연 보험/기타비",
+          "cached": "연 보험/기타비"
+        },
+        {
+          "addr": "B27",
+          "formula_or_raw": 500000,
+          "cached": 500000
+        },
+        {
+          "addr": "C27",
+          "formula_or_raw": "원/년",
+          "cached": "원/년"
+        },
+        {
+          "addr": "A28",
+          "formula_or_raw": "인버터 교체비용",
+          "cached": "인버터 교체비용"
+        },
+        {
+          "addr": "B28",
+          "formula_or_raw": 7000000,
+          "cached": 7000000
+        },
+        {
+          "addr": "C28",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "A29",
+          "formula_or_raw": "총 연간 운영비",
+          "cached": "총 연간 운영비"
+        },
+        {
+          "addr": "B29",
+          "formula_or_raw": "=B26+B27",
+          "cached": 2000000
+        },
+        {
+          "addr": "C29",
+          "formula_or_raw": "원/년",
+          "cached": "원/년"
+        },
+        {
+          "addr": "A32",
+          "formula_or_raw": "[월별 발전 계수]",
+          "cached": "[월별 발전 계수]"
+        },
+        {
+          "addr": "A33",
+          "formula_or_raw": "월",
+          "cached": "월"
+        },
+        {
+          "addr": "B33",
+          "formula_or_raw": "계수",
+          "cached": "계수"
+        },
+        {
+          "addr": "C33",
+          "formula_or_raw": "설명",
+          "cached": "설명"
+        },
+        {
+          "addr": "A34",
+          "formula_or_raw": 1,
+          "cached": 1
+        },
+        {
+          "addr": "B34",
+          "formula_or_raw": 0.07,
+          "cached": 0.07
+        },
+        {
+          "addr": "C34",
+          "formula_or_raw": "겨울(일조량 적음)",
+          "cached": "겨울(일조량 적음)"
+        },
+        {
+          "addr": "A35",
+          "formula_or_raw": 2,
+          "cached": 2
+        },
+        {
+          "addr": "B35",
+          "formula_or_raw": 0.075,
+          "cached": 0.075
+        },
+        {
+          "addr": "A36",
+          "formula_or_raw": 3,
+          "cached": 3
+        },
+        {
+          "addr": "B36",
+          "formula_or_raw": 0.085,
+          "cached": 0.085
+        },
+        {
+          "addr": "C36",
+          "formula_or_raw": "봄",
+          "cached": "봄"
+        },
+        {
+          "addr": "A37",
+          "formula_or_raw": 4,
+          "cached": 4
+        },
+        {
+          "addr": "B37",
+          "formula_or_raw": 0.095,
+          "cached": 0.095
+        },
+        {
+          "addr": "A38",
+          "formula_or_raw": 5,
+          "cached": 5
+        },
+        {
+          "addr": "B38",
+          "formula_or_raw": 0.1,
+          "cached": 0.1
+        },
+        {
+          "addr": "C38",
+          "formula_or_raw": "초여름",
+          "cached": "초여름"
+        },
+        {
+          "addr": "A39",
+          "formula_or_raw": 6,
+          "cached": 6
+        },
+        {
+          "addr": "B39",
+          "formula_or_raw": 0.09,
+          "cached": 0.09
+        },
+        {
+          "addr": "C39",
+          "formula_or_raw": "장마전",
+          "cached": "장마전"
+        },
+        {
+          "addr": "A40",
+          "formula_or_raw": 7,
+          "cached": 7
+        },
+        {
+          "addr": "B40",
+          "formula_or_raw": 0.075,
+          "cached": 0.075
+        },
+        {
+          "addr": "C40",
+          "formula_or_raw": "장마",
+          "cached": "장마"
+        },
+        {
+          "addr": "A41",
+          "formula_or_raw": 8,
+          "cached": 8
+        },
+        {
+          "addr": "B41",
+          "formula_or_raw": 0.085,
+          "cached": 0.085
+        },
+        {
+          "addr": "A42",
+          "formula_or_raw": 9,
+          "cached": 9
+        },
+        {
+          "addr": "B42",
+          "formula_or_raw": 0.09,
+          "cached": 0.09
+        },
+        {
+          "addr": "C42",
+          "formula_or_raw": "가을",
+          "cached": "가을"
+        },
+        {
+          "addr": "A43",
+          "formula_or_raw": 10,
+          "cached": 10
+        },
+        {
+          "addr": "B43",
+          "formula_or_raw": 0.085,
+          "cached": 0.085
+        },
+        {
+          "addr": "A44",
+          "formula_or_raw": 11,
+          "cached": 11
+        },
+        {
+          "addr": "B44",
+          "formula_or_raw": 0.075,
+          "cached": 0.075
+        },
+        {
+          "addr": "C44",
+          "formula_or_raw": "늦가을",
+          "cached": "늦가을"
+        },
+        {
+          "addr": "A45",
+          "formula_or_raw": 12,
+          "cached": 12
+        },
+        {
+          "addr": "B45",
+          "formula_or_raw": 0.07,
+          "cached": 0.07
+        },
+        {
+          "addr": "C45",
+          "formula_or_raw": "겨울",
+          "cached": "겨울"
+        },
+        {
+          "addr": "A47",
+          "formula_or_raw": "월별 계수 합계",
+          "cached": "월별 계수 합계"
+        },
+        {
+          "addr": "B47",
+          "formula_or_raw": "=SUM(B34:B45)",
+          "cached": 0.9949999999999999
+        },
+        {
+          "addr": "A49",
+          "formula_or_raw": "[비고]",
+          "cached": "[비고]"
+        },
+        {
+          "addr": "A50",
+          "formula_or_raw": "메모",
+          "cached": "메모"
+        }
+      ]
+    },
+    {
+      "name": "월별분석",
+      "max_row": 18,
+      "max_col": 6,
+      "cells": [
+        {
+          "addr": "A1",
+          "formula_or_raw": "📊 월별 발전량 및 수익 분석 (1년차 기준)",
+          "cached": "📊 월별 발전량 및 수익 분석 (1년차 기준)"
+        },
+        {
+          "addr": "A3",
+          "formula_or_raw": "월",
+          "cached": "월"
+        },
+        {
+          "addr": "B3",
+          "formula_or_raw": "발전계수",
+          "cached": "발전계수"
+        },
+        {
+          "addr": "C3",
+          "formula_or_raw": "발전량(kWh)",
+          "cached": "발전량(kWh)"
+        },
+        {
+          "addr": "D3",
+          "formula_or_raw": "매출(원)",
+          "cached": "매출(원)"
+        },
+        {
+          "addr": "E3",
+          "formula_or_raw": "운영비(원)",
+          "cached": "운영비(원)"
+        },
+        {
+          "addr": "F3",
+          "formula_or_raw": "순이익(원)",
+          "cached": "순이익(원)"
+        },
+        {
+          "addr": "A4",
+          "formula_or_raw": 1,
+          "cached": 1
+        },
+        {
+          "addr": "B4",
+          "formula_or_raw": "=입력값!B34",
+          "cached": 0.07
+        },
+        {
+          "addr": "C4",
+          "formula_or_raw": "=입력값!$B$18*B4",
+          "cached": 9198
+        },
+        {
+          "addr": "D4",
+          "formula_or_raw": "=C4*입력값!$B$21",
+          "cached": 1775214
+        },
+        {
+          "addr": "E4",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F4",
+          "formula_or_raw": "=D4-E4",
+          "cached": 1608547.3333333333
+        },
+        {
+          "addr": "A5",
+          "formula_or_raw": 2,
+          "cached": 2
+        },
+        {
+          "addr": "B5",
+          "formula_or_raw": "=입력값!B35",
+          "cached": 0.075
+        },
+        {
+          "addr": "C5",
+          "formula_or_raw": "=입력값!$B$18*B5",
+          "cached": 9855
+        },
+        {
+          "addr": "D5",
+          "formula_or_raw": "=C5*입력값!$B$21",
+          "cached": 1902015
+        },
+        {
+          "addr": "E5",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F5",
+          "formula_or_raw": "=D5-E5",
+          "cached": 1735348.3333333333
+        },
+        {
+          "addr": "A6",
+          "formula_or_raw": 3,
+          "cached": 3
+        },
+        {
+          "addr": "B6",
+          "formula_or_raw": "=입력값!B36",
+          "cached": 0.085
+        },
+        {
+          "addr": "C6",
+          "formula_or_raw": "=입력값!$B$18*B6",
+          "cached": 11169
+        },
+        {
+          "addr": "D6",
+          "formula_or_raw": "=C6*입력값!$B$21",
+          "cached": 2155617
+        },
+        {
+          "addr": "E6",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F6",
+          "formula_or_raw": "=D6-E6",
+          "cached": 1988950.3333333333
+        },
+        {
+          "addr": "A7",
+          "formula_or_raw": 4,
+          "cached": 4
+        },
+        {
+          "addr": "B7",
+          "formula_or_raw": "=입력값!B37",
+          "cached": 0.095
+        },
+        {
+          "addr": "C7",
+          "formula_or_raw": "=입력값!$B$18*B7",
+          "cached": 12483
+        },
+        {
+          "addr": "D7",
+          "formula_or_raw": "=C7*입력값!$B$21",
+          "cached": 2409219
+        },
+        {
+          "addr": "E7",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F7",
+          "formula_or_raw": "=D7-E7",
+          "cached": 2242552.3333333335
+        },
+        {
+          "addr": "A8",
+          "formula_or_raw": 5,
+          "cached": 5
+        },
+        {
+          "addr": "B8",
+          "formula_or_raw": "=입력값!B38",
+          "cached": 0.1
+        },
+        {
+          "addr": "C8",
+          "formula_or_raw": "=입력값!$B$18*B8",
+          "cached": 13140
+        },
+        {
+          "addr": "D8",
+          "formula_or_raw": "=C8*입력값!$B$21",
+          "cached": 2536020
+        },
+        {
+          "addr": "E8",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F8",
+          "formula_or_raw": "=D8-E8",
+          "cached": 2369353.3333333335
+        },
+        {
+          "addr": "A9",
+          "formula_or_raw": 6,
+          "cached": 6
+        },
+        {
+          "addr": "B9",
+          "formula_or_raw": "=입력값!B39",
+          "cached": 0.09
+        },
+        {
+          "addr": "C9",
+          "formula_or_raw": "=입력값!$B$18*B9",
+          "cached": 11826
+        },
+        {
+          "addr": "D9",
+          "formula_or_raw": "=C9*입력값!$B$21",
+          "cached": 2282418
+        },
+        {
+          "addr": "E9",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F9",
+          "formula_or_raw": "=D9-E9",
+          "cached": 2115751.3333333335
+        },
+        {
+          "addr": "A10",
+          "formula_or_raw": 7,
+          "cached": 7
+        },
+        {
+          "addr": "B10",
+          "formula_or_raw": "=입력값!B40",
+          "cached": 0.075
+        },
+        {
+          "addr": "C10",
+          "formula_or_raw": "=입력값!$B$18*B10",
+          "cached": 9855
+        },
+        {
+          "addr": "D10",
+          "formula_or_raw": "=C10*입력값!$B$21",
+          "cached": 1902015
+        },
+        {
+          "addr": "E10",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F10",
+          "formula_or_raw": "=D10-E10",
+          "cached": 1735348.3333333333
+        },
+        {
+          "addr": "A11",
+          "formula_or_raw": 8,
+          "cached": 8
+        },
+        {
+          "addr": "B11",
+          "formula_or_raw": "=입력값!B41",
+          "cached": 0.085
+        },
+        {
+          "addr": "C11",
+          "formula_or_raw": "=입력값!$B$18*B11",
+          "cached": 11169
+        },
+        {
+          "addr": "D11",
+          "formula_or_raw": "=C11*입력값!$B$21",
+          "cached": 2155617
+        },
+        {
+          "addr": "E11",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F11",
+          "formula_or_raw": "=D11-E11",
+          "cached": 1988950.3333333333
+        },
+        {
+          "addr": "A12",
+          "formula_or_raw": 9,
+          "cached": 9
+        },
+        {
+          "addr": "B12",
+          "formula_or_raw": "=입력값!B42",
+          "cached": 0.09
+        },
+        {
+          "addr": "C12",
+          "formula_or_raw": "=입력값!$B$18*B12",
+          "cached": 11826
+        },
+        {
+          "addr": "D12",
+          "formula_or_raw": "=C12*입력값!$B$21",
+          "cached": 2282418
+        },
+        {
+          "addr": "E12",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F12",
+          "formula_or_raw": "=D12-E12",
+          "cached": 2115751.3333333335
+        },
+        {
+          "addr": "A13",
+          "formula_or_raw": 10,
+          "cached": 10
+        },
+        {
+          "addr": "B13",
+          "formula_or_raw": "=입력값!B43",
+          "cached": 0.085
+        },
+        {
+          "addr": "C13",
+          "formula_or_raw": "=입력값!$B$18*B13",
+          "cached": 11169
+        },
+        {
+          "addr": "D13",
+          "formula_or_raw": "=C13*입력값!$B$21",
+          "cached": 2155617
+        },
+        {
+          "addr": "E13",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F13",
+          "formula_or_raw": "=D13-E13",
+          "cached": 1988950.3333333333
+        },
+        {
+          "addr": "A14",
+          "formula_or_raw": 11,
+          "cached": 11
+        },
+        {
+          "addr": "B14",
+          "formula_or_raw": "=입력값!B44",
+          "cached": 0.075
+        },
+        {
+          "addr": "C14",
+          "formula_or_raw": "=입력값!$B$18*B14",
+          "cached": 9855
+        },
+        {
+          "addr": "D14",
+          "formula_or_raw": "=C14*입력값!$B$21",
+          "cached": 1902015
+        },
+        {
+          "addr": "E14",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F14",
+          "formula_or_raw": "=D14-E14",
+          "cached": 1735348.3333333333
+        },
+        {
+          "addr": "A15",
+          "formula_or_raw": 12,
+          "cached": 12
+        },
+        {
+          "addr": "B15",
+          "formula_or_raw": "=입력값!B45",
+          "cached": 0.07
+        },
+        {
+          "addr": "C15",
+          "formula_or_raw": "=입력값!$B$18*B15",
+          "cached": 9198
+        },
+        {
+          "addr": "D15",
+          "formula_or_raw": "=C15*입력값!$B$21",
+          "cached": 1775214
+        },
+        {
+          "addr": "E15",
+          "formula_or_raw": "=입력값!$B$29/12",
+          "cached": 166666.66666666666
+        },
+        {
+          "addr": "F15",
+          "formula_or_raw": "=D15-E15",
+          "cached": 1608547.3333333333
+        },
+        {
+          "addr": "A16",
+          "formula_or_raw": "합계",
+          "cached": "합계"
+        },
+        {
+          "addr": "B16",
+          "formula_or_raw": "=SUM(B4:B15)",
+          "cached": 0.9949999999999999
+        },
+        {
+          "addr": "C16",
+          "formula_or_raw": "=SUM(C4:C15)",
+          "cached": 130743
+        },
+        {
+          "addr": "D16",
+          "formula_or_raw": "=SUM(D4:D15)",
+          "cached": 25233399
+        },
+        {
+          "addr": "E16",
+          "formula_or_raw": "=SUM(E4:E15)",
+          "cached": 2000000.0000000002
+        },
+        {
+          "addr": "F16",
+          "formula_or_raw": "=SUM(F4:F15)",
+          "cached": 23233399
+        },
+        {
+          "addr": "A18",
+          "formula_or_raw": "※ 입력값 시트의 발전계수와 단가를 수정하면 자동으로 재계산됩니다.",
+          "cached": "※ 입력값 시트의 발전계수와 단가를 수정하면 자동으로 재계산됩니다."
+        }
+      ]
+    },
+    {
+      "name": "연간분석",
+      "max_row": 26,
+      "max_col": 9,
+      "cells": [
+        {
+          "addr": "A1",
+          "formula_or_raw": "📈 연간 현금흐름 분석",
+          "cached": "📈 연간 현금흐름 분석"
+        },
+        {
+          "addr": "A3",
+          "formula_or_raw": "연차",
+          "cached": "연차"
+        },
+        {
+          "addr": "B3",
+          "formula_or_raw": "발전량(kWh)",
+          "cached": "발전량(kWh)"
+        },
+        {
+          "addr": "C3",
+          "formula_or_raw": "매출(원)",
+          "cached": "매출(원)"
+        },
+        {
+          "addr": "D3",
+          "formula_or_raw": "운영비(원)",
+          "cached": "운영비(원)"
+        },
+        {
+          "addr": "E3",
+          "formula_or_raw": "교체비(원)",
+          "cached": "교체비(원)"
+        },
+        {
+          "addr": "F3",
+          "formula_or_raw": "대출상환(원)",
+          "cached": "대출상환(원)"
+        },
+        {
+          "addr": "G3",
+          "formula_or_raw": "순현금흐름(원)",
+          "cached": "순현금흐름(원)"
+        },
+        {
+          "addr": "H3",
+          "formula_or_raw": "누적현금흐름(원)",
+          "cached": "누적현금흐름(원)"
+        },
+        {
+          "addr": "I3",
+          "formula_or_raw": "회수여부",
+          "cached": "회수여부"
+        },
+        {
+          "addr": "A4",
+          "formula_or_raw": 0,
+          "cached": 0
+        },
+        {
+          "addr": "G4",
+          "formula_or_raw": "=-입력값!B8",
+          "cached": -90000000
+        },
+        {
+          "addr": "H4",
+          "formula_or_raw": "=G4",
+          "cached": -90000000
+        },
+        {
+          "addr": "A5",
+          "formula_or_raw": 1,
+          "cached": 1
+        },
+        {
+          "addr": "B5",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A5-1)",
+          "cached": 131400
+        },
+        {
+          "addr": "C5",
+          "formula_or_raw": "=B5*입력값!B21",
+          "cached": 25360200
+        },
+        {
+          "addr": "D5",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E5",
+          "formula_or_raw": "=IF(A5=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F5",
+          "formula_or_raw": "=IF(A5<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A5<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 6580000
+        },
+        {
+          "addr": "G5",
+          "formula_or_raw": "=C5-D5-E5-F5",
+          "cached": 16780200
+        },
+        {
+          "addr": "H5",
+          "formula_or_raw": "=H4+G5",
+          "cached": -73219800
+        },
+        {
+          "addr": "I5",
+          "formula_or_raw": "=IF(H5>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A6",
+          "formula_or_raw": 2,
+          "cached": 2
+        },
+        {
+          "addr": "B6",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A6-1)",
+          "cached": 130743
+        },
+        {
+          "addr": "C6",
+          "formula_or_raw": "=B6*입력값!B21",
+          "cached": 25233399
+        },
+        {
+          "addr": "D6",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E6",
+          "formula_or_raw": "=IF(A6=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F6",
+          "formula_or_raw": "=IF(A6<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A6<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 6580000
+        },
+        {
+          "addr": "G6",
+          "formula_or_raw": "=C6-D6-E6-F6",
+          "cached": 16653399
+        },
+        {
+          "addr": "H6",
+          "formula_or_raw": "=H5+G6",
+          "cached": -56566401
+        },
+        {
+          "addr": "I6",
+          "formula_or_raw": "=IF(H6>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A7",
+          "formula_or_raw": 3,
+          "cached": 3
+        },
+        {
+          "addr": "B7",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A7-1)",
+          "cached": 130089.285
+        },
+        {
+          "addr": "C7",
+          "formula_or_raw": "=B7*입력값!B21",
+          "cached": 25107232.005
+        },
+        {
+          "addr": "D7",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E7",
+          "formula_or_raw": "=IF(A7=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F7",
+          "formula_or_raw": "=IF(A7<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A7<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 6580000
+        },
+        {
+          "addr": "G7",
+          "formula_or_raw": "=C7-D7-E7-F7",
+          "cached": 16527232.004999999
+        },
+        {
+          "addr": "H7",
+          "formula_or_raw": "=H6+G7",
+          "cached": -40039168.995000005
+        },
+        {
+          "addr": "I7",
+          "formula_or_raw": "=IF(H7>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A8",
+          "formula_or_raw": 4,
+          "cached": 4
+        },
+        {
+          "addr": "B8",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A8-1)",
+          "cached": 129438.838575
+        },
+        {
+          "addr": "C8",
+          "formula_or_raw": "=B8*입력값!B21",
+          "cached": 24981695.844975002
+        },
+        {
+          "addr": "D8",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E8",
+          "formula_or_raw": "=IF(A8=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F8",
+          "formula_or_raw": "=IF(A8<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A8<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G8",
+          "formula_or_raw": "=C8-D8-E8-F8",
+          "cached": 10840507.408283409
+        },
+        {
+          "addr": "H8",
+          "formula_or_raw": "=H7+G8",
+          "cached": -29198661.586716596
+        },
+        {
+          "addr": "I8",
+          "formula_or_raw": "=IF(H8>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A9",
+          "formula_or_raw": 5,
+          "cached": 5
+        },
+        {
+          "addr": "B9",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A9-1)",
+          "cached": 128791.64438212501
+        },
+        {
+          "addr": "C9",
+          "formula_or_raw": "=B9*입력값!B21",
+          "cached": 24856787.365750127
+        },
+        {
+          "addr": "D9",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E9",
+          "formula_or_raw": "=IF(A9=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F9",
+          "formula_or_raw": "=IF(A9<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A9<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G9",
+          "formula_or_raw": "=C9-D9-E9-F9",
+          "cached": 10715598.929058533
+        },
+        {
+          "addr": "H9",
+          "formula_or_raw": "=H8+G9",
+          "cached": -18483062.657658063
+        },
+        {
+          "addr": "I9",
+          "formula_or_raw": "=IF(H9>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A10",
+          "formula_or_raw": 6,
+          "cached": 6
+        },
+        {
+          "addr": "B10",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A10-1)",
+          "cached": 128147.68616021439
+        },
+        {
+          "addr": "C10",
+          "formula_or_raw": "=B10*입력값!B21",
+          "cached": 24732503.42892138
+        },
+        {
+          "addr": "D10",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E10",
+          "formula_or_raw": "=IF(A10=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F10",
+          "formula_or_raw": "=IF(A10<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A10<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G10",
+          "formula_or_raw": "=C10-D10-E10-F10",
+          "cached": 10591314.992229786
+        },
+        {
+          "addr": "H10",
+          "formula_or_raw": "=H9+G10",
+          "cached": -7891747.665428277
+        },
+        {
+          "addr": "I10",
+          "formula_or_raw": "=IF(H10>=0,\"회수완료\",\"\")",
+          "cached": null
+        },
+        {
+          "addr": "A11",
+          "formula_or_raw": 7,
+          "cached": 7
+        },
+        {
+          "addr": "B11",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A11-1)",
+          "cached": 127506.94772941331
+        },
+        {
+          "addr": "C11",
+          "formula_or_raw": "=B11*입력값!B21",
+          "cached": 24608840.91177677
+        },
+        {
+          "addr": "D11",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E11",
+          "formula_or_raw": "=IF(A11=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F11",
+          "formula_or_raw": "=IF(A11<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A11<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G11",
+          "formula_or_raw": "=C11-D11-E11-F11",
+          "cached": 10467652.475085177
+        },
+        {
+          "addr": "H11",
+          "formula_or_raw": "=H10+G11",
+          "cached": 2575904.8096568994
+        },
+        {
+          "addr": "I11",
+          "formula_or_raw": "=IF(H11>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A12",
+          "formula_or_raw": 8,
+          "cached": 8
+        },
+        {
+          "addr": "B12",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A12-1)",
+          "cached": 126869.41299076624
+        },
+        {
+          "addr": "C12",
+          "formula_or_raw": "=B12*입력값!B21",
+          "cached": 24485796.707217883
+        },
+        {
+          "addr": "D12",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E12",
+          "formula_or_raw": "=IF(A12=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F12",
+          "formula_or_raw": "=IF(A12<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A12<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G12",
+          "formula_or_raw": "=C12-D12-E12-F12",
+          "cached": 10344608.27052629
+        },
+        {
+          "addr": "H12",
+          "formula_or_raw": "=H11+G12",
+          "cached": 12920513.08018319
+        },
+        {
+          "addr": "I12",
+          "formula_or_raw": "=IF(H12>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A13",
+          "formula_or_raw": 9,
+          "cached": 9
+        },
+        {
+          "addr": "B13",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A13-1)",
+          "cached": 126235.06592581242
+        },
+        {
+          "addr": "C13",
+          "formula_or_raw": "=B13*입력값!B21",
+          "cached": 24363367.723681796
+        },
+        {
+          "addr": "D13",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E13",
+          "formula_or_raw": "=IF(A13=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F13",
+          "formula_or_raw": "=IF(A13<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A13<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G13",
+          "formula_or_raw": "=C13-D13-E13-F13",
+          "cached": 10222179.286990203
+        },
+        {
+          "addr": "H13",
+          "formula_or_raw": "=H12+G13",
+          "cached": 23142692.367173392
+        },
+        {
+          "addr": "I13",
+          "formula_or_raw": "=IF(H13>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A14",
+          "formula_or_raw": 10,
+          "cached": 10
+        },
+        {
+          "addr": "B14",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A14-1)",
+          "cached": 125603.89059618335
+        },
+        {
+          "addr": "C14",
+          "formula_or_raw": "=B14*입력값!B21",
+          "cached": 24241550.885063387
+        },
+        {
+          "addr": "D14",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E14",
+          "formula_or_raw": "=IF(A14=입력값!B23,입력값!B28,0)",
+          "cached": 7000000
+        },
+        {
+          "addr": "F14",
+          "formula_or_raw": "=IF(A14<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A14<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G14",
+          "formula_or_raw": "=C14-D14-E14-F14",
+          "cached": 3100362.448371794
+        },
+        {
+          "addr": "H14",
+          "formula_or_raw": "=H13+G14",
+          "cached": 26243054.815545186
+        },
+        {
+          "addr": "I14",
+          "formula_or_raw": "=IF(H14>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A15",
+          "formula_or_raw": 11,
+          "cached": 11
+        },
+        {
+          "addr": "B15",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A15-1)",
+          "cached": 124975.87114320244
+        },
+        {
+          "addr": "C15",
+          "formula_or_raw": "=B15*입력값!B21",
+          "cached": 24120343.13063807
+        },
+        {
+          "addr": "D15",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E15",
+          "formula_or_raw": "=IF(A15=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F15",
+          "formula_or_raw": "=IF(A15<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A15<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G15",
+          "formula_or_raw": "=C15-D15-E15-F15",
+          "cached": 9979154.693946477
+        },
+        {
+          "addr": "H15",
+          "formula_or_raw": "=H14+G15",
+          "cached": 36222209.50949167
+        },
+        {
+          "addr": "I15",
+          "formula_or_raw": "=IF(H15>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A16",
+          "formula_or_raw": 12,
+          "cached": 12
+        },
+        {
+          "addr": "B16",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A16-1)",
+          "cached": 124350.99178748642
+        },
+        {
+          "addr": "C16",
+          "formula_or_raw": "=B16*입력값!B21",
+          "cached": 23999741.41498488
+        },
+        {
+          "addr": "D16",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E16",
+          "formula_or_raw": "=IF(A16=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F16",
+          "formula_or_raw": "=IF(A16<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A16<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G16",
+          "formula_or_raw": "=C16-D16-E16-F16",
+          "cached": 9858552.978293285
+        },
+        {
+          "addr": "H16",
+          "formula_or_raw": "=H15+G16",
+          "cached": 46080762.48778495
+        },
+        {
+          "addr": "I16",
+          "formula_or_raw": "=IF(H16>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A17",
+          "formula_or_raw": 13,
+          "cached": 13
+        },
+        {
+          "addr": "B17",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A17-1)",
+          "cached": 123729.236828549
+        },
+        {
+          "addr": "C17",
+          "formula_or_raw": "=B17*입력값!B21",
+          "cached": 23879742.707909957
+        },
+        {
+          "addr": "D17",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E17",
+          "formula_or_raw": "=IF(A17=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F17",
+          "formula_or_raw": "=IF(A17<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A17<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G17",
+          "formula_or_raw": "=C17-D17-E17-F17",
+          "cached": 9738554.271218363
+        },
+        {
+          "addr": "H17",
+          "formula_or_raw": "=H16+G17",
+          "cached": 55819316.75900331
+        },
+        {
+          "addr": "I17",
+          "formula_or_raw": "=IF(H17>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A18",
+          "formula_or_raw": 14,
+          "cached": 14
+        },
+        {
+          "addr": "B18",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A18-1)",
+          "cached": 123110.59064440626
+        },
+        {
+          "addr": "C18",
+          "formula_or_raw": "=B18*입력값!B21",
+          "cached": 23760343.99437041
+        },
+        {
+          "addr": "D18",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E18",
+          "formula_or_raw": "=IF(A18=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F18",
+          "formula_or_raw": "=IF(A18<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A18<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G18",
+          "formula_or_raw": "=C18-D18-E18-F18",
+          "cached": 9619155.557678815
+        },
+        {
+          "addr": "H18",
+          "formula_or_raw": "=H17+G18",
+          "cached": 65438472.31668213
+        },
+        {
+          "addr": "I18",
+          "formula_or_raw": "=IF(H18>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A19",
+          "formula_or_raw": 15,
+          "cached": 15
+        },
+        {
+          "addr": "B19",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A19-1)",
+          "cached": 122495.03769118423
+        },
+        {
+          "addr": "C19",
+          "formula_or_raw": "=B19*입력값!B21",
+          "cached": 23641542.274398558
+        },
+        {
+          "addr": "D19",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E19",
+          "formula_or_raw": "=IF(A19=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F19",
+          "formula_or_raw": "=IF(A19<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A19<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G19",
+          "formula_or_raw": "=C19-D19-E19-F19",
+          "cached": 9500353.837706964
+        },
+        {
+          "addr": "H19",
+          "formula_or_raw": "=H18+G19",
+          "cached": 74938826.1543891
+        },
+        {
+          "addr": "I19",
+          "formula_or_raw": "=IF(H19>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A20",
+          "formula_or_raw": 16,
+          "cached": 16
+        },
+        {
+          "addr": "B20",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A20-1)",
+          "cached": 121882.56250272831
+        },
+        {
+          "addr": "C20",
+          "formula_or_raw": "=B20*입력값!B21",
+          "cached": 23523334.563026562
+        },
+        {
+          "addr": "D20",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E20",
+          "formula_or_raw": "=IF(A20=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F20",
+          "formula_or_raw": "=IF(A20<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A20<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G20",
+          "formula_or_raw": "=C20-D20-E20-F20",
+          "cached": 9382146.126334969
+        },
+        {
+          "addr": "H20",
+          "formula_or_raw": "=H19+G20",
+          "cached": 84320972.28072406
+        },
+        {
+          "addr": "I20",
+          "formula_or_raw": "=IF(H20>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A21",
+          "formula_or_raw": 17,
+          "cached": 17
+        },
+        {
+          "addr": "B21",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A21-1)",
+          "cached": 121273.14969021466
+        },
+        {
+          "addr": "C21",
+          "formula_or_raw": "=B21*입력값!B21",
+          "cached": 23405717.89021143
+        },
+        {
+          "addr": "D21",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E21",
+          "formula_or_raw": "=IF(A21=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F21",
+          "formula_or_raw": "=IF(A21<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A21<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G21",
+          "formula_or_raw": "=C21-D21-E21-F21",
+          "cached": 9264529.453519836
+        },
+        {
+          "addr": "H21",
+          "formula_or_raw": "=H20+G21",
+          "cached": 93585501.7342439
+        },
+        {
+          "addr": "I21",
+          "formula_or_raw": "=IF(H21>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A22",
+          "formula_or_raw": 18,
+          "cached": 18
+        },
+        {
+          "addr": "B22",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A22-1)",
+          "cached": 120666.78394176358
+        },
+        {
+          "addr": "C22",
+          "formula_or_raw": "=B22*입력값!B21",
+          "cached": 23288689.300760373
+        },
+        {
+          "addr": "D22",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E22",
+          "formula_or_raw": "=IF(A22=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F22",
+          "formula_or_raw": "=IF(A22<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A22<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G22",
+          "formula_or_raw": "=C22-D22-E22-F22",
+          "cached": 9147500.86406878
+        },
+        {
+          "addr": "H22",
+          "formula_or_raw": "=H21+G22",
+          "cached": 102733002.59831268
+        },
+        {
+          "addr": "I22",
+          "formula_or_raw": "=IF(H22>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A23",
+          "formula_or_raw": 19,
+          "cached": 19
+        },
+        {
+          "addr": "B23",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A23-1)",
+          "cached": 120063.45002205478
+        },
+        {
+          "addr": "C23",
+          "formula_or_raw": "=B23*입력값!B21",
+          "cached": 23172245.85425657
+        },
+        {
+          "addr": "D23",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E23",
+          "formula_or_raw": "=IF(A23=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F23",
+          "formula_or_raw": "=IF(A23<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A23<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G23",
+          "formula_or_raw": "=C23-D23-E23-F23",
+          "cached": 9031057.417564977
+        },
+        {
+          "addr": "H23",
+          "formula_or_raw": "=H22+G23",
+          "cached": 111764060.01587765
+        },
+        {
+          "addr": "I23",
+          "formula_or_raw": "=IF(H23>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A24",
+          "formula_or_raw": 20,
+          "cached": 20
+        },
+        {
+          "addr": "B24",
+          "formula_or_raw": "=입력값!B18*(1-입력값!B22)^(A24-1)",
+          "cached": 119463.1327719445
+        },
+        {
+          "addr": "C24",
+          "formula_or_raw": "=B24*입력값!B21",
+          "cached": 23056384.62498529
+        },
+        {
+          "addr": "D24",
+          "formula_or_raw": "=입력값!B29",
+          "cached": 2000000
+        },
+        {
+          "addr": "E24",
+          "formula_or_raw": "=IF(A24=입력값!B23,입력값!B28,0)",
+          "cached": 0
+        },
+        {
+          "addr": "F24",
+          "formula_or_raw": "=IF(A24<=입력값!$B$12,입력값!$B$9*입력값!$B$10,IF(A24<=입력값!$B$11,-PMT(입력값!$B$10,입력값!$B$11-입력값!$B$12,입력값!$B$9),0))",
+          "cached": 12141188.436691593
+        },
+        {
+          "addr": "G24",
+          "formula_or_raw": "=C24-D24-E24-F24",
+          "cached": 8915196.188293695
+        },
+        {
+          "addr": "H24",
+          "formula_or_raw": "=H23+G24",
+          "cached": 120679256.20417134
+        },
+        {
+          "addr": "I24",
+          "formula_or_raw": "=IF(H24>=0,\"회수완료\",\"\")",
+          "cached": "회수완료"
+        },
+        {
+          "addr": "A26",
+          "formula_or_raw": "※ 대출상환: 거치기간 중 이자만 납부, 이후 원리금균등상환",
+          "cached": "※ 대출상환: 거치기간 중 이자만 납부, 이후 원리금균등상환"
+        }
+      ]
+    },
+    {
+      "name": "수익성지표",
+      "max_row": 30,
+      "max_col": 7,
+      "cells": [
+        {
+          "addr": "A1",
+          "formula_or_raw": "💰 수익성 지표 요약",
+          "cached": "💰 수익성 지표 요약"
+        },
+        {
+          "addr": "E1",
+          "formula_or_raw": "연차",
+          "cached": "연차"
+        },
+        {
+          "addr": "F1",
+          "formula_or_raw": "순현금흐름",
+          "cached": "순현금흐름"
+        },
+        {
+          "addr": "G1",
+          "formula_or_raw": "누적현금흐름",
+          "cached": "누적현금흐름"
+        },
+        {
+          "addr": "E2",
+          "formula_or_raw": "=연간분석!A4",
+          "cached": 0
+        },
+        {
+          "addr": "F2",
+          "formula_or_raw": "=연간분석!G4",
+          "cached": -90000000
+        },
+        {
+          "addr": "G2",
+          "formula_or_raw": "=연간분석!H4",
+          "cached": -90000000
+        },
+        {
+          "addr": "A3",
+          "formula_or_raw": "[투자 요약]",
+          "cached": "[투자 요약]"
+        },
+        {
+          "addr": "E3",
+          "formula_or_raw": "=연간분석!A5",
+          "cached": 1
+        },
+        {
+          "addr": "F3",
+          "formula_or_raw": "=연간분석!G5",
+          "cached": 16780200
+        },
+        {
+          "addr": "G3",
+          "formula_or_raw": "=연간분석!H5",
+          "cached": -73219800
+        },
+        {
+          "addr": "A4",
+          "formula_or_raw": "총 투자비",
+          "cached": "총 투자비"
+        },
+        {
+          "addr": "B4",
+          "formula_or_raw": "=입력값!B6",
+          "cached": 230000000
+        },
+        {
+          "addr": "C4",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E4",
+          "formula_or_raw": "=연간분석!A6",
+          "cached": 2
+        },
+        {
+          "addr": "F4",
+          "formula_or_raw": "=연간분석!G6",
+          "cached": 16653399
+        },
+        {
+          "addr": "G4",
+          "formula_or_raw": "=연간분석!H6",
+          "cached": -56566401
+        },
+        {
+          "addr": "A5",
+          "formula_or_raw": "자기자본",
+          "cached": "자기자본"
+        },
+        {
+          "addr": "B5",
+          "formula_or_raw": "=입력값!B8",
+          "cached": 90000000
+        },
+        {
+          "addr": "C5",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E5",
+          "formula_or_raw": "=연간분석!A7",
+          "cached": 3
+        },
+        {
+          "addr": "F5",
+          "formula_or_raw": "=연간분석!G7",
+          "cached": 16527232.004999999
+        },
+        {
+          "addr": "G5",
+          "formula_or_raw": "=연간분석!H7",
+          "cached": -40039168.995000005
+        },
+        {
+          "addr": "A6",
+          "formula_or_raw": "대출금",
+          "cached": "대출금"
+        },
+        {
+          "addr": "B6",
+          "formula_or_raw": "=입력값!B9",
+          "cached": 140000000
+        },
+        {
+          "addr": "C6",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E6",
+          "formula_or_raw": "=연간분석!A8",
+          "cached": 4
+        },
+        {
+          "addr": "F6",
+          "formula_or_raw": "=연간분석!G8",
+          "cached": 10840507.408283409
+        },
+        {
+          "addr": "G6",
+          "formula_or_raw": "=연간분석!H8",
+          "cached": -29198661.586716596
+        },
+        {
+          "addr": "A7",
+          "formula_or_raw": "1년차 예상 매출",
+          "cached": "1년차 예상 매출"
+        },
+        {
+          "addr": "B7",
+          "formula_or_raw": "=연간분석!C5",
+          "cached": 25360200
+        },
+        {
+          "addr": "C7",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E7",
+          "formula_or_raw": "=연간분석!A9",
+          "cached": 5
+        },
+        {
+          "addr": "F7",
+          "formula_or_raw": "=연간분석!G9",
+          "cached": 10715598.929058533
+        },
+        {
+          "addr": "G7",
+          "formula_or_raw": "=연간분석!H9",
+          "cached": -18483062.657658063
+        },
+        {
+          "addr": "A8",
+          "formula_or_raw": "1년차 예상 순현금흐름",
+          "cached": "1년차 예상 순현금흐름"
+        },
+        {
+          "addr": "B8",
+          "formula_or_raw": "=연간분석!G5",
+          "cached": 16780200
+        },
+        {
+          "addr": "C8",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E8",
+          "formula_or_raw": "=연간분석!A10",
+          "cached": 6
+        },
+        {
+          "addr": "F8",
+          "formula_or_raw": "=연간분석!G10",
+          "cached": 10591314.992229786
+        },
+        {
+          "addr": "G8",
+          "formula_or_raw": "=연간분석!H10",
+          "cached": -7891747.665428277
+        },
+        {
+          "addr": "A9",
+          "formula_or_raw": "20년 총 순현금흐름",
+          "cached": "20년 총 순현금흐름"
+        },
+        {
+          "addr": "B9",
+          "formula_or_raw": "=SUM(연간분석!G4:G24)",
+          "cached": 120679256.20417134
+        },
+        {
+          "addr": "C9",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E9",
+          "formula_or_raw": "=연간분석!A11",
+          "cached": 7
+        },
+        {
+          "addr": "F9",
+          "formula_or_raw": "=연간분석!G11",
+          "cached": 10467652.475085177
+        },
+        {
+          "addr": "G9",
+          "formula_or_raw": "=연간분석!H11",
+          "cached": 2575904.8096568994
+        },
+        {
+          "addr": "E10",
+          "formula_or_raw": "=연간분석!A12",
+          "cached": 8
+        },
+        {
+          "addr": "F10",
+          "formula_or_raw": "=연간분석!G12",
+          "cached": 10344608.27052629
+        },
+        {
+          "addr": "G10",
+          "formula_or_raw": "=연간분석!H12",
+          "cached": 12920513.08018319
+        },
+        {
+          "addr": "A11",
+          "formula_or_raw": "[수익성 지표]",
+          "cached": "[수익성 지표]"
+        },
+        {
+          "addr": "E11",
+          "formula_or_raw": "=연간분석!A13",
+          "cached": 9
+        },
+        {
+          "addr": "F11",
+          "formula_or_raw": "=연간분석!G13",
+          "cached": 10222179.286990203
+        },
+        {
+          "addr": "G11",
+          "formula_or_raw": "=연간분석!H13",
+          "cached": 23142692.367173392
+        },
+        {
+          "addr": "A12",
+          "formula_or_raw": "단순 회수기간",
+          "cached": "단순 회수기간"
+        },
+        {
+          "addr": "B12",
+          "formula_or_raw": "=입력값!B8/연간분석!G5",
+          "cached": 5.36346408266886
+        },
+        {
+          "addr": "C12",
+          "formula_or_raw": "년",
+          "cached": "년"
+        },
+        {
+          "addr": "E12",
+          "formula_or_raw": "=연간분석!A14",
+          "cached": 10
+        },
+        {
+          "addr": "F12",
+          "formula_or_raw": "=연간분석!G14",
+          "cached": 3100362.448371794
+        },
+        {
+          "addr": "G12",
+          "formula_or_raw": "=연간분석!H14",
+          "cached": 26243054.815545186
+        },
+        {
+          "addr": "A13",
+          "formula_or_raw": "실제 회수 연차",
+          "cached": "실제 회수 연차"
+        },
+        {
+          "addr": "B13",
+          "formula_or_raw": "=MATCH(TRUE,INDEX(연간분석!H4:H24>=0,0),0)-1",
+          "cached": 7
+        },
+        {
+          "addr": "C13",
+          "formula_or_raw": "년차",
+          "cached": "년차"
+        },
+        {
+          "addr": "E13",
+          "formula_or_raw": "=연간분석!A15",
+          "cached": 11
+        },
+        {
+          "addr": "F13",
+          "formula_or_raw": "=연간분석!G15",
+          "cached": 9979154.693946477
+        },
+        {
+          "addr": "G13",
+          "formula_or_raw": "=연간분석!H15",
+          "cached": 36222209.50949167
+        },
+        {
+          "addr": "A14",
+          "formula_or_raw": "IRR (내부수익률)",
+          "cached": "IRR (내부수익률)"
+        },
+        {
+          "addr": "B14",
+          "formula_or_raw": "=IRR(연간분석!G4:G24)",
+          "cached": 0.11859448154492336
+        },
+        {
+          "addr": "E14",
+          "formula_or_raw": "=연간분석!A16",
+          "cached": 12
+        },
+        {
+          "addr": "F14",
+          "formula_or_raw": "=연간분석!G16",
+          "cached": 9858552.978293285
+        },
+        {
+          "addr": "G14",
+          "formula_or_raw": "=연간분석!H16",
+          "cached": 46080762.48778495
+        },
+        {
+          "addr": "A15",
+          "formula_or_raw": "NPV (순현재가치)",
+          "cached": "NPV (순현재가치)"
+        },
+        {
+          "addr": "B15",
+          "formula_or_raw": "=NPV(입력값!B14,연간분석!G5:G24)+연간분석!G4",
+          "cached": 48506449.99683812
+        },
+        {
+          "addr": "C15",
+          "formula_or_raw": "원",
+          "cached": "원"
+        },
+        {
+          "addr": "E15",
+          "formula_or_raw": "=연간분석!A17",
+          "cached": 13
+        },
+        {
+          "addr": "F15",
+          "formula_or_raw": "=연간분석!G17",
+          "cached": 9738554.271218363
+        },
+        {
+          "addr": "G15",
+          "formula_or_raw": "=연간분석!H17",
+          "cached": 55819316.75900331
+        },
+        {
+          "addr": "A16",
+          "formula_or_raw": "총 수익률 (20년)",
+          "cached": "총 수익률 (20년)"
+        },
+        {
+          "addr": "B16",
+          "formula_or_raw": "=SUM(연간분석!G4:G24)/입력값!B8",
+          "cached": 1.3408806244907927
+        },
+        {
+          "addr": "E16",
+          "formula_or_raw": "=연간분석!A18",
+          "cached": 14
+        },
+        {
+          "addr": "F16",
+          "formula_or_raw": "=연간분석!G18",
+          "cached": 9619155.557678815
+        },
+        {
+          "addr": "G16",
+          "formula_or_raw": "=연간분석!H18",
+          "cached": 65438472.31668213
+        },
+        {
+          "addr": "E17",
+          "formula_or_raw": "=연간분석!A19",
+          "cached": 15
+        },
+        {
+          "addr": "F17",
+          "formula_or_raw": "=연간분석!G19",
+          "cached": 9500353.837706964
+        },
+        {
+          "addr": "G17",
+          "formula_or_raw": "=연간분석!H19",
+          "cached": 74938826.1543891
+        },
+        {
+          "addr": "A18",
+          "formula_or_raw": "[분석 차트]",
+          "cached": "[분석 차트]"
+        },
+        {
+          "addr": "E18",
+          "formula_or_raw": "=연간분석!A20",
+          "cached": 16
+        },
+        {
+          "addr": "F18",
+          "formula_or_raw": "=연간분석!G20",
+          "cached": 9382146.126334969
+        },
+        {
+          "addr": "G18",
+          "formula_or_raw": "=연간분석!H20",
+          "cached": 84320972.28072406
+        },
+        {
+          "addr": "E19",
+          "formula_or_raw": "=연간분석!A21",
+          "cached": 17
+        },
+        {
+          "addr": "F19",
+          "formula_or_raw": "=연간분석!G21",
+          "cached": 9264529.453519836
+        },
+        {
+          "addr": "G19",
+          "formula_or_raw": "=연간분석!H21",
+          "cached": 93585501.7342439
+        },
+        {
+          "addr": "E20",
+          "formula_or_raw": "=연간분석!A22",
+          "cached": 18
+        },
+        {
+          "addr": "F20",
+          "formula_or_raw": "=연간분석!G22",
+          "cached": 9147500.86406878
+        },
+        {
+          "addr": "G20",
+          "formula_or_raw": "=연간분석!H22",
+          "cached": 102733002.59831268
+        },
+        {
+          "addr": "E21",
+          "formula_or_raw": "=연간분석!A23",
+          "cached": 19
+        },
+        {
+          "addr": "F21",
+          "formula_or_raw": "=연간분석!G23",
+          "cached": 9031057.417564977
+        },
+        {
+          "addr": "G21",
+          "formula_or_raw": "=연간분석!H23",
+          "cached": 111764060.01587765
+        },
+        {
+          "addr": "E22",
+          "formula_or_raw": "=연간분석!A24",
+          "cached": 20
+        },
+        {
+          "addr": "F22",
+          "formula_or_raw": "=연간분석!G24",
+          "cached": 8915196.188293695
+        },
+        {
+          "addr": "G22",
+          "formula_or_raw": "=연간분석!H24",
+          "cached": 120679256.20417134
+        }
+      ]
+    }
+  ]
+}
