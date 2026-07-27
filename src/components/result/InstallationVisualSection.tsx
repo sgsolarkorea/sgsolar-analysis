@@ -23,7 +23,7 @@ function reviewPointsFor(installType: string): string[] {
 export default function InstallationVisualSection() {
   const { metrics, capacity, installType } = useResultMetrics();
   const visual = resolveInstallVisual(installType);
-  const usable = metrics.usableAreaSqm ?? metrics.roofUsableAreaSqm;
+  const usable = metrics.usableAreaSqm ?? metrics.roofUsableAreaSqm ?? metrics.baseAreaSqm;
   const points = reviewPointsFor(installType);
 
   return (
